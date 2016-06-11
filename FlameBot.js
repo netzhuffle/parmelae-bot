@@ -99,6 +99,42 @@ class FlameBot {
     }
 
     if (message.text) {
+      if (/PogChamp/i.test(message.text)) {
+        this.reply(new Sticker('BQADBAADRwADA3PcAonWVpUYQn7wAg'), message);
+      }
+
+      if (/BibleThump/i.test(message.text)) {
+        this.reply(new Sticker('BQADBAADSQADA3PcAuf5fC5IUsSIAg'), message);
+      }
+
+      if (/HeyGuys/i.test(message.text)) {
+        this.reply(new Sticker('BQADBAADUQADA3PcAsD2jUlwP50BAg'), message);
+      }
+
+      if (/4Head/i.test(message.text)) {
+        this.reply(new Sticker('BQADBAADTwADA3PcAgVaAAGYwr1AIAI'), message);
+      }
+
+      if (/ShazBotstix/i.test(message.text)) {
+        this.reply(new Sticker('BQADBAADVQADA3PcAqRaDEgkvdLoAg'), message);
+      }
+
+      if (/SwiftRage/i.test(message.text)) {
+        this.reply(new Sticker('BQADAgAD8AEAAmqovAHW7GujCT1lnAI'), message);
+      }
+
+      if (/Kreygasm/i.test(message.text)) {
+        this.reply(new Sticker('BQADAgAD3gEAAmqovAFEyUScVyeAAwI'), message);
+      }
+
+      if (/Kappa/i.test(message.text)) {
+        this.reply(new Sticker('BQADAgAD2gEAAmqovAFX0dUOG-jIjgI'), message);
+      }
+
+      if (/Keepo/i.test(message.text)) {
+        this.reply(new Sticker('BQADAgAD3AEAAmqovAEo-y3Y0w0D7AI'), message);
+      }
+
       const repliesMatch = this.replies.search(message.text);
       if (repliesMatch) {
         this.reply(repliesMatch, message);

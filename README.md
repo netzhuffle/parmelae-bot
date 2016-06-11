@@ -1,7 +1,9 @@
-# Flame Bot
+# Nachtchad Bot
 
-A Telegram bot that flames everything! Available as
-[@CoredumpFlameBot](https://telegram.me/CoredumpFlameBot)
+The second most polite bot you’ve ever seen on Telegram. Loves Twitch and the
+RocketBeans Nacht Chad. Based on
+[coredump-ch/telegram-flame-bot](https://github.com/coredump-ch/telegram-flame-bot)
+and available as [@NachtChadBot](https://telegram.me/NachtChadBot)
 
 # Developing
 
