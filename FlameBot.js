@@ -99,6 +99,12 @@ class FlameBot {
     }
 
     if (message.text) {
+      if (this.lastMessage === message.text) {
+        this.telegram.sendMessage(message.chat.id, message.text);
+      } else {
+        this.lastMessage = message.text;
+      }
+
       if (/PogChamp/i.test(message.text)) {
         this.reply(new Sticker('BQADBAADRwADA3PcAonWVpUYQn7wAg'), message);
       }
@@ -152,6 +158,14 @@ class FlameBot {
           return;
         }
       });
+    }
+
+    if (message.sticker) {
+      if (this.lastMessage === message.sticker.file_id) {
+        this.telegram.sendSticker(message.chat.id, message.sticker.file_id);
+      } else {
+        this.lastMessage = message.sticker.file_id;
+      }
     }
 
     if (Math.random() < this.flameRate) {
