@@ -147,11 +147,6 @@ class FlameBot {
         return;
       }
 
-      if (/mue?tt?(er|i)/i.test(message.text)) {
-        this.reply('HANI MUETTER GHÖRT??!', message);
-        return;
-      }
-
       this.usernamePromise.then((username) => {
         if (new RegExp(username, 'i').test(message.text)) {
           this.replyRandomInsult(message, message.from);
