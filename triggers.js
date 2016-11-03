@@ -30,20 +30,29 @@ const replies = new Map([
   ],
   [
     /SwiftRage/i,
-    new Sticker('BQADAgAD8AEAAmqovAHW7GujCT1lnAI'),
+    new Sticker('BQADAQADowADObDtBTtlb93L3s8qAg'),
   ],
   [
     /Kreygasm/i,
-    new Sticker('BQADAgAD3gEAAmqovAFEyUScVyeAAwI'),
+    new Sticker('BQADAQADzwADObDtBZeZpn9zkazLAg'),
   ],
   [
     /Kappa/i,
-    new Sticker('BQADAgAD2gEAAmqovAFX0dUOG-jIjgI'),
+    new Sticker('BQADAQADGwADObDtBYvEvLz-j3q-Ag'),
   ],
   [
-    /Keepo/i,
-    new Sticker('BQADAgAD3AEAAmqovAEo-y3Y0w0D7AI'),
+    /FailFish/i,
+    new Sticker('BQADAQADngADObDtBeUbVNB4kV6oAg'),
   ],
+  [
+    /NotLikeThis/i,
+    new Sticker('BQADAQADLwADObDtBQdMrRY67IxCAg'),
+  ],
+  [
+    /NomNom/i,
+    new Sticker('BQADAQADnQEAAjmw7QX_YWZsHQzazwI'),
+  ],
+
 ]);
 
 /**
