@@ -99,10 +99,15 @@ class FlameBot {
     }
 
     if (message.text) {
-      if (this.lastMessage === message.text) {
+      if (this.lastMessage && this.lastMessage.text === message.text && this.lastMessage.from.first_name !== message.from.first_name) {
         this.telegram.sendMessage(message.chat.id, message.text);
+        delete this.lastMessage;
       } else {
-        this.lastMessage = message.text;
+        /**
+         * The last message
+         * @type {Object}
+         */
+        this.lastMessage = message;
       }
 
       if (/PogChamp/i.test(message.text)) {
@@ -155,10 +160,11 @@ class FlameBot {
     }
 
     if (message.sticker) {
-      if (this.lastMessage === message.sticker.file_id) {
+      if (this.lastMessage && this.lastMessage.sticker && this.lastMessage.sticker.file_id === message.sticker.file_id && this.lastMessage.from.first_name !== message.from.first_name) {
         this.telegram.sendSticker(message.chat.id, message.sticker.file_id);
+        delete this.lastMessage;
       } else {
-        this.lastMessage = message.sticker.file_id;
+        this.lastMessage = message;
       }
     }
 
