@@ -3,7 +3,6 @@
 const FuzzySet = require('fuzzyset.js');
 const Sticker = require('./Sticker');
 
-// jscs:disable requireTrailingComma
 /**
  * Insult reply map
  * Key: insult, value: corresponding reply
@@ -12,11 +11,10 @@ const Sticker = require('./Sticker');
 const insults = new Map([
   [
     '❤️',
-    [new Sticker('BQADBAADLgADA3PcAuCVGZCipKVwAg')]
+    [new Sticker('BQADBAADLgADA3PcAuCVGZCipKVwAg')],
   ],
 ]);
 
-// jscs:enable requireTrailingComma
 /**
  * FuzzySet with insult replies
  * @type {Object}

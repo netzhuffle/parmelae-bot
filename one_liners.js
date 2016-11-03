@@ -16,7 +16,7 @@ const insults = [
  * @param {string} userName - The user's name who should be insulted
  * @returns {(string|Sticker)} A random insult text or sticker
  */
-exports.getRandomInsult = function (userName) {
+module.exports.getRandomInsult = function (userName) {
   const insult = insults[Math.floor(Math.random() * insults.length)];
   if (insult instanceof Sticker) {
     return insult;
