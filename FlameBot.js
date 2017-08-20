@@ -13,8 +13,9 @@ class FlameBot {
    * @param {Object} triggers - The triggers dependency
    * @param {Object} replies - The replies dependency
    * @param {Object} telegram - The telegram bot API dependency
+   * @param {Object} cmd - The cmd dependency
    */
-  constructor(flameRate, oneLiners, triggers, replies, telegram) {
+  constructor(flameRate, oneLiners, triggers, replies, telegram, cmd) {
     /**
      * The chance how often the bot flames back on a message (1 = 100 %)
      * @type {number}
@@ -36,10 +37,15 @@ class FlameBot {
      */
     this.replies = replies;
     /**
-     * The telegram telegram dependency
+     * The telegram dependency
      * @type {Object}
      */
     this.telegram = telegram;
+    /**
+     * The cmd dependency
+     * @type {Object}
+     */
+    this.cmd = cmd;
 
     /**
      * The bots username as a Promise
@@ -105,6 +111,10 @@ class FlameBot {
     }
 
     if (message.text) {
+      if (message.text.startsWith('/')) {
+        this.handleCommand(message);
+      }
+
       if (this.lastMessage && this.lastMessage.text === message.text && this.lastMessage.from.first_name !== message.from.first_name) {
         this.telegram.sendMessage(message.chat.id, message.text);
         delete this.lastMessage;
@@ -145,6 +155,35 @@ class FlameBot {
 
     if (Math.random() < this.flameRate) {
       this.replyRandomInsult(message, message.from);
+    }
+  }
+
+  /**
+   * Handles a command
+   *
+   * @param {Object} message - The message with a command
+   */
+  handleCommand(message) {
+    if (message.chat.id === -126749874) {
+      if (message.text.startsWith('/startminecraft')) {
+        this.cmd.get('./cmd/startminecraft', (error, data, stderr) => {
+          this.reply(data, message);
+        });
+      } else if (message.text.startsWith('/stopminecraft')) {
+        this.cmd.get('./cmd/stopminecraft', (error, data, stderr) => {
+          this.reply(data, message);
+        });
+      } else if (message.text.startsWith('/backupminecraft')) {
+        this.cmd.get('./cmd/backupminecraft', (error, data, stderr) => {
+          this.reply(data, message);
+        });
+      } else if (message.text.startsWith('/statusminecraft')) {
+        this.cmd.get('./cmd/statusminecraft', (error, data, stderr) => {
+          this.reply(data, message);
+        });
+      }
+    } else {
+      this.reply('Sorry, ich höre nur im Banden-Chat auf Kommandos.');
     }
   }
 }
