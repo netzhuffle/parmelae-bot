@@ -138,7 +138,7 @@ class FlameBot {
       }
 
       this.usernamePromise.then(username => {
-        if (new RegExp(username, 'i').test(message.text)) {
+        if ((!message.text || !message.text.startsWith('/')) && new RegExp(username, 'i').test(message.text)) {
           this.replyRandomInsult(message, message.from);
         }
       });

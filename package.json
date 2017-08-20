@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "fuzzyset.js": "0.0.1",
+    "node-cmd": "^3.0.0",
     "node-telegram-bot-api": "^0.23.3"
   },
   "private": true,
