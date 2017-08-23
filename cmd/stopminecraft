@@ -1,1 +1,2 @@
-mscs stop Bande; ./backupminecraft
+#!/bin/sh
+mscs stop Bande; ./cmd/backupminecraft
