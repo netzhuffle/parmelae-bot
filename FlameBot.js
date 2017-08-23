@@ -167,19 +167,19 @@ class FlameBot {
     if (message.chat.id === -126749874) {
       if (message.text.startsWith('/startminecraft')) {
         this.cmd.get('./cmd/startminecraft', (error, data, stderr) => {
-          this.reply(data, message);
+          this.reply(data + stderr, message);
         });
       } else if (message.text.startsWith('/stopminecraft')) {
         this.cmd.get('./cmd/stopminecraft', (error, data, stderr) => {
-          this.reply(data, message);
+          this.reply(data + stderr, message);
         });
       } else if (message.text.startsWith('/backupminecraft')) {
         this.cmd.get('./cmd/backupminecraft', (error, data, stderr) => {
-          this.reply(data, message);
+          this.reply(data + stderr, message);
         });
       } else if (message.text.startsWith('/statusminecraft')) {
         this.cmd.get('./cmd/statusminecraft', (error, data, stderr) => {
-          this.reply(data, message);
+          this.reply(data + stderr, message);
         });
       }
     } else {
