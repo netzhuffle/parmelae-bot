@@ -137,6 +137,98 @@ class FlameBot {
         return;
       }
 
+      let adjectives = [
+        'Gummy',
+        'Pink',
+        'Pink',
+        'Pink',
+        'Jelly',
+        'Funny',
+        'Cute',
+        'Sweet',
+        'Double',
+        'Juicy',
+        'Icy',
+        'Angel',
+        'Gummy',
+        'Quarter',
+        '90 %',
+        'Junior',
+        'Hot',
+        'Swiss',
+        'Muffin',
+        'Butter',
+        'Chicken',
+        'Baby',
+        'Unicorn',
+        'Sugar',
+        'Honey',
+        'Toffee',
+        'Berry',
+        'Itsy Bitsy',
+        'Lil',
+        'Swooping'
+      ];
+
+      let nouns = [
+        'Worm',
+        'Bear',
+        'Unicorn',
+        'Unicorn',
+        'Pinky',
+        'Pinky',
+        'Pinky',
+        'Peach',
+        'Roll',
+        'Gum',
+        'Stardust',
+        'Marshmallow',
+        'Baby',
+        'Gummy',
+        'Budding',
+        'Twix',
+        'Snickers',
+        'WTF',
+        'Cookie',
+        'Cake',
+        'Niffler',
+        'Swooping Evil',
+        'Evil',
+        'Carrot',
+        'Lady',
+        'Lady',
+        'Pimpkin',
+        'Pie',
+        'Kitty',
+        'Mouse',
+        'Rabbit',
+        'Otter',
+        'Beauty',
+        'Snow White',
+        'Bee',
+        'Bug',
+        'Grasshopper',
+        'Occamy',
+        'Ponny',
+        'Powny',
+        'Wonwon',
+        'Lavender',
+        'Tinkerbell',
+        'Bluebell',
+        'Lovely',
+        'Chiquitita',
+        'Face',
+        'Snuggles',
+        'Charmy'
+      ];
+
+      if (/<Spitzname>/i.test(message.text)) {
+        var adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+        var noun = nouns[Math.floor(Math.random() * nouns.length)];
+        this.reply(`${adjective} ${noun}`, message);
+        return;
+      }
+
       this.usernamePromise.then(username => {
         if ((!message.text || !message.text.startsWith('/')) && new RegExp(username, 'i').test(message.text)) {
           this.replyRandomInsult(message, message.from);
