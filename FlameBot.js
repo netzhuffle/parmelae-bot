@@ -12,10 +12,11 @@ class FlameBot {
      * @param {Object} oneLiners - The oneLiners dependency
      * @param {Object} triggers - The triggers dependency
      * @param {Object} replies - The replies dependency
+     * @param {Object} nicknames - The nicknames dependency
      * @param {Object} telegram - The telegram bot API dependency
      * @param {Object} cmd - The cmd dependency
      */
-    constructor(flameRate, oneLiners, triggers, replies, telegram, cmd) {
+    constructor(flameRate, oneLiners, triggers, replies, nicknames, telegram, cmd) {
         /**
          * The chance how often the bot flames back on a message (1 = 100 %)
          * @type {number}
@@ -41,6 +42,11 @@ class FlameBot {
          * @type {Object}
          */
         this.telegram = telegram;
+        /**
+         * The nicknames dependency
+         * @type {Object}
+         */
+        this.nicknames = nicknames;
         /**
          * The cmd dependency
          * @type {Object}
@@ -137,95 +143,8 @@ class FlameBot {
                 return;
             }
 
-            let adjectives = [
-                'Gummy',
-                'Pink',
-                'Pink',
-                'Pink',
-                'Jelly',
-                'Funny',
-                'Cute',
-                'Sweet',
-                'Double',
-                'Juicy',
-                'Icy',
-                'Angel',
-                'Gummy',
-                'Quarter',
-                '90 %',
-                'Junior',
-                'Hot',
-                'Swiss',
-                'Muffin',
-                'Butter',
-                'Chicken',
-                'Baby',
-                'Unicorn',
-                'Sugar',
-                'Honey',
-                'Toffee',
-                'Berry',
-                'Itsy Bitsy',
-                'Lil',
-                'Swooping'
-            ];
-
-            let nouns = [
-                'Worm',
-                'Bear',
-                'Unicorn',
-                'Unicorn',
-                'Pinky',
-                'Pinky',
-                'Pinky',
-                'Peach',
-                'Roll',
-                'Gum',
-                'Stardust',
-                'Marshmallow',
-                'Baby',
-                'Gummy',
-                'Budding',
-                'Twix',
-                'Snickers',
-                'WTF',
-                'Cookie',
-                'Cake',
-                'Niffler',
-                'Swooping Evil',
-                'Evil',
-                'Carrot',
-                'Lady',
-                'Lady',
-                'Pimpkin',
-                'Pie',
-                'Kitty',
-                'Mouse',
-                'Rabbit',
-                'Otter',
-                'Beauty',
-                'Snow White',
-                'Bee',
-                'Bug',
-                'Grasshopper',
-                'Occamy',
-                'Ponny',
-                'Powny',
-                'Wonwon',
-                'Lavender',
-                'Tinkerbell',
-                'Bluebell',
-                'Lovely',
-                'Chiquitita',
-                'Face',
-                'Snuggles',
-                'Charmy'
-            ];
-
             if (/<Spitzname>/i.test(message.text)) {
-                var adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-                var noun = nouns[Math.floor(Math.random() * nouns.length)];
-                this.reply(`${adjective} ${noun}`, message);
+                this.reply(this.nicknames.getNickname(), message);
                 return;
             }
 
