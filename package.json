@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "fuzzyset.js": "0.0.1",
-    "node-cmd": "^3.0.0",
-    "node-telegram-bot-api": "^0.23.3"
+    "fuzzyset.js": "^1.0.6",
+    "node-cmd": "^5.0.0",
+    "node-telegram-bot-api": "^0.54.0"
   },
   "private": true,
   "jscsConfig": {

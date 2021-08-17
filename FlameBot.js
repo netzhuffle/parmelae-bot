@@ -177,19 +177,19 @@ class FlameBot {
     handleCommand(message) {
         if (message.chat.id === -104936118) {
             if (message.text.startsWith('/startminecraft')) {
-                this.cmd.get('/home/jannis/telegram-nachtchad-bot/cmd/startminecraft', (error, data, stderr) => {
+                this.cmd.run('/home/jannis/telegram-nachtchad-bot/cmd/startminecraft', (error, data, stderr) => {
                     this.reply(data + stderr, message);
                 });
             } else if (message.text.startsWith('/stopminecraft')) {
-                this.cmd.get('/home/jannis/telegram-nachtchad-bot/cmd/stopminecraft', (error, data, stderr) => {
+                this.cmd.run('/home/jannis/telegram-nachtchad-bot/cmd/stopminecraft', (error, data, stderr) => {
                     this.reply(data + stderr, message);
                 });
             } else if (message.text.startsWith('/backupminecraft')) {
-                this.cmd.get('/home/jannis/telegram-nachtchad-bot/cmd/backupminecraft', (error, data, stderr) => {
+                this.cmd.run('/home/jannis/telegram-nachtchad-bot/cmd/backupminecraft', (error, data, stderr) => {
                     this.reply(data + stderr, message);
                 });
             } else if (message.text.startsWith('/statusminecraft')) {
-                this.cmd.get('/home/jannis/telegram-nachtchad-bot/cmd/statusminecraft', (error, data, stderr) => {
+                this.cmd.run('/home/jannis/telegram-nachtchad-bot/cmd/statusminecraft', (error, data, stderr) => {
                     this.reply(data + stderr, message);
                 });
             }
