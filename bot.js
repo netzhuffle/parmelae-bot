@@ -9,6 +9,6 @@ const TelegramBot = require('node-telegram-bot-api');
 const cmd = require('node-cmd');
 
 const flameRate = 0.0001;
-const telegram = new TelegramBot(config.token, { polling: true });
+const telegram = new TelegramBot(config.token, {polling: true});
 const flameBot = new FlameBot(flameRate, oneLiners, triggers, replies, telegram, cmd);
 flameBot.start();

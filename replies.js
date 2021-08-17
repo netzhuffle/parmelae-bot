@@ -9,10 +9,10 @@ const Sticker = require('./Sticker');
  * @type {Map}
  */
 const insults = new Map([
-  [
-    '❤️',
-    [new Sticker('BQADBAADLgADA3PcAuCVGZCipKVwAg')],
-  ],
+    [
+        '❤️',
+        [new Sticker('BQADBAADLgADA3PcAuCVGZCipKVwAg')],
+    ],
 ]);
 
 /**
@@ -27,16 +27,16 @@ const fuzzy = FuzzySet([...insults.keys()]);
  * @returns {(string|Sticker|undefined)} A reply or undefined if query not found
  */
 module.exports.search = function (query) {
-  let match = fuzzy.get(query);
-  if (!match) {
-    return;
-  }
+    let match = fuzzy.get(query);
+    if (!match) {
+        return;
+    }
 
-  let score = match[0][0];
-  if (score > 0.5) {
-    let result = match[0][1];
-    let possibleCounters = insults.get(result);
-    return possibleCounters[Math.floor(Math.random() * possibleCounters.length)];
-  }
+    let score = match[0][0];
+    if (score > 0.5) {
+        let result = match[0][1];
+        let possibleCounters = insults.get(result);
+        return possibleCounters[Math.floor(Math.random() * possibleCounters.length)];
+    }
 };
 

@@ -8,7 +8,7 @@ const Sticker = require('./Sticker.js');
  * @type {Array.<(string|Sticker)>}
  */
 const insults = [
-  new Sticker('CAACAgQAAxkBAAEDe-9hHCedKTkqD5q28fNC_QPskmoeggACCQADGzHQB7YWKGObHwqcIAQ'),
+    new Sticker('CAACAgQAAxkBAAEDe-9hHCedKTkqD5q28fNC_QPskmoeggACCQADGzHQB7YWKGObHwqcIAQ'),
     new Sticker('CAACAgQAAxkBAAEDe_FhHChKNUTKx7ClLPi8LnVqgBoWiwACFwADGzHQB5n_p7uFvNX5IAQ'),
     new Sticker('CAACAgQAAxkBAAEDe_NhHChfR2GXOEgazyGQMcBgh3-N2QACIgADGzHQB1MGbzrur3htIAQ'),
     new Sticker('CAACAgQAAxkBAAEDe_lhHCh9Kdw_A0QQb2bFMZ1iXirfswACQAADGzHQBzQQuA1tKXrKIAQ'),
@@ -22,11 +22,11 @@ const insults = [
  * @returns {(string|Sticker)} A random insult text or sticker
  */
 module.exports.getRandomInsult = function (userName) {
-  const insult = insults[Math.floor(Math.random() * insults.length)];
-  if (insult instanceof Sticker) {
-    return insult;
-  }
+    const insult = insults[Math.floor(Math.random() * insults.length)];
+    if (insult instanceof Sticker) {
+        return insult;
+    }
 
-  return insult.replace(/%u%/g, userName);
+    return insult.replace(/%u%/g, userName);
 };
 
