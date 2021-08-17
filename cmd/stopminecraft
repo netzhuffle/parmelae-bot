@@ -1,2 +1,3 @@
 #!/bin/sh
-mscs stop Bande; ./cmd/backupminecraft
+sudo /usr/local/bin/mscs stop zebenwusch; /home/jannis/telegram-nachtchad-bot/cmd/backupminecraft
+

@@ -1,2 +1,5 @@
-#!/bin/sh
-mscs backup Bande; mscs map Bande
+#!/bin/bash
+#sudo /usr/local/bin/mscs backup zebenwusch
+#echo "https://zebenwusch.jannis.rocks/"
+sudo /usr/local/bin/mscs backup zebenwusch && sudo /usr/local/bin/mscs map zebenwusch && echo "https://jannis.rocks/maps/zebenwusch/"
+

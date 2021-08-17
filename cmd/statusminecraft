@@ -1,2 +1,3 @@
 #!/bin/sh
-mscs status Bande
+sudo /usr/local/bin/mscs status zebenwusch
+
