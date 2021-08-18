@@ -161,7 +161,7 @@ class FlameBot {
             }
 
             this.usernamePromise.then(username => {
-                const usernameRegex = new RegExp(`^(.*)( ${username}|${username} )(.*)$`, 'i');
+                const usernameRegex = new RegExp(`^(.*)( @${username}|@${username} )(.*)$`, 'i');
                 const matches = message.text.match(usernameRegex);
                 if (matches) {
                     this.wit.message(`${matches[1]}${matches[3]}`).then(data => {
