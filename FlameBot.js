@@ -211,8 +211,10 @@ class FlameBot {
         } else {
             this.reply('Unbekannter Befehl', message);
         }
+        if (process) {
             process.stdout.on('data', (data) => this.telegram.sendMessage(message.chat.id, data.toString()));
             process.stderr.on('data', (data) => this.telegram.sendMessage(message.chat.id, `Fehler: ${data.toString()}`));
+        }
     }
 }
 
