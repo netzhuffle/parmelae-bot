@@ -188,7 +188,7 @@ class FlameBot {
                     }
                     this.wit.message(witMessage).then(data => {
                         const intents = data.intents;
-                        if (intents) {
+                        if (intents && intents[0]) {
                             const intent = intents[0].name;
                             this.handleCommand(intent, message);
                         }
