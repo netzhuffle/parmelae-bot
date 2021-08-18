@@ -183,8 +183,8 @@ class FlameBot {
                 if (matches) {
                     const [, part1, part2] = matches;
                     let witMessage = part1 + part2;
-                    if (part1.endsWith(' ') && part2.startsWith(' ')) {
-                        witMessage = part1 + part2.substring(1);
+                    if (part1.endsWith(' ')) {
+                        witMessage = part1.substring(0, part1.length - 1) + part2;
                     }
                     this.wit.message(witMessage).then(data => {
                         const intents = data.intents;
