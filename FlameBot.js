@@ -124,14 +124,7 @@ class FlameBot {
         }
 
         if (message.text) {
-            if (message.text.startsWith('/')) {
-                if (message.chat.id === -104936118) {
-                    this.handleCommand(message.text.match(/^\/(.*)@?/)[1], message);
-                } else {
-                    this.reply('Sorry, ich höre nur im Schi-Parmelä-Chat auf Kommandos.', message);
-                }
-                return;
-            }
+            this.usernamePromise.then(username => this.handleUsernameMessage(message, username));
 
             if (this.lastMessage && this.lastMessage.text === message.text && this.lastMessage.from.first_name !== message.from.first_name) {
                 this.telegram.sendMessage(message.chat.id, message.text);
@@ -159,17 +152,6 @@ class FlameBot {
                 this.reply(this.nicknames.getNickname(), message);
                 return;
             }
-
-            this.usernamePromise.then(username => {
-                const usernameRegex = new RegExp(`^(.*)( @${username}|@${username} )(.*)$`, 'i');
-                const matches = message.text.match(usernameRegex);
-                if (matches) {
-                    this.wit.message(`${matches[1]}${matches[3]}`).then(data => {
-                        const intent = data.intents[0].name;
-                        this.handleCommand(intent, message);
-                    });
-                }
-            });
         }
 
         if (message.sticker) {
@@ -183,6 +165,38 @@ class FlameBot {
 
         if (Math.random() < this.flameRate) {
             this.replyRandomInsult(message, message.from);
+        }
+    }
+
+    /**
+     * Handles a message containing the bots name
+     * @param {Object} message Telegram message
+     * @param {string} username The bots username
+     */
+    handleUsernameMessage(message, username) {
+        if (message.chat.id === -104936118 && message.text.includes(username)) {
+            if (message.text.startsWith('/')) {
+                this.handleCommand(message.text.match(/^\/(.*)@/)[1], message);
+            } else {
+                const usernameRegex = new RegExp(`^(.*)@${username}(.*)$`, 'i');
+                const matches = message.text.match(usernameRegex);
+                if (matches) {
+                    const [, part1, part2] = matches;
+                    let witMessage = part1 + part2;
+                    if (part1.endsWith(' ') && part2.startsWith(' ')) {
+                        witMessage = part1 + part2.substring(1);
+                    }
+                    this.wit.message(witMessage).then(data => {
+                        const intents = data.intents;
+                        if (intents) {
+                            const intent = intents[0].name;
+                            this.handleCommand(intent, message);
+                        }
+                    });
+                }
+            }
+        } else if (message.chat.id !== -104936118 && message.text.startsWith('/')) {
+            this.reply('Sorry, ich höre nur im Schi-Parmelä-Chat auf Kommandos.', message);
         }
     }
 
