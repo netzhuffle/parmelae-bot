@@ -14,9 +14,9 @@ class FlameBot {
      * @param {Object} replies - The replies dependency
      * @param {Object} nicknames - The nicknames dependency
      * @param {Object} telegram - The telegram bot API dependency
-     * @param {Object} cmd - The cmd dependency
+     * @param {function(string):ChildProcess} spawn - The child_process spawn function
      */
-    constructor(flameRate, oneLiners, triggers, replies, nicknames, telegram, cmd) {
+    constructor(flameRate, oneLiners, triggers, replies, nicknames, telegram, spawn) {
         /**
          * The chance how often the bot flames back on a message (1 = 100 %)
          * @type {number}
@@ -48,10 +48,10 @@ class FlameBot {
          */
         this.nicknames = nicknames;
         /**
-         * The cmd dependency
+         * The child_process spawn function
          * @type {Object}
          */
-        this.cmd = cmd;
+        this.spawn = spawn;
 
         /**
          * The bots username as a Promise
@@ -71,6 +71,7 @@ class FlameBot {
         this.telegram.on('message', (message) => {
             this.handleMessage(message);
         });
+        this.telegram.on('polling_error', console.log);
     }
 
     /**
@@ -118,7 +119,12 @@ class FlameBot {
 
         if (message.text) {
             if (message.text.startsWith('/')) {
-                this.handleCommand(message);
+                if (message.chat.id === -104936118) {
+                    this.handleCommand(message.text.match(/^\/(.*)@/)[1], message);
+                } else {
+                    this.reply('Sorry, ich höre nur im Schi-Parmelä-Chat auf Kommandos.', message);
+                }
+                return;
             }
 
             if (this.lastMessage && this.lastMessage.text === message.text && this.lastMessage.from.first_name !== message.from.first_name) {
@@ -149,7 +155,7 @@ class FlameBot {
             }
 
             this.usernamePromise.then(username => {
-                if ((!message.text || !message.text.startsWith('/')) && new RegExp(username, 'i').test(message.text)) {
+                if (new RegExp(username, 'i').test(message.text)) {
                     this.replyRandomInsult(message, message.from);
                 }
             });
@@ -172,29 +178,29 @@ class FlameBot {
     /**
      * Handles a command
      *
-     * @param {Object} message - The message with a command
+     * @param {string} command - The command
+     * @param {Object} message - The message to reply to
      */
-    handleCommand(message) {
-        if (message.chat.id === -104936118) {
-            if (message.text.startsWith('/startminecraft')) {
-                this.cmd.run('/home/jannis/telegram-nachtchad-bot/cmd/startminecraft', (error, data, stderr) => {
-                    this.reply(data + stderr, message);
-                });
-            } else if (message.text.startsWith('/stopminecraft')) {
-                this.cmd.run('/home/jannis/telegram-nachtchad-bot/cmd/stopminecraft', (error, data, stderr) => {
-                    this.reply(data + stderr, message);
-                });
-            } else if (message.text.startsWith('/backupminecraft')) {
-                this.cmd.run('/home/jannis/telegram-nachtchad-bot/cmd/backupminecraft', (error, data, stderr) => {
-                    this.reply(data + stderr, message);
-                });
-            } else if (message.text.startsWith('/statusminecraft')) {
-                this.cmd.run('/home/jannis/telegram-nachtchad-bot/cmd/statusminecraft', (error, data, stderr) => {
-                    this.reply(data + stderr, message);
-                });
-            }
+    handleCommand(command, message) {
+        let process;
+        if (command === 'startminecraft') {
+            this.reply('Starte Zebenwusch …', message);
+            process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/startminecraft');
+        } else if (command === 'stopminecraft') {
+            this.reply('Stoppe & backuppe Zebenwusch …', message);
+            process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/stopminecraft');
+        } else if (command === 'backupminecraft') {
+            this.reply('Backuppe Zebenwusch …', message);
+            process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/backupminecraft');
+        } else if (command === 'statusminecraft') {
+            this.reply('Prüfe Serverstatus …', message);
+            process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/statusminecraft');
+        }
+        if (process) {
+            process.stdout.on('data', (data) => this.telegram.sendMessage(message.chat.id, data.toString()));
+            process.stderr.on('data', (data) => this.telegram.sendMessage(message.chat.id, `Fehler: ${data.toString()}`));
         } else {
-            this.reply('Sorry, ich höre nur im Schi-Parmelä-Chat auf Kommandos.');
+            this.reply('Unbekannter Befehl', message);
         }
     }
 }
