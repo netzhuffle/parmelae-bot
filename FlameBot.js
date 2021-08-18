@@ -191,6 +191,8 @@ class FlameBot {
                         if (intents && intents[0]) {
                             const intent = intents[0].name;
                             this.handleCommand(intent, message);
+                        } else {
+                            this.reply('Sorry, das verstehe ich (noch?) nicht.', message);
                         }
                     });
                 }
