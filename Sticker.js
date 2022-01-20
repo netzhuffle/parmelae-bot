@@ -3,7 +3,7 @@
 /**
  * A telegram sticker
  */
-class Sticker {
+export class Sticker {
     /**
      * Constructs a sticker
      * @param {string} fileId - The telegram sticker’s file_id
@@ -12,5 +12,3 @@ class Sticker {
         this.fileId = fileId;
     }
 }
-
-module.exports = Sticker;

@@ -1,6 +1,6 @@
 'use strict';
 
-const Sticker = require('./Sticker.js');
+import {Sticker} from './Sticker.js';
 
 /**
  * Stickers and one liner text insults
@@ -16,17 +16,19 @@ const insults = [
     new Sticker('CAACAgQAAxkBAAEDfAdhHCivPudpZv2nvYcOywciVkGdNwACPwADmu78Apk-SGoCcKTzIAQ'),
 ];
 
-/**
- * Returns a random insult
- * @param {string} userName - The user's name who should be insulted
- * @returns {(string|Sticker)} A random insult text or sticker
- */
-module.exports.getRandomInsult = function (userName) {
-    const insult = insults[Math.floor(Math.random() * insults.length)];
-    if (insult instanceof Sticker) {
-        return insult;
-    }
+export default {
+    /**
+     * Returns a random insult
+     * @param {string} userName - The user's name who should be insulted
+     * @returns {(string|Sticker)} A random insult text or sticker
+     */
+    getRandomInsult: function (userName) {
+        const insult = insults[Math.floor(Math.random() * insults.length)];
+        if (insult instanceof Sticker) {
+            return insult;
+        }
 
-    return insult.replace(/%u%/g, userName);
+        return insult.replace(/%u%/g, userName);
+    }
 };
 

@@ -1,7 +1,5 @@
 'use strict';
 
-const Sticker = require('./Sticker.js');
-
 /**
  * Adjectives: First word of nickname
  * @type {Array.<string>}
@@ -95,14 +93,16 @@ let nouns = [
     'Charmy'
 ];
 
-/**
- * Returns a random nickname
- * @returns {string} A random nickname
- */
-module.exports.getNickname = function () {
-    var adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-    var noun = nouns[Math.floor(Math.random() * nouns.length)];
+export default {
+    /**
+     * Returns a random nickname
+     * @returns {string} A random nickname
+     */
+    getNickname: function () {
+        var adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+        var noun = nouns[Math.floor(Math.random() * nouns.length)];
 
-    return `${adjective} ${noun}`;
+        return `${adjective} ${noun}`;
+    }
 };
 

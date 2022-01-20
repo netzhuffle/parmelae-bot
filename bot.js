@@ -1,17 +1,22 @@
 'use strict';
 
-const {telegramToken, witToken} = require('./config.js');
-const oneLiners = require('./one_liners.js');
-const triggers = require('./triggers.js');
-const replies = require('./replies.js');
-const nicknames = require('./nicknames');
-const {spawn} = require('child_process');
-const FlameBot = require('./FlameBot.js');
-const TelegramBot = require('node-telegram-bot-api');
-const {Wit} = require('node-wit');
+import {openAiKey, telegramToken, witToken} from './config.js';
+import oneLiners from './one_liners.js';
+import triggers from './triggers.js';
+import nicknames from './nicknames.js';
+import gpt3 from './gpt3.js';
+import {spawn} from 'child_process';
+import {FlameBot} from './FlameBot.js';
+import TelegramBot from 'node-telegram-bot-api';
+import nodeWitPackage from 'node-wit';
+import openAiPackage from '@dalenguyen/openai';
 
-const flameRate = 0.0001;
+const {Wit} = nodeWitPackage;
+const {OpenAI} = openAiPackage;
+
+const flameRate = 0.03;
 const telegram = new TelegramBot(telegramToken, {polling: true});
 const wit = new Wit({accessToken: witToken});
-const flameBot = new FlameBot(flameRate, oneLiners, triggers, replies, nicknames, telegram, spawn, wit);
+const openAi = new OpenAI(openAiKey);
+const flameBot = new FlameBot(flameRate, oneLiners, triggers, nicknames, gpt3, telegram, spawn, wit, openAi);
 flameBot.start();

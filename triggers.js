@@ -1,6 +1,6 @@
 'use strict';
 
-const Sticker = require('./Sticker');
+import {Sticker} from './Sticker.js';
 
 /**
  * Trigger reply map
@@ -61,12 +61,14 @@ const replies = new Map([
  */
 const triggers = [...replies.keys()];
 
-/**
- * Checks if triggers match and returns the according replies
- * @param {string} query - A query text
- * @returns {Array<string|Sticker>} A reply or undefined if query not found
- */
-module.exports.search = function (query) {
-    const matches = triggers.filter(trigger => trigger.test(query));
-    return matches.map(match => replies.get(match));
+export default {
+    /**
+     * Checks if triggers match and returns the according replies
+     * @param {string} query - A query text
+     * @returns {Array<string|Sticker>} A reply or undefined if query not found
+     */
+    search: function (query) {
+        const matches = triggers.filter(trigger => trigger.test(query));
+        return matches.map(match => replies.get(match));
+    }
 };
