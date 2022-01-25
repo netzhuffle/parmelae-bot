@@ -174,7 +174,7 @@ export class FlameBot {
             }
         }
 
-        if (Math.random() < this.flameRate / 10) {
+        if (Math.random() < this.flameRate / 100) {
             this.replyRandomInsult(message, message.from);
         }
     }
@@ -202,7 +202,7 @@ export class FlameBot {
                     const intent = intents[0].name;
                     this.handleCommand(intent, message);
                 } else {
-                    this.reply('Entschuldigen Sie, das verstehe ich bedaurlicherweise (noch?) nicht.', message);
+                    this.gpt3.reply(witMessage, text => this.reply(text, message), this.openAi);
                 }
             });
         }
@@ -216,7 +216,7 @@ export class FlameBot {
      */
     handleCommand(command, message) {
         if (command === 'info') {
-            this.reply('Sie können mich nach dem aktuellen Status von Zebenwusch fragen oder mich bitten, Zebenwusch zu starten, zu stoppen oder zu backuppen.', message);
+            this.reply('Sie können mich nach dem aktuellen Status von Minecraft fragen oder mich bitten, Skycreate zu starten, zu stoppen oder zu backuppen.', message);
             return;
         }
         if (command === 'comment') {
@@ -227,16 +227,24 @@ export class FlameBot {
             this.gpt3.reply(message.reply_to_message.text, (text) => this.reply(text, message), this.openAi);
             return;
         }
+        if (command === 'complete') {
+            if (!message.reply_to_message || !message.reply_to_message.text) {
+                this.reply('Ich würde gerne fortfahren, aber dazu müssen Sie mich in einer Antwort auf einen meiner Texte darum bitten, s’il vous plait.', message);
+                return;
+            }
+            this.gpt3.continue(message.reply_to_message.text, (text) => this.reply(text, message), this.openAi);
+            return;
+        }
 
         let process;
         if (command === 'startminecraft') {
-            this.reply('Starte Zebenwusch …', message);
+            this.reply('Starte Skycreate …', message);
             process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/startminecraft');
         } else if (command === 'stopminecraft') {
-            this.reply('Stoppe & backuppe Zebenwusch …', message);
+            this.reply('Stoppe & backuppe Skycreate …', message);
             process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/stopminecraft');
         } else if (command === 'backupminecraft') {
-            this.reply('Backuppe Zebenwusch …', message);
+            this.reply('Backuppe Skycreate …', message);
             process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/backupminecraft');
         } else if (command === 'statusminecraft') {
             this.reply('Prüfe Serverstatus …', message);

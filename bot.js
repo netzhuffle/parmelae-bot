@@ -14,7 +14,7 @@ import openAiPackage from '@dalenguyen/openai';
 const {Wit} = nodeWitPackage;
 const {OpenAI} = openAiPackage;
 
-const flameRate = 0.03;
+const flameRate = 0.035;
 const telegram = new TelegramBot(telegramToken, {polling: true});
 const wit = new Wit({accessToken: witToken});
 const openAi = new OpenAI(openAiKey);
