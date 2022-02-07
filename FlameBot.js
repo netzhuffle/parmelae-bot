@@ -202,7 +202,7 @@ export class FlameBot {
                     const intent = intents[0].name;
                     this.handleCommand(intent, message);
                 } else {
-                    this.gpt3.reply(witMessage, text => this.reply(text, message), this.openAi);
+                    this.gpt3.replyCheaper(witMessage, text => this.reply(text, message), this.openAi);
                 }
             });
         }
