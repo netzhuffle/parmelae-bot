@@ -1,5 +1,8 @@
 'use strict';
 
+/** Maximale Anzahl Tokens, die GPT-3 generieren soll */
+const MAX_TOKENS = 256;
+
 export default {
     /**
      * Asks GPT-3 to generate a reply
@@ -15,6 +18,7 @@ export default {
 
         if (text.length >= 400) {
             callback('Entschuldigen Sie bitte, aber der Text ist zu lang. GPT-3 kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …');
+            return;
         }
 
         const textOnOneLine = text.replace(/\n/, ' ').trim();
@@ -52,7 +56,7 @@ User: https://www.youtube.com/watch?v=Qp9es-qnt8k
 Parmelä: Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam anschauen.
 
 User: ${textOnOneLine}
-Parmelä:`, temperature: 0.9, max_tokens: 64, stop: ["User:", "Parmelä:"]
+Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:"]
         }).then((completion) => {
             const response = completion && completion.choices && completion.choices.length && completion.choices[0].text;
             const trimmed = response.trim();
@@ -77,6 +81,7 @@ Parmelä:`, temperature: 0.9, max_tokens: 64, stop: ["User:", "Parmelä:"]
 
         if (text.length >= 400) {
             callback('Entschuldigen Sie bitte, aber der Text ist zu lang. GPT-3 kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …');
+            return;
         }
 
         const textOnOneLine = text.replace(/\n/, ' ').trim();
@@ -114,7 +119,7 @@ User: https://www.youtube.com/watch?v=Qp9es-qnt8k
 Parmelä: Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam anschauen.
 
 User: ${textOnOneLine}
-Parmelä:`, temperature: 0.9, max_tokens: 64, stop: ["User:", "Parmelä:"]
+Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:"]
         }).then((completion) => {
             const response = completion && completion.choices && completion.choices.length && completion.choices[0].text;
             const trimmed = response.trim();
@@ -140,6 +145,7 @@ Parmelä:`, temperature: 0.9, max_tokens: 64, stop: ["User:", "Parmelä:"]
 
         if (text.length >= 600) {
             callback('Entschuldigen Sie bitte, aber der Text ist bereits zu lang. GPT-3 kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …');
+            return;
         }
 
         const textOnOneLine = text.replace(/\n/, ' ').trim();
@@ -155,12 +161,14 @@ Parmelä: Seit dem 1. Januar 2019 bin ich Vorsteher des Eidgenössischen Departe
 Parmelä: Ja, das ist Alain Berset. Ich erkenne ihn sofort.
 Parmelä: Wir werden uns dass Thema bei der nächsten Bundesratssitzung gemeinsam anschauen.
 Parmelä: Ohne Sicherheit gibt es keine Wohlfahrt. Ohne Sicherheit wird die Wirtschaft gebremst. Dann können wir auch keine Sozialleistungen mehr finanzieren.
-Parmelä: ${textOnOneLine}`, temperature: 0.9, max_tokens: 64, stop: ["Parmelä:"]
+Parmelä: ${textOnOneLine}`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["Parmelä:"]
         }).then((completion) => {
             const response = completion && completion.choices && completion.choices.length && completion.choices[0].text;
             const trimmed = response.trimEnd();
             if (trimmed) {
                 callback(textOnOneLine + trimmed);
+            } else {
+                callback('Ich habe bereits fertig.');
             }
         })
             .catch((error) => console.error(error));
