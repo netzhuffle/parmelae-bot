@@ -188,7 +188,7 @@ export class FlameBot {
             this.handleCommand(message.text.match(/^\/(.*)@/)[1], message);
             return;
         }
-        const usernameRegex = new RegExp(`^(.*)@${this.username}(.*)$`, 'i');
+        const usernameRegex = new RegExp(`^(.*)@${this.username}(.*)$`, 'is');
         const matches = message.text.match(usernameRegex);
         if (matches) {
             const [, part1, part2] = matches;
