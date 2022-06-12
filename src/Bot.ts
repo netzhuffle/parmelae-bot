@@ -9,6 +9,8 @@ import {OneLiners} from "./OneLiners";
 import {Nicknames} from "./Nicknames";
 import {Gpt3} from "./Gpt3";
 import {Triggers} from "./Triggers";
+import {ReplyStrategyFinder} from "./ReplyStrategies/ReplyStrategyFinder";
+import {NullReplyStrategy} from "./ReplyStrategies/NullReplyStrategy";
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;
@@ -23,6 +25,7 @@ export class Bot {
     /** The last sent message */
     private lastMessage: TelegramBot.Message | null = null;
 
+    private readonly replyStrategyFinder: ReplyStrategyFinder;
     private readonly oneLiners: OneLiners;
     private readonly triggers: Triggers;
     private readonly nicknames: Nicknames;
@@ -31,17 +34,17 @@ export class Bot {
     private readonly wit: Wit;
     private readonly openAi: OpenAIApi;
 
-    /**
-     * Constructs the flame bot
-     * @param oneLiners
-     * @param triggers
-     * @param nicknames
-     * @param gpt3
-     * @param telegram
-     * @param wit
-     * @param openAi
-     */
-    constructor(oneLiners: OneLiners, triggers: Triggers, nicknames: Nicknames, gpt3: Gpt3, telegram: TelegramBot, wit: Wit, openAi: OpenAIApi) {
+    constructor(
+        replyStrategyFinder: ReplyStrategyFinder,
+        oneLiners: OneLiners,
+        triggers: Triggers,
+        nicknames: Nicknames,
+        gpt3: Gpt3,
+        telegram: TelegramBot,
+        wit: Wit,
+        openAi: OpenAIApi
+    ) {
+        this.replyStrategyFinder = replyStrategyFinder;
         this.oneLiners = oneLiners;
         this.triggers = triggers;
         this.nicknames = nicknames;
@@ -99,11 +102,13 @@ export class Bot {
     handleMessage(message: TelegramBot.Message): void {
         assert(this.username);
 
-        // To find a sticker id: Send it to the bot in private chat
-        if (message.chat.type === 'private' && message.sticker) {
-            this.reply('Sticker file_id: ' + message.sticker.file_id, message);
+        const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
+        replyStrategy.handle(message, this.reply);
+
+        if (!(replyStrategy instanceof NullReplyStrategy)) {
             return;
         }
+        // This is a temporary fallthrough until all handlers have been converted to ReplyStrategies.
 
         if (message.new_chat_members) {
             message.new_chat_members.forEach(member => {
