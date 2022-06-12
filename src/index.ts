@@ -5,7 +5,7 @@ import oneLiners from './one_liners';
 import triggers from './triggers';
 import nicknames from './nicknames';
 import gpt3 from './gpt3';
-import {FlameBot} from './FlameBot';
+import {Bot} from './Bot';
 import TelegramBot from 'node-telegram-bot-api';
 import {Wit} from 'node-wit';
 import {Configuration, OpenAIApi} from 'openai';
@@ -17,5 +17,5 @@ const openAi = new OpenAIApi(new Configuration({
     apiKey: openAiKey
 }));
 
-const flameBot = new FlameBot(flameRate, oneLiners, triggers, nicknames, gpt3, telegram, wit, openAi);
+const flameBot = new Bot(flameRate, oneLiners, triggers, nicknames, gpt3, telegram, wit, openAi);
 flameBot.start();

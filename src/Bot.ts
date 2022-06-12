@@ -10,7 +10,7 @@ import assert from "assert";
 /**
  * The most helpful bot in the world
  */
-export class FlameBot {
+export class Bot {
     /** The chance how often the bot flames back on a message (1 = 100 %) */
     private readonly flameRate: number;
     /** The username, as soon as its available */
