@@ -1,5 +1,3 @@
-'use strict';
-
 import {singleton} from "tsyringe";
 
 /** Adjectives: First word of nickname */

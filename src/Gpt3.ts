@@ -1,5 +1,3 @@
-'use strict';
-
 import {OpenAIApi} from "openai";
 import {singleton} from "tsyringe";
 

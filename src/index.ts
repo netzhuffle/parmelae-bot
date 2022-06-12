@@ -1,5 +1,3 @@
-'use strict';
-
 import 'reflect-metadata';
 import {openAiKey, telegramToken, witToken} from '../config';
 import {Bot} from './Bot';

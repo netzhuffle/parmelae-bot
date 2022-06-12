@@ -1,5 +1,3 @@
-'use strict';
-
 import {Sticker} from './Sticker';
 import TelegramBot from "node-telegram-bot-api";
 import {spawn} from "child_process";

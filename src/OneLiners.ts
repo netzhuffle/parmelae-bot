@@ -1,5 +1,3 @@
-'use strict';
-
 import {Sticker} from './Sticker';
 import {singleton} from "tsyringe";
 
