@@ -1,18 +1,21 @@
 'use strict';
 
 import {OpenAIApi} from "openai";
+import {singleton} from "tsyringe";
 
 /** Maximum number of tokens to generate by GPT-3 */
 const MAX_TOKENS = 256;
 
-export default {
+/** GPT-3 Service */
+@singleton()
+export class Gpt3 {
     /**
      * Asks GPT-3 to generate a reply
      * @param text - A query text
      * @param callback - The callback for successful execution, called with response text
      * @param openAi - The OpenAI-Dependency
      */
-    reply: function (text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
+    reply(text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
         if (!text) {
             return;
         }
@@ -66,7 +69,7 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
                 callback('Ich bin sprachlos.');
             }
         }).catch((error) => console.error(error));
-    },
+    }
 
     /**
      * Asks GPT-3 to generate a reply with a more cost efficient model
@@ -74,7 +77,7 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
      * @param callback - The callback for successful execution, called with response text
      * @param openAi - The OpenAI-Dependency
      */
-    replyCheaper: function (text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
+    replyCheaper(text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
         if (!text) {
             return;
         }
@@ -128,7 +131,7 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
                 callback('Ich bin sprachlos.');
             }
         }).catch((error) => console.error(error));
-    },
+    }
 
 
     /**
@@ -137,7 +140,7 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
      * @param callback - The callback for successful execution, called with the text (old & new)
      * @param openAi - The OpenAI-Dependency
      */
-    continue: function (text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
+    continue(text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
         if (!text) {
             return;
         }
@@ -170,4 +173,4 @@ Parmelä: ${text}`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["Parmelä:"
             }
         }).catch((error) => console.error(error));
     }
-};
+}

@@ -6,29 +6,35 @@ import {spawn} from "child_process";
 import {Wit} from "node-wit";
 import {OpenAIApi} from "openai";
 import assert from "assert";
+import {singleton} from "tsyringe";
+import {OneLiners} from "./OneLiners";
+import {Nicknames} from "./Nicknames";
+import {Gpt3} from "./Gpt3";
+import {Triggers} from "./Triggers";
+
+/** How likely the bot randomly replies to a message. 1 = 100%. */
+const RANDOM_REPLY_PROBABILITY = 0.035;
 
 /**
  * The most helpful bot in the world
  */
+@singleton()
 export class Bot {
-    /** The chance how often the bot flames back on a message (1 = 100 %) */
-    private readonly flameRate: number;
     /** The username, as soon as its available */
     private username: string | null = null;
     /** The last sent message */
     private lastMessage: TelegramBot.Message | null = null;
 
-    private readonly oneLiners: any;
-    private readonly triggers: any;
-    private readonly nicknames: any;
-    private readonly gpt3: any;
+    private readonly oneLiners: OneLiners;
+    private readonly triggers: Triggers;
+    private readonly nicknames: Nicknames;
+    private readonly gpt3: Gpt3;
     private readonly telegram: TelegramBot;
     private readonly wit: Wit;
     private readonly openAi: OpenAIApi;
 
     /**
      * Constructs the flame bot
-     * @param {number} flameRate - The chance how often the bot flames back on a message (1 = 100 %)
      * @param oneLiners
      * @param triggers
      * @param nicknames
@@ -37,8 +43,7 @@ export class Bot {
      * @param wit
      * @param openAi
      */
-    constructor(flameRate: number, oneLiners: any, triggers: any, nicknames: any, gpt3: any, telegram: TelegramBot, wit: Wit, openAi: OpenAIApi) {
-        this.flameRate = flameRate;
+    constructor(oneLiners: OneLiners, triggers: Triggers, nicknames: Nicknames, gpt3: Gpt3, telegram: TelegramBot, wit: Wit, openAi: OpenAIApi) {
         this.oneLiners = oneLiners;
         this.triggers = triggers;
         this.nicknames = nicknames;
@@ -63,14 +68,14 @@ export class Bot {
     }
 
     /**
-     * Replies with an insult
+     * Replies with a random message
      *
      * @param message - The message to reply to
-     * @param user - The user to insult
+     * @param user - The user to reply to
      */
-    replyRandomInsult(message: TelegramBot.Message, user: TelegramBot.User): void {
-        const insult = this.oneLiners.getRandomInsult(user.first_name);
-        this.reply(insult, message);
+    replyRandomMessage(message: TelegramBot.Message, user: TelegramBot.User): void {
+        const randomMessage = this.oneLiners.getRandomMessage(user.first_name);
+        this.reply(randomMessage, message);
     }
 
     /**
@@ -89,7 +94,7 @@ export class Bot {
     }
 
     /**
-     * Handles new messages and replies with insults if necessary
+     * Handles new messages and replies if necessary
      *
      * @param message - The message to reply to
      */
@@ -104,7 +109,7 @@ export class Bot {
 
         if (message.new_chat_members) {
             message.new_chat_members.forEach(member => {
-                this.replyRandomInsult(message, member);
+                this.replyRandomMessage(message, member);
             });
             return;
         }
@@ -143,7 +148,7 @@ export class Bot {
                 return;
             }
 
-            if (Math.random() < this.flameRate && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') {
+            if (Math.random() < RANDOM_REPLY_PROBABILITY && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') {
                 this.gpt3.reply(message.text, (text: string) => this.reply(text, message), this.openAi);
                 return;
             }
@@ -158,8 +163,8 @@ export class Bot {
             }
         }
 
-        if (message.from && Math.random() < this.flameRate / 100) {
-            this.replyRandomInsult(message, message.from);
+        if (message.from && Math.random() < RANDOM_REPLY_PROBABILITY / 100) {
+            this.replyRandomMessage(message, message.from);
         }
     }
 

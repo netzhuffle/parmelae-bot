@@ -1,6 +1,7 @@
 'use strict';
 
 import {Sticker} from './Sticker';
+import {singleton} from "tsyringe";
 
 /**
  * Trigger reply map
@@ -60,14 +61,16 @@ const replies = new Map<RegExp, string | Sticker>([
  */
 const triggers = [...replies.keys()];
 
-export default {
+/** Trigger service class that replies with specific messages on RegEx match */
+@singleton()
+export class Triggers {
     /**
      * Checks if triggers match and returns the according replies
      * @param query - A query text
      * @return A reply or undefined if query not found
      */
-    search: function (query: string): (string | Sticker)[] {
+    search(query: string): (string | Sticker)[] {
         const matches = triggers.filter(trigger => trigger.test(query));
         return matches.map(match => replies.get(match) ?? '');
     }
-};
+}

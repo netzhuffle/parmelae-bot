@@ -1,5 +1,7 @@
 'use strict';
 
+import {singleton} from "tsyringe";
+
 /** Adjectives: First word of nickname */
 const adjectives = [
     'Gummy',
@@ -87,13 +89,14 @@ let nouns = [
     'Charmy'
 ];
 
-export default {
+/** Nickname generation service */
+@singleton()
+export class Nicknames {
     /** Returns a random nickname */
-    getNickname: function (): string {
+    getNickname(): string {
         const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
         const noun = nouns[Math.floor(Math.random() * nouns.length)];
 
         return `${adjective} ${noun}`;
     }
-};
-
+}
