@@ -1,16 +1,17 @@
-# Nachtchad Bot
+# Parmelä Bot
 
-The second most polite bot you’ve ever seen on Telegram. Loves Twitch and the
-RocketBeans Nacht Chad. Based on
-[coredump-ch/telegram-flame-bot](https://github.com/coredump-ch/telegram-flame-bot)
-and available as [@NachtChadBot](https://telegram.me/NachtChadBot)
+The most helpful bot you’ve ever seen on Telegram.
 
 # Developing
 
 * Run `npm install` to install dependencies.
 * Copy `config.example.ts` to `config.ts` and add a token
 
+# Build
+
+    tsc
+
 # Run
 
-    node index.ts
+    node built/index.js
 
