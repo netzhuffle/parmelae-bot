@@ -128,12 +128,12 @@ export class FlameBot {
         }
 
         if (message.text) {
-            if ((message.chat.id === -104936118 || message.from.id === 48001795 && message.chat.type === 'private') && message.text.includes(this.username)) {
+            if ((message.chat.id === -1001736687780 || message.from.id === 48001795 && message.chat.type === 'private') && message.text.includes(this.username)) {
                 this.handleUsernameMessage(message);
                 return;
             }
 
-            if (message.chat.id !== -104936118 && message.text.startsWith('/') && message.text.includes(this.username)) {
+            if (message.chat.id !== -1001736687780 && message.text.startsWith('/') && message.text.includes(this.username)) {
                 this.reply('Entschuldigen Sie, ich höre nur im Schi-Parmelä-Chat auf Kommandos.', message);
                 return;
             }
@@ -159,7 +159,7 @@ export class FlameBot {
                 return;
             }
 
-            if (Math.random() < this.flameRate && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -104936118 || message.from.id === 48001795 && message.chat.type === 'private') {
+            if (Math.random() < this.flameRate && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -1001736687780 || message.from.id === 48001795 && message.chat.type === 'private') {
                 this.gpt3.reply(message.text, (text) => this.reply(text, message), this.openAi);
                 return;
             }
