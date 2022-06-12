@@ -7,10 +7,10 @@ and available as [@NachtChadBot](https://telegram.me/NachtChadBot)
 
 # Developing
 
- * Run `npm install` to install dependencies.
- * Copy `config.example.js` to `config.js` and add a token
+* Run `npm install` to install dependencies.
+* Copy `config.example.ts` to `config.ts` and add a token
 
 # Run
 
-    node bot.js
+    node index.ts
 

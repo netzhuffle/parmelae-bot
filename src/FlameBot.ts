@@ -1,6 +1,6 @@
 'use strict';
 
-import {Sticker} from './Sticker.js';
+import {Sticker} from './Sticker';
 
 /**
  * The most polite bot in the world
@@ -16,7 +16,7 @@ export class FlameBot {
      * @param {Object} telegram - The telegram bot API dependency
      * @param {function(string):ChildProcess} spawn - The child_process spawn function
      * @param {Wit} wit - Wit client
-     * @param {OpenAI} openAi - OpenAI client
+     * @param {OpenAIApi} openAi - OpenAI client
      */
     constructor(flameRate, oneLiners, triggers, nicknames, gpt3, telegram, spawn, wit, openAi) {
         /**
@@ -61,7 +61,7 @@ export class FlameBot {
         this.wit = wit;
         /**
          * OpenAI client
-         * @type {OpenAI}
+         * @type {OpenAIApi}
          */
         this.openAi = openAi;
         /**

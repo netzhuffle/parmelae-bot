@@ -8,7 +8,7 @@ export default {
      * Asks GPT-3 to generate a reply
      * @param {string} text - A query text
      * @param {function(string)} callback - The callback for successful execution, called with response text
-     * @param {OpenAI} openAi - The OpenAI-Dependency
+     * @param {OpenAIApi} openAi - The OpenAI-Dependency
      * @returns {void}
      */
     reply: function (text, callback, openAi) {
@@ -21,7 +21,8 @@ export default {
             return;
         }
 
-        openAi.createCompletion('text-davinci-002', {
+        openAi.createCompletion({
+            model: 'text-davinci-002',
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitete das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 
 User: hoffe, bi Coop wirds mal no besser. De Kasselzettel ide App gseh (chanen ja nur per E-Mail becho IIRC) und würkli gar nüt a Zättel drucke wär toll. Geschter halt doch no 2 becho. Regt mi jedes Mal uf
@@ -57,13 +58,14 @@ Parmelä: Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam ans
 User: ${text}
 Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:"]
         }).then((completion) => {
-            const response = completion && completion.choices && completion.choices.length && completion.choices[0].text;
+            const response = completion && completion.data && completion.data.choices && completion.data.choices.length && completion.data.choices[0].text;
             const trimmed = response.trim();
             if (trimmed) {
                 callback(trimmed);
+            } else {
+                callback('Ich bin sprachlos.');
             }
-        })
-            .catch((error) => console.error(error));
+        }).catch((error) => console.error(error));
     },
 
     /**
@@ -83,7 +85,8 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
             return;
         }
 
-        openAi.createCompletion('text-curie-001', {
+        openAi.createCompletion({
+            model: 'text-curie-001',
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitete das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 
 User: Ich hoffe, Coop wird mal noch besser. Die Kassenzettel in der App anzuzeigen (kann sie ja nur per Mail bekommen IIRC) und wirklich gar keine Zettel zu drucken, wäre toll. Gestern halt doch noch zwei bekommen. Regt mich jedes Mal auf
@@ -119,13 +122,14 @@ Parmelä: Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam ans
 User: ${text}
 Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:"]
         }).then((completion) => {
-            const response = completion && completion.choices && completion.choices.length && completion.choices[0].text;
+            const response = completion && completion.data && completion.data.choices && completion.data.choices.length && completion.data.choices[0].text;
             const trimmed = response.trim();
             if (trimmed) {
                 callback(trimmed);
+            } else {
+                callback('Ich bin sprachlos.');
             }
-        })
-            .catch((error) => console.error(error));
+        }).catch((error) => console.error(error));
     },
 
 
@@ -146,7 +150,8 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
             return;
         }
 
-        openAi.createCompletion('text-curie-001', {
+        openAi.createCompletion({
+            model: 'text-curie-001',
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitete das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 
 Parmelä: Der Bundesrat muss Prioritäten setzen. Schliesslich fällt das Geld nicht vom Himmel. Wir haben in den letzten Jahren Milliarden für Sozialausgaben ausgegeben. Die Kosten werden in den nächsten Jahren mit der AHV und IV weiter steigen – stärker als das Bruttoinlandprodukt. Da liegen neue Sozialleistungen einfach nicht drin.
@@ -160,14 +165,13 @@ Parmelä: Wir werden uns dass Thema bei der nächsten Bundesratssitzung gemeinsa
 Parmelä: Ohne Sicherheit gibt es keine Wohlfahrt. Ohne Sicherheit wird die Wirtschaft gebremst. Dann können wir auch keine Sozialleistungen mehr finanzieren.
 Parmelä: ${text}`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["Parmelä:"]
         }).then((completion) => {
-            const response = completion && completion.choices && completion.choices.length && completion.choices[0].text;
+            const response = completion && completion.data && completion.data.choices && completion.data.choices.length && completion.data.choices[0].text;
             const trimmed = response.trimEnd();
             if (trimmed) {
                 callback(text + trimmed);
             } else {
                 callback('Ich habe bereits fertig.');
             }
-        })
-            .catch((error) => console.error(error));
+        }).catch((error) => console.error(error));
     }
 };

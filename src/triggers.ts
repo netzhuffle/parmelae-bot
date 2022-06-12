@@ -1,6 +1,6 @@
 'use strict';
 
-import {Sticker} from './Sticker.js';
+import {Sticker} from './Sticker';
 
 /**
  * Trigger reply map
