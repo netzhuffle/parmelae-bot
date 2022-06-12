@@ -1,10 +1,7 @@
 'use strict';
 
-/**
- * Adjectives: First word of nickname
- * @type {Array.<string>}
- */
-let adjectives = [
+/** Adjectives: First word of nickname */
+const adjectives = [
     'Gummy',
     'Pink',
     'Pink',
@@ -37,10 +34,7 @@ let adjectives = [
     'Swooping'
 ];
 
-/**
- * Nouns: Second word of nickname
- * @type {Array.<string>}
- */
+/** Nouns: Second word of nickname */
 let nouns = [
     'Worm',
     'Bear',
@@ -94,13 +88,10 @@ let nouns = [
 ];
 
 export default {
-    /**
-     * Returns a random nickname
-     * @returns {string} A random nickname
-     */
-    getNickname: function () {
-        var adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-        var noun = nouns[Math.floor(Math.random() * nouns.length)];
+    /** Returns a random nickname */
+    getNickname: function (): string {
+        const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const noun = nouns[Math.floor(Math.random() * nouns.length)];
 
         return `${adjective} ${noun}`;
     }

@@ -1,82 +1,60 @@
 'use strict';
 
 import {Sticker} from './Sticker';
+import TelegramBot from "node-telegram-bot-api";
+import {spawn} from "child_process";
+import {Wit} from "node-wit";
+import {OpenAIApi} from "openai";
+import assert from "assert";
 
 /**
- * The most polite bot in the world
+ * The most helpful bot in the world
  */
 export class FlameBot {
+    /** The chance how often the bot flames back on a message (1 = 100 %) */
+    private readonly flameRate: number;
+    /** The username, as soon as its available */
+    private username: string | null = null;
+    /** The last sent message */
+    private lastMessage: TelegramBot.Message | null = null;
+
+    private readonly oneLiners: any;
+    private readonly triggers: any;
+    private readonly nicknames: any;
+    private readonly gpt3: any;
+    private readonly telegram: TelegramBot;
+    private readonly wit: Wit;
+    private readonly openAi: OpenAIApi;
+
     /**
      * Constructs the flame bot
      * @param {number} flameRate - The chance how often the bot flames back on a message (1 = 100 %)
-     * @param {Object} oneLiners - The oneLiners dependency
-     * @param {Object} triggers - The triggers dependency
-     * @param {Object} nicknames - The nicknames dependency
-     * @param {Object} gpt3 - The gpt3 dependency
-     * @param {Object} telegram - The telegram bot API dependency
-     * @param {function(string):ChildProcess} spawn - The child_process spawn function
-     * @param {Wit} wit - Wit client
-     * @param {OpenAIApi} openAi - OpenAI client
+     * @param oneLiners
+     * @param triggers
+     * @param nicknames
+     * @param gpt3
+     * @param telegram
+     * @param wit
+     * @param openAi
      */
-    constructor(flameRate, oneLiners, triggers, nicknames, gpt3, telegram, spawn, wit, openAi) {
-        /**
-         * The chance how often the bot flames back on a message (1 = 100 %)
-         * @type {number}
-         */
+    constructor(flameRate: number, oneLiners: any, triggers: any, nicknames: any, gpt3: any, telegram: TelegramBot, wit: Wit, openAi: OpenAIApi) {
         this.flameRate = flameRate;
-        /**
-         * The oneLiners dependency
-         * @type {Object}
-         */
         this.oneLiners = oneLiners;
-        /**
-         * The triggers dependency
-         * @type {Object}
-         */
         this.triggers = triggers;
-        /**
-         * The nicknames dependency
-         * @type {Object}
-         */
         this.nicknames = nicknames;
-        /**
-         * The gpt3 dependency
-         * @type {Object}
-         */
         this.gpt3 = gpt3;
-        /**
-         * The telegram dependency
-         * @type {Object}
-         */
         this.telegram = telegram;
-        /**
-         * The child_process spawn function
-         * @type {Object}
-         */
-        this.spawn = spawn;
-        /**
-         * Wit client
-         * @type {Wit}
-         */
         this.wit = wit;
-        /**
-         * OpenAI client
-         * @type {OpenAIApi}
-         */
         this.openAi = openAi;
-        /**
-         * The username, as soon as its available
-         * @type {?string}
-         */
         this.username = null;
     }
 
     /**
      * Sets the handler to listen to messages
      */
-    start() {
+    start(): void {
         this.telegram.getMe().then((me) => {
-            this.username = me.username;
+            this.username = me.username ?? null;
             this.telegram.on('message', (message) => {
                 this.handleMessage(message);
             });
@@ -87,10 +65,10 @@ export class FlameBot {
     /**
      * Replies with an insult
      *
-     * @param {Object} message - The message to reply to
-     * @param {Object} user - The user to insult
+     * @param message - The message to reply to
+     * @param user - The user to insult
      */
-    replyRandomInsult(message, user) {
+    replyRandomInsult(message: TelegramBot.Message, user: TelegramBot.User): void {
         const insult = this.oneLiners.getRandomInsult(user.first_name);
         this.reply(insult, message);
     }
@@ -98,10 +76,10 @@ export class FlameBot {
     /**
      * Replies to a message
      *
-     * @param {(string|Sticker)} reply - The text or Sticker to send
-     * @param {Object} message - The message to reply to
+     * @param reply - The text or Sticker to send
+     * @param message - The message to reply to
      */
-    reply(reply, message) {
+    reply(reply: string | Sticker, message: TelegramBot.Message): void {
         if (reply instanceof Sticker) {
             const stickerFileId = reply.fileId;
             this.telegram.sendSticker(message.chat.id, stickerFileId, {reply_to_message_id: message.message_id});
@@ -113,22 +91,26 @@ export class FlameBot {
     /**
      * Handles new messages and replies with insults if necessary
      *
-     * @param {Object} message - The message to reply to
+     * @param message - The message to reply to
      */
-    handleMessage(message) {
+    handleMessage(message: TelegramBot.Message): void {
+        assert(this.username);
+
         // To find a sticker id: Send it to the bot in private chat
         if (message.chat.type === 'private' && message.sticker) {
             this.reply('Sticker file_id: ' + message.sticker.file_id, message);
             return;
         }
 
-        if (message.new_chat_participant) {
-            this.replyRandomInsult(message, message.new_chat_participant);
+        if (message.new_chat_members) {
+            message.new_chat_members.forEach(member => {
+                this.replyRandomInsult(message, member);
+            });
             return;
         }
 
         if (message.text) {
-            if ((message.chat.id === -1001736687780 || message.from.id === 48001795 && message.chat.type === 'private') && message.text.includes(this.username)) {
+            if ((message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') && message.text.includes(this.username)) {
                 this.handleUsernameMessage(message);
                 return;
             }
@@ -138,9 +120,9 @@ export class FlameBot {
                 return;
             }
 
-            if (this.lastMessage && this.lastMessage.text === message.text && this.lastMessage.from.first_name !== message.from.first_name) {
+            if (this.lastMessage && this.lastMessage.text === message.text && this.lastMessage.from?.first_name !== message.from?.first_name) {
                 this.telegram.sendMessage(message.chat.id, message.text);
-                delete this.lastMessage;
+                this.lastMessage = null;
             } else {
                 /**
                  * The last message
@@ -150,8 +132,10 @@ export class FlameBot {
             }
 
             const triggersMatches = this.triggers.search(message.text);
-            triggersMatches.forEach(triggersMatch => {
-                this.reply(triggersMatch, message);
+            triggersMatches.forEach((triggersMatch: string | Sticker) => {
+                if (triggersMatch) {
+                    this.reply(triggersMatch, message);
+                }
             });
 
             if (/<Spitzname>/i.test(message.text)) {
@@ -159,50 +143,52 @@ export class FlameBot {
                 return;
             }
 
-            if (Math.random() < this.flameRate && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -1001736687780 || message.from.id === 48001795 && message.chat.type === 'private') {
-                this.gpt3.reply(message.text, (text) => this.reply(text, message), this.openAi);
+            if (Math.random() < this.flameRate && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') {
+                this.gpt3.reply(message.text, (text: string) => this.reply(text, message), this.openAi);
                 return;
             }
         }
 
         if (message.sticker) {
-            if (this.lastMessage && this.lastMessage.sticker && this.lastMessage.sticker.file_id === message.sticker.file_id && this.lastMessage.from.first_name !== message.from.first_name) {
+            if (this.lastMessage && this.lastMessage.sticker && this.lastMessage.sticker.file_id === message.sticker.file_id && this.lastMessage.from?.first_name !== message.from?.first_name) {
                 this.telegram.sendSticker(message.chat.id, message.sticker.file_id);
-                delete this.lastMessage;
+                this.lastMessage = null;
             } else {
                 this.lastMessage = message;
             }
         }
 
-        if (Math.random() < this.flameRate / 100) {
+        if (message.from && Math.random() < this.flameRate / 100) {
             this.replyRandomInsult(message, message.from);
         }
     }
 
     /**
      * Handles a message containing the bots name
-     * @param {Object} message Telegram message
+     * @param message Telegram message
      */
-    handleUsernameMessage(message) {
-        if (message.text.startsWith('/')) {
-            this.handleCommand(message.text.match(/^\/(.*)@/)[1], message);
+    handleUsernameMessage(message: TelegramBot.Message): void {
+        if (message.text?.startsWith('/')) {
+            const commandMatches = message.text.match(/^\/(.*)@/);
+            assert(commandMatches && commandMatches.length >= 2);
+            this.handleCommand(commandMatches[1], message);
             return;
         }
         const usernameRegex = new RegExp(`^(.*)@${this.username}(.*)$`, 'is');
-        const matches = message.text.match(usernameRegex);
+        const matches = message.text?.match(usernameRegex);
         if (matches) {
             const [, part1, part2] = matches;
             let witMessage = part1 + part2;
             if (part1.endsWith(' ')) {
                 witMessage = part1.substring(0, part1.length - 1) + part2;
             }
-            this.wit.message(witMessage).then(data => {
+            this.wit.message(witMessage, {}).then(data => {
                 const intents = data.intents;
                 if (intents && intents[0]) {
                     const intent = intents[0].name;
                     this.handleCommand(intent, message);
                 } else {
-                    this.gpt3.replyCheaper(witMessage, text => this.reply(text, message), this.openAi);
+                    this.gpt3.replyCheaper(witMessage, (text: string) => this.reply(text, message), this.openAi);
                 }
             });
         }
@@ -211,10 +197,10 @@ export class FlameBot {
     /**
      * Handles a command
      *
-     * @param {string} command - The command
-     * @param {Object} message - The message to reply to
+     * @param command - The command
+     * @param message - The message to reply to
      */
-    handleCommand(command, message) {
+    handleCommand(command: string, message: TelegramBot.Message): void {
         if (command === 'info') {
             this.reply('Sie können mich nach dem aktuellen Status von Minecraft fragen oder mich bitten, Skycreate zu starten, zu stoppen oder zu backuppen.', message);
             return;
@@ -224,7 +210,7 @@ export class FlameBot {
                 this.reply('Ich würde Ihnen gerne einen Kommentar dazu abgeben, aber dazu müssen Sie mich in einer Antwort auf einen Text fragen, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.reply(message.reply_to_message.text, (text) => this.reply(text, message), this.openAi);
+            this.gpt3.reply(message.reply_to_message.text, (text: string) => this.reply(text, message), this.openAi);
             return;
         }
         if (command === 'complete') {
@@ -232,23 +218,23 @@ export class FlameBot {
                 this.reply('Ich würde gerne fortfahren, aber dazu müssen Sie mich in einer Antwort auf einen meiner Texte darum bitten, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.continue(message.reply_to_message.text, (text) => this.reply(text, message), this.openAi);
+            this.gpt3.continue(message.reply_to_message.text, (text: string) => this.reply(text, message), this.openAi);
             return;
         }
 
         let process;
         if (command === 'startminecraft') {
             this.reply('Starte Skycreate …', message);
-            process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/startminecraft');
+            process = spawn('/home/jannis/telegram-nachtchad-bot/cmd/startminecraft');
         } else if (command === 'stopminecraft') {
             this.reply('Stoppe & backuppe Skycreate …', message);
-            process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/stopminecraft');
+            process = spawn('/home/jannis/telegram-nachtchad-bot/cmd/stopminecraft');
         } else if (command === 'backupminecraft') {
             this.reply('Backuppe Skycreate …', message);
-            process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/backupminecraft');
+            process = spawn('/home/jannis/telegram-nachtchad-bot/cmd/backupminecraft');
         } else if (command === 'statusminecraft') {
             this.reply('Prüfe Serverstatus …', message);
-            process = this.spawn('/home/jannis/telegram-nachtchad-bot/cmd/statusminecraft');
+            process = spawn('/home/jannis/telegram-nachtchad-bot/cmd/statusminecraft');
         } else {
             this.reply('Unbekannter Befehl', message);
         }

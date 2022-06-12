@@ -5,9 +5,8 @@ import {Sticker} from './Sticker';
 /**
  * Trigger reply map
  * Key: search RegExp, value: corresponding reply
- * @type {Map}
  */
-const replies = new Map([
+const replies = new Map<RegExp, string | Sticker>([
     [
         /PogChamp/i,
         new Sticker('BQADBAADRwADA3PcAonWVpUYQn7wAg'),
@@ -64,11 +63,11 @@ const triggers = [...replies.keys()];
 export default {
     /**
      * Checks if triggers match and returns the according replies
-     * @param {string} query - A query text
-     * @returns {Array<string|Sticker>} A reply or undefined if query not found
+     * @param query - A query text
+     * @return A reply or undefined if query not found
      */
-    search: function (query) {
+    search: function (query: string): (string | Sticker)[] {
         const matches = triggers.filter(trigger => trigger.test(query));
-        return matches.map(match => replies.get(match));
+        return matches.map(match => replies.get(match) ?? '');
     }
 };

@@ -4,11 +4,13 @@
  * A telegram sticker
  */
 export class Sticker {
+    /** The telegram sticker’s file_id */
+    public readonly fileId: string;
+
     /**
-     * Constructs a sticker
-     * @param {string} fileId - The telegram sticker’s file_id
+     * @param fileId - The telegram sticker’s file_id
      */
-    constructor(fileId) {
+    constructor(fileId: string) {
         this.fileId = fileId;
     }
 }

@@ -1,17 +1,18 @@
 'use strict';
 
-/** Maximale Anzahl Tokens, die GPT-3 generieren soll */
+import {OpenAIApi} from "openai";
+
+/** Maximum number of tokens to generate by GPT-3 */
 const MAX_TOKENS = 256;
 
 export default {
     /**
      * Asks GPT-3 to generate a reply
-     * @param {string} text - A query text
-     * @param {function(string)} callback - The callback for successful execution, called with response text
-     * @param {OpenAIApi} openAi - The OpenAI-Dependency
-     * @returns {void}
+     * @param text - A query text
+     * @param callback - The callback for successful execution, called with response text
+     * @param openAi - The OpenAI-Dependency
      */
-    reply: function (text, callback, openAi) {
+    reply: function (text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
         if (!text) {
             return;
         }
@@ -57,11 +58,10 @@ Parmelä: Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam ans
 
 User: ${text}
 Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:"]
-        }).then((completion) => {
-            const response = completion && completion.data && completion.data.choices && completion.data.choices.length && completion.data.choices[0].text;
-            const trimmed = response.trim();
-            if (trimmed) {
-                callback(trimmed);
+        }).then(response => {
+            const reply = response.data.choices?.[0].text?.trim();
+            if (reply) {
+                callback(reply);
             } else {
                 callback('Ich bin sprachlos.');
             }
@@ -70,12 +70,11 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
 
     /**
      * Asks GPT-3 to generate a reply with a more cost efficient model
-     * @param {string} text - A query text
-     * @param {function(string)} callback - The callback for successful execution, called with response text
-     * @param {OpenAI} openAi - The OpenAI-Dependency
-     * @returns {void}
+     * @param text - A query text
+     * @param callback - The callback for successful execution, called with response text
+     * @param openAi - The OpenAI-Dependency
      */
-    replyCheaper: function (text, callback, openAi) {
+    replyCheaper: function (text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
         if (!text) {
             return;
         }
@@ -121,11 +120,10 @@ Parmelä: Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam ans
 
 User: ${text}
 Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:"]
-        }).then((completion) => {
-            const response = completion && completion.data && completion.data.choices && completion.data.choices.length && completion.data.choices[0].text;
-            const trimmed = response.trim();
-            if (trimmed) {
-                callback(trimmed);
+        }).then(response => {
+            const reply = response.data.choices?.[0].text?.trim();
+            if (reply) {
+                callback(reply);
             } else {
                 callback('Ich bin sprachlos.');
             }
@@ -135,12 +133,11 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
 
     /**
      * Asks GPT-3 to continue a started text
-     * @param {string} text - The text
-     * @param {function(string)} callback - The callback for successful execution, called with the text (old & new)
-     * @param {OpenAI} openAi - The OpenAI-Dependency
-     * @returns {void}
+     * @param text - The text
+     * @param callback - The callback for successful execution, called with the text (old & new)
+     * @param openAi - The OpenAI-Dependency
      */
-    continue: function (text, callback, openAi) {
+    continue: function (text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
         if (!text) {
             return;
         }
@@ -164,11 +161,10 @@ Parmelä: Ja, das ist Alain Berset. Ich erkenne ihn sofort.
 Parmelä: Wir werden uns dass Thema bei der nächsten Bundesratssitzung gemeinsam anschauen.
 Parmelä: Ohne Sicherheit gibt es keine Wohlfahrt. Ohne Sicherheit wird die Wirtschaft gebremst. Dann können wir auch keine Sozialleistungen mehr finanzieren.
 Parmelä: ${text}`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["Parmelä:"]
-        }).then((completion) => {
-            const response = completion && completion.data && completion.data.choices && completion.data.choices.length && completion.data.choices[0].text;
-            const trimmed = response.trimEnd();
-            if (trimmed) {
-                callback(text + trimmed);
+        }).then(response => {
+            const completion = response.data.choices?.[0].text?.trimEnd();
+            if (completion) {
+                callback(text + completion);
             } else {
                 callback('Ich habe bereits fertig.');
             }

@@ -5,7 +5,6 @@ import {Sticker} from './Sticker';
 /**
  * Stickers and one liner text insults
  * where '%u%' is the username
- * @type {Array.<(string|Sticker)>}
  */
 const insults = [
     new Sticker('CAACAgQAAxkBAAEDe-9hHCedKTkqD5q28fNC_QPskmoeggACCQADGzHQB7YWKGObHwqcIAQ'),
@@ -14,15 +13,15 @@ const insults = [
     new Sticker('CAACAgQAAxkBAAEDe_lhHCh9Kdw_A0QQb2bFMZ1iXirfswACQAADGzHQBzQQuA1tKXrKIAQ'),
     new Sticker('CAACAgQAAxkBAAEDfAFhHCiX1bMBfca_9nNZD2buqsH2egACSgADGzHQB5xKfgjgIlcIIAQ'),
     new Sticker('CAACAgQAAxkBAAEDfAdhHCivPudpZv2nvYcOywciVkGdNwACPwADmu78Apk-SGoCcKTzIAQ'),
-];
+] as (string | Sticker)[];
 
 export default {
     /**
      * Returns a random insult
-     * @param {string} userName - The user's name who should be insulted
-     * @returns {(string|Sticker)} A random insult text or sticker
+     * @param userName - The user's name who should be insulted
+     * @returns A random insult text or sticker
      */
-    getRandomInsult: function (userName) {
+    getRandomInsult: function (userName: string): string | Sticker {
         const insult = insults[Math.floor(Math.random() * insults.length)];
         if (insult instanceof Sticker) {
             return insult;
