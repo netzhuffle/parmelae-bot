@@ -4,6 +4,7 @@ import {ReplyStrategy} from "./ReplyStrategy";
 import assert from "assert";
 import {singleton} from "tsyringe";
 import {StickerIdReplyStrategy} from "./ReplyStrategies/StickerIdReplyStrategy";
+import {NewMembersReplyStrategy} from "./ReplyStrategies/NewMembersReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -11,10 +12,17 @@ export class ReplyStrategyFinder {
     /** All possible strategies, in order. One strategy must handle the message. */
     private readonly strategies: ReplyStrategy[];
 
-    constructor(stickerIdReplyStrategy: StickerIdReplyStrategy, nullReplyStrategy: NullReplyStrategy) {
+    constructor(
+        stickerIdReplyStrategy: StickerIdReplyStrategy,
+        newMembersReplyStrategy: NewMembersReplyStrategy,
+        nullReplyStrategy: NullReplyStrategy
+    ) {
         this.strategies = [
             // Replies with Sticker file_id in private chats.
             stickerIdReplyStrategy,
+
+            // Welcomes new chat members.
+            newMembersReplyStrategy,
 
             // Do nothing (catch all last rule).
             nullReplyStrategy

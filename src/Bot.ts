@@ -110,13 +110,6 @@ export class Bot {
         }
         // This is a temporary fallthrough until all handlers have been converted to ReplyStrategies.
 
-        if (message.new_chat_members) {
-            message.new_chat_members.forEach(member => {
-                this.replyRandomMessage(message, member);
-            });
-            return;
-        }
-
         if (message.text) {
             if ((message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') && message.text.includes(this.username)) {
                 this.handleUsernameMessage(message);
