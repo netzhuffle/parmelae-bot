@@ -1,5 +1,5 @@
 import TelegramBot from "node-telegram-bot-api";
-import {Sticker} from "../Sticker";
+import {Sticker} from "./Sticker";
 
 export type ReplyFunction = (reply: string | Sticker, message: TelegramBot.Message) => void;
 

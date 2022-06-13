@@ -9,7 +9,7 @@ import {OneLiners} from "./OneLiners";
 import {Nicknames} from "./Nicknames";
 import {Gpt3} from "./Gpt3";
 import {Triggers} from "./Triggers";
-import {ReplyStrategyFinder} from "./ReplyStrategies/ReplyStrategyFinder";
+import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {NullReplyStrategy} from "./ReplyStrategies/NullReplyStrategy";
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
@@ -233,16 +233,16 @@ export class Bot {
         let process;
         if (command === 'startminecraft') {
             this.reply('Starte Skycreate …', message);
-            process = spawn('/home/jannis/telegram-nachtchad-bot/cmd/startminecraft');
+            process = spawn('/home/jannis/parmelae-bot/cmd/startminecraft');
         } else if (command === 'stopminecraft') {
             this.reply('Stoppe & backuppe Skycreate …', message);
-            process = spawn('/home/jannis/telegram-nachtchad-bot/cmd/stopminecraft');
+            process = spawn('/home/jannis/parmelae-bot/cmd/stopminecraft');
         } else if (command === 'backupminecraft') {
             this.reply('Backuppe Skycreate …', message);
-            process = spawn('/home/jannis/telegram-nachtchad-bot/cmd/backupminecraft');
+            process = spawn('/home/jannis/parmelae-bot/cmd/backupminecraft');
         } else if (command === 'statusminecraft') {
             this.reply('Prüfe Serverstatus …', message);
-            process = spawn('/home/jannis/telegram-nachtchad-bot/cmd/statusminecraft');
+            process = spawn('/home/jannis/parmelae-bot/cmd/statusminecraft');
         } else {
             this.reply('Unbekannter Befehl', message);
         }

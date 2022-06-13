@@ -1,9 +1,9 @@
 import TelegramBot from "node-telegram-bot-api";
-import {NullReplyStrategy} from "./NullReplyStrategy";
+import {NullReplyStrategy} from "./ReplyStrategies/NullReplyStrategy";
 import {ReplyStrategy} from "./ReplyStrategy";
 import assert from "assert";
 import {singleton} from "tsyringe";
-import {StickerIdReplyStrategy} from "./StickerIdReplyStrategy";
+import {StickerIdReplyStrategy} from "./ReplyStrategies/StickerIdReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -12,7 +12,13 @@ export class ReplyStrategyFinder {
     private readonly strategies: ReplyStrategy[];
 
     constructor(stickerIdReplyStrategy: StickerIdReplyStrategy, nullReplyStrategy: NullReplyStrategy) {
-        this.strategies = [stickerIdReplyStrategy, nullReplyStrategy];
+        this.strategies = [
+            // Replies with Sticker file_id in private chats.
+            stickerIdReplyStrategy,
+
+            // Do nothing (catch all last rule).
+            nullReplyStrategy
+        ];
     }
 
     /**

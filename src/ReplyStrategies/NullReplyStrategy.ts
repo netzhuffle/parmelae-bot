@@ -1,4 +1,4 @@
-import {ReplyFunction, ReplyStrategy} from "./ReplyStrategy";
+import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
 
