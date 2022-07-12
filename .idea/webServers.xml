@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="e13d15c5-d8f4-4b7e-a28f-96b12f788e1c" name="jannis.rocks">
-        <fileTransfer rootFolder="/home/jannis/telegram-nachtchad-bot" accessType="SFTP" host="jannis.rocks" port="22" sshConfigId="d60f2f4e-6ac0-4ff7-a74c-db10ba4cb0a7" sshConfig="jannis.rocks" authAgent="true">
+        <fileTransfer rootFolder="/home/jannis/parmelae-bot" accessType="SFTP" host="jannis.rocks" port="22" sshConfigId="d60f2f4e-6ac0-4ff7-a74c-db10ba4cb0a7" sshConfig="jannis.rocks" authAgent="true">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseRsync="true" />
           </advancedOptions>
