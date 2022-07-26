@@ -25,34 +25,16 @@ export class Bot {
     /** The last sent message */
     private lastMessage: TelegramBot.Message | null = null;
 
-    private readonly replyStrategyFinder: ReplyStrategyFinder;
-    private readonly oneLiners: OneLiners;
-    private readonly triggers: Triggers;
-    private readonly nicknames: Nicknames;
-    private readonly gpt3: Gpt3;
-    private readonly telegram: TelegramBot;
-    private readonly wit: Wit;
-    private readonly openAi: OpenAIApi;
-
     constructor(
-        replyStrategyFinder: ReplyStrategyFinder,
-        oneLiners: OneLiners,
-        triggers: Triggers,
-        nicknames: Nicknames,
-        gpt3: Gpt3,
-        telegram: TelegramBot,
-        wit: Wit,
-        openAi: OpenAIApi
+        private readonly replyStrategyFinder: ReplyStrategyFinder,
+        private readonly oneLiners: OneLiners,
+        private readonly triggers: Triggers,
+        private readonly nicknames: Nicknames,
+        private readonly gpt3: Gpt3,
+        private readonly telegram: TelegramBot,
+        private readonly wit: Wit,
+        private readonly openAi: OpenAIApi
     ) {
-        this.replyStrategyFinder = replyStrategyFinder;
-        this.oneLiners = oneLiners;
-        this.triggers = triggers;
-        this.nicknames = nicknames;
-        this.gpt3 = gpt3;
-        this.telegram = telegram;
-        this.wit = wit;
-        this.openAi = openAi;
-        this.username = null;
     }
 
     /**

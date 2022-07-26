@@ -7,10 +7,7 @@ import assert from "assert";
 /** Welcomes new chat members. */
 @singleton()
 export class NewMembersReplyStrategy implements ReplyStrategy {
-    private readonly oneLiners: OneLiners;
-
-    constructor(oneLiners: OneLiners) {
-        this.oneLiners = oneLiners;
+    constructor(private readonly oneLiners: OneLiners) {
     }
 
     willHandle(message: TelegramBot.Message): boolean {
@@ -23,7 +20,7 @@ export class NewMembersReplyStrategy implements ReplyStrategy {
 
     handle(message: TelegramBot.Message, reply: ReplyFunction): void {
         assert(message.new_chat_members);
-        
+
         message.new_chat_members.forEach(user => {
             const randomMessage = this.oneLiners.getRandomMessage(user.first_name);
             reply(randomMessage, message);

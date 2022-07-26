@@ -1,16 +1,17 @@
 import 'reflect-metadata';
-import {openAiKey, telegramToken, witToken} from '../config';
+import config from '../config';
 import {Bot} from './Bot';
 import TelegramBot from 'node-telegram-bot-api';
 import {Wit} from 'node-wit';
 import {Configuration, OpenAIApi} from 'openai';
 import {container} from "tsyringe";
 
-container.register(TelegramBot, {useValue: new TelegramBot(telegramToken, {polling: true})});
-container.register(Wit, {useValue: new Wit({accessToken: witToken})});
+container.register('config', {useValue: config});
+container.register(TelegramBot, {useValue: new TelegramBot(config.telegramToken, {polling: true})});
+container.register(Wit, {useValue: new Wit({accessToken: config.witToken})});
 container.register(OpenAIApi, {
     useValue: new OpenAIApi(new Configuration({
-        apiKey: openAiKey
+        apiKey: config.openAiKey
     }))
 });
 
