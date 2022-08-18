@@ -4,13 +4,14 @@ import {spawn} from "child_process";
 import {Wit} from "node-wit";
 import {OpenAIApi} from "openai";
 import assert from "assert";
-import {singleton} from "tsyringe";
+import {inject, singleton} from "tsyringe";
 import {OneLiners} from "./OneLiners";
 import {Nicknames} from "./Nicknames";
 import {Gpt3} from "./Gpt3";
 import {Triggers} from "./Triggers";
 import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {NullReplyStrategy} from "./ReplyStrategies/NullReplyStrategy";
+import { Config } from './Config';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;
@@ -33,7 +34,8 @@ export class Bot {
         private readonly gpt3: Gpt3,
         private readonly telegram: TelegramBot,
         private readonly wit: Wit,
-        private readonly openAi: OpenAIApi
+        private readonly openAi: OpenAIApi,
+        @inject('Config') private readonly config: Config,
     ) {
     }
 

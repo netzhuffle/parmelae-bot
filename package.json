@@ -16,6 +16,7 @@
   "devDependencies": {
     "@types/node": "^17.0.42",
     "@types/node-telegram-bot-api": "^0.57.1",
-    "@types/node-wit": "^6.0.1"
+    "@types/node-wit": "^6.0.1",
+    "ts-node": "^10.9.1"
   }
 }

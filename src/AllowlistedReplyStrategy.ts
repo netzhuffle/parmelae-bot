@@ -1,13 +1,14 @@
 import {ReplyFunction, ReplyStrategy} from "./ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
+import {Config} from "./Config";
 
 /** Abstract ReplyStrategy for allowlisted chats and allowlisted private message senders only */
 export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
-    constructor(private config: { chatAllowlist: number[], senderAllowlist: number[] }) {
+    constructor(private config: Config) {
     }
 
     willHandle(message: TelegramBot.Message): boolean {
-        if (message.chat.type === 'private' && !this.config.senderAllowlist.includes(message.from?.id)) {
+        if (message.chat.type === 'private' && message.from && !this.config.senderAllowlist.includes(message.from.id)) {
             return false;
         }
 
