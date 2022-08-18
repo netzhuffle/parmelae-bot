@@ -21,8 +21,6 @@ const RANDOM_REPLY_PROBABILITY = 0.035;
  */
 @singleton()
 export class Bot {
-    /** The username, as soon as its available */
-    private username: string | null = null;
     /** The last sent message */
     private lastMessage: TelegramBot.Message | null = null;
 
@@ -43,13 +41,13 @@ export class Bot {
      * Sets the handler to listen to messages
      */
     start(): void {
-        this.telegram.getMe().then((me) => {
-            this.username = me.username ?? null;
-            this.telegram.on('message', (message) => {
-                this.handleMessage(message);
-            });
-        }).catch(console.log);
+        this.telegram.on('message', (message) => {
+            this.handleMessage(message);
+        });
         this.telegram.on('polling_error', console.log);
+        this.telegram.getMe().then((me) => {
+            assert(me.username === this.config.username);
+        });
     }
 
     /**
@@ -84,8 +82,6 @@ export class Bot {
      * @param message - The message to reply to
      */
     handleMessage(message: TelegramBot.Message): void {
-        assert(this.username);
-
         const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
         replyStrategy.handle(message, this.reply);
 
@@ -95,12 +91,12 @@ export class Bot {
         // This is a temporary fallthrough until all handlers have been converted to ReplyStrategies.
 
         if (message.text) {
-            if ((message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') && message.text.includes(this.username)) {
+            if ((message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') && message.text.includes(this.config.username)) {
                 this.handleUsernameMessage(message);
                 return;
             }
 
-            if (message.chat.id !== -1001736687780 && message.text.startsWith('/') && message.text.includes(this.username)) {
+            if (message.chat.id !== -1001736687780 && message.text.startsWith('/') && message.text.includes(this.config.username)) {
                 this.reply('Entschuldigen Sie, ich höre nur im Schi-Parmelä-Chat auf Kommandos.', message);
                 return;
             }
@@ -159,7 +155,7 @@ export class Bot {
             this.handleCommand(commandMatches[1], message);
             return;
         }
-        const usernameRegex = new RegExp(`^(.*)@${this.username}(.*)$`, 'is');
+        const usernameRegex = new RegExp(`^(.*)@${this.config.username}(.*)$`, 'is');
         const matches = message.text?.match(usernameRegex);
         if (matches) {
             const [, part1, part2] = matches;
