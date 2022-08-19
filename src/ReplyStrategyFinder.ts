@@ -5,6 +5,7 @@ import assert from "assert";
 import {singleton} from "tsyringe";
 import {StickerIdReplyStrategy} from "./ReplyStrategies/StickerIdReplyStrategy";
 import {NewMembersReplyStrategy} from "./ReplyStrategies/NewMembersReplyStrategy";
+import { CommandReplyStrategy } from "./ReplyStrategies/CommandReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -15,6 +16,7 @@ export class ReplyStrategyFinder {
     constructor(
         stickerIdReplyStrategy: StickerIdReplyStrategy,
         newMembersReplyStrategy: NewMembersReplyStrategy,
+        commandReplyStrategy: CommandReplyStrategy,
         nullReplyStrategy: NullReplyStrategy
     ) {
         this.strategies = [
@@ -23,6 +25,9 @@ export class ReplyStrategyFinder {
 
             // Welcomes new chat members.
             newMembersReplyStrategy,
+
+            // Executes commands written as /xyz@BotName in allowlisted chats.
+            commandReplyStrategy,
 
             // Do nothing (catch all last rule).
             nullReplyStrategy

@@ -12,6 +12,7 @@ import {Triggers} from "./Triggers";
 import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {NullReplyStrategy} from "./ReplyStrategies/NullReplyStrategy";
 import { Config } from './Config';
+import { CommandService } from './CommandService';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;
@@ -29,6 +30,7 @@ export class Bot {
         private readonly oneLiners: OneLiners,
         private readonly triggers: Triggers,
         private readonly nicknames: Nicknames,
+        private readonly commandService: CommandService,
         private readonly gpt3: Gpt3,
         private readonly telegram: TelegramBot,
         private readonly wit: Wit,
@@ -83,7 +85,7 @@ export class Bot {
      */
     handleMessage(message: TelegramBot.Message): void {
         const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
-        replyStrategy.handle(message, this.reply);
+        replyStrategy.handle(message, this.reply.bind(this));
 
         if (!(replyStrategy instanceof NullReplyStrategy)) {
             return;
@@ -149,12 +151,6 @@ export class Bot {
      * @param message Telegram message
      */
     handleUsernameMessage(message: TelegramBot.Message): void {
-        if (message.text?.startsWith('/')) {
-            const commandMatches = message.text.match(/^\/(.*)@/);
-            assert(commandMatches && commandMatches.length >= 2);
-            this.handleCommand(commandMatches[1], message);
-            return;
-        }
         const usernameRegex = new RegExp(`^(.*)@${this.config.username}(.*)$`, 'is');
         const matches = message.text?.match(usernameRegex);
         if (matches) {
@@ -167,61 +163,11 @@ export class Bot {
                 const intents = data.intents;
                 if (intents && intents[0]) {
                     const intent = intents[0].name;
-                    this.handleCommand(intent, message);
+                    this.commandService.execute(intent, message, this.reply.bind(this));
                 } else {
                     this.gpt3.replyCheaper(witMessage, (text: string) => this.reply(text, message), this.openAi);
                 }
             });
-        }
-    }
-
-    /**
-     * Handles a command
-     *
-     * @param command - The command
-     * @param message - The message to reply to
-     */
-    handleCommand(command: string, message: TelegramBot.Message): void {
-        if (command === 'info') {
-            this.reply('Sie können mich nach dem aktuellen Status von Minecraft fragen oder mich bitten, Skycreate zu starten, zu stoppen oder zu backuppen.', message);
-            return;
-        }
-        if (command === 'comment') {
-            if (!message.reply_to_message || !message.reply_to_message.text) {
-                this.reply('Ich würde Ihnen gerne einen Kommentar dazu abgeben, aber dazu müssen Sie mich in einer Antwort auf einen Text fragen, s’il vous plait.', message);
-                return;
-            }
-            this.gpt3.reply(message.reply_to_message.text, (text: string) => this.reply(text, message), this.openAi);
-            return;
-        }
-        if (command === 'complete') {
-            if (!message.reply_to_message || !message.reply_to_message.text) {
-                this.reply('Ich würde gerne fortfahren, aber dazu müssen Sie mich in einer Antwort auf einen meiner Texte darum bitten, s’il vous plait.', message);
-                return;
-            }
-            this.gpt3.continue(message.reply_to_message.text, (text: string) => this.reply(text, message), this.openAi);
-            return;
-        }
-
-        let process;
-        if (command === 'startminecraft') {
-            this.reply('Starte Skycreate …', message);
-            process = spawn('/home/jannis/parmelae-bot/cmd/startminecraft');
-        } else if (command === 'stopminecraft') {
-            this.reply('Stoppe & backuppe Skycreate …', message);
-            process = spawn('/home/jannis/parmelae-bot/cmd/stopminecraft');
-        } else if (command === 'backupminecraft') {
-            this.reply('Backuppe Skycreate …', message);
-            process = spawn('/home/jannis/parmelae-bot/cmd/backupminecraft');
-        } else if (command === 'statusminecraft') {
-            this.reply('Prüfe Serverstatus …', message);
-            process = spawn('/home/jannis/parmelae-bot/cmd/statusminecraft');
-        } else {
-            this.reply('Unbekannter Befehl', message);
-        }
-        if (process) {
-            process.stdout.on('data', (data) => this.telegram.sendMessage(message.chat.id, data.toString()));
-            process.stderr.on('data', (data) => this.telegram.sendMessage(message.chat.id, `Fehler: ${data.toString()}`));
         }
     }
 }

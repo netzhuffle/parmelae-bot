@@ -4,7 +4,7 @@ import {Config} from "./Config";
 
 /** Abstract ReplyStrategy for allowlisted chats and allowlisted private message senders only */
 export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
-    constructor(private config: Config) {
+    constructor(private readonly config: Config) {
     }
 
     willHandle(message: TelegramBot.Message): boolean {
