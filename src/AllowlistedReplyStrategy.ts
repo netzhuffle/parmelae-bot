@@ -1,10 +1,11 @@
 import {ReplyFunction, ReplyStrategy} from "./ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {Config} from "./Config";
+import { inject } from "tsyringe";
 
 /** Abstract ReplyStrategy for allowlisted chats and allowlisted private message senders only */
 export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
-    constructor(private readonly config: Config) {
+    constructor(@inject('Config') protected readonly config: Config) {
     }
 
     willHandle(message: TelegramBot.Message): boolean {

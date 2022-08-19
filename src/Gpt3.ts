@@ -7,13 +7,14 @@ const MAX_TOKENS = 256;
 /** GPT-3 Service */
 @singleton()
 export class Gpt3 {
+    constructor(private readonly openAi: OpenAIApi) {}
+
     /**
      * Asks GPT-3 to generate a reply
      * @param text - A query text
      * @param callback - The callback for successful execution, called with response text
-     * @param openAi - The OpenAI-Dependency
      */
-    reply(text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
+    reply(text: string, callback: (text: string) => void): void {
         if (!text) {
             return;
         }
@@ -23,7 +24,7 @@ export class Gpt3 {
             return;
         }
 
-        openAi.createCompletion({
+        this.openAi.createCompletion({
             model: 'text-davinci-002',
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitete das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 
@@ -73,9 +74,8 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
      * Asks GPT-3 to generate a reply with a more cost efficient model
      * @param text - A query text
      * @param callback - The callback for successful execution, called with response text
-     * @param openAi - The OpenAI-Dependency
      */
-    replyCheaper(text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
+    replyCheaper(text: string, callback: (text: string) => void): void {
         if (!text) {
             return;
         }
@@ -85,7 +85,7 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
             return;
         }
 
-        openAi.createCompletion({
+        this.openAi.createCompletion({
             model: 'text-curie-001',
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitete das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 
@@ -136,9 +136,8 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
      * Asks GPT-3 to continue a started text
      * @param text - The text
      * @param callback - The callback for successful execution, called with the text (old & new)
-     * @param openAi - The OpenAI-Dependency
      */
-    continue(text: string, callback: (text: string) => void, openAi: OpenAIApi): void {
+    continue(text: string, callback: (text: string) => void): void {
         if (!text) {
             return;
         }
@@ -148,7 +147,7 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
             return;
         }
 
-        openAi.createCompletion({
+        this.openAi.createCompletion({
             model: 'text-curie-001',
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitete das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 

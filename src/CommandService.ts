@@ -31,7 +31,7 @@ export class CommandService {
                 reply('Ich würde Ihnen gerne einen Kommentar dazu abgeben, aber dazu müssen Sie mich in einer Antwort auf einen Text fragen, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.reply(message.reply_to_message.text, (text: string) => reply(text, message), this.openAi);
+            this.gpt3.reply(message.reply_to_message.text, (text: string) => reply(text, message));
             return;
         }
         if (command === 'complete') {
@@ -39,7 +39,7 @@ export class CommandService {
                 reply('Ich würde gerne fortfahren, aber dazu müssen Sie mich in einer Antwort auf einen meiner Texte darum bitten, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.continue(message.reply_to_message.text, (text: string) => reply(text, message), this.openAi);
+            this.gpt3.continue(message.reply_to_message.text, (text: string) => reply(text, message));
             return;
         }
 

@@ -93,16 +93,6 @@ export class Bot {
         // This is a temporary fallthrough until all handlers have been converted to ReplyStrategies.
 
         if (message.text) {
-            if ((message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') && message.text.includes(this.config.username)) {
-                this.handleUsernameMessage(message);
-                return;
-            }
-
-            if (message.chat.id !== -1001736687780 && message.text.startsWith('/') && message.text.includes(this.config.username)) {
-                this.reply('Entschuldigen Sie, ich höre nur im Schi-Parmelä-Chat auf Kommandos.', message);
-                return;
-            }
-
             if (this.lastMessage && this.lastMessage.text === message.text && this.lastMessage.from?.first_name !== message.from?.first_name) {
                 this.telegram.sendMessage(message.chat.id, message.text);
                 this.lastMessage = null;
@@ -127,7 +117,7 @@ export class Bot {
             }
 
             if (Math.random() < RANDOM_REPLY_PROBABILITY && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') {
-                this.gpt3.reply(message.text, (text: string) => this.reply(text, message), this.openAi);
+                this.gpt3.reply(message.text, (text: string) => this.reply(text, message));
                 return;
             }
         }
@@ -143,31 +133,6 @@ export class Bot {
 
         if (message.from && Math.random() < RANDOM_REPLY_PROBABILITY / 100) {
             this.replyRandomMessage(message, message.from);
-        }
-    }
-
-    /**
-     * Handles a message containing the bots name
-     * @param message Telegram message
-     */
-    handleUsernameMessage(message: TelegramBot.Message): void {
-        const usernameRegex = new RegExp(`^(.*)@${this.config.username}(.*)$`, 'is');
-        const matches = message.text?.match(usernameRegex);
-        if (matches) {
-            const [, part1, part2] = matches;
-            let witMessage = part1 + part2;
-            if (part1.endsWith(' ')) {
-                witMessage = part1.substring(0, part1.length - 1) + part2;
-            }
-            this.wit.message(witMessage, {}).then(data => {
-                const intents = data.intents;
-                if (intents && intents[0]) {
-                    const intent = intents[0].name;
-                    this.commandService.execute(intent, message, this.reply.bind(this));
-                } else {
-                    this.gpt3.replyCheaper(witMessage, (text: string) => this.reply(text, message), this.openAi);
-                }
-            });
         }
     }
 }
