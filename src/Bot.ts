@@ -11,8 +11,8 @@ import {Gpt3} from "./Gpt3";
 import {Triggers} from "./Triggers";
 import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {NullReplyStrategy} from "./ReplyStrategies/NullReplyStrategy";
-import { Config } from './Config';
-import { CommandService } from './CommandService';
+import {Config} from './Config';
+import {CommandService} from './CommandService';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;
@@ -93,17 +93,6 @@ export class Bot {
         // This is a temporary fallthrough until all handlers have been converted to ReplyStrategies.
 
         if (message.text) {
-            if (this.lastMessage && this.lastMessage.text === message.text && this.lastMessage.from?.first_name !== message.from?.first_name) {
-                this.telegram.sendMessage(message.chat.id, message.text);
-                this.lastMessage = null;
-            } else {
-                /**
-                 * The last message
-                 * @type {Object}
-                 */
-                this.lastMessage = message;
-            }
-
             const triggersMatches = this.triggers.search(message.text);
             triggersMatches.forEach((triggersMatch: string | Sticker) => {
                 if (triggersMatch) {

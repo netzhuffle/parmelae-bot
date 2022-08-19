@@ -7,6 +7,7 @@ import {StickerIdReplyStrategy} from "./ReplyStrategies/StickerIdReplyStrategy";
 import {NewMembersReplyStrategy} from "./ReplyStrategies/NewMembersReplyStrategy";
 import { CommandReplyStrategy } from "./ReplyStrategies/CommandReplyStrategy";
 import { WitReplyStrategy } from "./ReplyStrategies/WitReplyStrategy";
+import { MessageRepetitionReplyStrategy } from "./ReplyStrategies/MessageRepetitionReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -19,6 +20,7 @@ export class ReplyStrategyFinder {
         newMembersReplyStrategy: NewMembersReplyStrategy,
         commandReplyStrategy: CommandReplyStrategy,
         witReplyStrategy: WitReplyStrategy,
+        messageRepetitionReplyStrategy: MessageRepetitionReplyStrategy,
         nullReplyStrategy: NullReplyStrategy
     ) {
         this.strategies = [
@@ -33,6 +35,9 @@ export class ReplyStrategyFinder {
 
             // Handles messages mentioning the bot in allowlisted chats by sending them to Wit for handling.
             witReplyStrategy,
+
+            // Repeats a message that two other users wrote.
+            messageRepetitionReplyStrategy,
 
             // Do nothing (catch all last rule).
             nullReplyStrategy
