@@ -13,21 +13,35 @@ export class MessageRepetitionReplyStrategy implements ReplyStrategy {
     }
 
     willHandle(message: TelegramBot.Message): boolean {
-        if (message.text !== undefined) {
-            if (this.lastMessage?.text === message.text && this.lastMessage.from?.first_name !== message.from?.first_name) {
-                this.lastMessage = null;
-
-                return true;
-            }
+        if (this.lastMessage?.from?.first_name === message.from?.first_name) {
+            // Same author: Don’t repeat.
             this.lastMessage = message;
+            return false;
         }
 
+        if (message.text && this.lastMessage?.text === message.text) {
+            // Same text: Repeat.
+            this.lastMessage = null;
+            return true;
+        }
+
+        if (message.sticker && this.lastMessage?.sticker?.file_unique_id === message.sticker.file_unique_id) {
+            // Same sticker: Repeat.
+            this.lastMessage = null;
+            return true;
+        }
+
+        // Different message: Don’t repeat.
+        this.lastMessage = message;
         return false;
     }
 
     handle(message: TelegramBot.Message, reply: ReplyFunction): void {
-        assert(message.text !== undefined);
-
-        this.telegram.sendMessage(message.chat.id, message.text);
+        if (message.text) {
+            this.telegram.sendMessage(message.chat.id, message.text);
+        } else {
+            assert(message.sticker);
+            this.telegram.sendSticker(message.chat.id, message.sticker.file_id);
+        }
     }
 }

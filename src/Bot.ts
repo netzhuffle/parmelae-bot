@@ -88,15 +88,6 @@ export class Bot {
         }
         // This is a temporary fallthrough until all handlers have been converted to ReplyStrategies.
 
-        if (message.sticker) {
-            if (this.lastMessage && this.lastMessage.sticker && this.lastMessage.sticker.file_id === message.sticker.file_id && this.lastMessage.from?.first_name !== message.from?.first_name) {
-                this.telegram.sendSticker(message.chat.id, message.sticker.file_id);
-                this.lastMessage = null;
-            } else {
-                this.lastMessage = message;
-            }
-        }
-
         if (message.from && Math.random() < RANDOM_REPLY_PROBABILITY / 100) {
             this.replyRandomMessage(message, message.from);
         }
