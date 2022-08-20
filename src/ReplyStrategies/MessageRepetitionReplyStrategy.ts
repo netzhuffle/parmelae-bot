@@ -1,6 +1,5 @@
 import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
-import {OneLiners} from "../OneLiners";
 import {singleton} from "tsyringe";
 import assert from "assert";
 

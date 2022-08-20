@@ -10,6 +10,7 @@ import {WitReplyStrategy} from "./ReplyStrategies/WitReplyStrategy";
 import {MessageRepetitionReplyStrategy} from "./ReplyStrategies/MessageRepetitionReplyStrategy";
 import {NicknameReplyStrategy} from "./ReplyStrategies/NicknameReplyStrategy";
 import {RandomizedGpt3ReplyStrategy} from "./ReplyStrategies/RandomizedGpt3ReplyStrategy";
+import {RandomizedStickerReplyStrategy} from "./ReplyStrategies/RandomizedStickerReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -25,6 +26,7 @@ export class ReplyStrategyFinder {
         messageRepetitionReplyStrategy: MessageRepetitionReplyStrategy,
         nicknameReplyStrategy: NicknameReplyStrategy,
         randomizedGpt3ReplyStrategy: RandomizedGpt3ReplyStrategy,
+        randomizedStickerReplyStrategy: RandomizedStickerReplyStrategy,
         nullReplyStrategy: NullReplyStrategy
     ) {
         this.strategies = [
@@ -48,6 +50,9 @@ export class ReplyStrategyFinder {
 
             // Picks a message by random chance to reply with GPT-3.
             randomizedGpt3ReplyStrategy,
+
+            // Picks a message by random chance to reply with a random sticker.
+            randomizedStickerReplyStrategy,
 
             // Do nothing (catch all last rule).
             nullReplyStrategy

@@ -7,7 +7,8 @@ const MAX_TOKENS = 256;
 /** GPT-3 Service */
 @singleton()
 export class Gpt3 {
-    constructor(private readonly openAi: OpenAIApi) {}
+    constructor(private readonly openAi: OpenAIApi) {
+    }
 
     /**
      * Asks GPT-3 to generate a reply
