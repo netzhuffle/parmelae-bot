@@ -4,7 +4,7 @@ import {inject, singleton} from "tsyringe";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {Config} from "../Config";
 import {Gpt3} from "../Gpt3";
-import {ReplyFunction} from "../ReplyStrategy";
+import {TelegramService} from "../TelegramService";
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;
@@ -13,6 +13,7 @@ const RANDOM_REPLY_PROBABILITY = 0.035;
 @singleton()
 export class RandomizedGpt3ReplyStrategy extends AllowlistedReplyStrategy {
     constructor(
+        private readonly telegram: TelegramService,
         private readonly gpt3: Gpt3,
         @inject('Config') config: Config,
     ) {
@@ -24,9 +25,9 @@ export class RandomizedGpt3ReplyStrategy extends AllowlistedReplyStrategy {
         return message.text !== undefined && Math.random() < RANDOM_REPLY_PROBABILITY;
     }
 
-    handle(message: TelegramBot.Message, reply: ReplyFunction): void {
+    handle(message: TelegramBot.Message): void {
         assert(message.text !== undefined);
 
-        this.gpt3.reply(message.text, (text: string) => reply(text, message));
+        this.gpt3.reply(message.text, (text: string) => this.telegram.reply(text, message));
     }
 }

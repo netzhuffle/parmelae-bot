@@ -1,6 +1,7 @@
-import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
+import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
+import {TelegramService} from "../TelegramService";
 
 /** Adjectives: First word of nickname. */
 const ADJECTIVES = [
@@ -92,14 +93,17 @@ const NOUNS = [
 /** Replies with a nickname when the text contains <Spitzname>. */
 @singleton()
 export class NicknameReplyStrategy implements ReplyStrategy {
+    constructor(private readonly telegram: TelegramService) {
+    }
+
     willHandle(message: TelegramBot.Message): boolean {
         return message.text?.includes('<Spitzname>') ?? false;
     }
 
-    handle(message: TelegramBot.Message, reply: ReplyFunction): void {
+    handle(message: TelegramBot.Message): void {
         const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
         const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
 
-        reply(`${adjective} ${noun}`, message);
+        this.telegram.reply(`${adjective} ${noun}`, message);
     }
 }

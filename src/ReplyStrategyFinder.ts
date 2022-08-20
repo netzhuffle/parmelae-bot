@@ -16,7 +16,7 @@ import {RandomizedStickerReplyStrategy} from "./ReplyStrategies/RandomizedSticke
 @singleton()
 export class ReplyStrategyFinder {
     /** All possible strategies, in order. One strategy must handle the message. */
-    private readonly strategies: ReplyStrategy[];
+    private readonly strategies: readonly ReplyStrategy[];
 
     constructor(
         stickerIdReplyStrategy: StickerIdReplyStrategy,

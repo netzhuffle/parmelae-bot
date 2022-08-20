@@ -1,4 +1,4 @@
-import {ReplyFunction, ReplyStrategy} from "./ReplyStrategy";
+import {ReplyStrategy} from "./ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 
 /** Abstract ReplyStrategy for private chats only */
@@ -19,5 +19,5 @@ export abstract class PrivateChatReplyStrategy implements ReplyStrategy {
      */
     abstract willHandlePrivate(message: TelegramBot.Message): boolean;
 
-    abstract handle(message: TelegramBot.Message, reply: ReplyFunction): void;
+    abstract handle(message: TelegramBot.Message): void;
 }

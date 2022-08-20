@@ -1,4 +1,3 @@
-import {ReplyFunction} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {inject, singleton} from "tsyringe";
 import assert from "assert";
@@ -23,12 +22,12 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
         return message.text !== undefined && COMMAND_NAME.test(message.text);
     }
 
-    handle(message: TelegramBot.Message, reply: ReplyFunction) {
+    handle(message: TelegramBot.Message) {
         assert(message.text !== undefined);
 
         const commandMatches = message.text.match(COMMAND_NAME);
         assert(commandMatches && commandMatches.length >= 2);
 
-        this.commandService.execute(commandMatches[1], message, reply);
+        this.commandService.execute(commandMatches[1], message);
     }
 }

@@ -1,8 +1,9 @@
-import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
+import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
 import assert from "assert";
 import {Sticker} from "../Sticker";
+import {TelegramService} from "../TelegramService";
 
 /** Possible messages. %u will be replaced with the user’s first name. */
 const MESSAGES = [
@@ -23,6 +24,9 @@ const MESSAGES = [
 /** Welcomes new chat members. */
 @singleton()
 export class NewMembersReplyStrategy implements ReplyStrategy {
+    constructor(private readonly telegram: TelegramService) {
+    }
+
     willHandle(message: TelegramBot.Message): boolean {
         if (message.new_chat_members === undefined) {
             return false;
@@ -31,7 +35,7 @@ export class NewMembersReplyStrategy implements ReplyStrategy {
         return message.new_chat_members.length >= 1;
     }
 
-    handle(message: TelegramBot.Message, reply: ReplyFunction): void {
+    handle(message: TelegramBot.Message): void {
         assert(message.new_chat_members);
 
         message.new_chat_members.forEach(user => {
@@ -39,7 +43,7 @@ export class NewMembersReplyStrategy implements ReplyStrategy {
             if (this.isString(randomMessage)) {
                 randomMessage = randomMessage.replace(/%u/, user.first_name);
             }
-            reply(randomMessage, message);
+            this.telegram.reply(randomMessage, message);
         });
     }
 

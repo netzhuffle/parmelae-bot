@@ -6,7 +6,7 @@ import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
 import {Gpt3} from "../Gpt3";
-import {ReplyFunction} from "../ReplyStrategy";
+import {TelegramService} from "../TelegramService";
 
 /**
  * Handles messages mentioning the bot in allowlisted chats by sending them to Wit for handling.
@@ -18,6 +18,7 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
     private readonly usernameRegex: RegExp;
 
     constructor(
+        private readonly telegram: TelegramService,
         private readonly wit: Wit,
         private readonly commandService: CommandService,
         private readonly gpt3: Gpt3,
@@ -31,7 +32,7 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
         return message.text !== undefined && this.usernameRegex.test(message.text);
     }
 
-    handle(message: TelegramBot.Message, reply: ReplyFunction): void {
+    handle(message: TelegramBot.Message): void {
         assert(message.text !== undefined);
 
         const matches = message.text.match(this.usernameRegex);
@@ -47,9 +48,9 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
             const intents = data.intents;
             if (intents && intents[0]) {
                 const intent = intents[0].name;
-                this.commandService.execute(intent, message, reply.bind(this));
+                this.commandService.execute(intent, message);
             } else {
-                this.gpt3.replyCheaper(witMessage, (text: string) => reply(text, message));
+                this.gpt3.replyCheaper(witMessage, (text: string) => this.telegram.reply(text, message));
             }
         });
     }

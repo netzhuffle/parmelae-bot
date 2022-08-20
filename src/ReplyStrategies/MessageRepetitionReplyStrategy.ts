@@ -1,14 +1,16 @@
-import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
+import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
 import assert from "assert";
+import {TelegramService} from "../TelegramService";
+import {Sticker} from "../Sticker";
 
 /** Repeats a message that two other users wrote. */
 @singleton()
 export class MessageRepetitionReplyStrategy implements ReplyStrategy {
     private lastMessage: TelegramBot.Message | null = null;
 
-    constructor(private telegram: TelegramBot) {
+    constructor(private telegram: TelegramService) {
     }
 
     willHandle(message: TelegramBot.Message): boolean {
@@ -35,12 +37,12 @@ export class MessageRepetitionReplyStrategy implements ReplyStrategy {
         return false;
     }
 
-    handle(message: TelegramBot.Message, reply: ReplyFunction): void {
+    handle(message: TelegramBot.Message): void {
         if (message.text) {
-            this.telegram.sendMessage(message.chat.id, message.text);
+            this.telegram.send(message.text, message.chat);
         } else {
             assert(message.sticker);
-            this.telegram.sendSticker(message.chat.id, message.sticker.file_id);
+            this.telegram.send(new Sticker(message.sticker.file_id), message.chat);
         }
     }
 }

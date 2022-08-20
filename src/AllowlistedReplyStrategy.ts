@@ -1,4 +1,4 @@
-import {ReplyFunction, ReplyStrategy} from "./ReplyStrategy";
+import {ReplyStrategy} from "./ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {Config} from "./Config";
 import {inject} from "tsyringe";
@@ -28,5 +28,5 @@ export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
      */
     abstract willHandleAllowlisted(message: TelegramBot.Message): boolean;
 
-    abstract handle(message: TelegramBot.Message, reply: ReplyFunction): void;
+    abstract handle(message: TelegramBot.Message): void;
 }

@@ -1,4 +1,4 @@
-import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
+import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
 
@@ -9,7 +9,7 @@ export class NullReplyStrategy implements ReplyStrategy {
         return true;
     }
 
-    handle(_message: TelegramBot.Message, _reply: ReplyFunction): void {
+    handle(_message: TelegramBot.Message): void {
         // Do nothing.
     }
 }

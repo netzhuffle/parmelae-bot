@@ -1,4 +1,3 @@
-import {Sticker} from './Sticker';
 import TelegramBot from "node-telegram-bot-api";
 import assert from "assert";
 import {inject, singleton} from "tsyringe";
@@ -34,27 +33,12 @@ export class Bot {
     }
 
     /**
-     * Replies to a message
-     *
-     * @param reply - The text or Sticker to send
-     * @param message - The message to reply to
-     */
-    reply(reply: string | Sticker, message: TelegramBot.Message): void {
-        if (reply instanceof Sticker) {
-            const stickerFileId = reply.fileId;
-            this.telegram.sendSticker(message.chat.id, stickerFileId, {reply_to_message_id: message.message_id});
-        } else {
-            this.telegram.sendMessage(message.chat.id, reply, {reply_to_message_id: message.message_id});
-        }
-    }
-
-    /**
      * Handles new messages and replies if necessary
      *
      * @param message - The message to reply to
      */
     handleMessage(message: TelegramBot.Message): void {
         const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
-        replyStrategy.handle(message, this.reply.bind(this));
+        replyStrategy.handle(message);
     }
 }

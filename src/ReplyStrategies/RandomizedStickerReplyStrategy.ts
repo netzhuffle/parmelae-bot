@@ -1,7 +1,8 @@
-import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
+import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
 import {Sticker} from "../Sticker";
+import {TelegramService} from "../TelegramService";
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.00035;
@@ -19,12 +20,15 @@ const STICKERS = [
 /** Picks a message by random chance to reply with a random sticker. */
 @singleton()
 export class RandomizedStickerReplyStrategy implements ReplyStrategy {
+    constructor(private readonly telegram: TelegramService) {
+    }
+
     willHandle(message: TelegramBot.Message): boolean {
         return message.from !== undefined && Math.random() < RANDOM_REPLY_PROBABILITY;
     }
 
-    handle(message: TelegramBot.Message, reply: ReplyFunction): void {
+    handle(message: TelegramBot.Message): void {
         const sticker = STICKERS[Math.floor(Math.random() * STICKERS.length)];
-        reply(sticker, message);
+        this.telegram.reply(sticker, message);
     }
 }
