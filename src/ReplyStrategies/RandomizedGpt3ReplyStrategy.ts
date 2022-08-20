@@ -1,9 +1,7 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import {Wit} from "node-wit";
 import {inject, singleton} from "tsyringe";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
-import {CommandService} from "../CommandService";
 import {Config} from "../Config";
 import {Gpt3} from "../Gpt3";
 import {ReplyFunction} from "../ReplyStrategy";

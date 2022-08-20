@@ -1,4 +1,4 @@
-import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
+import {ReplyFunction} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import {inject, singleton} from "tsyringe";
 import assert from "assert";
