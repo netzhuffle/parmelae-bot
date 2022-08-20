@@ -1,12 +1,12 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import { Wit } from "node-wit";
-import {inject, singleton } from "tsyringe";
-import { AllowlistedReplyStrategy } from "../AllowlistedReplyStrategy";
-import { CommandService } from "../CommandService";
-import { Config } from "../Config";
-import { Gpt3 } from "../Gpt3";
-import { ReplyFunction } from "../ReplyStrategy";
+import {Wit} from "node-wit";
+import {inject, singleton} from "tsyringe";
+import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
+import {CommandService} from "../CommandService";
+import {Config} from "../Config";
+import {Gpt3} from "../Gpt3";
+import {ReplyFunction} from "../ReplyStrategy";
 
 /**
  * Handles messages mentioning the bot in allowlisted chats by sending them to Wit for handling.
@@ -22,7 +22,7 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
         private readonly commandService: CommandService,
         private readonly gpt3: Gpt3,
         @inject('Config') config: Config,
-        ) {
+    ) {
         super(config);
         this.usernameRegex = new RegExp(`^(.*)@${this.config.username}(.*)$`, 'is');
     }
