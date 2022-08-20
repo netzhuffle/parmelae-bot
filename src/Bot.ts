@@ -88,13 +88,6 @@ export class Bot {
         }
         // This is a temporary fallthrough until all handlers have been converted to ReplyStrategies.
 
-        if (message.text) {
-            if (Math.random() < RANDOM_REPLY_PROBABILITY && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') {
-                this.gpt3.reply(message.text, (text: string) => this.reply(text, message));
-                return;
-            }
-        }
-
         if (message.sticker) {
             if (this.lastMessage && this.lastMessage.sticker && this.lastMessage.sticker.file_id === message.sticker.file_id && this.lastMessage.from?.first_name !== message.from?.first_name) {
                 this.telegram.sendSticker(message.chat.id, message.sticker.file_id);

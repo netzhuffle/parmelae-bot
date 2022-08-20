@@ -5,10 +5,11 @@ import assert from "assert";
 import {singleton} from "tsyringe";
 import {StickerIdReplyStrategy} from "./ReplyStrategies/StickerIdReplyStrategy";
 import {NewMembersReplyStrategy} from "./ReplyStrategies/NewMembersReplyStrategy";
-import { CommandReplyStrategy } from "./ReplyStrategies/CommandReplyStrategy";
-import { WitReplyStrategy } from "./ReplyStrategies/WitReplyStrategy";
-import { MessageRepetitionReplyStrategy } from "./ReplyStrategies/MessageRepetitionReplyStrategy";
-import { NicknameReplyStrategy } from "./ReplyStrategies/NicknameReplyStrategy";
+import {CommandReplyStrategy} from "./ReplyStrategies/CommandReplyStrategy";
+import {WitReplyStrategy} from "./ReplyStrategies/WitReplyStrategy";
+import {MessageRepetitionReplyStrategy} from "./ReplyStrategies/MessageRepetitionReplyStrategy";
+import {NicknameReplyStrategy} from "./ReplyStrategies/NicknameReplyStrategy";
+import {RandomizedGpt3ReplyStrategy} from "./ReplyStrategies/RandomizedGpt3ReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -23,6 +24,7 @@ export class ReplyStrategyFinder {
         witReplyStrategy: WitReplyStrategy,
         messageRepetitionReplyStrategy: MessageRepetitionReplyStrategy,
         nicknameReplyStrategy: NicknameReplyStrategy,
+        randomizedGpt3ReplyStrategy: RandomizedGpt3ReplyStrategy,
         nullReplyStrategy: NullReplyStrategy
     ) {
         this.strategies = [
@@ -43,6 +45,9 @@ export class ReplyStrategyFinder {
 
             // Replies with a nickname when the text contains <Spitzname>.
             nicknameReplyStrategy,
+
+            // Picks a message by random chance to reply with GPT-3.
+            randomizedGpt3ReplyStrategy,
 
             // Do nothing (catch all last rule).
             nullReplyStrategy
