@@ -3,7 +3,6 @@ import {singleton} from "tsyringe";
 import {spawn} from "child_process";
 import {ReplyFunction} from "./ReplyStrategy";
 import {Gpt3} from "./Gpt3";
-import {OpenAIApi} from "openai";
 
 /** Executes a command */
 @singleton()
@@ -11,7 +10,6 @@ export class CommandService {
     constructor(
         private readonly telegram: TelegramBot,
         private readonly gpt3: Gpt3,
-        private readonly openAi: OpenAIApi,
     ) {
     }
 
@@ -20,6 +18,7 @@ export class CommandService {
      *
      * @param command - The command
      * @param message - The message to reply to
+     * @param reply - Function to reply to a message
      */
     execute(command: string, message: TelegramBot.Message, reply: ReplyFunction): void {
         if (command === 'info') {
