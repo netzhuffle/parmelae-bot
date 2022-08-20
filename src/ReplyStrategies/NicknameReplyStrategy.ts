@@ -1,7 +1,11 @@
+import {ReplyFunction, ReplyStrategy} from "../ReplyStrategy";
+import TelegramBot from "node-telegram-bot-api";
+import {OneLiners} from "../OneLiners";
 import {singleton} from "tsyringe";
+import assert from "assert";
 
-/** Adjectives: First word of nickname */
-const adjectives = [
+/** Adjectives: First word of nickname. */
+const ADJECTIVES = [
     'Gummy',
     'Pink',
     'Pink',
@@ -34,8 +38,8 @@ const adjectives = [
     'Swooping'
 ];
 
-/** Nouns: Second word of nickname */
-let nouns = [
+/** Nouns: Second word of nickname. */
+const NOUNS = [
     'Worm',
     'Bear',
     'Unicorn',
@@ -87,14 +91,17 @@ let nouns = [
     'Charmy'
 ];
 
-/** Nickname generation service */
+/** Replies with a nickname when the text contains <Spitzname>. */
 @singleton()
-export class Nicknames {
-    /** Returns a random nickname */
-    getNickname(): string {
-        const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-        const noun = nouns[Math.floor(Math.random() * nouns.length)];
+export class NicknameReplyStrategy implements ReplyStrategy {
+    willHandle(message: TelegramBot.Message): boolean {
+        return message.text?.includes('<Spitzname>') ?? false;
+    }
 
-        return `${adjective} ${noun}`;
+    handle(message: TelegramBot.Message, reply: ReplyFunction): void {
+        const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+        const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+
+        reply(`${adjective} ${noun}`, message);
     }
 }

@@ -8,6 +8,7 @@ import {NewMembersReplyStrategy} from "./ReplyStrategies/NewMembersReplyStrategy
 import { CommandReplyStrategy } from "./ReplyStrategies/CommandReplyStrategy";
 import { WitReplyStrategy } from "./ReplyStrategies/WitReplyStrategy";
 import { MessageRepetitionReplyStrategy } from "./ReplyStrategies/MessageRepetitionReplyStrategy";
+import { NicknameReplyStrategy } from "./ReplyStrategies/NicknameReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -21,6 +22,7 @@ export class ReplyStrategyFinder {
         commandReplyStrategy: CommandReplyStrategy,
         witReplyStrategy: WitReplyStrategy,
         messageRepetitionReplyStrategy: MessageRepetitionReplyStrategy,
+        nicknameReplyStrategy: NicknameReplyStrategy,
         nullReplyStrategy: NullReplyStrategy
     ) {
         this.strategies = [
@@ -38,6 +40,9 @@ export class ReplyStrategyFinder {
 
             // Repeats a message that two other users wrote.
             messageRepetitionReplyStrategy,
+
+            // Replies with a nickname when the text contains <Spitzname>.
+            nicknameReplyStrategy,
 
             // Do nothing (catch all last rule).
             nullReplyStrategy

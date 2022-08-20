@@ -6,9 +6,7 @@ import {OpenAIApi} from "openai";
 import assert from "assert";
 import {inject, singleton} from "tsyringe";
 import {OneLiners} from "./OneLiners";
-import {Nicknames} from "./Nicknames";
 import {Gpt3} from "./Gpt3";
-import {Triggers} from "./Triggers";
 import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {NullReplyStrategy} from "./ReplyStrategies/NullReplyStrategy";
 import {Config} from './Config';
@@ -28,8 +26,6 @@ export class Bot {
     constructor(
         private readonly replyStrategyFinder: ReplyStrategyFinder,
         private readonly oneLiners: OneLiners,
-        private readonly triggers: Triggers,
-        private readonly nicknames: Nicknames,
         private readonly commandService: CommandService,
         private readonly gpt3: Gpt3,
         private readonly telegram: TelegramBot,
@@ -93,18 +89,6 @@ export class Bot {
         // This is a temporary fallthrough until all handlers have been converted to ReplyStrategies.
 
         if (message.text) {
-            const triggersMatches = this.triggers.search(message.text);
-            triggersMatches.forEach((triggersMatch: string | Sticker) => {
-                if (triggersMatch) {
-                    this.reply(triggersMatch, message);
-                }
-            });
-
-            if (/<Spitzname>/i.test(message.text)) {
-                this.reply(this.nicknames.getNickname(), message);
-                return;
-            }
-
             if (Math.random() < RANDOM_REPLY_PROBABILITY && !message.text.startsWith('/') && message.text.length < 400 && message.chat.id === -1001736687780 || message.from?.id === 48001795 && message.chat.type === 'private') {
                 this.gpt3.reply(message.text, (text: string) => this.reply(text, message));
                 return;
