@@ -6,6 +6,7 @@ import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
 
+/** Regex matching the command name. */
 const COMMAND_NAME = /^\/(.*)@/;
 
 /** Executes commands written as /xyz@BotName in allowlisted chats. */
