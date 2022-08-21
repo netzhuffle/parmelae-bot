@@ -1,7 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
 import {spawn} from "child_process";
-import {Gpt3} from "./Gpt3";
+import {Gpt3Service} from "./Gpt3Service";
 import {TelegramService} from "./TelegramService";
 
 /** Executes a command */
@@ -9,7 +9,7 @@ import {TelegramService} from "./TelegramService";
 export class CommandService {
     constructor(
         private readonly telegram: TelegramService,
-        private readonly gpt3: Gpt3,
+        private readonly gpt3: Gpt3Service,
     ) {
     }
 
@@ -29,7 +29,7 @@ export class CommandService {
                 this.telegram.reply('Ich würde Ihnen gerne einen Kommentar dazu abgeben, aber dazu müssen Sie mich in einer Antwort auf einen Text fragen, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.reply(message.reply_to_message.text, (text: string) => this.telegram.reply(text, message));
+            this.gpt3.reply(message.reply_to_message.text).then((text: string) => this.telegram.reply(text, message));
             return;
         }
         if (command === 'complete') {
@@ -37,7 +37,7 @@ export class CommandService {
                 this.telegram.reply('Ich würde gerne fortfahren, aber dazu müssen Sie mich in einer Antwort auf einen meiner Texte darum bitten, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.continue(message.reply_to_message.text, (text: string) => this.telegram.reply(text, message));
+            this.gpt3.continue(message.reply_to_message.text).then((text: string) => this.telegram.reply(text, message));
             return;
         }
 

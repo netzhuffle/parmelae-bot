@@ -5,7 +5,7 @@ import {inject, singleton} from "tsyringe";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
-import {Gpt3} from "../Gpt3";
+import {Gpt3Service} from "../Gpt3Service";
 import {TelegramService} from "../TelegramService";
 
 /**
@@ -21,7 +21,7 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
         private readonly telegram: TelegramService,
         private readonly wit: Wit,
         private readonly commandService: CommandService,
-        private readonly gpt3: Gpt3,
+        private readonly gpt3: Gpt3Service,
         @inject('Config') config: Config,
     ) {
         super(config);
@@ -50,7 +50,8 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
                 const intent = intents[0].name;
                 this.commandService.execute(intent, message);
             } else {
-                this.gpt3.replyCheaper(witMessage, (text: string) => this.telegram.reply(text, message));
+                this.gpt3.replyCheaper(witMessage)
+                    .then((text: string) => this.telegram.reply(text, message));
             }
         });
     }
