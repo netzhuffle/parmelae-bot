@@ -30,7 +30,7 @@ The most helpful bot you’ve ever seen on Telegram.
 
 # Run in production
 
-* Update dependencies: `npm install --production`
+* Update dependencies: `npm install --omit=dev`
 * Compile: `npx tsc`
 * Deploy (however you like)
 * Execute: `node built/src/index.js`
