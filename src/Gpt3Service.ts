@@ -3,9 +3,19 @@ import {OpenAIApi, CreateCompletionResponse} from "openai";
 import {singleton} from "tsyringe";
 import {AxiosResponse} from "axios";
 
-/** Maximum number of tokens to generate by GPT-3 */
+/** Maximum number of tokens to generate by GPT-3. */
 const MAX_TOKENS = 256;
+
+/** Maximum number of characters in input. */
 const MAX_INPUT_LENGTH = 800;
+
+/**
+ * GPT-3 generation temperature (0–1).
+ *
+ * 0 = stay close to given prompt.
+ * 1 = 100% maximum creativity.
+ */
+const TEMPERATURE = 0.9;
 
 /** GPT-3 Service */
 @singleton()
@@ -14,7 +24,7 @@ export class Gpt3Service {
     }
 
     /**
-     * Asks GPT-3 to generate a reply
+     * Asks GPT-3 to generate a reply.
      * @param text - A query text
      * @return The reply text
      */
@@ -60,7 +70,10 @@ User: https://www.youtube.com/watch?v=Qp9es-qnt8k
 Parmelä: Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam anschauen.
 
 User: ${text}
-Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:"]
+Parmelä:`,
+            temperature: TEMPERATURE,
+            max_tokens: MAX_TOKENS,
+            stop: ['User:', 'Parmelä:'],
         });
 
         const reply = this.getCompletion(response)?.trim();
@@ -68,7 +81,7 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
     }
 
     /**
-     * Asks GPT-3 to generate a reply with a more cost-efficient model
+     * Asks GPT-3 to generate a reply with a more cost-efficient model.
      * @param text - A query text
      * @return The reploy text
      */
@@ -114,7 +127,10 @@ User: https://www.youtube.com/watch?v=Qp9es-qnt8k
 Parmelä: Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam anschauen.
 
 User: ${text}
-Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:"]
+Parmelä:`,
+            temperature: TEMPERATURE,
+            max_tokens: MAX_TOKENS,
+            stop: ['User:', 'Parmelä:'],
         });
 
         const reply = this.getCompletion(response)?.trim();
@@ -123,7 +139,7 @@ Parmelä:`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["User:", "Parmelä:
 
 
     /**
-     * Asks GPT-3 to continue a started text
+     * Asks GPT-3 to continue a started text.
      * @param text - The text
      * @return The completed text (including both old and new parts)
      */
@@ -147,7 +163,10 @@ Parmelä: Seit dem 1. Januar 2019 bin ich Vorsteher des Eidgenössischen Departe
 Parmelä: Ja, das ist Alain Berset. Ich erkenne ihn sofort.
 Parmelä: Wir werden uns dass Thema bei der nächsten Bundesratssitzung gemeinsam anschauen.
 Parmelä: Ohne Sicherheit gibt es keine Wohlfahrt. Ohne Sicherheit wird die Wirtschaft gebremst. Dann können wir auch keine Sozialleistungen mehr finanzieren.
-Parmelä: ${text}`, temperature: 0.9, max_tokens: MAX_TOKENS, stop: ["Parmelä:"]
+Parmelä: ${text}`,
+            temperature: TEMPERATURE,
+            max_tokens: MAX_TOKENS,
+            stop: 'Parmelä:',
         });
 
         const completion = this.getCompletion(response)?.trimEnd();
