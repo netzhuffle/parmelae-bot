@@ -11,6 +11,7 @@ import {MessageRepetitionReplyStrategy} from "./ReplyStrategies/MessageRepetitio
 import {NicknameReplyStrategy} from "./ReplyStrategies/NicknameReplyStrategy";
 import {RandomizedGpt3ReplyStrategy} from "./ReplyStrategies/RandomizedGpt3ReplyStrategy";
 import {RandomizedStickerReplyStrategy} from "./ReplyStrategies/RandomizedStickerReplyStrategy";
+import {CommentReplyStrategy} from "./ReplyStrategies/CommentReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -21,6 +22,7 @@ export class ReplyStrategyFinder {
     constructor(
         stickerIdReplyStrategy: StickerIdReplyStrategy,
         newMembersReplyStrategy: NewMembersReplyStrategy,
+        commentReplyStrategy: CommentReplyStrategy,
         commandReplyStrategy: CommandReplyStrategy,
         witReplyStrategy: WitReplyStrategy,
         messageRepetitionReplyStrategy: MessageRepetitionReplyStrategy,
@@ -35,6 +37,9 @@ export class ReplyStrategyFinder {
 
             // Welcomes new chat members.
             newMembersReplyStrategy,
+
+            // Comments a message when somebody replies with (just) the bot’s name.
+            commentReplyStrategy,
 
             // Executes commands written as /xyz@BotName in allowlisted chats.
             commandReplyStrategy,
