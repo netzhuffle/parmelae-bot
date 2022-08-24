@@ -4,6 +4,7 @@ import assert from "assert";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
+import {Command} from "../Command";
 
 /** Regex matching the command name. */
 const COMMAND_NAME = /^\/(.*)@/;
@@ -27,7 +28,29 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
 
         const commandMatches = message.text.match(COMMAND_NAME);
         assert(commandMatches && commandMatches.length >= 2);
+        const command = this.getCommand(commandMatches[1]);
 
-        this.commandService.execute(commandMatches[1], message);
+        this.commandService.execute(command, message);
+    }
+
+    private getCommand(command: string): Command {
+        switch (command) {
+            case 'info':
+                return Command.Info;
+            case 'comment':
+                return Command.Comment;
+            case 'completed':
+                return Command.Complete;
+            case 'startminecraft':
+                return Command.StartMinecraft;
+            case 'stopminecraft':
+                return Command.StopMinecraft;
+            case 'backupminecraft':
+                return Command.BackupMinecraft;
+            case 'statusminecraft':
+                return Command.StatusMinecraft;
+            default:
+                return Command.Unknown;
+        }
     }
 }

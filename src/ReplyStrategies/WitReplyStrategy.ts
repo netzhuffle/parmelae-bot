@@ -7,6 +7,7 @@ import {CommandService} from "../CommandService";
 import {Config} from "../Config";
 import {Gpt3Service} from "../Gpt3Service";
 import {TelegramService} from "../TelegramService";
+import {Command} from "../Command";
 
 /**
  * Handles messages mentioning the bot in allowlisted chats by sending them to Wit for handling.
@@ -48,11 +49,33 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
             const intents = data.intents;
             if (intents && intents[0]) {
                 const intent = intents[0].name;
-                this.commandService.execute(intent, message);
+                const command = this.getCommand(intent);
+                this.commandService.execute(command, message);
             } else {
                 this.gpt3.replyCheaper(witMessage)
                     .then((text: string) => this.telegram.reply(text, message));
             }
         });
+    }
+
+    private getCommand(command: string): Command {
+        switch (command) {
+            case 'info':
+                return Command.Info;
+            case 'comment':
+                return Command.Comment;
+            case 'completed':
+                return Command.Complete;
+            case 'startminecraft':
+                return Command.StartMinecraft;
+            case 'stopminecraft':
+                return Command.StopMinecraft;
+            case 'backupminecraft':
+                return Command.BackupMinecraft;
+            case 'statusminecraft':
+                return Command.StatusMinecraft;
+            default:
+                return Command.Unknown;
+        }
     }
 }
