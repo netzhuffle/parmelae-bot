@@ -17,6 +17,16 @@ const MAX_INPUT_LENGTH = 800;
  */
 const TEMPERATURE = 0.9;
 
+/**
+ * The more capable, expensive GPT-3 text completion model.
+ */
+const MODEL_DAVINCI = 'text-davinci-002';
+
+/**
+ * The less capable, cheaper GPT-3 text completion model.
+ */
+const MODEL_CURIE = 'text-curie-001';
+
 /** GPT-3 Service */
 @singleton()
 export class Gpt3Service {
@@ -36,7 +46,7 @@ export class Gpt3Service {
         }
 
         const response = await this.openAi.createCompletion({
-            model: 'text-davinci-002',
+            model: MODEL_DAVINCI,
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 
 User: hoffe, bi Coop wirds mal no besser. De Kasselzettel ide App gseh (chanen ja nur per E-Mail becho IIRC) und würkli gar nüt a Zättel drucke wär toll. Geschter halt doch no 2 becho. Regt mi jedes Mal uf
@@ -93,7 +103,7 @@ Parmelä:`,
         }
 
         const response = await this.openAi.createCompletion({
-            model: 'text-curie-001',
+            model: MODEL_DAVINCI,
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 
 User: Ich hoffe, Coop wird mal noch besser. Die Kassenzettel in der App anzuzeigen (kann sie ja nur per Mail bekommen IIRC) und wirklich gar keine Zettel zu drucken, wäre toll. Gestern halt doch noch zwei bekommen. Regt mich jedes Mal auf
@@ -151,7 +161,7 @@ Parmelä:`,
         }
 
         const response = await this.openAi.createCompletion({
-            model: 'text-curie-001',
+            model: MODEL_DAVINCI,
             prompt: `Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
 
 Parmelä: Der Bundesrat muss Prioritäten setzen. Schliesslich fällt das Geld nicht vom Himmel. Wir haben in den letzten Jahren Milliarden für Sozialausgaben ausgegeben. Die Kosten werden in den nächsten Jahren mit der AHV und IV weiter steigen – stärker als das Bruttoinlandprodukt. Da liegen neue Sozialleistungen einfach nicht drin.
