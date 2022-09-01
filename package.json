@@ -3,7 +3,7 @@
   "main": "built/src/index.js",
   "dependencies": {
     "fuzzyset.js": "^1.0.7",
-    "node-telegram-bot-api": "^0.57.0",
+    "node-telegram-bot-api": "^0.59.0",
     "node-wit": "^6.2.2",
     "openai": "^3.0.0",
     "reflect-metadata": "^0.1.13",
