@@ -25,11 +25,11 @@ export class Bot {
      * Sets the handler to listen to messages
      */
     start(): void {
-        this.telegram.on('message', (message) => {
-            this.handleMessage(message);
+        this.telegram.on('message', async (message): Promise<void> => {
+            await this.handleMessage(message);
         });
         this.telegram.on('polling_error', console.log);
-        this.telegram.getMe().then((me) => {
+        this.telegram.getMe().then((me): void => {
             assert(me.username === this.config.username);
         });
     }
@@ -39,8 +39,8 @@ export class Bot {
      *
      * @param message - The message to reply to
      */
-    handleMessage(message: TelegramBot.Message): void {
-        this.messageStorageService.store(message);
+    async handleMessage(message: TelegramBot.Message): Promise<void> {
+        await this.messageStorageService.store(message);
         const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
         replyStrategy.handle(message);
     }
