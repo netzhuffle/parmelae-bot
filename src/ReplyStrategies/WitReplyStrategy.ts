@@ -16,8 +16,6 @@ import {Command} from "../Command";
  */
 @singleton()
 export class WitReplyStrategy extends AllowlistedReplyStrategy {
-    private readonly usernameRegex: RegExp;
-
     constructor(
         private readonly telegram: TelegramService,
         private readonly wit: Wit,
@@ -26,25 +24,16 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
         @inject('Config') config: Config,
     ) {
         super(config);
-        this.usernameRegex = new RegExp(`^(.*)@${this.config.username}(.*)$`, 'is');
     }
 
     willHandleAllowlisted(message: TelegramBot.Message): boolean {
-        return message.text !== undefined && this.usernameRegex.test(message.text);
+        return message.text !== undefined && message.text.includes(`@${this.config.username}`);
     }
 
     handle(message: TelegramBot.Message): void {
         assert(message.text !== undefined);
 
-        const matches = message.text.match(this.usernameRegex);
-        assert(matches !== null);
-        assert(matches.length === 3);
-        const [, part1, part2] = matches;
-
-        let witMessage = part1 + part2;
-        if (part1.endsWith(' ')) {
-            witMessage = part1.substring(0, part1.length - 1) + part2;
-        }
+        const witMessage = message.text.replace(`@${this.config.username}`, 'Herr Parmelä');
         this.wit.message(witMessage, {}).then(data => {
             const intents = data.intents;
             if (intents && intents[0]) {
