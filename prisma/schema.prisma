@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Chat {
-  id        Int       @id
+  id        BigInt       @id
   type      String
   title     String?
   username  String?
@@ -23,7 +23,7 @@ model Message {
   from             User      @relation(fields: [fromId], references: [id])
   fromId           BigInt
   chat             Chat      @relation(fields: [chatId], references: [id])
-  chatId           Int
+  chatId           BigInt
   sentAt           DateTime
   editedAt         DateTime?
   replyToMessage   Message?  @relation("ReplyToMessage", fields: [replyToMessageId], references: [id])
