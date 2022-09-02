@@ -1,4 +1,3 @@
-import assert from "assert";
 import {OpenAIApi, CreateCompletionResponse} from "openai";
 import {singleton} from "tsyringe";
 import {AxiosResponse} from "axios";
@@ -17,15 +16,14 @@ const MAX_INPUT_LENGTH = 800;
  */
 const TEMPERATURE = 0.9;
 
-/**
- * The more capable, expensive GPT-3 text completion model.
- */
+/** The more capable, expensive GPT-3 text completion model. */
 const MODEL_DAVINCI = 'text-davinci-002';
 
-/**
- * The less capable, cheaper GPT-3 text completion model.
- */
+/** The less capable, cheaper GPT-3 text completion model. */
 const MODEL_CURIE = 'text-curie-001';
+
+/** RegExp to find linebreaks. */
+const NEWLINES_REGEXP = /\\n+/g;
 
 /** GPT-3 Service */
 @singleton()
@@ -39,8 +37,6 @@ export class Gpt3Service {
      * @return The reply text
      */
     async reply(text: string): Promise<string> {
-        assert(text !== '');
-
         if (text.length >= MAX_INPUT_LENGTH) {
             return 'Entschuldigen Sie bitte, aber der Text ist zu lang. GPT-3 kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …';
         }
@@ -96,8 +92,6 @@ Parmelä:`,
      * @return The reploy text
      */
     async replyCheaper(text: string): Promise<string> {
-        assert(text !== '');
-
         if (text.length >= MAX_INPUT_LENGTH) {
             return 'Entschuldigen Sie bitte, aber der Text ist zu lang. GPT-3 kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …';
         }
@@ -154,8 +148,6 @@ Parmelä:`,
      * @return The completed text (including both old and new parts)
      */
     async continue(text: string): Promise<string> {
-        assert(text !== '');
-
         if (text.length >= MAX_INPUT_LENGTH) {
             return 'Entschuldigen Sie bitte, aber der Text ist bereits zu lang. GPT-3 kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …';
         }
@@ -181,6 +173,43 @@ Parmelä: ${text}`,
 
         const completion = this.getCompletion(response)?.trimEnd();
         return completion !== undefined ? text + completion : 'Ich habe bereits fertig.';
+    }
+
+    /**
+     * Asks GPT-3 to announce what’s new in a new commit.
+     * @param commitMessage - The commit’s message
+     * @return The reply text
+     */
+    async announceNewCommit(commitMessage: string): Promise<string> {
+        const gpt3CommitMessage = commitMessage.replaceAll(NEWLINES_REGEXP, ' | ');
+        const response = await this.openAi.createCompletion({
+            model: MODEL_DAVINCI,
+            prompt: `Ich bin der Bot Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst, freundlich und gehe gezielt auf Themen in der Nachricht ein. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Ich kündige neue meine neuen Funktionalitäten basierend auf der neusten Git-Commit-Message an.
+
+Commit-Message: Replace username instead of stripping in request
+Parmelä: Ich habe ein Update! Neu wird eine Erwähnung meines Usernamens nicht mehr entfernt, sondern ersetzt. Das sorgt für besseres Reagieren auf Nachrichten.
+
+Commit-Message: Apply WitReplyStrategy also to replies  | In addition to mentions.
+Parmelä: Guten Tag, ich habe ein neues Feature. Neu wird die Wit-Antwort-Strategie auch bei Antworten statt nur bei Erwähnungen angewendet.
+
+Commit-Message: Use only largest GPT-3 model  | In preparation for OpenAI's price cuts
+Parmelä: Ich verkünde: Neu wird immer das grösste GPT-3-Modell genutzt, da OpenAI die Preise senken wird.
+
+Commit-Message: Add CommentReplyStrategy | Comments a message when somebody replies (only) the bot's username (including the @). | Also refactor commands to an enum.
+Parmelä: Grüezi, ich habe eine Ankündigung. Neu nutze ich eine Kommentar-Antwort-Strategie. Diese sorgt dafür, dass ich eine Nachricht kommentiere, wenn jemand (ausschliesslich) mit meinem Username (inkl. @) antwortet. Zudem nutze ich jetzt ein Enum für meine Kommandos.
+
+Commit-Message: Set @types/node to LTS node version
+Parmelä: Ganz neu: Ich nutze jetzt – für Verbesserung meiner Arbeitsqualität und weiteres – die Versionsnummer von Node LTS für meine @types/node-Bibliothek. Genial!
+
+Commit-Message: ${gpt3CommitMessage}
+Parmelä:`,
+            temperature: TEMPERATURE,
+            max_tokens: MAX_TOKENS,
+            stop: ['Commit-Message:', 'Parmelä:'],
+        });
+
+        const reply = this.getCompletion(response)?.trim();
+        return reply !== undefined ? reply : `Ich habe ein neues Feature:\n${commitMessage}\nIch verstehe es aber selbst nicht ganz.`;
     }
 
     /** Returns the completion string if one was returned and is not empty or whitespace. */

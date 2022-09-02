@@ -5,10 +5,12 @@ import {Bot} from './Bot';
 import TelegramBot from 'node-telegram-bot-api';
 import {Wit} from 'node-wit';
 import {Configuration, OpenAIApi} from 'openai';
-import {container} from "tsyringe";
+import {container} from 'tsyringe';
 import {PrismaClient} from '@prisma/client';
+import {Octokit} from 'octokit';
 
 container.register<Config>('Config', {useValue: config as Config});
+container.register(Octokit, {useValue: new Octokit()});
 container.register(OpenAIApi, {
     useValue: new OpenAIApi(new Configuration({
         apiKey: config.openAiKey

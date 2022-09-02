@@ -4,6 +4,7 @@ import {inject, singleton} from "tsyringe";
 import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {Config} from './Config';
 import {MessageStorageService} from "./MessageStorageService";
+import {GitHubService} from "./GitHubService";
 
 /**
  * The most helpful bot in the world
@@ -18,6 +19,7 @@ export class Bot {
         private readonly telegram: TelegramBot,
         @inject('Config') private readonly config: Config,
         private readonly messageStorageService: MessageStorageService,
+        private readonly gitHubService: GitHubService,
     ) {
     }
 
@@ -32,6 +34,7 @@ export class Bot {
         this.telegram.getMe().then((me): void => {
             assert(me.username === this.config.username);
         });
+        this.gitHubService.startPollingAndAnnounceCommits();
     }
 
     /**

@@ -15,11 +15,12 @@ export class TelegramService {
      * @param message - The text or Sticker to send
      * @param chat - The chat to send in
      */
-    async send(message: string | Sticker, chat: TelegramBot.Chat): Promise<void> {
+    async send(message: string | Sticker, chat: TelegramBot.Chat | number): Promise<void> {
+        const chatId = typeof chat === "number" ? chat : chat.id;
         if (message instanceof Sticker) {
-            this.telegram.sendSticker(chat.id, message.fileId);
+            this.telegram.sendSticker(chatId, message.fileId);
         } else {
-            const sentMessage = await this.telegram.sendMessage(chat.id, message);
+            const sentMessage = await this.telegram.sendMessage(chatId, message);
             await this.messageStorageService.store(sentMessage);
         }
     }

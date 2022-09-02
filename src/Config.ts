@@ -5,4 +5,5 @@ export interface Config {
     readonly openAiKey: string;
     readonly chatAllowlist: readonly number[];
     readonly senderAllowlist: readonly number[];
+    readonly newCommitAnnouncementChats: readonly number[];
 }
