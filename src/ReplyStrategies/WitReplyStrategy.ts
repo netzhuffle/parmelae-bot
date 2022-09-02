@@ -27,13 +27,17 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
     }
 
     willHandleAllowlisted(message: TelegramBot.Message): boolean {
-        return message.text !== undefined && message.text.includes(`@${this.config.username}`);
+        if (message.text === undefined) {
+            return false;
+        }
+
+        return message.text.includes(`@${this.config.username}`) || message.reply_to_message?.from?.username === this.config.username;
     }
 
     handle(message: TelegramBot.Message): void {
         assert(message.text !== undefined);
 
-        const witMessage = message.text.replace(`@${this.config.username}`, 'Herr Parmelä');
+        const witMessage = message.text.replaceAll(`@${this.config.username}`, 'Herr Parmelä');
         this.wit.message(witMessage, {}).then(data => {
             const intents = data.intents;
             if (intents && intents[0]) {
