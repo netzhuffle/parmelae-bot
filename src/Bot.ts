@@ -3,6 +3,7 @@ import assert from "assert";
 import {inject, singleton} from "tsyringe";
 import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {Config} from './Config';
+import {MessageStorageService} from "./MessageStorageService";
 
 /**
  * The most helpful bot in the world
@@ -16,6 +17,7 @@ export class Bot {
         private readonly replyStrategyFinder: ReplyStrategyFinder,
         private readonly telegram: TelegramBot,
         @inject('Config') private readonly config: Config,
+        private readonly messageStorageService: MessageStorageService,
     ) {
     }
 
@@ -38,6 +40,7 @@ export class Bot {
      * @param message - The message to reply to
      */
     handleMessage(message: TelegramBot.Message): void {
+        this.messageStorageService.store(message);
         const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
         replyStrategy.handle(message);
     }
