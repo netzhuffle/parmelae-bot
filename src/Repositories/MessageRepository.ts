@@ -1,4 +1,4 @@
-import {Message, Prisma, PrismaClient} from "@prisma/client";
+import {Prisma, PrismaClient} from "@prisma/client";
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
