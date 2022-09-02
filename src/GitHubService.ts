@@ -24,7 +24,7 @@ export class GitHubService {
 
     /** Fetches commits now and periodically and announces new commits. */
     async startPollingAndAnnounceCommits(): Promise<void> {
-        this.lastCommitDateTime = await this.dateTimeSettingRepository.get(LAST_COMMIT_DATE_TIME_SETTING, new Date(0));
+        this.lastCommitDateTime = await this.dateTimeSettingRepository.get(LAST_COMMIT_DATE_TIME_SETTING, new Date());
         await this.pollAndAnnounceCommits();
         setInterval(async (): Promise<void> => {
             await this.pollAndAnnounceCommits();
@@ -38,7 +38,9 @@ export class GitHubService {
             since: this.lastCommitDateTime?.toISOString(),
         });
         commits.data.reverse();
-        commits.data.forEach(this.handleCommit.bind(this));
+        for (const commit of commits.data) {
+            await this.handleCommit(commit);
+        }
     }
 
     private async handleCommit(commit: {
@@ -69,9 +71,8 @@ export class GitHubService {
 
     private async updateSettingIfNewer(date: Date): Promise<void> {
         if (this.lastCommitDateTime && date > this.lastCommitDateTime) {
-            const promise = this.dateTimeSettingRepository.update(LAST_COMMIT_DATE_TIME_SETTING, this.lastCommitDateTime, date);
             this.lastCommitDateTime = date;
-            await promise;
+            await this.dateTimeSettingRepository.update(LAST_COMMIT_DATE_TIME_SETTING, date);
         }
     }
 }

@@ -33,15 +33,25 @@ export class DateTimeSettingRepository {
     }
 
     /**
-     * Updates an existing setting to a new Date.
+     * Updates an existing setting to a new Date, if it is newer than the current date.
      * @param setting The setting’s name
-     * @param oldDate The old date (used as a fingerprint to avoid concurrent updates)
      * @param newDate The new date
      */
-    async update(setting: string, oldDate: Date, newDate: Date): Promise<void> {
+    async update(setting: string, newDate: Date): Promise<void> {
+        const oldSetting = await this.prisma.dateTimeSetting.findUnique({
+            where: {
+                setting
+            }
+        });
+        const oldDate = oldSetting?.dateTime;
+        if (oldDate && oldDate >= newDate) {
+            return;
+        }
+
         await this.prisma.dateTimeSetting.updateMany({
             where: {
                 setting,
+                // Send old date as a fingerprint to make sure it didn’t get changed asynchronously in the meantime.
                 dateTime: oldDate,
             },
             data: {
