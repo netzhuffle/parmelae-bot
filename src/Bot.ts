@@ -30,10 +30,11 @@ export class Bot {
         this.telegram.on('message', async (message): Promise<void> => {
             await this.handleMessage(message);
         });
-        this.telegram.on('polling_error', console.log);
+        this.telegram.on('polling_error', console.error);
         this.telegram.getMe().then((me): void => {
             assert(me.username === this.config.username);
         });
+        this.messageStorageService.startDailyDeletion();
         this.gitHubService.startPollingAndAnnounceCommits();
     }
 

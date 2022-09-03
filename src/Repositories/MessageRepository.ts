@@ -1,7 +1,11 @@
-import {Prisma, PrismaClient} from "@prisma/client";
+import {Message, Prisma, PrismaClient} from "@prisma/client";
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
+
+/** Number of milliseconds in a day */
+const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 
 /** Repository for messages */
 @singleton()
@@ -17,10 +21,7 @@ export class MessageRepository {
 
         const databaseMessage = await this.prisma.message.findUnique({
             where: {
-                id: {
-                    messageId: message.message_id,
-                    chatId: message.chat.id,
-                }
+                id: this.getMessageId(message),
             },
         });
         if (databaseMessage) {
@@ -40,6 +41,33 @@ export class MessageRepository {
                 from: this.connectUser(message.from),
             }
         });
+    }
+
+    /**
+     * Deletes and returns old messages.
+     * @return The deleted messages
+     */
+    async deleteOld(): Promise<Message[]> {
+        const date7DaysAgo = new Date(Date.now() - SEVEN_DAYS_IN_MILLISECONDS);
+        const where7DaysAgo: Prisma.MessageWhereInput = {
+            sentAt: {
+                lt: date7DaysAgo,
+            },
+        };
+        const messagesToDelete = await this.prisma.message.findMany({
+            where: where7DaysAgo,
+        });
+        await this.prisma.message.deleteMany({
+            where: where7DaysAgo,
+        });
+        return messagesToDelete;
+    }
+
+    private getMessageId(message: TelegramBot.Message): Prisma.MessageIdCompoundUniqueInput {
+        return {
+            messageId: message.message_id,
+            chatId: message.chat.id,
+        };
     }
 
     private connectChat(chat: TelegramBot.Chat): Prisma.ChatCreateNestedOneWithoutMessagesInput {
@@ -82,10 +110,7 @@ export class MessageRepository {
         // Querying to make sure the message replied to exists in the database.
         const replyToMessage = await this.prisma.message.findUnique({
             where: {
-                id: {
-                    messageId: message.message_id,
-                    chatId: message.chat.id,
-                }
+                id: this.getMessageId(message),
             },
         });
 
