@@ -4,6 +4,16 @@ import {DateTimeSettingRepository} from "./Repositories/DateTimeSettingRepositor
 import {Gpt3Service} from "./Gpt3Service";
 import {TelegramService} from "./TelegramService";
 import {Config} from "./Config";
+import {RequestError} from "@octokit/request-error";
+
+type Commit = {
+    commit: {
+        committer: {
+            date?: string,
+        } | null,
+        message: string,
+    }
+};
 
 const LAST_COMMIT_DATE_TIME_SETTING = 'last commit DateTime';
 const INTERVAL_MILLISECONDS = 180_000;
@@ -32,25 +42,35 @@ export class GitHubService {
     }
 
     private async pollAndAnnounceCommits(): Promise<void> {
-        const commits = await this.octokit.rest.repos.listCommits({
-            owner: 'netzhuffle',
-            repo: 'parmelae-bot',
-            since: this.lastCommitDateTime?.toISOString(),
-        });
-        commits.data.reverse();
-        for (const commit of commits.data) {
+        const commits = await this.pollCommits();
+        commits.reverse();
+        for (const commit of commits) {
             await this.handleCommit(commit);
         }
     }
 
-    private async handleCommit(commit: {
-        commit: {
-            committer: {
-                date?: string,
-            } | null,
-            message: string,
+    private async pollCommits(): Promise<Commit[]> {
+        let commitsList: { data: Commit[] };
+        try {
+            commitsList = await this.octokit.rest.repos.listCommits({
+                owner: 'netzhuffle',
+                repo: 'parmelae-bot',
+                since: this.lastCommitDateTime?.toISOString(),
+            });
+        } catch (e) {
+            if (e instanceof RequestError) {
+                // Avoid crash for HTTP request errors.
+                console.error(e);
+                return [];
+            } else {
+                // Rethrow otherwise.
+                throw e;
+            }
         }
-    }): Promise<void> {
+        return commitsList.data;
+    }
+
+    private async handleCommit(commit: Commit): Promise<void> {
         const dateString = commit.commit.committer?.date;
         if (dateString) {
             const date = new Date(dateString);
