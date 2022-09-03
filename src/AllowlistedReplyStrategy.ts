@@ -9,11 +9,7 @@ export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
     }
 
     willHandle(message: TelegramBot.Message): boolean {
-        if (message.chat.type === 'private' && message.from && !this.config.senderAllowlist.includes(message.from.id)) {
-            return false;
-        }
-
-        if (message.chat.type !== 'private' && !this.config.chatAllowlist.includes(message.chat.id)) {
+        if (!this.config.chatAllowlist.includes(message.chat.id)) {
             return false;
         }
 
