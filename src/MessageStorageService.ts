@@ -1,15 +1,24 @@
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
 import {MessageRepository} from "./Repositories/MessageRepository";
+import {OldMessageReplyService} from "./OldMessageReplyService";
 
+/** First hour to reply to old messages in. */
 const MAIN_CHAT_TIME_STARTING_HOUR = 11;
+
+/** Last hour to reply to old messages in. */
 const MAIN_CHAT_TIME_ENDING_HOUR = 23;
+
+/** Milliseconds per hour. */
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 
 /** Handles the message database storage. */
 @singleton()
 export class MessageStorageService {
-    constructor(private readonly messageRepository: MessageRepository) {
+    constructor(
+        private readonly messageRepository: MessageRepository,
+        private readonly oldMessageReplyService: OldMessageReplyService,
+    ) {
     }
 
     /** Stores a message and its author. */
@@ -41,7 +50,8 @@ export class MessageStorageService {
     }
 
     private async deleteAndScheduleNext(): Promise<void> {
-        await this.messageRepository.deleteOld();
+        const deletedMessages = await this.messageRepository.deleteOld();
+        await this.oldMessageReplyService.reply(deletedMessages);
         this.scheduleNextDeletion();
     }
 

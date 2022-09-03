@@ -6,7 +6,10 @@ import {MessageStorageService} from "./MessageStorageService";
 /** Service to interact with Telegram */
 @singleton()
 export class TelegramService {
-    constructor(private readonly telegram: TelegramBot, private readonly messageStorageService: MessageStorageService) {
+    constructor(
+        private readonly telegram: TelegramBot,
+        private readonly messageStorageService: MessageStorageService,
+    ) {
     }
 
     /**
@@ -31,7 +34,7 @@ export class TelegramService {
      * @param reply - The text or Sticker to send
      * @param message - The message to reply to
      */
-    async reply(reply: string | Sticker, message: TelegramBot.Message): Promise<void> {
+    async reply(reply: string | Sticker, message: TelegramBot.Message | { message_id: number, chat: { id: number } }): Promise<void> {
         if (reply instanceof Sticker) {
             this.telegram.sendSticker(message.chat.id, reply.fileId, {reply_to_message_id: message.message_id});
         } else {

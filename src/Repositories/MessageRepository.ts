@@ -1,10 +1,13 @@
-import {Message, Prisma, PrismaClient} from "@prisma/client";
+import {Prisma, PrismaClient} from "@prisma/client";
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
+import {MessageWithUser} from "./Types";
 
 /** Number of milliseconds in a day */
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+
+/** Number of milliseconds in 7 days */
 const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 
 /** Repository for messages */
@@ -47,7 +50,7 @@ export class MessageRepository {
      * Deletes and returns old messages.
      * @return The deleted messages
      */
-    async deleteOld(): Promise<Message[]> {
+    async deleteOld(): Promise<MessageWithUser[]> {
         const date7DaysAgo = new Date(Date.now() - SEVEN_DAYS_IN_MILLISECONDS);
         const where7DaysAgo: Prisma.MessageWhereInput = {
             sentAt: {
@@ -56,6 +59,9 @@ export class MessageRepository {
         };
         const messagesToDelete = await this.prisma.message.findMany({
             where: where7DaysAgo,
+            include: {
+                from: true,
+            }
         });
         await this.prisma.message.deleteMany({
             where: where7DaysAgo,
