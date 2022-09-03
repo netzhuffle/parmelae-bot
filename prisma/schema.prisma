@@ -24,17 +24,20 @@ model DateTimeSetting {
 }
 
 model Message {
-  id               Int       @id
-  from             User      @relation(fields: [fromId], references: [id])
-  fromId           BigInt
-  chat             Chat      @relation(fields: [chatId], references: [id])
-  chatId           BigInt
-  sentAt           DateTime
-  editedAt         DateTime?
-  replyToMessage   Message?  @relation("ReplyToMessage", fields: [replyToMessageId], references: [id])
-  replyToMessageId Int?
-  text             String?
-  replies          Message[] @relation("ReplyToMessage")
+  messageId            Int
+  chat                 Chat      @relation(fields: [chatId], references: [id])
+  chatId               BigInt
+  from                 User      @relation(fields: [fromId], references: [id])
+  fromId               BigInt
+  sentAt               DateTime
+  editedAt             DateTime?
+  replyToMessage       Message?  @relation("ReplyToMessage", fields: [replyToMessageId, replyToMessageChatId], references: [messageId, chatId])
+  replyToMessageId     Int?
+  replyToMessageChatId BigInt?
+  text                 String?
+  replies              Message[] @relation("ReplyToMessage")
+
+  @@id([messageId, chatId], name: "id")
 }
 
 model User {

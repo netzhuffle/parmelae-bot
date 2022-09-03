@@ -16,7 +16,12 @@ export class MessageRepository {
         assert(message.text);
 
         const databaseMessage = await this.prisma.message.findUnique({
-            where: {id: message.message_id},
+            where: {
+                id: {
+                    messageId: message.message_id,
+                    chatId: message.chat.id,
+                }
+            },
         });
         if (databaseMessage) {
             // Message already stored.
@@ -26,13 +31,13 @@ export class MessageRepository {
         const replyToMessage = message.reply_to_message ? await this.connectReplyToMessage(message.reply_to_message) : null;
         await this.prisma.message.create({
             data: {
-                id: message.message_id,
+                messageId: message.message_id,
+                chat: this.connectChat(message.chat),
                 sentAt: this.getDate(message.date),
                 editedAt: this.getOptionalDate(message.edit_date),
                 text: message.text,
                 replyToMessage: replyToMessage ?? undefined,
                 from: this.connectUser(message.from),
-                chat: this.connectChat(message.chat),
             }
         });
     }
@@ -76,7 +81,12 @@ export class MessageRepository {
     private async connectReplyToMessage(message: TelegramBot.Message): Promise<Prisma.MessageCreateNestedOneWithoutRepliesInput | null> {
         // Querying to make sure the message replied to exists in the database.
         const replyToMessage = await this.prisma.message.findUnique({
-            where: {id: message.message_id},
+            where: {
+                id: {
+                    messageId: message.message_id,
+                    chatId: message.chat.id,
+                }
+            },
         });
 
         if (!replyToMessage) {
@@ -85,7 +95,10 @@ export class MessageRepository {
 
         return {
             connect: {
-                id: replyToMessage.id,
+                id: {
+                    messageId: replyToMessage.messageId,
+                    chatId: replyToMessage.chatId,
+                },
             }
         };
     }
