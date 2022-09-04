@@ -11,6 +11,9 @@ export default {
     /** The OpenAI API auth key. */
     openAiKey: 'get from open_ai.com',
 
+    /** The Sentry DSN (optional). */
+    sentryDsn: null,
+
     /**
      * The allowlisted chats for GPT-3 queries.
      *

@@ -11,6 +11,9 @@ export interface Config {
     /** The OpenAI API auth key. */
     readonly openAiKey: string;
 
+    /** The Sentry DSN (optional). */
+    readonly sentryDsn: string | null;
+
     /**
      * The allowlisted chats for GPT-3 queries.
      *

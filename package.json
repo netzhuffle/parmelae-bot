@@ -1,8 +1,11 @@
 {
   "private": true,
-  "main": "built/src/index.js",
+  "main": "built/index.js",
   "dependencies": {
     "@prisma/client": "^4.3.1",
+    "@sentry/integrations": "^7.12.1",
+    "@sentry/node": "^7.12.1",
+    "@sentry/tracing": "^7.12.1",
     "fuzzyset.js": "^1.0.7",
     "node-telegram-bot-api": "^0.59.0",
     "node-wit": "^6.2.2",

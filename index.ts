@@ -1,13 +1,30 @@
+// For Sentry setup
+const rootDirectory = __dirname || process.cwd();
+
 import 'reflect-metadata';
-import {Config} from './Config';
-import config from '../config';
-import {Bot} from './Bot';
+import {Config} from './src/Config';
+import config from './config';
+import {Bot} from './src/Bot';
 import TelegramBot from 'node-telegram-bot-api';
 import {Wit} from 'node-wit';
 import {Configuration, OpenAIApi} from 'openai';
 import {container} from 'tsyringe';
 import {PrismaClient} from '@prisma/client';
 import {Octokit} from 'octokit';
+import * as Sentry from '@sentry/node';
+import {RewriteFrames} from "@sentry/integrations";
+
+if (config.sentryDsn) {
+    Sentry.init({
+        dsn: config.sentryDsn,
+        tracesSampleRate: 0.1,
+        integrations: [
+            new RewriteFrames({
+                root: rootDirectory,
+            }),
+        ],
+    });
+}
 
 container.register<Config>('Config', {useValue: config as Config});
 container.register(Octokit, {useValue: new Octokit()});
