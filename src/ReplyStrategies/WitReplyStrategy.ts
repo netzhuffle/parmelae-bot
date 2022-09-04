@@ -45,7 +45,7 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
                 const command = this.getCommand(intent);
                 this.commandService.execute(command, message);
             } else {
-                this.gpt3.replyGermanQuery(witMessage)
+                this.gpt3.reply(message)
                     .then((text: string) => this.telegram.reply(text, message));
             }
         });

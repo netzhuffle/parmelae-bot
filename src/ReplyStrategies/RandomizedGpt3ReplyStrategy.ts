@@ -28,7 +28,7 @@ export class RandomizedGpt3ReplyStrategy extends AllowlistedReplyStrategy {
     handle(message: TelegramBot.Message): void {
         assert(message.text !== undefined);
 
-        this.gpt3.reply(message.text)
+        this.gpt3.reply(message)
             .then((text: string) => this.telegram.reply(text, message));
     }
 }

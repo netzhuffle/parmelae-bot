@@ -34,7 +34,7 @@ export class CommandService {
                 this.telegram.reply('Ich würde Ihnen gerne einen Kommentar dazu abgeben, aber dazu müssen Sie mich in einer Antwort auf einen Text fragen, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.reply(message.reply_to_message.text).then((text: string) => this.telegram.reply(text, message));
+            this.gpt3.reply(message.reply_to_message).then((text: string) => this.telegram.reply(text, message));
             return;
         }
         if (command === Command.Complete) {

@@ -2,7 +2,7 @@ import {Prisma, PrismaClient} from "@prisma/client";
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
-import {MessageWithUser} from "./Types";
+import {MessageWithUser, MessageWithUserAndReplyToAndReplyToUser} from "./Types";
 
 /** Number of milliseconds in a day */
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
@@ -14,6 +14,23 @@ const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 @singleton()
 export class MessageRepository {
     constructor(private readonly prisma: PrismaClient) {
+    }
+
+    /** Returns the message for a Telegram message if found in the database. */
+    async get(message: TelegramBot.Message): Promise<MessageWithUserAndReplyToAndReplyToUser | null> {
+        return this.prisma.message.findUnique({
+            where: {
+                id: this.getMessageId(message),
+            },
+            include: {
+                from: true,
+                replyToMessage: {
+                    include: {
+                        from: true,
+                    }
+                },
+            }
+        });
     }
 
     /** Stores a message and its author. */
@@ -43,6 +60,24 @@ export class MessageRepository {
                 replyToMessage: replyToMessage ?? undefined,
                 from: this.connectUser(message.from),
             }
+        });
+    }
+
+    /** Gets the last message from a chat that doesn’t have an excluded messageId, if there is any. */
+    async getLastChatMessage(chatId: bigint | number, excludedMessageIds: number[]): Promise<MessageWithUser | null> {
+        return this.prisma.message.findFirst({
+            where: {
+                chatId: chatId,
+                messageId: {
+                    notIn: excludedMessageIds,
+                }
+            },
+            orderBy: {
+                messageId: 'desc',
+            },
+            include: {
+                from: true,
+            },
         });
     }
 
