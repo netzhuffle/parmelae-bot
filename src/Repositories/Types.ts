@@ -17,17 +17,13 @@ const messageWithUser = Prisma.validator<Prisma.MessageArgs>()({
 /** Message including the User relation. */
 export type MessageWithUser = Prisma.MessageGetPayload<typeof messageWithUser>;
 
-/** Validator for Message including the User relation, ReplyToMessage relation and its User relation. */
-const messageWithUserAndReplyToAndReplyToUser = Prisma.validator<Prisma.MessageArgs>()({
+/** Validator for Message including the User and ReplyToMessage relations. */
+const messageWithUserAndReplyToMessage = Prisma.validator<Prisma.MessageArgs>()({
     include: {
         from: true,
-        replyToMessage: {
-            include: {
-                from: true,
-            }
-        }
+        replyToMessage: true,
     }
 });
 
-/** Message including the User relation, ReplyToMessage relation and its User relation. */
-export type MessageWithUserAndReplyToAndReplyToUser = Prisma.MessageGetPayload<typeof messageWithUserAndReplyToAndReplyToUser>;
+/** Message including the User and ReplyToMessage relations. */
+export type MessageWithUserAndReplyToMessage = Prisma.MessageGetPayload<typeof messageWithUserAndReplyToMessage>;

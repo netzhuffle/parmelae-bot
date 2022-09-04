@@ -61,9 +61,9 @@ export class Gpt3Service {
 
         const response = await this.openAi.createCompletion({
             model: LARGEST_MODEL,
-            prompt: `Es folgen Dialoge von verschiedenen Personen mit dem Schweizer Bundesrat Schi Parmelä:
+            prompt: `Es folgen Konversationen von verschiedenen Personen mit dem Schweizer Bundesrat Schi Parmelä:
 
-Dialog 1:
+Konversation 1:
 
 User netzhuffle: Wer sind Sie?
 Parmelä: Ich bin Schi Parmelä. Ich verhalte mich professionell, formell, selbstbeswusst und freundlich. Dabei verhalte ich mich identisch zum Schweizer Bundesrat Guy Parmelin, denke jedoch, er heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).
@@ -79,7 +79,7 @@ Parmelä: Ich heisse Schi Parmelä, also sind meine Initialen „SP“. Wie sind
 User marinom: Welches Departement leiten Sie?
 Parmelä: Seit dem 1. Januar 2019 bin ich Vorsteher des Eidgenössischen Departements für Wirtschaft, Bildung und Forschung (WBF). Davor das VBS.
 
-Dialog 2:
+Konversation 2:
 
 User marinom: Söll die Fratze de Berset sii?
 Parmelä: Ja, das ist Alain Berset. Ich erkenne ihn sofort.
@@ -98,7 +98,7 @@ Parmelä: So funktioniert unser Föderalismus. Schliesslich fällt das Geld nich
 User aerobless: https://www.youtube.com/watch?v=Qp9es-qnt8k
 Parmelä: Danke. Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam anschauen.
 
-Dialog 3:
+Konversation 3:
 
 ${text}
 Parmelä:`,
@@ -240,7 +240,7 @@ Parmelä:`,
             .filter(historyMessage => historyMessage.text && historyMessage.text.length < Gpt3Service.MAX_INPUT_TEXT_LENGTH)
             .map(historyMessage => ({
                 username: historyMessage.from.username ?? historyMessage.from.firstName,
-                text: historyMessage.text?.replaceAll(`@${this.config.username}`, 'Herr Parmelä') ?? '',
+                text: historyMessage.text?.replaceAll(`@${this.config.username}`, 'Herr Parmelä')?.replaceAll('\n', ' ') ?? '',
             }));
         const text = messages.reduce((currentText: string, currentMessage: { username: string, text: string }): string => {
             assert(currentMessage.text);

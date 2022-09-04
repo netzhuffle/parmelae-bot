@@ -1,8 +1,8 @@
-import {Prisma, PrismaClient} from "@prisma/client";
+import {Message, Prisma, PrismaClient} from "@prisma/client";
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
-import {MessageWithUser, MessageWithUserAndReplyToAndReplyToUser} from "./Types";
+import {MessageWithUser, MessageWithUserAndReplyToMessage} from "./Types";
 
 /** Number of milliseconds in a day */
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
@@ -16,19 +16,19 @@ export class MessageRepository {
     constructor(private readonly prisma: PrismaClient) {
     }
 
-    /** Returns the message for a Telegram message if found in the database. */
-    async get(message: TelegramBot.Message): Promise<MessageWithUserAndReplyToAndReplyToUser | null> {
-        return this.prisma.message.findUnique({
+    /**
+     * Returns the full message including relations.
+     *
+     * The message must be in the database.
+     */
+    async get(message: Message | TelegramBot.Message): Promise<MessageWithUserAndReplyToMessage> {
+        return this.prisma.message.findUniqueOrThrow({
             where: {
                 id: this.getMessageId(message),
             },
             include: {
                 from: true,
-                replyToMessage: {
-                    include: {
-                        from: true,
-                    }
-                },
+                replyToMessage: true,
             }
         });
     }
@@ -63,13 +63,14 @@ export class MessageRepository {
         });
     }
 
-    /** Gets the last message from a chat that doesn’t have an excluded messageId, if there is any. */
-    async getLastChatMessage(chatId: bigint | number, excludedMessageIds: number[]): Promise<MessageWithUser | null> {
+    /** Gets the last message from a chat before the given messageId, if there is any. */
+    async getLastChatMessage(chatId: bigint | number, beforeMessageId: number): Promise<MessageWithUserAndReplyToMessage | null> {
+        // Assumes that messageIds in the same chat are always increasing.
         return this.prisma.message.findFirst({
             where: {
                 chatId: chatId,
                 messageId: {
-                    notIn: excludedMessageIds,
+                    lt: beforeMessageId,
                 }
             },
             orderBy: {
@@ -77,6 +78,7 @@ export class MessageRepository {
             },
             include: {
                 from: true,
+                replyToMessage: true,
             },
         });
     }
@@ -104,11 +106,22 @@ export class MessageRepository {
         return messagesToDelete;
     }
 
-    private getMessageId(message: TelegramBot.Message): Prisma.MessageIdCompoundUniqueInput {
+    private getMessageId(message: Message | TelegramBot.Message): Prisma.MessageIdCompoundUniqueInput {
+        if (this.isTelegramMessage(message)) {
+            return {
+                messageId: message.message_id,
+                chatId: message.chat.id,
+            };
+        }
+
         return {
-            messageId: message.message_id,
-            chatId: message.chat.id,
-        };
+            messageId: message.messageId,
+            chatId: message.chatId,
+        }
+    }
+
+    private isTelegramMessage(message: Message | TelegramBot.Message): message is TelegramBot.Message {
+        return (message as TelegramBot.Message).message_id !== undefined;
     }
 
     private connectChat(chat: TelegramBot.Chat): Prisma.ChatCreateNestedOneWithoutMessagesInput {
