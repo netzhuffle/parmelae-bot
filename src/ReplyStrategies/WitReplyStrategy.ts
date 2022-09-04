@@ -9,6 +9,9 @@ import {Gpt3Service} from "../Gpt3Service";
 import {TelegramService} from "../TelegramService";
 import {Command} from "../Command";
 
+/** Maximum number of characters wit.ai allows in messages. */
+const MAXIMUM_WIT_MESSAGE_LENGTH = 280;
+
 /**
  * Handles messages mentioning the bot in allowlisted chats by sending them to Wit for handling.
  *
@@ -38,6 +41,11 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
         assert(message.text !== undefined);
 
         const witMessage = message.text.replaceAll(`@${this.config.username}`, 'Herr Parmelä');
+        if (witMessage.length > MAXIMUM_WIT_MESSAGE_LENGTH) {
+            // Skip wit.ai and just assume no intent (out of context for wit.ai).
+            this.fallbackToGpt3(message);
+        }
+
         this.wit.message(witMessage, {}).then(data => {
             const intents = data.intents;
             if (intents && intents[0]) {
@@ -45,8 +53,8 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
                 const command = this.getCommand(intent);
                 this.commandService.execute(command, message);
             } else {
-                this.gpt3.reply(message)
-                    .then((text: string) => this.telegram.reply(text, message));
+                // No intent matched, fallback to GPT-3 reply.
+                this.fallbackToGpt3(message);
             }
         });
     }
@@ -70,5 +78,10 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
             default:
                 return Command.Unknown;
         }
+    }
+
+    private fallbackToGpt3(message: TelegramBot.Message): void {
+        this.gpt3.reply(message)
+            .then((text: string) => this.telegram.reply(text, message));
     }
 }
