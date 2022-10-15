@@ -29,7 +29,7 @@ The most helpful bot you’ve ever seen on Telegram.
 
 1. Update dependencies: `npm install`
 2. Run new database migrations: `npx prisma migrate dev`
-3. Execute: `npx ts-node src/index.ts`
+3. Execute: `npx ts-node index.ts`
 
 # Run in production
 
@@ -38,4 +38,4 @@ The most helpful bot you’ve ever seen on Telegram.
 3. Compile: `npx tsc`
 4. Remove dev dependencies: `npm install --omit=dev`
 5. Deploy (however you like)
-6. Execute: `node built/src/index.js`
+6. Execute: `node built/index.js`
