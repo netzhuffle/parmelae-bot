@@ -11,7 +11,7 @@ const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 
 /** An experiment adds a debug part at the end of the message in the form of “(₇₅₄₁₀₃₆₂)” that needs to be removed. */
-const DEBUG_REGEX = /\([₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔ]+\)$/;
+const DEBUG_REGEX = /₍[₀₁₂₃₄₅₆₇₈₉₊₋₌ₐₑₒₓₔ]+₎$/;
 
 /** Repository for messages */
 @singleton()
