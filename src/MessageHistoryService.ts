@@ -10,7 +10,7 @@ export class MessageHistoryService {
     }
 
     /**
-     * Returns the message and its preceding message.
+     * Returns the message and 4 preceding messages.
      *
      * Preceding message is the message replied to, or if it is not a reply, then the message last written before in the
      * same chat, if there is one.

@@ -10,6 +10,9 @@ const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 /** Number of milliseconds in 7 days */
 const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 
+/** An experiment adds a debug part at the end of the message in the form of “(₇₅₄₁₀₃₆₂)” that needs to be removed. */
+const DEBUG_REGEX = /\([₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔ]+\)$/;
+
 /** Repository for messages */
 @singleton()
 export class MessageRepository {
@@ -56,7 +59,7 @@ export class MessageRepository {
                 chat: this.connectChat(message.chat),
                 sentAt: this.getDate(message.date),
                 editedAt: this.getOptionalDate(message.edit_date),
-                text: message.text,
+                text: this.stripDebugFromText(message.text),
                 replyToMessage: replyToMessage ?? undefined,
                 from: this.connectUser(message.from),
             }
@@ -188,5 +191,10 @@ export class MessageRepository {
 
     private getOptionalDate(unixTimestamp?: number): Date | null {
         return unixTimestamp ? this.getDate(unixTimestamp) : null;
+    }
+
+    /** An experiment adds a debug part at the end of the message in the form of “(₇₅₄₁₀₃₆₂)” that needs to be removed. */
+    private stripDebugFromText(text: string): string {
+        return text.replace(DEBUG_REGEX, '');
     }
 }
