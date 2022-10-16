@@ -188,11 +188,11 @@ Parmelä:`,
             indexes.push(i);
         }
         this.shuffleArray(indexes);
-        const partIds = indexes.slice(0, 9);
+        const partIds = indexes.slice(0, 7);
         let conversation1 = '';
         let conversation2 = '';
         for (let i = 0; i < partIds.length; i++) {
-            if (i < 5) {
+            if (i < 4) {
                 conversation1 += `${randomPromptParts[partIds[i]]}\n`;
             } else {
                 conversation2 += `${randomPromptParts[partIds[i]]}\n`;

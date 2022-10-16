@@ -30,16 +30,23 @@ export class Gpt3Service {
         stopStrings: string | string[],
         temperature: Gpt3Temperature = Gpt3Temperature.Default,
     ): Promise<string | null> {
-        const response = await this.openAi.createCompletion({
-            model: LARGEST_MODEL,
-            prompt,
-            stop: stopStrings,
-            max_tokens: MAX_TOKENS,
-            temperature,
-        });
-        const completion = response.data.choices?.[0].text;
-        if (completion?.trim()) {
-            return completion;
+        try {
+            const response = await this.openAi.createCompletion({
+                model: LARGEST_MODEL,
+                prompt,
+                stop: stopStrings,
+                max_tokens: MAX_TOKENS,
+                temperature,
+            });
+            const completion = response.data.choices?.[0].text;
+            if (completion?.trim()) {
+                return completion;
+            }
+        } catch (e) {
+            if (e instanceof Error && e.message.startsWith('connect ECONNREFUSED')) {
+                return null;
+            }
+            throw e;
         }
 
         return null;
