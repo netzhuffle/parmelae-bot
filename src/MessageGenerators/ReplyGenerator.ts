@@ -40,7 +40,7 @@ Parmelä: So funktioniert unser Föderalismus. Schliesslich fällt das Geld nich
 Parmelä: Danke. Wir werden die Video bei der nächsten Bundesratssitzung gemeinsam anschauen.`,
 ];
 
-const subscriptIds = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉', '₊', '₋', '₌', '₍', '₎', 'ₐ', 'ₑ', 'ₒ', 'ₓ', 'ₔ'];
+const subscriptIds = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉', '₊', '₋', '₌', 'ₐ', 'ₑ', 'ₒ', 'ₓ', 'ₔ'];
 
 @singleton()
 export class ReplyGenerator {
@@ -76,7 +76,7 @@ export class ReplyGenerator {
 
         const completion = await this.gpt3.generateCompletion(prompt.text, ['\nParmelä:', '\nUser ']);
         const reply = completion?.trim();
-        return reply !== undefined ? `${reply} (${prompt.id})` : 'Ich bin sprachlos.';
+        return reply !== undefined ? `${reply} ₍${prompt.id}₎` : 'Ich bin sprachlos.';
     }
 
     private async getClassicPrompt(message: TelegramBot.Message): Promise<Prompt> {
