@@ -5,9 +5,9 @@ import {inject, singleton} from "tsyringe";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
-import {Gpt3Service} from "../Gpt3Service";
 import {TelegramService} from "../TelegramService";
 import {Command} from "../Command";
+import {ReplyGenerator} from "../MessageGenerators/ReplyGenerator";
 
 /** Maximum number of characters wit.ai allows in messages. */
 const MAXIMUM_WIT_MESSAGE_LENGTH = 280;
@@ -23,7 +23,7 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
         private readonly telegram: TelegramService,
         private readonly wit: Wit,
         private readonly commandService: CommandService,
-        private readonly gpt3: Gpt3Service,
+        private readonly replyGenerator: ReplyGenerator,
         @inject('Config') config: Config,
     ) {
         super(config);
@@ -81,7 +81,7 @@ export class WitReplyStrategy extends AllowlistedReplyStrategy {
     }
 
     private fallbackToGpt3(message: TelegramBot.Message): void {
-        this.gpt3.reply(message)
+        this.replyGenerator.generate(message)
             .then((text: string) => this.telegram.reply(text, message));
     }
 }

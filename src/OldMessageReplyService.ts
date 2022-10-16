@@ -5,6 +5,7 @@ import {Gpt3Service} from "./Gpt3Service";
 import {Config} from "./Config";
 import {TelegramService} from "./TelegramService";
 import {MessageWithUser} from "./Repositories/Types";
+import {OldMessageReplyGenerator} from "./MessageGenerators/OldMessageReplyGenerator";
 
 /**
  * Minimum length to consider reply to a message.
@@ -21,7 +22,7 @@ const OLD_MESSAGE_REPLY_PROBABILITY = 0.15;
 export class OldMessageReplyService {
     constructor(
         @inject('Config') private readonly config: Config,
-        private readonly gpt3Service: Gpt3Service,
+        private readonly oldMessageReplyGenerator: OldMessageReplyGenerator,
         // Injection delayed because of dependency loop between TelegramService, MessageStorageService, and OldMessageReplyService.
         @inject(delay(() => TelegramService)) private readonly telegramService: TelegramService,
     ) {
@@ -48,7 +49,7 @@ export class OldMessageReplyService {
     private async replyToMessage(message: Message) {
         assert(message.text);
 
-        const reply = await this.gpt3Service.replyToOldMessage(message.text);
+        const reply = await this.oldMessageReplyGenerator.generate(message.text);
         await this.telegramService.reply(reply, {
             message_id: message.messageId,
             chat: {

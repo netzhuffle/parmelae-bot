@@ -1,16 +1,18 @@
 import TelegramBot from "node-telegram-bot-api";
 import {singleton} from "tsyringe";
 import {spawn} from "child_process";
-import {Gpt3Service} from "./Gpt3Service";
 import {TelegramService} from "./TelegramService";
 import {Command} from "./Command";
+import {ContinueMessageGenerator} from "./MessageGenerators/ContinueMessageGenerator";
+import {ReplyGenerator} from "./MessageGenerators/ReplyGenerator";
 
 /** Executes a command */
 @singleton()
 export class CommandService {
     constructor(
         private readonly telegram: TelegramService,
-        private readonly gpt3: Gpt3Service,
+        private readonly replyGenerator: ReplyGenerator,
+        private readonly continueMessageGenerator: ContinueMessageGenerator,
     ) {
     }
 
@@ -34,7 +36,7 @@ export class CommandService {
                 this.telegram.reply('Ich würde Ihnen gerne einen Kommentar dazu abgeben, aber dazu müssen Sie mich in einer Antwort auf einen Text fragen, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.reply(message.reply_to_message).then((text: string) => this.telegram.reply(text, message));
+            this.replyGenerator.generate(message.reply_to_message).then((text: string) => this.telegram.reply(text, message));
             return;
         }
         if (command === Command.Complete) {
@@ -42,7 +44,7 @@ export class CommandService {
                 this.telegram.reply('Ich würde gerne fortfahren, aber dazu müssen Sie mich in einer Antwort auf einen meiner Texte darum bitten, s’il vous plait.', message);
                 return;
             }
-            this.gpt3.continue(message.reply_to_message.text).then((text: string) => this.telegram.reply(text, message));
+            this.continueMessageGenerator.continue(message.reply_to_message.text).then((text: string) => this.telegram.reply(text, message));
             return;
         }
 

@@ -1,10 +1,10 @@
 import {Octokit} from "octokit";
 import {inject, singleton} from "tsyringe";
 import {DateTimeSettingRepository} from "./Repositories/DateTimeSettingRepository";
-import {Gpt3Service} from "./Gpt3Service";
 import {TelegramService} from "./TelegramService";
 import {Config} from "./Config";
 import {RequestError} from "@octokit/request-error";
+import {GitCommitAnnouncementGenerator} from "./MessageGenerators/GitCommitAnnouncementGenerator";
 
 type Commit = {
     commit: {
@@ -26,7 +26,7 @@ export class GitHubService {
     constructor(
         private readonly octokit: Octokit,
         private readonly dateTimeSettingRepository: DateTimeSettingRepository,
-        private readonly gpt3Service: Gpt3Service,
+        private readonly gitCommitAnnounceGenerator: GitCommitAnnouncementGenerator,
         private readonly telegramService: TelegramService,
         @inject('Config') private readonly config: Config,
     ) {
@@ -81,7 +81,7 @@ export class GitHubService {
         }
 
         const commitMessage = commit.commit.message;
-        const announcementText = await this.gpt3Service.announceNewCommit(commitMessage);
+        const announcementText = await this.gitCommitAnnounceGenerator.generate(commitMessage);
         let promises: Promise<void>[] = [];
         this.config.newCommitAnnouncementChats.forEach(chat => {
             promises.push(this.telegramService.send(announcementText, chat));

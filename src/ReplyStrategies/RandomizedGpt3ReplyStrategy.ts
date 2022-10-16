@@ -3,8 +3,8 @@ import TelegramBot from "node-telegram-bot-api";
 import {inject, singleton} from "tsyringe";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {Config} from "../Config";
-import {Gpt3Service} from "../Gpt3Service";
 import {TelegramService} from "../TelegramService";
+import {ReplyGenerator} from "../MessageGenerators/ReplyGenerator";
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;
@@ -14,7 +14,7 @@ const RANDOM_REPLY_PROBABILITY = 0.035;
 export class RandomizedGpt3ReplyStrategy extends AllowlistedReplyStrategy {
     constructor(
         private readonly telegram: TelegramService,
-        private readonly gpt3: Gpt3Service,
+        private readonly replyGenerator: ReplyGenerator,
         @inject('Config') config: Config,
     ) {
         super(config);
@@ -28,7 +28,7 @@ export class RandomizedGpt3ReplyStrategy extends AllowlistedReplyStrategy {
     handle(message: TelegramBot.Message): void {
         assert(message.text !== undefined);
 
-        this.gpt3.reply(message)
+        this.replyGenerator.generate(message)
             .then((text: string) => this.telegram.reply(text, message));
     }
 }
