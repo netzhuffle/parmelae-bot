@@ -3,7 +3,6 @@ import {singleton} from "tsyringe";
 import {spawn} from "child_process";
 import {TelegramService} from "./TelegramService";
 import {Command} from "./Command";
-import {ContinueMessageGenerator} from "./MessageGenerators/ContinueMessageGenerator";
 import {ReplyGenerator} from "./MessageGenerators/ReplyGenerator";
 
 /** Executes a command */
@@ -12,7 +11,6 @@ export class CommandService {
     constructor(
         private readonly telegram: TelegramService,
         private readonly replyGenerator: ReplyGenerator,
-        private readonly continueMessageGenerator: ContinueMessageGenerator,
     ) {
     }
 
@@ -37,14 +35,6 @@ export class CommandService {
                 return;
             }
             this.replyGenerator.generate(message.reply_to_message).then((text: string) => this.telegram.reply(text, message));
-            return;
-        }
-        if (command === Command.Complete) {
-            if (!message.reply_to_message || !message.reply_to_message.text) {
-                this.telegram.reply('Ich würde gerne fortfahren, aber dazu müssen Sie mich in einer Antwort auf einen meiner Texte darum bitten, s’il vous plait.', message);
-                return;
-            }
-            this.continueMessageGenerator.continue(message.reply_to_message.text).then((text: string) => this.telegram.reply(text, message));
             return;
         }
 

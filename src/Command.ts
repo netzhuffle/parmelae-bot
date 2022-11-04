@@ -6,8 +6,6 @@ export const enum Command {
     Info,
     /** Replies to the message the user replied to. */
     Comment,
-    /** Completes a text message. */
-    Complete,
     /** Starts the minecraft server. */
     StartMinecraft,
     /** Stops the minecraft server. */
