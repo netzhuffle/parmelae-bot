@@ -42,4 +42,15 @@ export class TelegramService {
             await this.messageStorageService.store(sentMessage);
         }
     }
+
+    /**
+     * Replies an image to a message
+     *
+     * @param url - The image URL
+     * @param caption - The image caption
+     * @param message - The message to reply to
+     */
+    async replyWithImage(url: string, caption: string, message: TelegramBot.Message): Promise<void> {
+        await this.telegram.sendPhoto(message.chat.id, url, {caption: caption, reply_to_message_id: message.message_id});
+    }
 }

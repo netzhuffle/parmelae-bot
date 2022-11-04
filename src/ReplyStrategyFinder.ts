@@ -12,6 +12,7 @@ import {NicknameReplyStrategy} from "./ReplyStrategies/NicknameReplyStrategy";
 import {RandomizedGpt3ReplyStrategy} from "./ReplyStrategies/RandomizedGpt3ReplyStrategy";
 import {RandomizedStickerReplyStrategy} from "./ReplyStrategies/RandomizedStickerReplyStrategy";
 import {CommentReplyStrategy} from "./ReplyStrategies/CommentReplyStrategy";
+import {ImageReplyStrategy} from "./ReplyStrategies/ImageReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
 @singleton()
@@ -24,6 +25,7 @@ export class ReplyStrategyFinder {
         newMembersReplyStrategy: NewMembersReplyStrategy,
         commentReplyStrategy: CommentReplyStrategy,
         commandReplyStrategy: CommandReplyStrategy,
+        imageReplyStrategy: ImageReplyStrategy,
         witReplyStrategy: WitReplyStrategy,
         messageRepetitionReplyStrategy: MessageRepetitionReplyStrategy,
         nicknameReplyStrategy: NicknameReplyStrategy,
@@ -43,6 +45,9 @@ export class ReplyStrategyFinder {
 
             // Executes commands written as /xyz@BotName in allowlisted chats.
             commandReplyStrategy,
+
+            // Sends an image from the given description.
+            imageReplyStrategy,
 
             // Handles messages mentioning the bot in allowlisted chats by sending them to Wit for handling.
             witReplyStrategy,
