@@ -81,6 +81,10 @@ export class GitHubService {
         }
 
         const commitMessage = commit.commit.message;
+        if (commitMessage.includes('no_announcement')) {
+            return;
+        }
+
         const announcementText = await this.gitCommitAnnounceGenerator.generate(commitMessage);
         let promises: Promise<void>[] = [];
         this.config.newCommitAnnouncementChats.forEach(chat => {
