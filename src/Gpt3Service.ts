@@ -6,7 +6,7 @@ import {Gpt3Temperature} from "./Gpt3Temperature";
 const MAX_TOKENS = 256;
 
 /** The most capable, expensive GPT-3 text completion model. */
-const LARGEST_MODEL = 'text-davinci-002';
+const LARGEST_MODEL = 'text-davinci-003';
 
 /** GPT-3 Service */
 @singleton()
