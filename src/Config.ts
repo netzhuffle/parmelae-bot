@@ -14,6 +14,9 @@ export interface Config {
     /** The Sentry DSN (optional). */
     readonly sentryDsn: string | null;
 
+    /** The GitHub Personal Access Token (for higher rate limits, optional). */
+    readonly gitHubPersonalAccessToken: string | null;
+
     /**
      * The allowlisted chats for GPT-3 queries.
      *

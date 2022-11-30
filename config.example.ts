@@ -14,6 +14,9 @@ export default {
     /** The Sentry DSN (optional). */
     sentryDsn: null,
 
+    /** The GitHub Personal Access Token (for higher rate limits, optional). */
+    gitHubPersonalAccessToken: null,
+
     /**
      * The allowlisted chats for GPT-3 queries.
      *

@@ -27,7 +27,13 @@ if (config.sentryDsn) {
 }
 
 container.register<Config>('Config', {useValue: config as Config});
-container.register(Octokit, {useValue: new Octokit()});
+container.register(Octokit, {
+    useValue: new Octokit({
+        auth: config.gitHubPersonalAccessToken ?? undefined,
+        userAgent: 'parmelae-bot',
+        timeZone: 'Europe/Zurich',
+    })
+});
 container.register(OpenAIApi, {
     useValue: new OpenAIApi(new Configuration({
         apiKey: config.openAiKey
