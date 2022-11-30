@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "type": "command",
+            "name": "Run with ts-node",
+            "program": "npx",
+            "args": ["ts-node", "index.ts"],
+        },
+        {
+            "type": "command",
+            "name": "compile",
+            "program": "tsc",
+        },
+    ],
+}
