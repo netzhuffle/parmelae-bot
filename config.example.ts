@@ -5,9 +5,6 @@ export default {
     /** The Telegram API auth token. */
     telegramToken: 'get from @BotFather',
 
-    /** The Wit API auth token. */
-    witToken: 'get from wit.ai',
-
     /** The OpenAI API auth key. */
     openAiKey: 'get from open_ai.com',
 

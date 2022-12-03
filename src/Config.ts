@@ -5,9 +5,6 @@ export interface Config {
     /** The Telegram API auth token. */
     readonly telegramToken: string;
 
-    /** The Wit API auth token. */
-    readonly witToken: string;
-
     /** The OpenAI API auth key. */
     readonly openAiKey: string;
 

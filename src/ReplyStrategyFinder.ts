@@ -6,7 +6,7 @@ import {singleton} from "tsyringe";
 import {StickerIdReplyStrategy} from "./ReplyStrategies/StickerIdReplyStrategy";
 import {NewMembersReplyStrategy} from "./ReplyStrategies/NewMembersReplyStrategy";
 import {CommandReplyStrategy} from "./ReplyStrategies/CommandReplyStrategy";
-import {WitReplyStrategy} from "./ReplyStrategies/WitReplyStrategy";
+import {BotMentionReplyStrategy} from "./ReplyStrategies/ BotMentionReplyStrategy";
 import {MessageRepetitionReplyStrategy} from "./ReplyStrategies/MessageRepetitionReplyStrategy";
 import {NicknameReplyStrategy} from "./ReplyStrategies/NicknameReplyStrategy";
 import {RandomizedGpt3ReplyStrategy} from "./ReplyStrategies/RandomizedGpt3ReplyStrategy";
@@ -26,7 +26,7 @@ export class ReplyStrategyFinder {
         commentReplyStrategy: CommentReplyStrategy,
         commandReplyStrategy: CommandReplyStrategy,
         imageReplyStrategy: ImageReplyStrategy,
-        witReplyStrategy: WitReplyStrategy,
+        botMentionReplyStrategy: BotMentionReplyStrategy,
         messageRepetitionReplyStrategy: MessageRepetitionReplyStrategy,
         nicknameReplyStrategy: NicknameReplyStrategy,
         randomizedGpt3ReplyStrategy: RandomizedGpt3ReplyStrategy,
@@ -49,8 +49,8 @@ export class ReplyStrategyFinder {
             // Sends an image from the given description.
             imageReplyStrategy,
 
-            // Handles messages mentioning the bot in allowlisted chats by sending them to Wit for handling.
-            witReplyStrategy,
+            // Handles messages mentioning or replying to the bot in allowlisted chats by sending them to GPT-3 for handling.
+            botMentionReplyStrategy,
 
             // Repeats a message that two other users wrote.
             messageRepetitionReplyStrategy,

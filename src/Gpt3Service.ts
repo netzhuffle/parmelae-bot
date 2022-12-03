@@ -12,7 +12,7 @@ const LARGEST_MODEL = 'text-davinci-003';
 @singleton()
 export class Gpt3Service {
     /** Maximum number of characters in input text to avoid high cost. */
-    static readonly MAX_INPUT_TEXT_LENGTH = 800;
+    static readonly MAX_INPUT_TEXT_LENGTH = 1200;
 
     constructor(
         private readonly openAi: OpenAIApi,
