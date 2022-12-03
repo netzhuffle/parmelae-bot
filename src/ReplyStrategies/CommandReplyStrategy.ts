@@ -5,6 +5,7 @@ import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
 import {Command} from "../Command";
+import {TelegramService} from "../TelegramService";
 
 /** Regex matching the command name. */
 const COMMAND_NAME = /^\/(.*)@/;
@@ -13,8 +14,9 @@ const COMMAND_NAME = /^\/(.*)@/;
 @singleton()
 export class CommandReplyStrategy extends AllowlistedReplyStrategy {
     constructor(
-        private readonly commandService: CommandService,
+        private readonly command: CommandService,
         @inject('Config') config: Config,
+        private readonly telegram: TelegramService,
     ) {
         super(config);
     }
@@ -30,7 +32,8 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
         assert(commandMatches && commandMatches.length >= 2);
         const command = this.getCommand(commandMatches[1]);
 
-        this.commandService.execute(command, message);
+        this.command.execute(command, message)
+            .then(reply => this.telegram.reply(reply, message));
     }
 
     private getCommand(command: string): Command {

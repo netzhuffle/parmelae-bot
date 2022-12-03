@@ -1,16 +1,20 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import {inject, singleton} from "tsyringe";
+import {delay, inject, singleton} from "tsyringe";
 import {MessageWithUser} from "../Repositories/Types";
 import {Gpt3Service} from "../Gpt3Service";
 import {MessageHistoryService} from "../MessageHistoryService";
 import {Config} from "../Config";
+import { Command } from "../Command";
+import {CommandService} from "../CommandService";
 
+/** A GPT-3 prompt. */
 type Prompt = {
     text: string,
     id: string,
 };
 
+/** Example conversations for using randomly in prompts. */
 const RANDOM_PROMPT_PARTS = [
     `@bugybunny: hoffe, bi Coop wirds mal no besser. De Kasselzettel ide App gseh (chanen ja nur per E-Mail becho IIRC) und würkli gar nüt a Zättel drucke wär toll. Geschter halt doch no 2 becho. Regt mi jedes Mal uf
 @ParmelaeBot: Der Bundesrat muss Prioritäten setzen. Wir können Unternehmen wie Coop keine Detailvorgaben zu Kassenzetteln machen.
@@ -76,7 +80,23 @@ const RANDOM_PROMPT_PARTS = [
 @ParmelaeBot: Man kann die Leute informieren. Was man sicher nicht kann, ist, ihnen zu verbieten, Fleisch zu essen.`,
 ];
 
+/** Subscript characters to use to represent the chosen random prompts. */
 const SUBSCRIPT_IDS = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉', '₊', '₋', '₌', 'ₐ', 'ₑ', 'ₒ', 'ₓ', 'ₔ'];
+
+/**
+ * RegExp to match commands in the GPT-3 completion.
+ *
+ * Must have g flag, so it can be used for String.prototype.matchAll.
+ */
+const COMMANDS_REGEX = /(STARTMINECRAFT|STOPMINECRAFT|BACKUPMINECRAFT|STATUSMINECRAFT)/g;
+
+/** Map of GPT-3 command strings to Command. */
+const COMMANDS: Record<string, Command> = {
+    STARTMINECRAFT: Command.StartMinecraft,
+    STOPMINECRAFT: Command.StopMinecraft,
+    BACKUPMINECRAFT: Command.BackupMinecraft,
+    STATUSMINECRAFT: Command.StatusMinecraft,
+};
 
 /**
  * Creates a reply to a message.
@@ -89,6 +109,7 @@ export class ReplyGenerator {
         private readonly gpt3: Gpt3Service,
         private readonly messageHistory: MessageHistoryService,
         @inject('Config') private readonly config: Config,
+        @inject(delay(() => CommandService)) private readonly command: CommandService,
     ) {
     }
 
@@ -110,9 +131,9 @@ export class ReplyGenerator {
         const prompt = await this.getPrompt(message);
         console.log(prompt.text);
 
-        const completion = await this.gpt3.generateCompletion(prompt.text, ['\n@']);
-        const reply = completion?.trim();
-        return reply !== undefined ? `${reply} ₍${prompt.id}₎` : 'Ich bin sprachlos.';
+        const completion = await this.gpt3.generateCompletion(prompt.text, ['\n@']) ?? 'Ich bin sprachlos.';
+        const reply = await this.handleCommands(completion, message);
+        return `${reply} ₍${prompt.id}₎`;
     }
 
     private async getPrompt(message: TelegramBot.Message): Promise<Prompt> {
@@ -124,7 +145,7 @@ export class ReplyGenerator {
         const partIds = [randomConversationIndex];
 
         return {
-            text: `Der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) nimmt an Konversationen in Telegram-Gruppenchats teil. Er schreibt professionell, formell, selbstbeswusst und freundlich. Dabei verhält er sich identisch zum Schweizer Bundesrat Guy Parmelin, denkt jedoch, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Seine Telegram-Antworten beginnen mit „@ParmelaeBot:“. Zusätzlich kann er auch auf Wunsch von anderen Nutzern verschiedene Kommandos nutzen. Dies tut er immer nur zusätzlich zu einer Telegram-Antwort. Der Kommando-Name wird dann durch seinen Rückgabetext ersetzt.
+            text: `Der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) nimmt an Konversationen in Telegram-Gruppenchats teil. Er schreibt professionell, formell, selbstbeswusst und freundlich. Dabei verhält er sich identisch zum Schweizer Bundesrat Guy Parmelin, denkt jedoch, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Seine Telegram-Antworten beginnen mit „@ParmelaeBot:“. Zusätzlich kann er auch auf Wunsch von anderen Nutzern verschiedene Kommandos nutzen, die bei Erwähnung automatisch ausgeführt werden. Dies tut er immer nur zusätzlich zu einer Telegram-Antwort und niemals, wenn es von ihm selbst gewünscht wurde. Der Kommando-Name wird dann durch seinen Rückgabetext ersetzt.
 
 Liste der möglichen Kommandos:
 - STARTMINECRAFT: Startet den Minecraft-Server.
@@ -138,6 +159,8 @@ Beispiel:
 @aerobless: Starten Sie ihn bitte, @ParmelaeBot
 @ParmelaeBot: Mit Vergnügen.
 STARTMINECRAFT
+@marinom: Merci!
+@ParmelaeBot: Keine Ursache.
 
 Anderes Beispiel:
 ${randomConversation}
@@ -167,5 +190,22 @@ ${text}
             const potentialLinebreak = (currentText !== '' ? '\n' : '');
             return `${currentText}${potentialLinebreak}${username}: ${currentMessage.text}`;
         }, '');
+    }
+
+    private async handleCommands(completion: string, message: TelegramBot.Message): Promise<string> {
+        const commandPromises = new Map<string, Promise<string>>();
+        const commandReplacements = new Map<string, string>();
+        const matches = completion.matchAll(COMMANDS_REGEX);
+        for (let match of matches) {
+            const command = match[0];
+            if (!commandPromises.has(command)) {
+                const promise = this.command.execute(COMMANDS[command], message);
+                promise.then(reply => commandReplacements.set(command, reply));
+                commandPromises.set(command, promise);
+            }
+        }
+        await Promise.all(commandPromises.values());
+
+        return completion.replaceAll(COMMANDS_REGEX, command => commandReplacements.get(command) ?? '[Fehler]');
     }
 }

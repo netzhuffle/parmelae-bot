@@ -31,6 +31,6 @@ export class BotMentionReplyStrategy extends AllowlistedReplyStrategy {
         assert(message.text !== undefined);
 
         this.replyGenerator.generate(message)
-            .then((text: string) => this.telegram.send(text, message.chat.id));
+            .then((text: string) => this.telegram.send(text, message.chat));
     }
 }
