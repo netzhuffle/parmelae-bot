@@ -2,9 +2,9 @@
     "configurations": [
         {
             "type": "command",
-            "name": "Run with ts-node",
+            "name": "Run with ts-node-dev",
             "program": "npx",
-            "args": ["ts-node", "index.ts"],
+            "args": ["ts-node-dev", "index.ts"],
         },
         {
             "type": "command",
