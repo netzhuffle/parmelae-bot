@@ -6,6 +6,8 @@ export const enum Command {
     Info,
     /** Replies to the message the user replied to. */
     Comment,
+    /** Generates an image corresponding to the query. */
+    Image,
     /** Starts the minecraft server. */
     StartMinecraft,
     /** Stops the minecraft server. */

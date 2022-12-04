@@ -88,10 +88,11 @@ const SUBSCRIPT_IDS = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '
  *
  * Must have g flag, so it can be used for String.prototype.matchAll.
  */
-const COMMANDS_REGEX = /(STARTMINECRAFT|STOPMINECRAFT|BACKUPMINECRAFT|STATUSMINECRAFT)/g;
+const COMMANDS_REGEX = /(IMAGE|STARTMINECRAFT|STOPMINECRAFT|BACKUPMINECRAFT|STATUSMINECRAFT)/g;
 
 /** Map of GPT-3 command strings to Command. */
 const COMMANDS: Record<string, Command> = {
+    IMAGE: Command.Image,
     STARTMINECRAFT: Command.StartMinecraft,
     STOPMINECRAFT: Command.StopMinecraft,
     BACKUPMINECRAFT: Command.BackupMinecraft,
@@ -152,6 +153,7 @@ Liste der möglichen Kommandos:
 - STOPMINECRAFT: Beendet den Minecraft Server.
 - BACKUPMINECRAFT: Erstellt eine Datensicherung des Minecraft-Servers und aktualisiert die Online-Karte.
 - STATUSMINECRAFT: Fragt ab, ob der Minecraft-Server gerade an oder aus ist.
+- IMAGE: Generiert ein Bild passend zur Anfrage.
 
 Beispiel:
 @Nurtak: Läuft Minecraft gerade?
@@ -159,8 +161,9 @@ Beispiel:
 @aerobless: Starten Sie ihn bitte, @ParmelaeBot
 @ParmelaeBot: Mit Vergnügen.
 STARTMINECRAFT
-@marinom: Merci!
-@ParmelaeBot: Keine Ursache.
+@bugybunny: Bitte machen Sie ein Foto der Golden Gate Bridge.
+@ParmelaeBot: Ich reise sofort mit dem Bundesratsjet dorthin.
+IMAGE
 
 Anderes Beispiel:
 ${randomConversation}

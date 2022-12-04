@@ -4,6 +4,9 @@ import {spawn} from "child_process";
 import {TelegramService} from "./TelegramService";
 import {Command} from "./Command";
 import {ReplyGenerator} from "./MessageGenerators/ReplyGenerator";
+import { DallEPromptGenerator } from "./MessageGenerators/DallEPromptGenerator";
+import assert from "assert";
+import {DallEService} from "./DallEService";
 
 /** Executes a command */
 @singleton()
@@ -13,6 +16,8 @@ export class CommandService {
     constructor(
         private readonly telegram: TelegramService,
         @inject(delay(() => ReplyGenerator)) private readonly replyGenerator: ReplyGenerator,
+        private readonly dallEPromptGenerator: DallEPromptGenerator,
+        private readonly dallE: DallEService,
     ) {
     }
 
@@ -35,6 +40,17 @@ export class CommandService {
             }
 
             return this.replyGenerator.generate(message.reply_to_message);
+        }
+        if (command === Command.Image) {
+            assert(message.text);
+            const dallEPrompt = await this.dallEPromptGenerator.generate(message.text);
+            const imageUrl = await this.dallE.generateImage(dallEPrompt);
+            if (!imageUrl) {
+                return 'Leider kann ich das Bild gerade nicht senden.';
+            }
+            this.telegram.replyWithImage(imageUrl, dallEPrompt, message);
+
+            return '';
         }
 
         let reply = '';
