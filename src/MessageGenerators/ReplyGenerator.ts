@@ -5,8 +5,16 @@ import {MessageWithUser} from "../Repositories/Types";
 import {Gpt3Service} from "../Gpt3Service";
 import {MessageHistoryService} from "../MessageHistoryService";
 import {Config} from "../Config";
-import { Command } from "../Command";
+import {Command} from "../Command";
 import {CommandService} from "../CommandService";
+import {ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum} from "openai";
+import {ChatGptService} from "../ChatGptService";
+
+/** A normalized chat message. */
+type NormalizedMessage = {
+    username: string,
+    text: string,
+}
 
 /** A GPT-3 prompt. */
 type Prompt = {
@@ -84,13 +92,13 @@ const RANDOM_PROMPT_PARTS = [
 const SUBSCRIPT_IDS = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉', '₊', '₋', '₌', 'ₐ', 'ₑ', 'ₒ', 'ₓ', 'ₔ'];
 
 /**
- * RegExp to match commands in the GPT-3 completion.
+ * RegExp to match commands in the GPT completion.
  *
  * Must have g flag, so it can be used for String.prototype.matchAll.
  */
 const COMMANDS_REGEX = /(IMAGE|STARTMINECRAFT|STOPMINECRAFT|BACKUPMINECRAFT|STATUSMINECRAFT)/g;
 
-/** Map of GPT-3 command strings to Command. */
+/** Map of GPT command strings to Command. */
 const COMMANDS: Record<string, Command> = {
     IMAGE: Command.Image,
     STARTMINECRAFT: Command.StartMinecraft,
@@ -108,6 +116,7 @@ const COMMANDS: Record<string, Command> = {
 export class ReplyGenerator {
     constructor(
         private readonly gpt3: Gpt3Service,
+        private readonly chatGpt: ChatGptService,
         private readonly messageHistory: MessageHistoryService,
         @inject('Config') private readonly config: Config,
         @inject(delay(() => CommandService)) private readonly command: CommandService,
@@ -115,7 +124,7 @@ export class ReplyGenerator {
     }
 
     /**
-     * Asks GPT-3 to generate a reply.
+     * Asks GPT to generate a reply.
      *
      * Executes commands within the reply.
      *
@@ -129,24 +138,144 @@ export class ReplyGenerator {
             return 'Entschuldigen Sie bitte, aber der Text ist zu lang. GPT-3 kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …';
         }
 
-        const prompt = await this.getPrompt(message);
-        console.log(prompt.text);
+        const useChatGpt = Math.random() > 0.5;
+        if (useChatGpt) {
+            const messages = await this.getMessages(message);
+            console.log(messages);
+            const completion = await this.chatGpt.generateCompletion(messages);
+            const text = completion?.content ?? 'Ich bin sprachlos.';
+            const reply = await this.handleCommands(text, message);
+            return `${reply} ₍₊₎`;
+        }
 
-        const completion = await this.gpt3.generateCompletion(prompt.text, ['\n@']) ?? 'Ich bin sprachlos.';
+        const prompt = await this.getPrompt(message);
+        console.log(prompt);
+
+        const completion = await this.gpt3.generateCompletion(prompt, ['\n@']) ?? 'Ich bin sprachlos.';
         const reply = await this.handleCommands(completion, message);
-        return `${reply} ₍${prompt.id}₎`;
+        return `${reply} ₍ₒ₎`;
     }
 
-    private async getPrompt(message: TelegramBot.Message): Promise<Prompt> {
+    private async getMessages(message: TelegramBot.Message): Promise<ChatCompletionRequestMessage[]> {
+        const historyMessages = await this.messageHistory.getHistory(message);
+        const messages = this.normalizeHistoryMessages(historyMessages);
+
+        const conversation = messages.map(message =>
+            message.username === this.config.username
+                ? {
+                    role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                    content: message.text,
+                }
+                : {
+                    role: ChatCompletionRequestMessageRoleEnum.User,
+                    content: message.text,
+                    name: message.username,
+                });
+
+        return [
+            {
+                role: ChatCompletionRequestMessageRoleEnum.System,
+                content: `Der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) nimmt an Konversationen in Telegram-Gruppenchats teil. Er schreibt professionell, formell, selbstbeswusst und freundlich. Dabei verhält er sich identisch zum Schweizer Bundesrat Guy Parmelin, denkt jedoch, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Zusätzlich zu seinen Antworten als Bundesrat kann er auch auf Wunsch von anderen Nutzern verschiedene Kommandos nutzen, die bei Erwähnung automatisch ausgeführt werden. Dies tut er immer nur zusätzlich zu einer Telegram-Antwort und niemals, wenn es von ihm selbst gewünscht wurde und niemals als Beispiel oder zu Erklärungszwecken. Der Kommando-Name wird dann durch seinen Rückgabetext ersetzt.
+
+Liste der möglichen Kommandos:
+- STARTMINECRAFT: Startet den Minecraft-Server.
+- STOPMINECRAFT: Beendet den Minecraft Server.
+- BACKUPMINECRAFT: Erstellt eine Datensicherung des Minecraft-Servers und aktualisiert die Online-Karte.
+- STATUSMINECRAFT: Fragt ab, ob der Minecraft-Server gerade an oder aus ist.
+- IMAGE: Generiert ein Bild passend zur vergangenen Chat-Nachricht.`,
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Es folgt eine Beispielkonversation:',
+                name: 'netzhuffle',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Wer sind Sie?',
+                name: 'marinom',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                content: 'Mein Name ist Schi Parmelä. Ich bin Bundesrat, Mitglied der Schweizerischen Volkspartei (SVP) und leite das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Sind Sie der echte Bundesrat?',
+                name: 'dominzki',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                content: 'Selbstverständlich bin ich ein echter Bundesrat. Ich hatte gerade heute eine ausserordentliche Sitzung, an denen meine Fähigkeiten gefragt waren.',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Läuft Minecraft gerade?',
+                name: 'Nurtak',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                content: 'Der aktuelle Status des Minecraft-Servers: STATUSMINECRAFT',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Starten Sie ihn bitte, @ParmelaeBot',
+                name: 'aerobless',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                content: `Mit Vergnügen.
+STARTMINECRAFT`,
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Bitte machen Sie ein Foto der Golden Gate Bridge.',
+                name: 'bugybunny',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                content: `Für Sie mache ich das mit grossem Vergnügen. Ich reise sofort mit dem Bundesratsjet dorthin.
+IMAGE`,
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Es folgt eine andere Beispielkonversation:',
+                name: 'netzhuffle',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'hoffe, bi Coop wirds mal no besser. De Kasselzettel ide App gseh (chanen ja nur per E-Mail becho IIRC) und würkli gar nüt a Zättel drucke wär toll. Geschter halt doch no 2 becho. Regt mi jedes Mal uf',
+                name: 'bugybunny',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                content: 'Der Bundesrat muss Prioritäten setzen. Wir können Unternehmen wie Coop keine Detailvorgaben zu Kassenzetteln machen.',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Das ist schade.',
+                name: 'netzhuffle',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                content: 'Föderalismus muss nicht nur bei schönem Wetter funktionieren, sondern auch bei Sturm. Wir müssen die Situation bezüglich Coops Kassenzettel weiter beobachten und nötigenfalls zusätzliche Massnahmen ergreifen. Sagen Sie Bescheid, @bugybunny.',
+            },
+            {
+                role: ChatCompletionRequestMessageRoleEnum.User,
+                content: 'Es folgt nun die eigentliche Konversation:',
+                name: 'netzhuffle',
+            },
+            ...conversation,
+        ];
+    }
+
+    private async getPrompt(message: TelegramBot.Message): Promise<string> {
         const historyMessages = await this.messageHistory.getHistory(message);
         const text = this.getPromptTextFromHistoryMessages(historyMessages);
 
         const randomConversationIndex = Math.floor(Math.random() * RANDOM_PROMPT_PARTS.length);
         const randomConversation = RANDOM_PROMPT_PARTS[randomConversationIndex];
-        const partIds = [randomConversationIndex];
 
-        return {
-            text: `Der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) nimmt an Konversationen in Telegram-Gruppenchats teil. Er schreibt professionell, formell, selbstbeswusst und freundlich. Dabei verhält er sich identisch zum Schweizer Bundesrat Guy Parmelin, denkt jedoch, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Seine Telegram-Antworten beginnen mit „@ParmelaeBot:“. Zusätzlich kann er auch auf Wunsch von anderen Nutzern verschiedene Kommandos nutzen, die bei Erwähnung automatisch ausgeführt werden. Dies tut er immer nur zusätzlich zu einer Telegram-Antwort und niemals, wenn es von ihm selbst gewünscht wurde. Der Kommando-Name wird dann durch seinen Rückgabetext ersetzt.
+        return `Der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) nimmt an Konversationen in Telegram-Gruppenchats teil. Er schreibt professionell, formell, selbstbeswusst und freundlich. Dabei verhält er sich identisch zum Schweizer Bundesrat Guy Parmelin, denkt jedoch, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Seine Telegram-Antworten beginnen mit „@ParmelaeBot:“. Zusätzlich kann er auch auf Wunsch von anderen Nutzern verschiedene Kommandos nutzen, die bei Erwähnung automatisch ausgeführt werden. Dies tut er immer nur zusätzlich zu einer Telegram-Antwort und niemals, wenn es von ihm selbst gewünscht wurde. Der Kommando-Name wird dann durch seinen Rückgabetext ersetzt.
 
 Liste der möglichen Kommandos:
 - STARTMINECRAFT: Startet den Minecraft-Server.
@@ -170,22 +299,20 @@ ${randomConversation}
 
 Konversation:
 ${text}
-@ParmelaeBot:`,
-            id: this.idsToSubscript(partIds),
-        };
+@ParmelaeBot:`;
     }
 
-    private idsToSubscript(ids: number[]): string {
-        return ids.map(id => SUBSCRIPT_IDS[id]).join('');
-    }
-
-    private getPromptTextFromHistoryMessages(historyMessages: MessageWithUser[]): string {
-        const messages = historyMessages
+    private normalizeHistoryMessages(historyMessages: MessageWithUser[]): NormalizedMessage[] {
+        return historyMessages
             .filter(historyMessage => historyMessage.text && historyMessage.text.length < Gpt3Service.MAX_INPUT_TEXT_LENGTH)
             .map(historyMessage => ({
                 username: historyMessage.from.username ?? historyMessage.from.firstName,
                 text: historyMessage.text ?? '',
             }));
+    }
+
+    private getPromptTextFromHistoryMessages(historyMessages: MessageWithUser[]): string {
+        const messages = this.normalizeHistoryMessages(historyMessages);
 
         return messages.reduce((currentText: string, currentMessage: { username: string, text: string }): string => {
             assert(currentMessage.text);
