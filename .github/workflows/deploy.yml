@@ -14,12 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
       - name: Use Node.js 16.x
         uses: actions/setup-node@v2
         with:
@@ -36,8 +30,18 @@ jobs:
       - name: Remove dev dependencies
         run: npm ci --omit=dev
 
+      - name: Install SSH Key
+        run: |
+          eval `ssh-agent -s`
+          mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
+          echo ${{ secrets.KNOWN_HOSTS }} >> ~/.ssh/known_hosts
+          echo ${{ secrets.SSH_PRIVATE_KEY }} | ssh-add -
+
       - name: Deploy
         run: rsync -chilOrz --stats --delete --include node_modules --include dist --exclude-from .gitignore --exclude .git jannis.rocks:/home/jannis/parmelae-bot/
 
       - name: Restart
         run: ssh jannis.rocks 'cd /home/jannis/parmelae-bot/ && forever stop /home/jannis/parmelae-bot/dist/index.js && forever start /home/jannis/parmelae-bot/dist/index.js'
+
+      - name: Remove SSH
+        run: rm -rf ~/.ssh
