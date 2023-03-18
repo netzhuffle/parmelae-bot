@@ -47,7 +47,7 @@ jobs:
       - name: Restart
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'forever stop /home/jannis/parmelae-bot/dist/index.js; forever start /home/jannis/parmelae-bot/dist/index.js'
+        run: ssh jannis@jannis.rocks 'forever stop /home/jannis/parmelae-bot/dist/index.js; forever start --workingDir /home/jannis/parmelae-bot/ /home/jannis/parmelae-bot/dist/index.js'
 
       - name: Remove SSH
         run: rm -rf ~/.ssh
