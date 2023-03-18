@@ -1,6 +1,10 @@
 {
   "private": true,
   "main": "built/index.js",
+  "scripts": {
+    "build": "tsc",
+    "run-dev": "npx ts-node-dev src/index.ts"
+  },
   "dependencies": {
     "@prisma/client": "^4.3.1",
     "@sentry/integrations": "^7.12.1",

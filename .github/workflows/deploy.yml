@@ -1,0 +1,43 @@
+name: Deploy
+
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Remove dev dependencies
+        run: npm ci --omit=dev
+
+      - name: Deploy
+        run: rsync -chilOrz --stats --delete --include node_modules --include dist --exclude-from .gitignore --exclude .git jannis.rocks:/home/jannis/parmelae-bot/
+
+      - name: Restart
+        run: ssh jannis.rocks 'cd /home/jannis/parmelae-bot/ && forever stop /home/jannis/parmelae-bot/dist/index.js && forever start /home/jannis/parmelae-bot/dist/index.js'
