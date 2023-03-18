@@ -1,15 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
-    "allowJs": true,
-    "lib": [
-      "es2021"
-    ],
+    "outDir": "dist",
     "module": "CommonJS",
     "target": "es2021",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -18,8 +13,6 @@
     "inlineSources": true
   },
   "include": [
-    "./index.ts",
-    "./config.ts",
-    "./src/**/*"
+    "src/**/*"
   ]
 }

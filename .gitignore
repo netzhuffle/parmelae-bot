@@ -1,4 +1,4 @@
 /.env
-/built/
+/dist/
 /node_modules/
 /prisma/sqlite.db
