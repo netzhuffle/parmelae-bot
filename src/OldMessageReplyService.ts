@@ -21,7 +21,7 @@ const OLD_MESSAGE_REPLY_PROBABILITY = 0.15;
 @singleton()
 export class OldMessageReplyService {
     constructor(
-        @inject('Config') private readonly config: Config,
+        private readonly config: Config,
         private readonly oldMessageReplyGenerator: OldMessageReplyGenerator,
         // Injection delayed because of dependency loop between TelegramService, MessageStorageService, and OldMessageReplyService.
         @inject(delay(() => TelegramService)) private readonly telegramService: TelegramService,

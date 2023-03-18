@@ -407,7 +407,7 @@ export class ReplyGenerator {
     constructor(
         private readonly chatGpt: ChatGptService,
         private readonly messageHistory: MessageHistoryService,
-        @inject('Config') private readonly config: Config,
+        private readonly config: Config,
         @inject(delay(() => CommandService)) private readonly command: CommandService,
     ) {
     }

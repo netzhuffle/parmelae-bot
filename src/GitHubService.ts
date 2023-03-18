@@ -28,7 +28,7 @@ export class GitHubService {
         private readonly dateTimeSettingRepository: DateTimeSettingRepository,
         private readonly gitCommitAnnounceGenerator: GitCommitAnnouncementGenerator,
         private readonly telegramService: TelegramService,
-        @inject('Config') private readonly config: Config,
+        private readonly config: Config,
     ) {
     }
 

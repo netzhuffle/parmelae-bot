@@ -1,6 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
 import assert from "assert";
-import {inject, singleton} from "tsyringe";
+import {singleton} from "tsyringe";
 import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {Config} from './Config';
 import {MessageStorageService} from "./MessageStorageService";
@@ -17,7 +17,7 @@ export class Bot {
     constructor(
         private readonly replyStrategyFinder: ReplyStrategyFinder,
         private readonly telegram: TelegramBot,
-        @inject('Config') private readonly config: Config,
+        private readonly config: Config,
         private readonly messageStorageService: MessageStorageService,
         private readonly gitHubService: GitHubService,
     ) {

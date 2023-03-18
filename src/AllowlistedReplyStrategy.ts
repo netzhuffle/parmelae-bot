@@ -5,7 +5,7 @@ import {inject} from "tsyringe";
 
 /** Abstract ReplyStrategy for allowlisted chats and allowlisted private message senders only */
 export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
-    constructor(@inject('Config') protected readonly config: Config) {
+    constructor(protected readonly config: Config) {
     }
 
     willHandle(message: TelegramBot.Message): boolean {

@@ -14,7 +14,7 @@ export class BotMentionReplyStrategy extends AllowlistedReplyStrategy {
     constructor(
         private readonly telegram: TelegramService,
         private readonly replyGenerator: ReplyGenerator,
-        @inject('Config') config: Config,
+        config: Config,
     ) {
         super(config);
     }

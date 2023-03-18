@@ -15,7 +15,7 @@ const COMMAND_NAME = /^\/(.*)@/;
 export class CommandReplyStrategy extends AllowlistedReplyStrategy {
     constructor(
         private readonly command: CommandService,
-        @inject('Config') config: Config,
+        config: Config,
         private readonly telegram: TelegramService,
     ) {
         super(config);

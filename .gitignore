@@ -1,4 +1,4 @@
-/config.ts
+/.env
 /built/
 /node_modules/
 /prisma/sqlite.db
