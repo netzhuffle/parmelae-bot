@@ -10,7 +10,7 @@ import {ChatGptService} from "./ChatGptService";
 /**
  * Minimum length to consider reply to a message.
  *
- * Shorter message likely have not enough good information for GPT-3.
+ * Shorter message likely have not enough good information for GPT.
  */
 const MINIMUM_MESSAGE_REPLY_LENGTH = 100;
 

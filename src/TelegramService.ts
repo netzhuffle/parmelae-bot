@@ -34,7 +34,10 @@ export class TelegramService {
      * @param reply - The text or Sticker to send
      * @param message - The message to reply to
      */
-    async reply(reply: string | Sticker, message: TelegramBot.Message | { message_id: number, chat: { id: number } }): Promise<void> {
+    async reply(reply: string | Sticker, message: TelegramBot.Message | {
+        message_id: number,
+        chat: { id: number }
+    }): Promise<void> {
         if (reply instanceof Sticker) {
             this.telegram.sendSticker(message.chat.id, reply.fileId, {reply_to_message_id: message.message_id});
         } else {
@@ -51,6 +54,9 @@ export class TelegramService {
      * @param message - The message to reply to
      */
     async replyWithImage(url: string, caption: string, message: TelegramBot.Message): Promise<void> {
-        await this.telegram.sendPhoto(message.chat.id, url, {caption: caption, reply_to_message_id: message.message_id});
+        await this.telegram.sendPhoto(message.chat.id, url, {
+            caption: caption,
+            reply_to_message_id: message.message_id
+        });
     }
 }

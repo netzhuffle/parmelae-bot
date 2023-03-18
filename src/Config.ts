@@ -19,7 +19,7 @@ export class Config {
     public readonly gitHubPersonalAccessToken: string | null;
 
     /**
-     * The allowlisted chats for GPT-3 queries.
+     * The allowlisted chats for GPT queries.
      *
      * Can be private chats, groups, supergroups, or channels.
      */

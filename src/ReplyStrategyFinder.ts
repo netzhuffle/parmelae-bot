@@ -9,7 +9,7 @@ import {CommandReplyStrategy} from "./ReplyStrategies/CommandReplyStrategy";
 import {BotMentionReplyStrategy} from "./ReplyStrategies/ BotMentionReplyStrategy";
 import {MessageRepetitionReplyStrategy} from "./ReplyStrategies/MessageRepetitionReplyStrategy";
 import {NicknameReplyStrategy} from "./ReplyStrategies/NicknameReplyStrategy";
-import {RandomizedGpt3ReplyStrategy} from "./ReplyStrategies/RandomizedGpt3ReplyStrategy";
+import {RandomizedGeneratedReplyStrategy} from "./ReplyStrategies/RandomizedGeneratedReplyStrategy";
 import {RandomizedStickerReplyStrategy} from "./ReplyStrategies/RandomizedStickerReplyStrategy";
 import {CommentReplyStrategy} from "./ReplyStrategies/CommentReplyStrategy";
 
@@ -27,7 +27,7 @@ export class ReplyStrategyFinder {
         botMentionReplyStrategy: BotMentionReplyStrategy,
         messageRepetitionReplyStrategy: MessageRepetitionReplyStrategy,
         nicknameReplyStrategy: NicknameReplyStrategy,
-        randomizedGpt3ReplyStrategy: RandomizedGpt3ReplyStrategy,
+        randomizedGeneratedReplyStrategy: RandomizedGeneratedReplyStrategy,
         randomizedStickerReplyStrategy: RandomizedStickerReplyStrategy,
         nullReplyStrategy: NullReplyStrategy
     ) {
@@ -44,7 +44,7 @@ export class ReplyStrategyFinder {
             // Executes commands written as /xyz@BotName in allowlisted chats.
             commandReplyStrategy,
 
-            // Handles messages mentioning or replying to the bot in allowlisted chats by sending them to GPT-3 for handling.
+            // Handles messages mentioning or replying to the bot in allowlisted chats.
             botMentionReplyStrategy,
 
             // Repeats a message that two other users wrote.
@@ -53,8 +53,8 @@ export class ReplyStrategyFinder {
             // Replies with a nickname when the text contains <Spitzname>.
             nicknameReplyStrategy,
 
-            // Picks a message by random chance to reply with GPT-3.
-            randomizedGpt3ReplyStrategy,
+            // Picks a message by random chance to reply with a generated message.
+            randomizedGeneratedReplyStrategy,
 
             // Picks a message by random chance to reply with a random sticker.
             randomizedStickerReplyStrategy,

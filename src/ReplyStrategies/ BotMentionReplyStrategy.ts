@@ -1,13 +1,13 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import {inject, singleton} from "tsyringe";
+import {singleton} from "tsyringe";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {Config} from "../Config";
 import {TelegramService} from "../TelegramService";
 import {ReplyGenerator} from "../MessageGenerators/ReplyGenerator";
 
 /**
- * Handles messages mentioning or replying to the bot in allowlisted chats by sending them to GPT-3 for handling.
+ * Handles messages mentioning or replying to the bot in allowlisted chats.
  */
 @singleton()
 export class BotMentionReplyStrategy extends AllowlistedReplyStrategy {

@@ -423,7 +423,7 @@ export class ReplyGenerator {
     async generate(message: TelegramBot.Message): Promise<string> {
         assert(message.text && message.from);
         if (message.text.length >= ChatGptService.MAX_INPUT_TEXT_LENGTH) {
-            return 'Entschuldigen Sie bitte, aber der Text ist zu lang. GPT-3 kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …';
+            return 'Entschuldigen Sie bitte, aber der Text ist zu lang. GPT kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …';
         }
 
         const messages = await this.getMessages(message);
