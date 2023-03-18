@@ -1,31 +1,47 @@
 import {singleton} from "tsyringe";
-import {Gpt3Service} from "../Gpt3Service";
+import {ChatGptService} from "../ChatGptService";
+import {ChatGptMessage, ChatGptRole} from "./ChatGptMessage";
 
 /** Creates Dall-E prompts. */
 @singleton()
 export class DallEPromptGenerator {
-    constructor(private readonly gpt3: Gpt3Service) {
+    constructor(private readonly chatGpt: ChatGptService) {
     }
 
     /**
-     * Asks GPT-3 to generate a GPT-3 prompt.
+     * Asks GPT to generate a DALL-E prompt.
      * @param text - The text about what’s asked.
      * @return The prompt.
      */
     async generate(text: string): Promise<string> {
-        const prompt = `Generiere einen Dall-E-Prompt für wunderschöne Kunst oder Fotos basierend auf einer simplen Anfrage. Dall-E-Prompts sind englisch, übertrieben detailliert beschrieben, mit hohen Qualitätsforderungen, jedoch nah an der ursprünglichen Anfrage.
+        const messages: ChatGptMessage[] = [
+            {
+                role: ChatGptRole.System,
+                content: 'Generiere einen Dall-E-Prompt für wunderschöne Kunst oder Fotos basierend auf einer simplen Anfrage. Dall-E-Prompts sind englisch, übertrieben detailliert beschrieben, mit hohen Qualitätsforderungen, jedoch nah an der ursprünglichen Anfrage.',
+            },
+            {
+                role: ChatGptRole.User,
+                content: 'Malen Sie einen Hamster.',
+            },
+            {
+                role: ChatGptRole.Assistant,
+                content: 'Drawing of a hamster, high quality, professional drawing, highly detailed epic, trending on art station.',
+            },
+            {
+                role: ChatGptRole.User,
+                content: 'Ein Foto der Golden Gate Bridge, bitte.',
+            },
+            {
+                role: ChatGptRole.Assistant,
+                content: 'Photo of the Golden Gate Bridge, in 4k high resolution, professional photo for magazine, 35mm camera 3.4f, hyper detailed.',
+            },
+            {
+                role: ChatGptRole.User,
+                content: text,
+            }
+        ];
 
-Anfrage: Malen Sie einen Hamster.
-Prompt: Drawing of a hamster, high quality, professional drawing, highly detailed epic, trending on art station.
-
-Anfrage: Ein Foto der Golden Gate Bridge, bitte.
-Prompt: Photo of the Golden Gate Bridge, in 4k high resolution, professional photo for magazine, 35mm camera 3.4f, hyper detailed.
-
-Anfrage: ${text}
-Prompt:`;
-
-        const completion = await this.gpt3.generateCompletion(prompt, ['Anfrage:', 'Prompt:', '\n']);
-        const message = completion?.trim();
-        return message !== undefined ? message : `Oh nein, ich bedaure: Meine Kamera ist kaputt, ich kann das Bild gerade nicht senden.`;
+        const completion = await this.chatGpt.generateCompletion(messages);
+        return completion ? completion.content : `Oh nein, ich bedaure: Meine Kamera ist kaputt, ich kann das echte Bild gerade nicht senden.`;
     }
 }

@@ -1,11 +1,11 @@
 import {Message} from "@prisma/client";
 import assert from "assert";
 import {delay, inject, singleton} from "tsyringe";
-import {Gpt3Service} from "./Gpt3Service";
 import {Config} from "./Config";
 import {TelegramService} from "./TelegramService";
 import {MessageWithUser} from "./Repositories/Types";
 import {OldMessageReplyGenerator} from "./MessageGenerators/OldMessageReplyGenerator";
+import {ChatGptService} from "./ChatGptService";
 
 /**
  * Minimum length to consider reply to a message.
@@ -70,12 +70,12 @@ export class OldMessageReplyService {
         }
 
         if (message.text.length < MINIMUM_MESSAGE_REPLY_LENGTH) {
-            // Short messages likely have not good enough content for GPT-3.
+            // Short messages likely have not good enough content for GPT.
             return false;
         }
 
-        if (message.text.length >= Gpt3Service.MAX_INPUT_TEXT_LENGTH) {
-            // Message too expensive to send to GPT-3.
+        if (message.text.length >= ChatGptService.MAX_INPUT_TEXT_LENGTH) {
+            // Message too expensive to send to GPT.
             return false;
         }
 
