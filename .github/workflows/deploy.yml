@@ -31,16 +31,22 @@ jobs:
         run: npm ci --omit=dev
 
       - name: Install SSH Key
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          eval `ssh-agent -s`
           mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
           echo ${{ secrets.KNOWN_HOSTS }} >> ~/.ssh/known_hosts
-          echo ${{ secrets.SSH_PRIVATE_KEY }} | ssh-add -
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
 
       - name: Deploy
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: rsync -chilOrz --stats --delete --include node_modules --include dist --exclude-from .gitignore --exclude .git jannis.rocks:/home/jannis/parmelae-bot/
 
       - name: Restart
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: ssh jannis.rocks 'cd /home/jannis/parmelae-bot/ && forever stop /home/jannis/parmelae-bot/dist/index.js && forever start /home/jannis/parmelae-bot/dist/index.js'
 
       - name: Remove SSH
