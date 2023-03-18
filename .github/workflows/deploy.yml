@@ -42,7 +42,7 @@ jobs:
       - name: Stop
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'forever stop /home/jannis/parmelae-bot/dist/index.js'
+        run: ssh jannis@jannis.rocks 'forever stop /home/jannis/parmelae-bot/dist/index.js || true'
 
       - name: Deploy
         env:
