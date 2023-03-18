@@ -1,3 +1,4 @@
+import assert from "assert";
 import {
     ChatCompletionRequestMessage,
     ChatCompletionRequestMessageRoleEnum,
@@ -10,7 +11,16 @@ import {ChatGptMessage, ChatGptRole} from "./MessageGenerators/ChatGptMessage";
 import {NotExhaustiveSwitchError} from "./NotExhaustiveSwitchError";
 
 /** The ChatGPT model to use. */
-const MODEL = 'gpt-3.5-turbo';
+const CHAT_GPT = 'gpt-3.5-turbo';
+
+/** The GPT-4 model to use. */
+const GPT4 = 'gpt-4';
+
+/** The string the newest message starts with to trigger use of GPT-4. */
+const GPT4_STRING = '4:';
+
+/** RegExp to match the GPT-4 string. */
+const GPT4_REGEXP = new RegExp(`^${GPT4_STRING}`);
 
 /** ChatGPT Service */
 @singleton()
@@ -29,9 +39,10 @@ export class ChatGptService {
     async generateCompletion(
         messages: ChatGptMessage[],
     ): Promise<ChatGptMessage | null> {
+        assert(messages.length > 0);
         try {
             const response = await this.openAi.createChatCompletion({
-                model: MODEL,
+                model: messages[messages.length - 1].content.startsWith('4:') ? GPT4 : CHAT_GPT,
                 messages: messages.map(this.getRequestMessage.bind(this)),
             });
             const responseMessage = response.data.choices?.[0].message;
@@ -48,7 +59,7 @@ export class ChatGptService {
     private getRequestMessage(message: ChatGptMessage): ChatCompletionRequestMessage {
         return {
             role: this.getRequestRole(message.role),
-            content: message.content,
+            content: message.content.replace(GPT4_REGEXP, '').trim(),
             name: message.name,
         };
     }
