@@ -17,15 +17,14 @@ The most helpful bot you’ve ever seen on Telegram.
 # Run in development
 
 1. Update dependencies: `npm install`
-2. Run new database migrations: `npx prisma migrate dev`
+2. Run new database migrations: `npm run migrate`
 3. Execute: `npm run run-dev`
 
 # Run in production
 
 1. Update dependencies: `npm install`
-2. Run new database migrations: `npx prisma migrate dev`
-3. Build: `npm run build`
-4. Remove dev dependencies: `npm install --omit=dev`
-5. Deploy (however you like). Careful, the config is part of the compiled code and might override your production server
-   config.
+2. Build: `npm run build`
+3. Remove dev dependencies: `npm install --omit=dev`
+4. Deploy (however you like)
+5. Run database migrations: `npm run migrate-prod`
 6. Execute: `node dist/index.js`

@@ -39,15 +39,20 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
 
+      - name: Stop
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: ssh jannis@jannis.rocks 'forever stop /home/jannis/parmelae-bot/dist/index.js'
+
       - name: Deploy
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: rsync -chilOrz --stats --delete --include node_modules --include dist --exclude-from .gitignore --exclude .git ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
 
-      - name: Restart
+      - name: Start
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'forever stop /home/jannis/parmelae-bot/dist/index.js; forever start --workingDir /home/jannis/parmelae-bot/ /home/jannis/parmelae-bot/dist/index.js'
+        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot/ && npm run migrate-prod && forever start --workingDir /home/jannis/parmelae-bot/ /home/jannis/parmelae-bot/dist/index.js'
 
       - name: Remove SSH
         run: rm -rf ~/.ssh
