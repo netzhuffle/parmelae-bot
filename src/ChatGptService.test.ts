@@ -8,7 +8,7 @@ import {ChatGptMessage, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
 const requestResponse = {
     request: {} as object,
     response: {} as object,
-    error: null as Error|null,
+    error: null as Error | null,
 };
 const openAiFake = {
     request: {},
@@ -160,7 +160,7 @@ test('ChatGPT connect error', async () => {
     expect(response).toBeNull();
 });
 
-test('ChatGPT other error', async () => {
+test('ChatGPT other error', () => {
     requestResponse.error = new Error('some other error');
     const sut = new ChatGptService(openAiFake);
     const requestMessages: ChatGptMessage[] = [
@@ -169,7 +169,7 @@ test('ChatGPT other error', async () => {
             content: 'User Message',
             name: 'Username',
         },
-        ];
+    ];
 
     const response = sut.generateCompletion(requestMessages);
 
