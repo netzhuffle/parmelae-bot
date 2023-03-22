@@ -1,8 +1,10 @@
-export enum ChatGptRole {
-    System,
-    User,
-    Assistant,
-}
+export const ChatGptRoles = {
+    System: 'system',
+    User: 'user',
+    Assistant: 'assistant',
+} as const;
+
+export type ChatGptRole = typeof ChatGptRoles[keyof typeof ChatGptRoles];
 
 /** A message for the ChatGPT API. */
 export type ChatGptMessage = {

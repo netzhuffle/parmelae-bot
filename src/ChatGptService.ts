@@ -7,7 +7,7 @@ import {
     OpenAIApi
 } from "openai";
 import {singleton} from "tsyringe";
-import {ChatGptMessage, ChatGptRole} from "./MessageGenerators/ChatGptMessage";
+import {ChatGptMessage, ChatGptRole, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
 import {NotExhaustiveSwitchError} from "./NotExhaustiveSwitchError";
 
 /** The ChatGPT model to use. */
@@ -73,11 +73,11 @@ export class ChatGptService {
 
     private getRequestRole(role: ChatGptRole): ChatCompletionRequestMessageRoleEnum {
         switch (role) {
-            case ChatGptRole.System:
+            case ChatGptRoles.System:
                 return ChatCompletionRequestMessageRoleEnum.System;
-            case ChatGptRole.Assistant:
+            case ChatGptRoles.Assistant:
                 return ChatCompletionRequestMessageRoleEnum.Assistant;
-            case ChatGptRole.User:
+            case ChatGptRoles.User:
                 return ChatCompletionRequestMessageRoleEnum.User;
             default:
                 throw new NotExhaustiveSwitchError(role);
@@ -87,11 +87,11 @@ export class ChatGptService {
     private getRole(role: ChatCompletionResponseMessageRoleEnum): ChatGptRole {
         switch (role) {
             case ChatCompletionRequestMessageRoleEnum.System:
-                return ChatGptRole.System;
+                return ChatGptRoles.System;
             case ChatCompletionRequestMessageRoleEnum.Assistant:
-                return ChatGptRole.Assistant;
+                return ChatGptRoles.Assistant;
             case ChatCompletionRequestMessageRoleEnum.User:
-                return ChatGptRole.User;
+                return ChatGptRoles.User;
             default:
                 throw new NotExhaustiveSwitchError(role);
         }
