@@ -86,11 +86,11 @@ export class ChatGptService {
 
     private getRole(role: ChatCompletionResponseMessageRoleEnum): ChatGptRole {
         switch (role) {
-            case ChatCompletionRequestMessageRoleEnum.System:
+            case ChatCompletionResponseMessageRoleEnum.System:
                 return ChatGptRoles.System;
-            case ChatCompletionRequestMessageRoleEnum.Assistant:
+            case ChatCompletionResponseMessageRoleEnum.Assistant:
                 return ChatGptRoles.Assistant;
-            case ChatCompletionRequestMessageRoleEnum.User:
+            case ChatCompletionResponseMessageRoleEnum.User:
                 return ChatGptRoles.User;
             default:
                 throw new NotExhaustiveSwitchError(role);
