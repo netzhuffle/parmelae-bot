@@ -1,10 +1,10 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import {inject, singleton} from "tsyringe";
+import {singleton} from "tsyringe";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
-import {Command} from "../Command";
+import {Commands} from "../Command";
 import {TelegramService} from "../TelegramService";
 
 /**
@@ -30,7 +30,7 @@ export class CommentReplyStrategy extends AllowlistedReplyStrategy {
     handle(message: TelegramBot.Message): void {
         assert(message.text !== undefined);
 
-        this.command.execute(Command.Comment, message)
+        this.command.execute(Commands.Comment, message)
             .then(reply => this.telegram.reply(reply, message));
     }
 }

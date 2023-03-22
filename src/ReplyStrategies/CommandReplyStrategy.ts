@@ -1,10 +1,10 @@
 import TelegramBot from "node-telegram-bot-api";
-import {inject, singleton} from "tsyringe";
+import {singleton} from "tsyringe";
 import assert from "assert";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
-import {Command} from "../Command";
+import {Command, Commands} from "../Command";
 import {TelegramService} from "../TelegramService";
 
 /** Regex matching the command name. */
@@ -39,19 +39,19 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
     private getCommand(command: string): Command {
         switch (command) {
             case 'info':
-                return Command.Info;
+                return Commands.Info;
             case 'comment':
-                return Command.Comment;
+                return Commands.Comment;
             case 'startminecraft':
-                return Command.StartMinecraft;
+                return Commands.StartMinecraft;
             case 'stopminecraft':
-                return Command.StopMinecraft;
+                return Commands.StopMinecraft;
             case 'backupminecraft':
-                return Command.BackupMinecraft;
+                return Commands.BackupMinecraft;
             case 'statusminecraft':
-                return Command.StatusMinecraft;
+                return Commands.StatusMinecraft;
             default:
-                return Command.Unknown;
+                return Commands.Unknown;
         }
     }
 }

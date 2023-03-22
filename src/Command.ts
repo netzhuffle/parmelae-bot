@@ -1,21 +1,26 @@
 /**
  * Commands recognized by the bot.
  */
-export const enum Command {
+export const Commands = {
     /** Informs the user about the capabilities of the bot. */
-    Info,
+    Info: 'info',
     /** Replies to the message the user replied to. */
-    Comment,
+    Comment: 'comment',
     /** Generates an image corresponding to the query. */
-    Image,
+    Image: 'image',
     /** Starts the minecraft server. */
-    StartMinecraft,
+    StartMinecraft: 'startminecraft',
     /** Stops the minecraft server. */
-    StopMinecraft,
+    StopMinecraft: 'stopminecraft',
     /** Backups the minecraft server. */
-    BackupMinecraft,
+    BackupMinecraft: 'backupminecraft',
     /** Tells the current running status of the minecraft server. */
-    StatusMinecraft,
+    StatusMinecraft: 'statusminecraft',
     /** Tells the user that the command is unknown. */
-    Unknown,
-}
+    Unknown: 'unknown',
+} as const;
+
+/**
+ * Commands recognized by the bot.
+ */
+export type Command = typeof Commands[keyof typeof Commands];

@@ -3,7 +3,7 @@ import TelegramBot from "node-telegram-bot-api";
 import {delay, inject, singleton} from "tsyringe";
 import {MessageHistoryService} from "../MessageHistoryService";
 import {Config} from "../Config";
-import {Command} from "../Command";
+import {Command, Commands} from "../Command";
 import {CommandService} from "../CommandService";
 import {ChatGptService} from "../ChatGptService";
 import {ChatGptMessage, ChatGptRoles} from "./ChatGptMessage";
@@ -390,11 +390,11 @@ const COMMANDS_REGEX = /(IMAGE|STARTMINECRAFT|STOPMINECRAFT|BACKUPMINECRAFT|STAT
 
 /** Map of GPT command strings to Command. */
 const COMMANDS: Record<string, Command> = {
-    IMAGE: Command.Image,
-    STARTMINECRAFT: Command.StartMinecraft,
-    STOPMINECRAFT: Command.StopMinecraft,
-    BACKUPMINECRAFT: Command.BackupMinecraft,
-    STATUSMINECRAFT: Command.StatusMinecraft,
+    IMAGE: Commands.Image,
+    STARTMINECRAFT: Commands.StartMinecraft,
+    STOPMINECRAFT: Commands.StopMinecraft,
+    BACKUPMINECRAFT: Commands.BackupMinecraft,
+    STATUSMINECRAFT: Commands.StatusMinecraft,
 };
 
 /**
