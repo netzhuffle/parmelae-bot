@@ -1,5 +1,5 @@
 import {Octokit} from "octokit";
-import {inject, singleton} from "tsyringe";
+import {singleton} from "tsyringe";
 import {DateTimeSettingRepository} from "./Repositories/DateTimeSettingRepository";
 import {TelegramService} from "./TelegramService";
 import {Config} from "./Config";
@@ -16,7 +16,6 @@ type Commit = {
 };
 
 const LAST_COMMIT_DATE_TIME_SETTING = 'last commit DateTime';
-const INTERVAL_MILLISECONDS = 180_000;
 
 /** Announces new commits on GitHub */
 @singleton()
@@ -32,13 +31,10 @@ export class GitHubService {
     ) {
     }
 
-    /** Fetches commits now and periodically and announces new commits. */
-    async startPollingAndAnnounceCommits(): Promise<void> {
+    /** Fetches commits and announces new ones. */
+    async announceNewCommits(): Promise<void> {
         this.lastCommitDateTime = await this.dateTimeSettingRepository.get(LAST_COMMIT_DATE_TIME_SETTING, new Date());
         await this.pollAndAnnounceCommits();
-        setInterval(async (): Promise<void> => {
-            await this.pollAndAnnounceCommits();
-        }, INTERVAL_MILLISECONDS);
     }
 
     private async pollAndAnnounceCommits(): Promise<void> {

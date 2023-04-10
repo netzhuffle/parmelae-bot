@@ -35,7 +35,7 @@ export class Bot {
             assert(me.username === this.config.username);
         });
         this.messageStorageService.startDailyDeletion();
-        this.gitHubService.startPollingAndAnnounceCommits();
+        this.gitHubService.announceNewCommits();
     }
 
     /**
