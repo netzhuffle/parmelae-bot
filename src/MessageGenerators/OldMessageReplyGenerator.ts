@@ -87,7 +87,7 @@ export class OldMessageReplyGenerator {
                 content: text,
             },
         ];
-        const completion = await this.chatGpt.generateCompletion(messages);
+        const completion = await this.chatGpt.generateMessage(messages);
         return completion ? completion.content : 'Ich bin noch immer sprachlos über diese Nachricht.';
     }
 }

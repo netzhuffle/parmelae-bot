@@ -4,46 +4,34 @@ import {
 } from "openai/dist/api";
 import {ChatGptService} from "./ChatGptService";
 import {ChatGptMessage, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
+import {ChatGptModels} from "./ChatGptModels";
+import {ChatOpenAI} from "langchain/chat_models/openai";
+import {AIChatMessage, HumanChatMessage, SystemChatMessage} from "langchain/schema";
 
 const requestResponse = {
     request: {} as object,
     response: {} as object,
-    error: null as Error | null,
 };
-const openAiFake = {
+const chatOpenAiFake = {
     request: {},
     response: {},
-    createChatCompletion: async (request: object) => {
+    call: async (request: object) => {
         requestResponse.request = request;
-
-        if (requestResponse.error) {
-            throw requestResponse.error;
-        }
-
         return requestResponse.response;
     },
-} as unknown as OpenAIApi;
+} as unknown as ChatOpenAI;
+const chatGptModels = new ChatGptModels({
+    chatGpt: chatOpenAiFake,
+    gpt4: chatOpenAiFake,
+});
 
 beforeEach(() => {
     requestResponse.request = {};
     requestResponse.response = {};
-    requestResponse.error = null;
 });
 
 test('generate ChatGPT completion', async () => {
-    requestResponse.response = {
-        data: {
-            choices: [
-                {
-                    message: {
-                        role: ChatCompletionResponseMessageRoleEnum.Assistant,
-                        content: 'completion',
-                    },
-                },
-            ],
-        },
-    };
-    const sut = new ChatGptService(openAiFake);
+    const sut = new ChatGptService(chatGptModels);
     const requestMessages: ChatGptMessage[] = [
         {
             role: ChatGptRoles.System,
@@ -59,47 +47,25 @@ test('generate ChatGPT completion', async () => {
             name: 'Username',
         },
     ];
+    requestResponse.response = new AIChatMessage('completion');
 
-    const response = await sut.generateCompletion(requestMessages);
+    const response = await sut.generateMessage(requestMessages);
 
     expect(response).toEqual({
         role: ChatGptRoles.Assistant,
         content: 'completion',
     });
-    expect(requestResponse.request).toEqual({
-        model: 'gpt-3.5-turbo',
-        messages: [
-            {
-                role: ChatCompletionRequestMessageRoleEnum.System,
-                content: 'System Message',
-            },
-            {
-                role: ChatCompletionRequestMessageRoleEnum.Assistant,
-                content: 'Assistant Message',
-            },
-            {
-                role: ChatCompletionRequestMessageRoleEnum.User,
-                content: 'User Message',
-                name: 'Username',
-            },
-        ] as ChatCompletionRequestMessage[],
-    });
+    const humanMessage = new HumanChatMessage('User Message');
+    humanMessage.name = 'Username';
+    expect(requestResponse.request).toEqual([
+        new SystemChatMessage('System Message'),
+        new AIChatMessage('Assistant Message'),
+        humanMessage,
+    ]);
 });
 
 test('generate GPT-4 completion', async () => {
-    requestResponse.response = {
-        data: {
-            choices: [
-                {
-                    message: {
-                        role: ChatCompletionResponseMessageRoleEnum.Assistant,
-                        content: 'completion',
-                    },
-                },
-            ],
-        },
-    };
-    const sut = new ChatGptService(openAiFake);
+    const sut = new ChatGptService(chatGptModels);
     const requestMessages: ChatGptMessage[] = [
         {
             role: ChatCompletionRequestMessageRoleEnum.System,
@@ -116,63 +82,21 @@ test('generate GPT-4 completion', async () => {
             name: 'Username 2',
         },
     ];
+    requestResponse.response = new AIChatMessage('completion');
 
-    const response = await sut.generateCompletion(requestMessages);
+    const response = await sut.generateMessage(requestMessages);
 
     expect(response).toEqual({
         role: ChatGptRoles.Assistant,
         content: 'completion',
     });
-    expect(requestResponse.request).toEqual({
-        model: 'gpt-4',
-        messages: [
-            {
-                role: ChatCompletionRequestMessageRoleEnum.System,
-                content: 'System Message',
-            },
-            {
-                role: ChatCompletionRequestMessageRoleEnum.User,
-                content: 'User Message 1',
-                name: 'Username 1',
-            },
-            {
-                role: ChatCompletionRequestMessageRoleEnum.User,
-                content: 'User Message 2',
-                name: 'Username 2',
-            },
-        ] as ChatCompletionRequestMessage[],
-    });
-});
-
-test('ChatGPT connect error', async () => {
-    requestResponse.error = new Error('connect ECONNREFUSED error');
-    const sut = new ChatGptService(openAiFake);
-    const requestMessages: ChatGptMessage[] = [
-        {
-            role: ChatGptRoles.User,
-            content: 'User Message',
-            name: 'Username',
-        },
-    ];
-
-    const response = await sut.generateCompletion(requestMessages);
-
-    expect(response).toBeNull();
-});
-
-test('ChatGPT other error', () => {
-    requestResponse.error = new Error('some other error');
-    const sut = new ChatGptService(openAiFake);
-    const requestMessages: ChatGptMessage[] = [
-        {
-            role: ChatGptRoles.User,
-            content: 'User Message',
-            name: 'Username',
-        },
-    ];
-
-    const response = sut.generateCompletion(requestMessages);
-
-    expect.assertions(1);
-    response.catch(e => expect(e.message).toBe('some other error'));
+    const humanMessage1 = new HumanChatMessage('User Message 1');
+    humanMessage1.name = 'Username 1';
+    const humanMessage2 = new HumanChatMessage('User Message 2');
+    humanMessage2.name = 'Username 2';
+    expect(requestResponse.request).toEqual([
+        new SystemChatMessage('System Message'),
+        humanMessage1,
+        humanMessage2,
+    ]);
 });

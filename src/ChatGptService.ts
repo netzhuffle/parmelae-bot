@@ -1,20 +1,16 @@
 import assert from "assert";
 import {
-    ChatCompletionRequestMessage,
-    ChatCompletionRequestMessageRoleEnum,
-    ChatCompletionResponseMessage,
-    ChatCompletionResponseMessageRoleEnum,
-    OpenAIApi
-} from "openai";
+    AIChatMessage,
+    BaseChatMessage,
+    ChatMessage,
+    HumanChatMessage,
+    SystemChatMessage
+} from "langchain/schema";
 import {singleton} from "tsyringe";
+import {ChatGptModels} from "./ChatGptModels";
 import {ChatGptMessage, ChatGptRole, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
 import {NotExhaustiveSwitchError} from "./NotExhaustiveSwitchError";
-
-/** The ChatGPT model to use. */
-const CHAT_GPT = 'gpt-3.5-turbo';
-
-/** The GPT-4 model to use. */
-const GPT4 = 'gpt-4';
+import {UnknownLangChainMessageRoleError} from "./UnknownLangChainMessageRoleError";
 
 /** The string the newest message starts with to trigger use of GPT-4. */
 const GPT4_STRING = '4:';
@@ -29,71 +25,86 @@ export class ChatGptService {
     static readonly MAX_INPUT_TEXT_LENGTH = 1200;
 
     constructor(
-        private readonly openAi: OpenAIApi,
+        private readonly models: ChatGptModels,
     ) {
     }
 
     /**
      * Generates a completion message if possible and returns it.
      */
-    async generateCompletion(
+    async generateMessage(
         messages: ChatGptMessage[],
-    ): Promise<ChatGptMessage | null> {
+    ): Promise<ChatGptMessage> {
         assert(messages.length > 0);
-        try {
-            const response = await this.openAi.createChatCompletion({
-                model: messages[messages.length - 1].content.startsWith('4:') ? GPT4 : CHAT_GPT,
-                messages: messages.map(this.getRequestMessage.bind(this)),
-            });
-            const responseMessage = response.data.choices?.[0].message;
 
-            return responseMessage ? this.getMessage(responseMessage) : null;
-        } catch (e) {
-            if (e instanceof Error && e.message.startsWith('connect ECONNREFUSED')) {
-                return null;
-            }
-            throw e;
-        }
+        const model = messages[messages.length - 1].content.startsWith(GPT4_STRING) ? this.models.gpt4 : this.models.chatGpt;
+        const langChainMessages = messages.map(this.getLangChainMessage.bind(this));
+        const response = await model.call(langChainMessages);
+
+        return this.getMessage(response);
     }
 
-    private getRequestMessage(message: ChatGptMessage): ChatCompletionRequestMessage {
-        return {
-            role: this.getRequestRole(message.role),
-            content: message.content.replace(GPT4_REGEXP, '').trim(),
-            name: message.name,
-        };
-    }
-
-    private getMessage(apiMessage: ChatCompletionResponseMessage): ChatGptMessage {
-        return {
-            role: this.getRole(apiMessage.role),
-            content: apiMessage.content,
-        };
-    }
-
-    private getRequestRole(role: ChatGptRole): ChatCompletionRequestMessageRoleEnum {
+    private getLangChainMessage(message: ChatGptMessage): BaseChatMessage {
+        const content = message.content.replace(GPT4_REGEXP, '').trim();
+        const role = message.role;
         switch (role) {
             case ChatGptRoles.System:
-                return ChatCompletionRequestMessageRoleEnum.System;
+                return new SystemChatMessage(content);
             case ChatGptRoles.Assistant:
-                return ChatCompletionRequestMessageRoleEnum.Assistant;
+                return new AIChatMessage(content);
             case ChatGptRoles.User:
-                return ChatCompletionRequestMessageRoleEnum.User;
+                const humanMessage = new HumanChatMessage(content);
+                humanMessage.name = message.name;
+                return humanMessage;
             default:
                 throw new NotExhaustiveSwitchError(role);
         }
     }
 
-    private getRole(role: ChatCompletionResponseMessageRoleEnum): ChatGptRole {
+    private getMessage(langChainMessage: BaseChatMessage): ChatGptMessage {
+        const role = this.getRole(langChainMessage);
         switch (role) {
-            case ChatCompletionResponseMessageRoleEnum.System:
-                return ChatGptRoles.System;
-            case ChatCompletionResponseMessageRoleEnum.Assistant:
-                return ChatGptRoles.Assistant;
-            case ChatCompletionResponseMessageRoleEnum.User:
-                return ChatGptRoles.User;
+            case ChatGptRoles.System:
+            case ChatGptRoles.Assistant:
+                return {
+                    role: role,
+                    content: langChainMessage.text,
+                };
+            case ChatGptRoles.User:
+                return {
+                    role: role,
+                    content: langChainMessage.text,
+                    name: langChainMessage.name,
+                };
             default:
                 throw new NotExhaustiveSwitchError(role);
+        }
+
+    }
+
+    private getRole(langChainMessage: BaseChatMessage): ChatGptRole {
+        const type = langChainMessage._getType();
+        switch (type) {
+            case 'system':
+                return ChatGptRoles.System;
+            case 'ai':
+                return ChatGptRoles.Assistant;
+            case 'human':
+                return ChatGptRoles.User;
+            case 'generic':
+                assert(langChainMessage instanceof ChatMessage);
+                switch (langChainMessage.role) {
+                    case 'system':
+                        return ChatGptRoles.System;
+                    case 'ai':
+                        return ChatGptRoles.Assistant;
+                    case 'human':
+                        return ChatGptRoles.User;
+                    default:
+                        throw new UnknownLangChainMessageRoleError(langChainMessage.role);
+                }
+            default:
+                throw new NotExhaustiveSwitchError(type);
         }
     }
 }

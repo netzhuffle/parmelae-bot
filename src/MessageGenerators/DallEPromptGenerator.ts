@@ -41,7 +41,7 @@ export class DallEPromptGenerator {
             }
         ];
 
-        const completion = await this.chatGpt.generateCompletion(messages);
+        const completion = await this.chatGpt.generateMessage(messages);
         return completion ? completion.content : `Oh nein, ich bedaure: Meine Kamera ist kaputt, ich kann das echte Bild gerade nicht senden.`;
     }
 }

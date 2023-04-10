@@ -1,4 +1,6 @@
 // For Sentry setup
+import {ChatGptModels} from "./ChatGptModels";
+
 const rootDirectory = __dirname || process.cwd();
 
 import 'reflect-metadata';
@@ -11,6 +13,7 @@ import {PrismaClient} from '@prisma/client';
 import {Octokit} from 'octokit';
 import * as Sentry from '@sentry/node';
 import {RewriteFrames} from "@sentry/integrations";
+import {ChatOpenAI} from "langchain/chat_models/openai";
 
 const config = container.resolve(Config);
 if (config.sentryDsn) {
@@ -25,6 +28,17 @@ if (config.sentryDsn) {
     });
 }
 
+container.register(ChatGptModels, {
+    useValue: new ChatGptModels({
+            chatGpt: new ChatOpenAI({
+                modelName: 'gpt-3.5-turbo',
+            }),
+            gpt4: new ChatOpenAI({
+                modelName: 'gpt-4',
+            }),
+        }
+    ),
+});
 container.register(Octokit, {
     useValue: new Octokit({
         auth: config.gitHubPersonalAccessToken ?? undefined,

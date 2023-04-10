@@ -428,7 +428,7 @@ export class ReplyGenerator {
 
         const messages = await this.getMessages(message);
         console.log(messages);
-        const completion = await this.chatGpt.generateCompletion(messages);
+        const completion = await this.chatGpt.generateMessage(messages);
         const text = completion?.content ?? 'Ich bin sprachlos.';
         const reply = await this.handleCommands(text, message);
         return `${reply}`;
