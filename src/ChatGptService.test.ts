@@ -1,11 +1,17 @@
 import {ChatCompletionRequestMessageRoleEnum} from "openai/dist/api";
-import {ChatGptService} from "./ChatGptService";
+import {ChatGptService, UserMessagePromptTemplate} from "./ChatGptService";
 import {ChatGptMessage, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
-import {ChatGptModels} from "./ChatGptModels";
+import {ChatGptModels, ChatGptModelsProvider} from "./ChatGptModelsProvider";
 import {ChatOpenAI} from "langchain/chat_models/openai";
 import {AIChatMessage, BaseChatMessage, HumanChatMessage, SystemChatMessage} from "langchain/schema";
 import {BaseChatModel} from "langchain/chat_models/base";
 import {CallbackManager} from "langchain/callbacks";
+import {
+    AIMessagePromptTemplate,
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate
+} from "langchain/prompts";
 
 class ChatOpenAiFake extends BaseChatModel {
     request?: BaseChatMessage[];
@@ -36,9 +42,37 @@ class ChatOpenAiFake extends BaseChatModel {
     }
 }
 
+test('generate message', async () => {
+    const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
+    const sut = new ChatGptService(new ChatGptModelsProvider({
+        chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
+        gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
+    }), undefined as unknown as CallbackManager);
+    const prompt = ChatPromptTemplate.fromPromptMessages([
+        SystemMessagePromptTemplate.fromTemplate('System Message'),
+        AIMessagePromptTemplate.fromTemplate('Assistant Message'),
+        UserMessagePromptTemplate.fromNameAndTemplate('Username', '{text}'),
+    ]);
+    const response = await sut.generate(prompt, ChatGptModels.ChatGpt, {
+        text: 'User Message',
+    });
+
+    expect(response).toEqual({
+        role: ChatGptRoles.Assistant,
+        content: 'completion',
+    });
+    const humanMessage = new HumanChatMessage('User Message');
+    humanMessage.name = 'Username';
+    expect(chatOpenAiFake.request).toEqual([
+        new SystemChatMessage('System Message'),
+        new AIChatMessage('Assistant Message'),
+        humanMessage,
+    ]);
+});
+
 test('generate ChatGPT completion', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
-    const sut = new ChatGptService(new ChatGptModels({
+    const sut = new ChatGptService(new ChatGptModelsProvider({
         chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
         gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
     }), undefined as unknown as CallbackManager);
@@ -75,7 +109,7 @@ test('generate ChatGPT completion', async () => {
 
 test('generate GPT-4 completion', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
-    const sut = new ChatGptService(new ChatGptModels({
+    const sut = new ChatGptService(new ChatGptModelsProvider({
         chatGpt: new ChatOpenAiFake() as unknown as ChatOpenAI,
         gpt4: chatOpenAiFake as unknown as ChatOpenAI,
     }), undefined as unknown as CallbackManager);

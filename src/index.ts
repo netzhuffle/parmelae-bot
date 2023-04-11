@@ -1,5 +1,5 @@
 // For Sentry setup
-import {ChatGptModels} from "./ChatGptModels";
+import {ChatGptModelsProvider} from "./ChatGptModelsProvider";
 
 const rootDirectory = __dirname || process.cwd();
 
@@ -37,8 +37,8 @@ container.register(CallbackManager, {
         return callbackManager;
     }),
 });
-container.register(ChatGptModels, {
-    useValue: new ChatGptModels({
+container.register(ChatGptModelsProvider, {
+    useValue: new ChatGptModelsProvider({
             chatGpt: new ChatOpenAI({
                 modelName: 'gpt-3.5-turbo',
                 callbackManager: container.resolve(CallbackManager),
