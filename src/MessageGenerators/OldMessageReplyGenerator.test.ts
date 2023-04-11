@@ -4,7 +4,7 @@ import {ChatGptService} from "../ChatGptService";
 import {ChatGptModelsProvider} from "../ChatGptModelsProvider";
 import {ChatOpenAI} from "langchain/chat_models/openai";
 import {CallbackManager} from "langchain/callbacks";
-import {GitCommitAnnouncementGenerator} from "./GitCommitAnnouncementGenerator";
+import {OldMessageReplyGenerator} from "./OldMessageReplyGenerator";
 
 class ChatOpenAiFake extends BaseChatModel {
     request?: BaseChatMessage[];
@@ -37,15 +37,15 @@ class ChatOpenAiFake extends BaseChatModel {
 
 
 test('generate', async () => {
-    const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('Commit Description'));
-    const sut = new GitCommitAnnouncementGenerator(new ChatGptService(new ChatGptModelsProvider({
+    const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('Reply'));
+    const sut = new OldMessageReplyGenerator(new ChatGptService(new ChatGptModelsProvider({
         chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
         gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
     }), undefined as unknown as CallbackManager));
 
-    const response = await sut.generate('git commit message');
+    const response = await sut.generate('old message');
 
-    expect(response).toEqual('Commit Description');
-    expect(chatOpenAiFake.request).toHaveLength(12);
-    expect(chatOpenAiFake.request?.[11].text).toBe('git commit message');
+    expect(response).toEqual('Reply');
+    expect(chatOpenAiFake.request).toHaveLength(16);
+    expect(chatOpenAiFake.request?.[15].text).toBe('old message');
 });
