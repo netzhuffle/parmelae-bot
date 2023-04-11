@@ -8,6 +8,7 @@ import {singleton} from "tsyringe";
 import {ChatGptService} from "../ChatGptService";
 import {ChatGptModels} from "../ChatGptModelsProvider";
 
+/** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
     SystemMessagePromptTemplate.fromTemplate('Generiere einen Dall-E-Prompt für wunderschöne Kunst oder Fotos basierend auf einer simplen Anfrage. Dall-E-Prompts sind englisch, übertrieben detailliert beschrieben, mit hohen Qualitätsforderungen, jedoch nah an der ursprünglichen Anfrage.'),
     HumanMessagePromptTemplate.fromTemplate('Malen Sie einen Hamster.'),
