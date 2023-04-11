@@ -10,7 +10,7 @@ export class MessageHistoryService {
     }
 
     /**
-     * Returns the message and 4 preceding messages.
+     * Returns the message and 9 preceding messages.
      *
      * Preceding message is the message replied to, or if it is not a reply, then the message last written before in the
      * same chat, if there is one.
@@ -22,9 +22,9 @@ export class MessageHistoryService {
         return this.getHistoryForMessages([message]);
     }
 
-    /** Recursively fetches older messages until 5 messages are found or there are no more old messages. */
+    /** Recursively fetches older messages until 10 messages are found or there are no more old messages. */
     private async getHistoryForMessages(messages: MessageWithUserAndReplyToMessage[]): Promise<MessageWithUser[]> {
-        if (messages.length >= 5) {
+        if (messages.length >= 10) {
             return messages;
         }
 
