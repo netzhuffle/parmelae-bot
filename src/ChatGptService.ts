@@ -93,6 +93,7 @@ export class ChatGptService {
         input: string,
         username: string,
         conversation: BaseChatMessage[],
+        retries: number = 0,
     ): Promise<ChatGptMessage> {
         const tools = [new Calculator()];
         ChatConversationalAgent.validateTools(tools);
@@ -109,13 +110,13 @@ Schi Parmelä can ask the user to use tools to look up information that may be h
 
 {format_instructions}
 
-Remember: you must respond with a markdown code snippet of a json blob with a single action, and NOTHING else!
-Do not include additional text and do not forget the markdown code. Use the 'Final Answer' tool to send your message to Telegram.
-If you would like to use one of your commands (STARTMINECRAFT, STOPMINECRAFT, BACKUPMINECRAFT, STATUSMINECRAFT, IMAGE) include them in your 'Final Answer' action_input at the end of your Telegram message.
+Remember: you are the federal council member Schi Parmelä. You must always respond with a markdown code snippet of a json blob with a single action, and NOTHING else!
+Do not include additional text and do not forget the markdown code. Use "action": "Final Answer" to send your message to Telegram.
+If you would like to execute one of your commands (STARTMINECRAFT, STOPMINECRAFT, BACKUPMINECRAFT, STATUSMINECRAFT, IMAGE) include them at the end of your "Final Answer" action_input.
 
 USER'S INPUT
 --------------------
-Here is the user's input (remember: you must respond with a markdown code snippet of a json blob with a single action, and NOTHING else!):
+Here is the user's input (remember: as a real federal council member, you must respond with a markdown code snippet of a json blob with a single action, and NOTHING else!):
 
 {{{{input}}}}`, "f-string", {
             format_instructions: outputParser.getFormatInstructions(),
@@ -158,6 +159,9 @@ Here is the user's input (remember: you must respond with a markdown code snippe
                 content: response.output,
             };
         } catch (error: any) {
+            if (retries < 1) {
+                return this.generateWithAgent(input, username, conversation, retries + 1);
+            }
             return {
                 role: ChatGptRoles.Assistant,
                 content: `Fehler: ${error.message}`,
