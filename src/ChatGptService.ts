@@ -1,8 +1,10 @@
 import assert from "assert";
+import { CallbackManager } from "langchain/callbacks";
+import { LLMChain } from "langchain/chains";
+import { ChatPromptTemplate, MessagesPlaceholder } from "langchain/prompts";
 import {
     AIChatMessage,
     BaseChatMessage,
-    ChatMessage,
     HumanChatMessage,
     SystemChatMessage
 } from "langchain/schema";
@@ -26,6 +28,7 @@ export class ChatGptService {
 
     constructor(
         private readonly models: ChatGptModels,
+        private readonly callbackManager: CallbackManager,
     ) {
     }
 
@@ -39,9 +42,22 @@ export class ChatGptService {
 
         const model = messages[messages.length - 1].content.startsWith(GPT4_STRING) ? this.models.gpt4 : this.models.chatGpt;
         const langChainMessages = messages.map(this.getLangChainMessage.bind(this));
-        const response = await model.call(langChainMessages);
+        const prompt = ChatPromptTemplate.fromPromptMessages([
+            new MessagesPlaceholder('messages'),
+        ]);
+        const chain = new LLMChain({
+            prompt,
+            llm: model,
+            callbackManager: this.callbackManager,
+        });
+        const response = await chain.call({
+            messages: langChainMessages,
+        });
 
-        return this.getMessage(response);
+        return {
+            role: ChatGptRoles.Assistant,
+            content: response.text,
+        };
     }
 
     private getLangChainMessage(message: ChatGptMessage): BaseChatMessage {
@@ -58,53 +74,6 @@ export class ChatGptService {
                 return humanMessage;
             default:
                 throw new NotExhaustiveSwitchError(role);
-        }
-    }
-
-    private getMessage(langChainMessage: BaseChatMessage): ChatGptMessage {
-        const role = this.getRole(langChainMessage);
-        switch (role) {
-            case ChatGptRoles.System:
-            case ChatGptRoles.Assistant:
-                return {
-                    role: role,
-                    content: langChainMessage.text,
-                };
-            case ChatGptRoles.User:
-                return {
-                    role: role,
-                    content: langChainMessage.text,
-                    name: langChainMessage.name,
-                };
-            default:
-                throw new NotExhaustiveSwitchError(role);
-        }
-
-    }
-
-    private getRole(langChainMessage: BaseChatMessage): ChatGptRole {
-        const type = langChainMessage._getType();
-        switch (type) {
-            case 'system':
-                return ChatGptRoles.System;
-            case 'ai':
-                return ChatGptRoles.Assistant;
-            case 'human':
-                return ChatGptRoles.User;
-            case 'generic':
-                assert(langChainMessage instanceof ChatMessage);
-                switch (langChainMessage.role) {
-                    case 'system':
-                        return ChatGptRoles.System;
-                    case 'ai':
-                        return ChatGptRoles.Assistant;
-                    case 'human':
-                        return ChatGptRoles.User;
-                    default:
-                        throw new UnknownLangChainMessageRoleError(langChainMessage.role);
-                }
-            default:
-                throw new NotExhaustiveSwitchError(type);
         }
     }
 }

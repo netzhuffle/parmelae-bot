@@ -1,37 +1,47 @@
-import {
-    ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum,
-    ChatCompletionResponseMessageRoleEnum, OpenAIApi
-} from "openai/dist/api";
+import {ChatCompletionRequestMessageRoleEnum} from "openai/dist/api";
 import {ChatGptService} from "./ChatGptService";
 import {ChatGptMessage, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
 import {ChatGptModels} from "./ChatGptModels";
 import {ChatOpenAI} from "langchain/chat_models/openai";
-import {AIChatMessage, HumanChatMessage, SystemChatMessage} from "langchain/schema";
+import {AIChatMessage, BaseChatMessage, HumanChatMessage, SystemChatMessage} from "langchain/schema";
+import {BaseChatModel} from "langchain/chat_models/base";
+import {CallbackManager} from "langchain/callbacks";
 
-const requestResponse = {
-    request: {} as object,
-    response: {} as object,
-};
-const chatOpenAiFake = {
-    request: {},
-    response: {},
-    call: async (request: object) => {
-        requestResponse.request = request;
-        return requestResponse.response;
-    },
-} as unknown as ChatOpenAI;
-const chatGptModels = new ChatGptModels({
-    chatGpt: chatOpenAiFake,
-    gpt4: chatOpenAiFake,
-});
+class ChatOpenAiFake extends BaseChatModel {
+    request?: BaseChatMessage[];
 
-beforeEach(() => {
-    requestResponse.request = {};
-    requestResponse.response = {};
-});
+    constructor(private readonly response?: BaseChatMessage) {
+        super({});
+    }
+
+    _llmType() {
+        return 'openai-fake'
+    }
+
+    _combineLLMOutput() {
+        return {};
+    }
+
+    async _generate(messages: BaseChatMessage[], stop?: string[]) {
+        this.request = messages;
+
+        return {
+            generations: this.response ? [
+                {
+                    text: this.response.text,
+                    message: this.response
+                }
+            ] : [],
+        };
+    }
+}
 
 test('generate ChatGPT completion', async () => {
-    const sut = new ChatGptService(chatGptModels);
+    const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
+    const sut = new ChatGptService(new ChatGptModels({
+        chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
+        gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
+    }), undefined as unknown as CallbackManager);
     const requestMessages: ChatGptMessage[] = [
         {
             role: ChatGptRoles.System,
@@ -47,7 +57,6 @@ test('generate ChatGPT completion', async () => {
             name: 'Username',
         },
     ];
-    requestResponse.response = new AIChatMessage('completion');
 
     const response = await sut.generateMessage(requestMessages);
 
@@ -57,7 +66,7 @@ test('generate ChatGPT completion', async () => {
     });
     const humanMessage = new HumanChatMessage('User Message');
     humanMessage.name = 'Username';
-    expect(requestResponse.request).toEqual([
+    expect(chatOpenAiFake.request).toEqual([
         new SystemChatMessage('System Message'),
         new AIChatMessage('Assistant Message'),
         humanMessage,
@@ -65,7 +74,11 @@ test('generate ChatGPT completion', async () => {
 });
 
 test('generate GPT-4 completion', async () => {
-    const sut = new ChatGptService(chatGptModels);
+    const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
+    const sut = new ChatGptService(new ChatGptModels({
+        chatGpt: new ChatOpenAiFake() as unknown as ChatOpenAI,
+        gpt4: chatOpenAiFake as unknown as ChatOpenAI,
+    }), undefined as unknown as CallbackManager);
     const requestMessages: ChatGptMessage[] = [
         {
             role: ChatCompletionRequestMessageRoleEnum.System,
@@ -82,7 +95,6 @@ test('generate GPT-4 completion', async () => {
             name: 'Username 2',
         },
     ];
-    requestResponse.response = new AIChatMessage('completion');
 
     const response = await sut.generateMessage(requestMessages);
 
@@ -94,7 +106,7 @@ test('generate GPT-4 completion', async () => {
     humanMessage1.name = 'Username 1';
     const humanMessage2 = new HumanChatMessage('User Message 2');
     humanMessage2.name = 'Username 2';
-    expect(requestResponse.request).toEqual([
+    expect(chatOpenAiFake.request).toEqual([
         new SystemChatMessage('System Message'),
         humanMessage1,
         humanMessage2,
