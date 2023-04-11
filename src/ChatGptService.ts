@@ -83,21 +83,11 @@ export class ChatGptService {
         };
     }
 
-    /**
-     * Generates and returns message.
-     */
-    async generateMessage(
-        messages: ChatGptMessage[],
-    ): Promise<ChatGptMessage> {
-        assert(messages.length > 0);
-
-        const langChainMessages = messages.map(this.getLangChainMessage.bind(this));
-        const prompt = ChatPromptTemplate.fromPromptMessages([
-            new MessagesPlaceholder('messages'),
-        ]);
-        const model = messages[messages.length - 1].content.startsWith(GPT4_STRING) ? ChatGptModels.Gpt4 : ChatGptModels.ChatGpt;
-
-        return this.generate(prompt, model, {messages: langChainMessages});
+    /** Returns a human chat message with a username. */
+    static createUserChatMessage(name: string, content: string): HumanChatMessage {
+        const message = new HumanChatMessage(content);
+        message.name = name;
+        return message;
     }
 
     private getLangChainMessage(message: ChatGptMessage): BaseChatMessage {
@@ -109,9 +99,7 @@ export class ChatGptService {
             case ChatGptRoles.Assistant:
                 return new AIChatMessage(content);
             case ChatGptRoles.User:
-                const humanMessage = new HumanChatMessage(content);
-                humanMessage.name = message.name;
-                return humanMessage;
+                return message.name ? ChatGptService.createUserChatMessage(message.name, content) : new HumanChatMessage(content);
             default:
                 throw new NotExhaustiveSwitchError(role);
         }
