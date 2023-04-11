@@ -40,6 +40,7 @@ test('generate', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('Commit Description'));
     const sut = new GitCommitAnnouncementGenerator(new ChatGptService(new ChatGptModelsProvider({
         chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
+        chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,
         gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
     }), undefined as unknown as CallbackManager));
 

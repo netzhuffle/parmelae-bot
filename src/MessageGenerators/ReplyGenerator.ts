@@ -6,24 +6,20 @@ import {Config} from "../Config";
 import {Command, Commands} from "../Command";
 import {CommandService} from "../CommandService";
 import {ChatGptService, UserMessagePromptTemplate} from "../ChatGptService";
-import {ChatGptMessage, ChatGptRoles} from "./ChatGptMessage";
-import {ChatPromptTemplate, SystemMessagePromptTemplate, AIMessagePromptTemplate, MessagesPlaceholder} from "langchain/prompts";
-import {AIChatMessage, BaseChatMessage } from "langchain/schema";
-import { ChatGptModels } from "../ChatGptModelsProvider";
-
-/** The string the newest message starts with to trigger use of GPT-4. */
-const GPT4_STRING = '4:';
+import {ChatPromptTemplate, AIMessagePromptTemplate, MessagesPlaceholder} from "langchain/prompts";
+import {AIChatMessage, BaseChatMessage} from "langchain/schema";
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
-    SystemMessagePromptTemplate.fromTemplate(`Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Zusätzlich zu Ihren Antworten als Bundesrat können Sie auch auf Wunsch von anderen Nutzern verschiedene Kommandos nutzen, die bei Erwähnung automatisch ausgeführt werden. Dies tun Sie immer nur zusätzlich zu einer Telegram-Antwort und niemals, wenn es von Ihnen selbst gewünscht wurde und niemals als Beispiel oder zu Erklärungszwecken. Der Kommando-Name wird dann durch seinen Rückgabetext ersetzt.
+    UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', `Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Zusätzlich zu Ihren Antworten als Bundesrat können Sie auch auf Wunsch von anderen Nutzern verschiedene Kommandos nutzen, die bei Erwähnung automatisch ausgeführt werden. Dies tun Sie immer nur zusätzlich zu einer Telegram-Antwort und niemals, wenn es von Ihnen selbst gewünscht wurde und niemals als Beispiel oder zu Erklärungszwecken. Der Kommando-Name wird dann durch seinen Rückgabetext ersetzt.
 
 Liste der möglichen Kommandos:
 - STARTMINECRAFT: Startet den Minecraft-Server.
 - STOPMINECRAFT: Beendet den Minecraft Server.
 - BACKUPMINECRAFT: Erstellt eine Datensicherung des Minecraft-Servers und aktualisiert die Online-Karte.
 - STATUSMINECRAFT: Fragt ab, ob der Minecraft-Server gerade an oder aus ist.
-- IMAGE: Sie senden ein von Ihnen gemaltes Bild oder gemachtes Foto passend zur vergangenen Chat-Nachricht.`),
+- IMAGE: Sie senden ein von Ihnen gemaltes Bild passend zur vergangenen Chat-Nachricht.
+- IMAGE: Sie senden ein von Ihnen gemachtes Foto passend zur vergangenen Chat-Nachricht.`),
     UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', 'Es folgt eine Beispielkonversation:'),
     UserMessagePromptTemplate.fromNameAndTemplate('marinom', 'Wer sind Sie?'),
     AIMessagePromptTemplate.fromTemplate('Mein Name ist Schi Parmelä. Ich bin Bundesrat, Mitglied der Schweizerischen Volkspartei (SVP) und leite das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).'),
@@ -191,14 +187,12 @@ export class ReplyGenerator {
 
         const example = EXAMPLE_CONVERSATIONS[Math.floor(Math.random() * EXAMPLE_CONVERSATIONS.length)];
         const conversation = await this.getConversation(message);
-        const model = conversation[conversation.length - 1].text.startsWith(GPT4_STRING) ? ChatGptModels.Gpt4 : ChatGptModels.ChatGpt;
-        const completion = await this.chatGpt.generate(PROMPT, model, {
+        const messages = await PROMPT.formatMessages({
             example,
             conversation,
         });
-        const text = completion?.content ?? 'Ich bin sprachlos.';
-        const reply = await this.handleCommands(text, message);
-        return `${reply}`;
+        const completion = await this.chatGpt.generateWithAgent(message.text, message.from.username ?? message.from.first_name, messages);
+        return this.handleCommands(completion.content, message);
     }
 
     private async getConversation(message: TelegramBot.Message): Promise<BaseChatMessage[]> {

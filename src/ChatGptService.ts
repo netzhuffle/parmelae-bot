@@ -1,28 +1,31 @@
 import assert from "assert";
+import {
+    AgentExecutor,
+    ChatConversationalAgent,
+    ChatConversationalAgentOutputParser,
+} from "langchain/agents";
 import {CallbackManager} from "langchain/callbacks";
 import {LLMChain} from "langchain/chains";
 import {
     BasePromptTemplate,
-    BaseStringPromptTemplate, ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder, PromptTemplate
+    BaseStringPromptTemplate,
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+    PromptTemplate,
+    renderTemplate,
+    SystemMessagePromptTemplate,
 } from "langchain/prompts";
 import {
-    AIChatMessage,
     BaseChatMessage,
     ChainValues,
     HumanChatMessage,
     InputValues,
-    SystemChatMessage
 } from "langchain/schema";
+import {Calculator} from "langchain/tools/calculator";
 import {singleton} from "tsyringe";
-import {ChatGptModel, ChatGptModels, ChatGptModelsProvider} from "./ChatGptModelsProvider";
+import {ChatGptModel, ChatGptModelsProvider} from "./ChatGptModelsProvider";
 import {ChatGptMessage, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
-import {NotExhaustiveSwitchError} from "./NotExhaustiveSwitchError";
-
-/** The string the newest message starts with to trigger use of GPT-4. */
-const GPT4_STRING = '4:';
-
-/** RegExp to match the GPT-4 string. */
-const GPT4_REGEXP = new RegExp(`^${GPT4_STRING}`);
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate {
@@ -83,25 +86,89 @@ export class ChatGptService {
         };
     }
 
+    /**
+     * Generates and returns a message using an agent executor and tools.
+     */
+    async generateWithAgent(
+        input: string,
+        username: string,
+        conversation: BaseChatMessage[],
+    ): Promise<ChatGptMessage> {
+        const tools = [new Calculator()];
+        ChatConversationalAgent.validateTools(tools);
+        const toolStrings = tools
+            .map((tool) => `${tool.name}: ${tool.description}`)
+            .join("\n");
+
+        const outputParser = new ChatConversationalAgentOutputParser();
+        const formatInstructions = renderTemplate(`TOOLS
+------
+Schi Parmelä can ask the user to use tools to look up information that may be helpful in answering the users original question. The tools the human can use are:
+
+{{tools}}
+
+{format_instructions}
+
+Remember: you must respond with a markdown code snippet of a json blob with a single action, and NOTHING else!
+Do not include additional text and do not forget the markdown code. Use the 'Final Answer' tool to send your message to Telegram.
+If you would like to use one of your commands (STARTMINECRAFT, STOPMINECRAFT, BACKUPMINECRAFT, STATUSMINECRAFT, IMAGE) include them in your 'Final Answer' action_input at the end of your Telegram message.
+
+USER'S INPUT
+--------------------
+Here is the user's input (remember: you must respond with a markdown code snippet of a json blob with a single action, and NOTHING else!):
+
+{{{{input}}}}`, "f-string", {
+            format_instructions: outputParser.getFormatInstructions(),
+        });
+        const toolNames = tools.map((tool) => tool.name).join("\n");
+        const finalPrompt = renderTemplate(formatInstructions, "f-string", {
+            tools: toolStrings,
+            tool_names: toolNames,
+        }) + "\n\nDenken Sie daran, dass Sie immer mit JSON im vorgegebenen Format antworten und zum Schreiben in Telegram die action 'final message' verwenden müssen.";
+        const prompt = ChatPromptTemplate.fromPromptMessages([
+            SystemMessagePromptTemplate.fromTemplate('Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).'),
+            new MessagesPlaceholder('conversation'),
+            UserMessagePromptTemplate.fromNameAndTemplate(username, finalPrompt),
+            new MessagesPlaceholder('agent_scratchpad'),
+        ]);
+
+        const llmChain = new LLMChain({
+            prompt,
+            llm: this.models.chatGpt,
+            callbackManager: this.callbackManager,
+            verbose: true,
+        });
+        const agent = new ChatConversationalAgent({
+            llmChain,
+            allowedTools: tools.map((tool) => tool.name),
+        }, outputParser);
+        const executor = AgentExecutor.fromAgentAndTools({
+            agent,
+            tools,
+            verbose: true,
+        });
+
+        try {
+            const response = await executor.call({
+                input,
+                conversation,
+            });
+            return {
+                role: ChatGptRoles.Assistant,
+                content: response.output,
+            };
+        } catch (error: any) {
+            return {
+                role: ChatGptRoles.Assistant,
+                content: `Fehler: ${error.message}`,
+            };
+        }
+    }
+
     /** Returns a human chat message with a username. */
     static createUserChatMessage(name: string, content: string): HumanChatMessage {
         const message = new HumanChatMessage(content);
         message.name = name;
         return message;
-    }
-
-    private getLangChainMessage(message: ChatGptMessage): BaseChatMessage {
-        const content = message.content.replace(GPT4_REGEXP, '').trim();
-        const role = message.role;
-        switch (role) {
-            case ChatGptRoles.System:
-                return new SystemChatMessage(content);
-            case ChatGptRoles.Assistant:
-                return new AIChatMessage(content);
-            case ChatGptRoles.User:
-                return message.name ? ChatGptService.createUserChatMessage(message.name, content) : new HumanChatMessage(content);
-            default:
-                throw new NotExhaustiveSwitchError(role);
-        }
     }
 }
