@@ -6,8 +6,6 @@ export const Commands = {
     Info: 'info',
     /** Replies to the message the user replied to. */
     Comment: 'comment',
-    /** Generates an image corresponding to the query. */
-    Image: 'image',
     /** Tells the user that the command is unknown. */
     Unknown: 'unknown',
 } as const;

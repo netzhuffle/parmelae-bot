@@ -3,7 +3,6 @@ import {AIChatMessage, BaseChatMessage} from "langchain/schema";
 import {ChatGptService} from "../ChatGptService";
 import {ChatGptModelsProvider} from "../ChatGptModelsProvider";
 import {ChatOpenAI} from "langchain/chat_models/openai";
-import {CallbackManager} from "langchain/callbacks";
 import {OldMessageReplyGenerator} from "./OldMessageReplyGenerator";
 
 class ChatOpenAiFake extends BaseChatModel {
@@ -38,11 +37,22 @@ class ChatOpenAiFake extends BaseChatModel {
 
 test('generate', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('Reply'));
-    const sut = new OldMessageReplyGenerator(new ChatGptService(new ChatGptModelsProvider({
-        chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-        chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,
-        gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
-    }), undefined as unknown as CallbackManager));
+    const sut = new OldMessageReplyGenerator(
+        new ChatGptService(
+            new ChatGptModelsProvider(
+                {
+                    chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
+                    chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,
+                    gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
+                }),
+            undefined as any,
+            undefined as any,
+            undefined as any,
+            undefined as any,
+            undefined as any,
+            undefined as any,
+        )
+    );
 
     const response = await sut.generate('old message');
 

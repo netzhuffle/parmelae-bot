@@ -1,15 +1,12 @@
-import {ChatCompletionRequestMessageRoleEnum} from "openai/dist/api";
 import {ChatGptService, UserMessagePromptTemplate} from "./ChatGptService";
-import {ChatGptMessage, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
+import {ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
 import {ChatGptModels, ChatGptModelsProvider} from "./ChatGptModelsProvider";
 import {ChatOpenAI} from "langchain/chat_models/openai";
 import {AIChatMessage, BaseChatMessage, HumanChatMessage, SystemChatMessage} from "langchain/schema";
 import {BaseChatModel} from "langchain/chat_models/base";
-import {CallbackManager} from "langchain/callbacks";
 import {
     AIMessagePromptTemplate,
     ChatPromptTemplate,
-    HumanMessagePromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
 
@@ -44,11 +41,20 @@ class ChatOpenAiFake extends BaseChatModel {
 
 test('generate message', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
-    const sut = new ChatGptService(new ChatGptModelsProvider({
-        chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-        chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,
-        gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
-    }), undefined as unknown as CallbackManager);
+    const sut = new ChatGptService(
+        new ChatGptModelsProvider(
+            {
+                chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
+                chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,
+                gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
+            }),
+        undefined as any,
+        undefined as any,
+        undefined as any,
+        undefined as any,
+        undefined as any,
+        undefined as any,
+    );
     const prompt = ChatPromptTemplate.fromPromptMessages([
         SystemMessagePromptTemplate.fromTemplate('System Message'),
         AIMessagePromptTemplate.fromTemplate('Assistant Message'),

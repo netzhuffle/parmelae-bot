@@ -4,24 +4,26 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
-import {singleton} from "tsyringe";
+import {delay, inject, singleton} from "tsyringe";
 import {ChatGptService} from "../ChatGptService";
 import {ChatGptModels} from "../ChatGptModelsProvider";
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
     SystemMessagePromptTemplate.fromTemplate('Generiere einen Dall-E-Prompt für wunderschöne Kunst oder Fotos basierend auf einer simplen Anfrage. Dall-E-Prompts sind englisch, übertrieben detailliert beschrieben, mit hohen Qualitätsforderungen, jedoch nah an der ursprünglichen Anfrage.'),
-    HumanMessagePromptTemplate.fromTemplate('Malen Sie einen Hamster.'),
+    HumanMessagePromptTemplate.fromTemplate('Ich male einen Hamster für Sie.'),
     AIMessagePromptTemplate.fromTemplate('Drawing of a hamster, high quality, professional drawing, highly detailed epic, trending on art station.'),
-    HumanMessagePromptTemplate.fromTemplate('Ein Foto der Golden Gate Bridge, bitte.'),
-    AIMessagePromptTemplate.fromTemplate('Photo of the Golden Gate Bridge, in 4k high resolution, professional photo for magazine, 35mm camera 3.4f, hyper detailed.'),
+    HumanMessagePromptTemplate.fromTemplate('Ihr Wunsch ist mir Befehl. Hier ist ein Bild des Bundeshauses in Bern. Vielen Dank für die Anfrage!'),
+    AIMessagePromptTemplate.fromTemplate('Photo of the Swiss Federal Palace, in 4k high resolution, professional photo for magazine, 35mm camera 3.4f, hyper detailed.'),
     HumanMessagePromptTemplate.fromTemplate('{description}'),
 ]);
 
 /** Creates Dall-E prompts. */
 @singleton()
 export class DallEPromptGenerator {
-    constructor(private readonly chatGpt: ChatGptService) {
+    constructor(
+        @inject(delay(() => ChatGptService)) private readonly chatGpt: ChatGptService
+    ) {
     }
 
     /**

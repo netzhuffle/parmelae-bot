@@ -3,7 +3,6 @@ import TelegramBot from "node-telegram-bot-api";
 import {delay, inject, singleton} from "tsyringe";
 import {MessageHistoryService} from "../MessageHistoryService";
 import {Config} from "../Config";
-import {Command, Commands} from "../Command";
 import {CommandService} from "../CommandService";
 import {ChatGptService, UserMessagePromptTemplate} from "../ChatGptService";
 import {ChatPromptTemplate, AIMessagePromptTemplate, MessagesPlaceholder} from "langchain/prompts";
@@ -11,20 +10,11 @@ import {AIChatMessage, BaseChatMessage} from "langchain/schema";
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
-    UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', `Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Zusätzlich zu Ihren Antworten als Bundesrat können Sie auch auf Wunsch von anderen Nutzern verschiedene Kommandos nutzen, die bei Erwähnung automatisch ausgeführt werden. Dies tun Sie immer nur zusätzlich zu einer Telegram-Antwort und niemals, wenn es von Ihnen selbst gewünscht wurde und niemals als Beispiel oder zu Erklärungszwecken. Der Kommando-Name wird dann durch seinen Rückgabetext ersetzt.
-
-Liste der möglichen Kommandos:
-- IMAGE: Sie senden ein von Ihnen gemaltes Bild passend zur vergangenen Chat-Nachricht.
-- IMAGE: Sie senden ein von Ihnen gemachtes Foto passend zur vergangenen Chat-Nachricht.`),
     UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', 'Es folgt eine Beispielkonversation:'),
     UserMessagePromptTemplate.fromNameAndTemplate('marinom', 'Wer sind Sie?'),
     AIMessagePromptTemplate.fromTemplate('Mein Name ist Schi Parmelä. Ich bin Bundesrat, Mitglied der Schweizerischen Volkspartei (SVP) und leite das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).'),
     UserMessagePromptTemplate.fromNameAndTemplate('dominzki', 'Sind Sie der echte Bundesrat oder eine AI?'),
     AIMessagePromptTemplate.fromTemplate('Selbstverständlich bin ich ein echter Bundesrat. Ich hatte gerade heute eine ausserordentliche Sitzung, an denen meine Fähigkeiten gefragt waren.'),
-    UserMessagePromptTemplate.fromNameAndTemplate('bugybunny', 'Bitte machen Sie ein Foto der Golden Gate Bridge.'),
-    AIMessagePromptTemplate.fromTemplate(`Für Sie mache ich das mit grossem Vergnügen. Ich reise sofort mit dem Bundesratsjet dorthin.
-IMAGE`),
-    UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', 'Es folgt eine andere Beispielkonversation:'),
     new MessagesPlaceholder('example'),
     UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', 'Es folgt nun die eigentliche Konversation:'),
     new MessagesPlaceholder('conversation'),
@@ -132,18 +122,6 @@ Schi Permelä`),
 ];
 
 /**
- * RegExp to match commands in the GPT completion.
- *
- * Must have g flag, so it can be used for String.prototype.matchAll.
- */
-const COMMANDS_REGEX = /IMAGE/g;
-
-/** Map of GPT command strings to Command. */
-const COMMANDS: Record<string, Command> = {
-    IMAGE: Commands.Image,
-};
-
-/**
  * Creates a reply to a message.
  *
  * Can also execute commands within the reply.
@@ -178,8 +156,8 @@ export class ReplyGenerator {
             example,
             conversation,
         });
-        const completion = await this.chatGpt.generateWithAgent(message.text, message.from.username ?? message.from.first_name, messages);
-        return this.handleCommands(completion.content, message);
+        const completion = await this.chatGpt.generateWithAgent(message, messages);
+        return completion.content;
     }
 
     private async getConversation(message: TelegramBot.Message): Promise<BaseChatMessage[]> {
@@ -190,22 +168,5 @@ export class ReplyGenerator {
                 message.from.username === this.config.username
                     ? new AIChatMessage(message.text ?? '')
                     : ChatGptService.createUserChatMessage(message.from.username ?? message.from.firstName, message.text ?? ''));
-    }
-
-    private async handleCommands(completion: string, message: TelegramBot.Message): Promise<string> {
-        const commandPromises = new Map<string, Promise<string>>();
-        const commandReplacements = new Map<string, string>();
-        const matches = completion.matchAll(COMMANDS_REGEX);
-        for (let match of matches) {
-            const command = match[0];
-            if (!commandPromises.has(command)) {
-                const promise = this.command.execute(COMMANDS[command], message);
-                promise.then(reply => commandReplacements.set(command, reply));
-                commandPromises.set(command, promise);
-            }
-        }
-        await Promise.all(commandPromises.values());
-
-        return completion.replaceAll(COMMANDS_REGEX, command => commandReplacements.get(command) ?? '[Fehler]');
     }
 }

@@ -1,6 +1,8 @@
 import {exec} from "child_process";
 import {Tool} from "langchain/agents";
+import {singleton} from "tsyringe";
 
+@singleton()
 export class MinecraftStatusTool extends Tool {
     name = 'minecraft-status';
 

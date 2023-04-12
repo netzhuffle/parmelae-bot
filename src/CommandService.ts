@@ -12,8 +12,6 @@ import {NotExhaustiveSwitchError} from "./NotExhaustiveSwitchError";
 /** Executes a command */
 @singleton()
 export class CommandService {
-    private isMinecraftRunning: boolean | null = null;
-
     constructor(
         private readonly telegram: TelegramService,
         @inject(delay(() => ReplyGenerator)) private readonly replyGenerator: ReplyGenerator,
@@ -41,17 +39,6 @@ export class CommandService {
             }
 
             return this.replyGenerator.generate(message.reply_to_message);
-        }
-        if (command === Commands.Image) {
-            assert(message.text);
-            const dallEPrompt = await this.dallEPromptGenerator.generate(message.text);
-            const imageUrl = await this.dallE.generateImage(dallEPrompt);
-            if (!imageUrl) {
-                return 'Leider kann ich das Bild gerade nicht senden.';
-            }
-            this.telegram.replyWithImage(imageUrl, dallEPrompt, message);
-
-            return '';
         }
 
         throw new NotExhaustiveSwitchError(command);
