@@ -1,6 +1,6 @@
 tasks:
   - name: Prebuild
-    init: npm install && npm run build
+    init: npm install && npm run build && npm run migrate
   - name: Restore .env file
     command: |
       if [ -f .env ]; then
