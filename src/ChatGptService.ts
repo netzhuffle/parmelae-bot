@@ -183,7 +183,6 @@ Also remember: To send your reply to the Telegram chat, you must use the "Final 
                 memoryKey: 'chat_history',
                 inputKey: 'input',
             }),
-            returnIntermediateSteps: true,
             verbose: true,
             callbackManager: this.callbackManager,
         });
