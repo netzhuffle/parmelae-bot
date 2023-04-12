@@ -5,8 +5,8 @@ import {
     ChatConversationalAgentOutputParser,
     Tool,
 } from "langchain/agents";
-import {CallbackManager} from "langchain/callbacks";
-import {LLMChain} from "langchain/chains";
+import { CallbackManager } from "langchain/callbacks";
+import { LLMChain } from "langchain/chains";
 import {
     BasePromptTemplate,
     BaseStringPromptTemplate,
@@ -14,8 +14,8 @@ import {
     HumanMessagePromptTemplate,
     MessagesPlaceholder,
     PromptTemplate,
-    renderTemplate,
     SystemMessagePromptTemplate,
+    renderTemplate,
 } from "langchain/prompts";
 import {
     BaseChatMessage,
@@ -23,16 +23,17 @@ import {
     HumanChatMessage,
     InputValues,
 } from "langchain/schema";
-import {Calculator} from "langchain/tools/calculator";
-import {singleton} from "tsyringe";
-import {ChatGptModel, ChatGptModelsProvider} from "./ChatGptModelsProvider";
-import {ChatGptMessage, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
-import {MinecraftStatusTool} from "./Tools/MinecraftStatusTool";
-import {MinecraftStartTool} from "./Tools/MinecraftStartTool";
-import {MinecraftStopTool} from "./Tools/MinecraftStopTool";
-import {MinecraftBackupTool} from "./Tools/MinecraftBackupTool";
+import { BufferMemory, ChatMessageHistory } from "langchain/memory";
+import { Calculator } from "langchain/tools/calculator";
 import TelegramBot from "node-telegram-bot-api";
-import {DallEToolFactory} from "./Tools/DallEToolFactory";
+import { singleton } from "tsyringe";
+import { ChatGptModel, ChatGptModelsProvider } from "./ChatGptModelsProvider";
+import { ChatGptMessage, ChatGptRoles } from "./MessageGenerators/ChatGptMessage";
+import { DallEToolFactory } from "./Tools/DallEToolFactory";
+import { MinecraftBackupTool } from "./Tools/MinecraftBackupTool";
+import { MinecraftStartTool } from "./Tools/MinecraftStartTool";
+import { MinecraftStatusTool } from "./Tools/MinecraftStatusTool";
+import { MinecraftStopTool } from "./Tools/MinecraftStopTool";
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate {
@@ -158,7 +159,7 @@ Also remember: To send your reply to the Telegram chat, you must use the "Final 
         });
         const prompt = ChatPromptTemplate.fromPromptMessages([
             SystemMessagePromptTemplate.fromTemplate('Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).'),
-            new MessagesPlaceholder('conversation'),
+            new MessagesPlaceholder('chat_history'),
             UserMessagePromptTemplate.fromNameAndTemplate(message.from.username ?? message.from.first_name, finalPrompt),
             new MessagesPlaceholder('agent_scratchpad'),
         ]);
@@ -176,14 +177,21 @@ Also remember: To send your reply to the Telegram chat, you must use the "Final 
         const executor = AgentExecutor.fromAgentAndTools({
             agent,
             tools,
+            memory: new BufferMemory({
+                chatHistory: new ChatMessageHistory(conversation),
+                returnMessages: true,
+                memoryKey: 'chat_history',
+                inputKey: 'input',
+            }),
+            returnIntermediateSteps: true,
             verbose: true,
             callbackManager: this.callbackManager,
         });
+        console.log(executor.memory?.loadMemoryVariables)
 
         try {
             const response = await executor.call({
                 input: message.text,
-                conversation,
             });
             return {
                 role: ChatGptRoles.Assistant,
