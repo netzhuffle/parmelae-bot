@@ -1,3 +1,2 @@
 #!/bin/sh
-sudo /usr/local/bin/mscs stop zebenwusch; /home/jannis/telegram-nachtchad-bot/cmd/backupminecraft
-
+sudo /usr/local/bin/mscs stop zebenwusch; /home/jannis/parmelae-bot/cmd/backupminecraft

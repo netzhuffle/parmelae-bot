@@ -1,4 +1,4 @@
 #!/bin/sh
 sudo /usr/local/bin/mscs start zebenwusch
-echo "https://zebenwusch.jannis.rocks/"
+echo "https://jannis.rocks/maps/zebenwusch/"
 

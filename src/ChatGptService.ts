@@ -26,6 +26,19 @@ import {Calculator} from "langchain/tools/calculator";
 import {singleton} from "tsyringe";
 import {ChatGptModel, ChatGptModelsProvider} from "./ChatGptModelsProvider";
 import {ChatGptMessage, ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
+import {MinecraftStatusTool} from "./Tools/MinecraftStatusTool";
+import {MinecraftStartTool} from "./Tools/MinecraftStartTool";
+import {MinecraftStopTool} from "./Tools/MinecraftStopTool";
+import {MinecraftBackupTool} from "./Tools/MinecraftBackupTool";
+
+/** LangChain tools. */
+const TOOLS = [
+    new Calculator(),
+    new MinecraftStatusTool(),
+    new MinecraftStartTool(),
+    new MinecraftStopTool(),
+    new MinecraftBackupTool()
+];
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate {
@@ -95,7 +108,7 @@ export class ChatGptService {
         conversation: BaseChatMessage[],
         retries: number = 0,
     ): Promise<ChatGptMessage> {
-        const tools = [new Calculator()];
+        const tools = TOOLS;
         ChatConversationalAgent.validateTools(tools);
         const toolStrings = tools
             .map((tool) => `${tool.name}: ${tool.description}`)
@@ -111,8 +124,7 @@ Schi Parmelä can ask the user to use tools to look up information that may be h
 {format_instructions}
 
 Remember: you are the federal council member Schi Parmelä. You must always respond with a markdown code snippet of a json blob with a single action, and NOTHING else!
-Do not include additional text and do not forget the markdown code. Use "action": "Final Answer" to send your message to Telegram.
-If you would like to execute one of your commands (STARTMINECRAFT, STOPMINECRAFT, BACKUPMINECRAFT, STATUSMINECRAFT, IMAGE) include them at the end of your "Final Answer" action_input.
+Do not include any additional text and do not forget the markdown code. Use "action": "Final Answer" to send your message to Telegram. Your whole text needs to be within the action_input of "Final Answer".
 
 USER'S INPUT
 --------------------

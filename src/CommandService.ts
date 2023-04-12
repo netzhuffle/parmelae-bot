@@ -54,37 +54,6 @@ export class CommandService {
             return '';
         }
 
-        let reply = '';
-        let process;
-        if (command === Commands.StartMinecraft) {
-            if (this.isMinecraftRunning !== true) {
-                reply = 'Starte Minecraft …';
-                process = spawn('/home/jannis/parmelae-bot/cmd/startminecraft');
-                this.isMinecraftRunning = true;
-            }
-        } else if (command === Commands.StopMinecraft) {
-            if (this.isMinecraftRunning !== false) {
-                reply = 'Stoppe & backuppe Minecraft …';
-                process = spawn('/home/jannis/parmelae-bot/cmd/stopminecraft');
-                this.isMinecraftRunning = false;
-            }
-        } else if (command === Commands.BackupMinecraft) {
-            reply = 'Backuppe Minecraft …';
-            process = spawn('/home/jannis/parmelae-bot/cmd/backupminecraft');
-        } else if (command === Commands.StatusMinecraft) {
-            reply = 'Prüfe Minecraft-Status …';
-            process = spawn('/home/jannis/parmelae-bot/cmd/statusminecraft');
-        } else {
-            throw new NotExhaustiveSwitchError(command);
-        }
-        if (process) {
-            process.stdout.on('data', (data) => this.telegram.send(data.toString(), message.chat));
-            process.stderr.on('data', (data) => this.telegram.send(`Fehler: ${data.toString()}`, message.chat));
-            process.on('error', error => {
-                console.error(error);
-            });
-        }
-
-        return reply;
+        throw new NotExhaustiveSwitchError(command);
     }
 }

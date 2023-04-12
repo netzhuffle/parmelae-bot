@@ -42,14 +42,6 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
                 return Commands.Info;
             case 'comment':
                 return Commands.Comment;
-            case 'startminecraft':
-                return Commands.StartMinecraft;
-            case 'stopminecraft':
-                return Commands.StopMinecraft;
-            case 'backupminecraft':
-                return Commands.BackupMinecraft;
-            case 'statusminecraft':
-                return Commands.StatusMinecraft;
             default:
                 return Commands.Unknown;
         }
