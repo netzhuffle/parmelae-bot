@@ -34,7 +34,6 @@ import { MinecraftBackupTool } from "./Tools/MinecraftBackupTool";
 import { MinecraftStartTool } from "./Tools/MinecraftStartTool";
 import { MinecraftStatusTool } from "./Tools/MinecraftStatusTool";
 import { MinecraftStopTool } from "./Tools/MinecraftStopTool";
-import { ImportSwissConstitutionTool } from "./Tools/ImportSwissConstitutionTool";
 import { SwissConstitutionQaTool } from "./Tools/SwissConstitutionQaTool";
 
 /** Human message template with username. */
@@ -80,7 +79,6 @@ export class ChatGptService {
         minecraftStartTool: MinecraftStartTool,
         minecraftStopTool: MinecraftStopTool,
         minecraftBackupTool: MinecraftBackupTool,
-        importSwissConstitutionTool: ImportSwissConstitutionTool,
         swissConstitutionQaTool: SwissConstitutionQaTool,
     ) {
         this.tools = [
@@ -89,7 +87,6 @@ export class ChatGptService {
             minecraftStartTool,
             minecraftStopTool,
             minecraftBackupTool,
-            importSwissConstitutionTool,
         ];
         const tools = this.tools;
         swissConstitutionQaTool.get().then(tool => tools.push(tool));
