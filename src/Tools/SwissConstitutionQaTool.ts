@@ -24,7 +24,7 @@ export class SwissConstitutionQaTool {
         const vectorStore = await PineconeStore.fromExistingIndex(this.chatGptModelsProvider.embeddings, {
             pineconeIndex: client.Index(this.config.pineconeIndex),
         })
-        const chain = VectorDBQAChain.fromLLM(this.chatGptModelsProvider.chatGptZero, vectorStore);
+        const chain = VectorDBQAChain.fromLLM(this.chatGptModelsProvider.chatGptStrict, vectorStore);
         chain.callbackManager = this.callbackManager;
         chain.verbose = true;
 

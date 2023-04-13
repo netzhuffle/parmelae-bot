@@ -4,6 +4,7 @@ import {ChatGptService} from "../ChatGptService";
 import {GptModelsProvider} from "../GptModelsProvider";
 import {ChatOpenAI} from "langchain/chat_models/openai";
 import {OldMessageReplyGenerator} from "./OldMessageReplyGenerator";
+import { SwissConstitutionQaTool } from "../Tools/SwissConstitutionQaTool";
 
 class ChatOpenAiFake extends BaseChatModel {
     request?: BaseChatMessage[];
@@ -34,6 +35,11 @@ class ChatOpenAiFake extends BaseChatModel {
     }
 }
 
+class FakeToolProvider {
+    get(): Promise<any> {
+        return Promise.resolve(undefined as any);
+    }
+}
 
 test('generate', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('Reply'));
@@ -42,8 +48,9 @@ test('generate', async () => {
             new GptModelsProvider(
                 {
                     chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-                    chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,
-                    gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
+                    chatGptStrict: undefined as any,
+                    gpt4: undefined as any,
+                    embeddings: undefined as any,
                 }),
             undefined as any,
             undefined as any,
@@ -51,6 +58,8 @@ test('generate', async () => {
             undefined as any,
             undefined as any,
             undefined as any,
+            undefined as any,
+            new FakeToolProvider() as any,
         )
     );
 

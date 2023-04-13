@@ -45,7 +45,7 @@ container.register(GptModelsProvider, {
             modelName: 'gpt-3.5-turbo',
             callbackManager: container.resolve(CallbackManager),
         }),
-        chatGptZero: new ChatOpenAI({
+        chatGptStrict: new ChatOpenAI({
             modelName: 'gpt-3.5-turbo',
             temperature: 0,
             callbackManager: container.resolve(CallbackManager),

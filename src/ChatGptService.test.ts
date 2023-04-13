@@ -1,14 +1,15 @@
-import {ChatGptService, UserMessagePromptTemplate} from "./ChatGptService";
-import {ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
-import {ChatGptModels, GptModelsProvider} from "./GptModelsProvider";
-import {ChatOpenAI} from "langchain/chat_models/openai";
-import {AIChatMessage, BaseChatMessage, HumanChatMessage, SystemChatMessage} from "langchain/schema";
-import {BaseChatModel} from "langchain/chat_models/base";
+import { ChatGptService, UserMessagePromptTemplate } from "./ChatGptService";
+import { ChatGptRoles } from "./MessageGenerators/ChatGptMessage";
+import { ChatGptModels, GptModelsProvider } from "./GptModelsProvider";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { AIChatMessage, BaseChatMessage, HumanChatMessage, SystemChatMessage } from "langchain/schema";
+import { BaseChatModel } from "langchain/chat_models/base";
 import {
     AIMessagePromptTemplate,
     ChatPromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
+import { SwissConstitutionQaTool } from "./Tools/SwissConstitutionQaTool";
 
 class ChatOpenAiFake extends BaseChatModel {
     request?: BaseChatMessage[];
@@ -39,14 +40,21 @@ class ChatOpenAiFake extends BaseChatModel {
     }
 }
 
+class FakeToolProvider {
+    get(): Promise<any> {
+        return Promise.resolve(undefined as any);
+    }
+}
+
 test('generate message', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
     const sut = new ChatGptService(
         new GptModelsProvider(
             {
                 chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-                chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,
-                gpt4: new ChatOpenAiFake() as unknown as ChatOpenAI,
+                chatGptStrict: undefined as any,
+                gpt4: undefined as any,
+                embeddings: undefined as any,
             }),
         undefined as any,
         undefined as any,
@@ -54,6 +62,8 @@ test('generate message', async () => {
         undefined as any,
         undefined as any,
         undefined as any,
+        undefined as any,
+        new FakeToolProvider() as any,
     );
     const prompt = ChatPromptTemplate.fromPromptMessages([
         SystemMessagePromptTemplate.fromTemplate('System Message'),

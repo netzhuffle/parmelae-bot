@@ -15,7 +15,7 @@ export class GptModelsProvider {
     /** LangChain chat model of GPT-3.5-Turbo. */
     public readonly chatGpt: ChatOpenAI;
     /** LangChain chat model of GPT-3.5-Turbo with temperature 0. */
-    public readonly chatGptZero: ChatOpenAI;
+    public readonly chatGptStrict: ChatOpenAI;
     /** LangChain chat model of GPT-4. */
     public readonly gpt4: ChatOpenAI;
     /** LangChain embeddings model. */
@@ -26,7 +26,7 @@ export class GptModelsProvider {
             /** LangChain chat model of GPT-3.5-Turbo. */
             chatGpt: ChatOpenAI,
             /** LangChain chat model of GPT-3.5-Turbo with temperature 0. */
-            chatGptZero: ChatOpenAI,
+            chatGptStrict: ChatOpenAI,
             /** LangChain chat model of GPT-4. */
             gpt4: ChatOpenAI,
             /** LangChain embeddings model. */
@@ -34,7 +34,7 @@ export class GptModelsProvider {
         },
     ) {
         this.chatGpt = models.chatGpt;
-        this.chatGptZero = models.chatGptZero;
+        this.chatGptStrict = models.chatGptStrict;
         this.gpt4 = models.gpt4;
         this.embeddings = models.embeddings;
     }
