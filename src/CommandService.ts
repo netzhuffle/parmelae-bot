@@ -1,22 +1,14 @@
 import TelegramBot from "node-telegram-bot-api";
-import {delay, inject, singleton} from "tsyringe";
-import {spawn} from "child_process";
-import {TelegramService} from "./TelegramService";
-import {Command, Commands} from "./Command";
-import {ReplyGenerator} from "./MessageGenerators/ReplyGenerator";
-import {DallEPromptGenerator} from "./MessageGenerators/DallEPromptGenerator";
-import assert from "assert";
-import {DallEService} from "./DallEService";
-import {NotExhaustiveSwitchError} from "./NotExhaustiveSwitchError";
+import { delay, inject, singleton } from "tsyringe";
+import { Command, Commands } from "./Command";
+import { ReplyGenerator } from "./MessageGenerators/ReplyGenerator";
+import { NotExhaustiveSwitchError } from "./NotExhaustiveSwitchError";
 
 /** Executes a command */
 @singleton()
 export class CommandService {
     constructor(
-        private readonly telegram: TelegramService,
         @inject(delay(() => ReplyGenerator)) private readonly replyGenerator: ReplyGenerator,
-        private readonly dallEPromptGenerator: DallEPromptGenerator,
-        private readonly dallE: DallEService,
     ) {
     }
 

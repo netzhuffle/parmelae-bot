@@ -9,7 +9,6 @@ import {
     ChatPromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
-import { SwissConstitutionQaTool } from "./Tools/SwissConstitutionQaTool";
 
 class ChatOpenAiFake extends BaseChatModel {
     request?: BaseChatMessage[];
@@ -56,7 +55,6 @@ test('generate message', async () => {
                 gpt4: undefined as any,
                 embeddings: undefined as any,
             }),
-        undefined as any,
         undefined as any,
         undefined as any,
         undefined as any,

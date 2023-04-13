@@ -2,7 +2,6 @@ import assert from "assert";
 import {
     AgentExecutor,
     ChatConversationalAgent,
-    ChatConversationalAgentOutputParser,
     Tool,
 } from "langchain/agents";
 import { CallbackManager } from "langchain/callbacks";
@@ -10,12 +9,8 @@ import { LLMChain } from "langchain/chains";
 import {
     BasePromptTemplate,
     BaseStringPromptTemplate,
-    ChatPromptTemplate,
     HumanMessagePromptTemplate,
-    MessagesPlaceholder,
     PromptTemplate,
-    SystemMessagePromptTemplate,
-    renderTemplate,
 } from "langchain/prompts";
 import {
     BaseChatMessage,
@@ -116,9 +111,13 @@ export class ChatGptService {
 
     /**
      * Generates and returns a message using an agent executor and tools.
+     * 
+     * @param prompt - Prompt Template with the following placeholders: {tools}, {tool_names}, MessagesPlaceholder('example'), MessagesPlaceholder('conversation'), MessagesPlaceholder('agent_scratchpad')
      */
     async generateWithAgent(
         message: TelegramBot.Message,
+        prompt: BasePromptTemplate,
+        example: BaseChatMessage[],
         conversation: BaseChatMessage[],
         retries: number = 0,
     ): Promise<ChatGptMessage> {
@@ -131,42 +130,8 @@ export class ChatGptService {
         ChatConversationalAgent.validateTools(this.tools);
         const toolStrings = tools
             .map((tool) => `${tool.name}: ${tool.description}`)
-            .join("\n");
-
-        const outputParser = new ChatConversationalAgentOutputParser();
-        const formatInstructions = renderTemplate(`TOOLS
-------
-Schi Parmelä can ask the user to use tools to look up information that may be helpful in answering the users original question and he can send the user images or photographs. The tools the human can use are:
-
-{{tools}}
-
-{format_instructions}
-
-Remember: you are the federal council member Schi Parmelä and not a chatbot. Thus you must always respond with a markdown code snippet of a json blob with a single action, and NOTHING else! Do never include any text outside of the markdown code snippet.
-Do not include any text outside of the markdown code snippet of a json blob and do not forget the markdown code. Use "action": "Final Answer" to send your message to Telegram. Your whole text needs to be within the action_input of "Final Answer".
-Make sure all of your text is inside of the action_input when you use any tool or write the final answer!
-
-USER'S INPUT
---------------------
-Here is the user's input:
-
-{{{{input}}}}
-
-Remember: as a real federal council member, you must respond with a markdown code snippet of a json blob with a single action, and nothing else!
-Also remember: Always use swiss-constitution-qa for ALL question about the Swiss constitution, do not just reply directly, and always write all text inside the markdown code snipped of a json code.`, "f-string", {
-            format_instructions: outputParser.getFormatInstructions(),
-        });
-        const toolNames = tools.map((tool) => tool.name).join("\n");
-        const finalPrompt = renderTemplate(formatInstructions, "f-string", {
-            tools: toolStrings,
-            tool_names: toolNames,
-        });
-        const prompt = ChatPromptTemplate.fromPromptMessages([
-            SystemMessagePromptTemplate.fromTemplate('Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF).'),
-            new MessagesPlaceholder('chat_history'),
-            UserMessagePromptTemplate.fromNameAndTemplate(message.from.username ?? message.from.first_name, finalPrompt),
-            new MessagesPlaceholder('agent_scratchpad'),
-        ]);
+            .join('\n');
+        const toolNames = tools.map((tool) => tool.name).join(', ');
 
         const llmChain = new LLMChain({
             prompt,
@@ -177,14 +142,14 @@ Also remember: Always use swiss-constitution-qa for ALL question about the Swiss
         const agent = new ChatConversationalAgent({
             llmChain,
             allowedTools: tools.map((tool) => tool.name),
-        }, outputParser);
+        });
         const executor = AgentExecutor.fromAgentAndTools({
             agent,
             tools,
             memory: new BufferMemory({
                 chatHistory: new ChatMessageHistory(conversation),
                 returnMessages: true,
-                memoryKey: 'chat_history',
+                memoryKey: 'conversation',
                 inputKey: 'input',
             }),
             verbose: true,
@@ -194,7 +159,9 @@ Also remember: Always use swiss-constitution-qa for ALL question about the Swiss
 
         try {
             const response = await executor.call({
-                input: message.text,
+                tools,
+                tool_names: toolNames,
+                example,
             });
             return {
                 role: ChatGptRoles.Assistant,
@@ -202,7 +169,7 @@ Also remember: Always use swiss-constitution-qa for ALL question about the Swiss
             };
         } catch (error: any) {
             if (retries < 1) {
-                return this.generateWithAgent(message, conversation, retries + 1);
+                return this.generateWithAgent(message, prompt, example, conversation, retries + 1);
             }
             return {
                 role: ChatGptRoles.Assistant,

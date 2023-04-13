@@ -4,7 +4,6 @@ import { ChatGptService } from "../ChatGptService";
 import { DallEPromptGenerator } from "./DallEPromptGenerator";
 import { GptModelsProvider } from "../GptModelsProvider";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { SwissConstitutionQaTool } from "../Tools/SwissConstitutionQaTool";
 
 class ChatOpenAiFake extends BaseChatModel {
     request?: BaseChatMessage[];
@@ -53,7 +52,6 @@ test('generate', async () => {
                     gpt4: undefined as any,
                     embeddings: undefined as any,
                 }),
-            undefined as any,
             undefined as any,
             undefined as any,
             undefined as any,
