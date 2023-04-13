@@ -27,13 +27,15 @@ import { BufferMemory, ChatMessageHistory } from "langchain/memory";
 import { Calculator } from "langchain/tools/calculator";
 import TelegramBot from "node-telegram-bot-api";
 import { singleton } from "tsyringe";
-import { ChatGptModel, ChatGptModelsProvider } from "./ChatGptModelsProvider";
+import { ChatGptModel, GptModelsProvider } from "./GptModelsProvider";
 import { ChatGptMessage, ChatGptRoles } from "./MessageGenerators/ChatGptMessage";
 import { DallEToolFactory } from "./Tools/DallEToolFactory";
 import { MinecraftBackupTool } from "./Tools/MinecraftBackupTool";
 import { MinecraftStartTool } from "./Tools/MinecraftStartTool";
 import { MinecraftStatusTool } from "./Tools/MinecraftStatusTool";
 import { MinecraftStopTool } from "./Tools/MinecraftStopTool";
+import { ImportSwissConstitutionTool } from "./Tools/ImportSwissConstitutionTool";
+import { SwissConstitutionQaTool } from "./Tools/SwissConstitutionQaTool";
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate {
@@ -71,13 +73,15 @@ export class ChatGptService {
     ];
 
     constructor(
-        private readonly models: ChatGptModelsProvider,
+        private readonly models: GptModelsProvider,
         private readonly callbackManager: CallbackManager,
         private readonly dallEToolFactory: DallEToolFactory,
         minecraftStatusTool: MinecraftStatusTool,
         minecraftStartTool: MinecraftStartTool,
         minecraftStopTool: MinecraftStopTool,
         minecraftBackupTool: MinecraftBackupTool,
+        importSwissConstitutionTool: ImportSwissConstitutionTool,
+        swissConstitutionQaTool: SwissConstitutionQaTool,
     ) {
         this.tools = [
             ...this.tools,
@@ -85,7 +89,10 @@ export class ChatGptService {
             minecraftStartTool,
             minecraftStopTool,
             minecraftBackupTool,
+            importSwissConstitutionTool,
         ];
+        const tools = this.tools;
+        swissConstitutionQaTool.get().then(tool => tools.push(tool));
     }
 
     /**
@@ -148,8 +155,8 @@ Here is the user's input:
 
 {{{{input}}}}
 
-Remember: as a real federal council member, you must respond with a markdown code snippet of a json blob with a single action, and nothing else, including no additional text!
-Also remember: To send your reply to the Telegram chat, you must use the "Final Answer" and write ALL text inside the action_input.`, "f-string", {
+Remember: as a real federal council member, you must respond with a markdown code snippet of a json blob with a single action, and nothing else!
+Also remember: Always use swiss-constitution-qa for ALL question about the Swiss constitution, do not just reply directly, and always write all text inside the markdown code snipped of a json code.`, "f-string", {
             format_instructions: outputParser.getFormatInstructions(),
         });
         const toolNames = tools.map((tool) => tool.name).join("\n");

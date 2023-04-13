@@ -2,7 +2,7 @@ import {BaseChatModel} from "langchain/chat_models/base";
 import {AIChatMessage, BaseChatMessage} from "langchain/schema";
 import {ChatGptService} from "../ChatGptService";
 import {DallEPromptGenerator} from "./DallEPromptGenerator";
-import {ChatGptModelsProvider} from "../ChatGptModelsProvider";
+import {GptModelsProvider} from "../GptModelsProvider";
 import {ChatOpenAI} from "langchain/chat_models/openai";
 
 class ChatOpenAiFake extends BaseChatModel {
@@ -39,7 +39,7 @@ test('generate', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('DALL-E description'));
     const sut = new DallEPromptGenerator(
         new ChatGptService(
-            new ChatGptModelsProvider(
+            new GptModelsProvider(
                 {
                     chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
                     chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,

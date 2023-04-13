@@ -1,6 +1,6 @@
 import {ChatGptService, UserMessagePromptTemplate} from "./ChatGptService";
 import {ChatGptRoles} from "./MessageGenerators/ChatGptMessage";
-import {ChatGptModels, ChatGptModelsProvider} from "./ChatGptModelsProvider";
+import {ChatGptModels, GptModelsProvider} from "./GptModelsProvider";
 import {ChatOpenAI} from "langchain/chat_models/openai";
 import {AIChatMessage, BaseChatMessage, HumanChatMessage, SystemChatMessage} from "langchain/schema";
 import {BaseChatModel} from "langchain/chat_models/base";
@@ -42,7 +42,7 @@ class ChatOpenAiFake extends BaseChatModel {
 test('generate message', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
     const sut = new ChatGptService(
-        new ChatGptModelsProvider(
+        new GptModelsProvider(
             {
                 chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
                 chatGptStrict: new ChatOpenAiFake() as unknown as ChatOpenAI,

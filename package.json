@@ -9,6 +9,7 @@
     "migrate-prod": "prisma migrate deploy"
   },
   "dependencies": {
+    "@pinecone-database/pinecone": "^0.0.12",
     "@prisma/client": "^4.3.1",
     "@sentry/integrations": "^7.12.1",
     "@sentry/node": "^7.12.1",
@@ -19,6 +20,7 @@
     "octokit": "^2.0.7",
     "openai": "^3.0.0",
     "prisma": "^4.3.1",
+    "puppeteer": "^19.8.5",
     "redis": "^4.6.5",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.1.5",

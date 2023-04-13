@@ -1,5 +1,7 @@
-import {ChatOpenAI} from "langchain/chat_models/openai";
-import {NotExhaustiveSwitchError} from "./NotExhaustiveSwitchError";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { NotExhaustiveSwitchError } from "./NotExhaustiveSwitchError";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { OpenAI } from "langchain/llms/openai";
 
 export const ChatGptModels = {
     ChatGpt: 'ChatGPT',
@@ -8,28 +10,33 @@ export const ChatGptModels = {
 
 export type ChatGptModel = typeof ChatGptModels[keyof typeof ChatGptModels];
 
-/** Provider for LangChain chat models for dependency injection. */
-export class ChatGptModelsProvider {
+/** Provider for LangChain LLM models for dependency injection. */
+export class GptModelsProvider {
     /** LangChain chat model of GPT-3.5-Turbo. */
     public readonly chatGpt: ChatOpenAI;
     /** LangChain chat model of GPT-3.5-Turbo with temperature 0. */
-    public readonly chatGptStrict: ChatOpenAI;
+    public readonly chatGptZero: ChatOpenAI;
     /** LangChain chat model of GPT-4. */
     public readonly gpt4: ChatOpenAI;
+    /** LangChain embeddings model. */
+    public readonly embeddings: OpenAIEmbeddings;
 
     constructor(
         models: {
             /** LangChain chat model of GPT-3.5-Turbo. */
             chatGpt: ChatOpenAI,
             /** LangChain chat model of GPT-3.5-Turbo with temperature 0. */
-            chatGptStrict: ChatOpenAI,
+            chatGptZero: ChatOpenAI,
             /** LangChain chat model of GPT-4. */
             gpt4: ChatOpenAI,
+            /** LangChain embeddings model. */
+            embeddings: OpenAIEmbeddings,
         },
     ) {
         this.chatGpt = models.chatGpt;
-        this.chatGptStrict = models.chatGptStrict;
+        this.chatGptZero = models.chatGptZero;
         this.gpt4 = models.gpt4;
+        this.embeddings = models.embeddings;
     }
 
     /** Returns a ChatGPT model. */

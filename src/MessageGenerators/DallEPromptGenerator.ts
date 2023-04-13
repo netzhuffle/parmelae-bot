@@ -6,7 +6,7 @@ import {
 } from "langchain/prompts";
 import {delay, inject, singleton} from "tsyringe";
 import {ChatGptService} from "../ChatGptService";
-import {ChatGptModels} from "../ChatGptModelsProvider";
+import {ChatGptModels} from "../GptModelsProvider";
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
