@@ -1,7 +1,9 @@
 tasks:
-  - name: Prebuild
-    init: npm install && npm run build && npm run migrate
-  - name: Restore .env file
+  - name: Prebuild & Run
+    init: |
+      npm install
+      npm run build
+      npm run migrate
     command: |
       if [ -f .env ]; then
         # If this workspace already has a .env, don't override it
@@ -24,3 +26,4 @@ tasks:
           echo "${DOTENV}" | base64 -d > .env
         fi
       fi
+      [ -f .env ] && npm run run-dev
