@@ -27,6 +27,9 @@ export class Config {
     /** The Pinecone index. */
     public readonly pineconeIndex: string;
 
+    /** The SerpAPI API key. */
+    public readonly serpApiApiKey: string;
+
     /**
      * The allowlisted chats for GPT queries.
      *
@@ -62,6 +65,9 @@ export class Config {
         this.pineconeEnvironment = process.env.PINECONE_ENVIRONMENT;
         assert(process.env.PINECONE_INDEX, 'You must define PINECONE_INDEX in.env');
         this.pineconeIndex = process.env.PINECONE_INDEX;
+
+        assert(process.env.SERPAPI_API_KEY, 'You must define SERPAPI_API_KEY in.env');
+        this.serpApiApiKey = process.env.SERPAPI_API_KEY;
 
         assert(process.env.CHAT_ALLOWLIST, 'You must define CHAT_ALLOWLIST in .env');
         this.chatAllowlist = process.env.CHAT_ALLOWLIST.split(",").map(Number);
