@@ -15,8 +15,8 @@ export class Config {
     /** The Sentry DSN (optional). */
     public readonly sentryDsn: string | null;
 
-    /** The GitHub Personal Access Token (for higher rate limits, optional). */
-    public readonly gitHubPersonalAccessToken: string | null;
+    /** The GitHub Personal Access Token. */
+    public readonly gitHubPersonalAccessToken: string;
 
     /** The Pinecone API key. */
     public readonly pineconeApiKey: string;
@@ -57,7 +57,9 @@ export class Config {
         this.openAiKey = process.env.OPENAI_API_KEY;
 
         this.sentryDsn = process.env.SENTRY_DSN ?? null;
-        this.gitHubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN ?? null;
+
+        assert(process.env.GITHUB_PERSONAL_ACCESS_TOKEN, 'You must define GIT_HUB_PERSONAL_ACCESS_TOKEN in.env');
+        this.gitHubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 
         assert(process.env.PINECONE_API_KEY, 'You must define PINECONE_API_KEY in .env');
         this.pineconeApiKey = process.env.PINECONE_API_KEY;

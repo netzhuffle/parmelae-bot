@@ -57,6 +57,7 @@ export class ChatGptServiceFakeFactory {
             new FakeToolAsyncFactory() as any,
             new FakeToolFactory() as any,
             new FakeToolFactory() as any,
+            new FakeToolAsyncFactory() as any,
         );
     }
 }
