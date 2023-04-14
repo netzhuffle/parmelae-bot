@@ -168,7 +168,7 @@ export class ChatGptService {
 
         try {
             const response = await executor.call({
-                tools,
+                tools: toolStrings,
                 tool_names: toolNames,
                 example,
             });
