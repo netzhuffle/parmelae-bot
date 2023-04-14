@@ -27,3 +27,7 @@ tasks:
         fi
       fi
       [ -f .env ] && npm run run-dev
+
+vscode:
+  extensions:
+    - dbaeumer.vscode-eslint
