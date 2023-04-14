@@ -30,7 +30,9 @@ export class GitHubToolFactory {
         });
         const splitDocs = await splitter.splitDocuments(docs);
         const vectorStore = await MemoryVectorStore.fromDocuments(splitDocs, this.chatGptModelsProvider.embeddings);
-        const chain = VectorDBQAChain.fromLLM(this.chatGptModelsProvider.chatGptStrict, vectorStore);
+        const chain = VectorDBQAChain.fromLLM(
+            this.config.useGpt4 ? this.chatGptModelsProvider.gpt4Strict : this.chatGptModelsProvider.chatGptStrict,
+            vectorStore);
         chain.callbackManager = this.callbackManager;
         chain.verbose = true;
 

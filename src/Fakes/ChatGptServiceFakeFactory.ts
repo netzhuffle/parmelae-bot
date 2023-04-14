@@ -2,6 +2,7 @@ import { BaseChatModel } from "langchain/chat_models/base";
 import { ChatGptService } from "../ChatGptService";
 import { BaseChatMessage } from "langchain/schema";
 import { GptModelsProvider } from "../GptModelsProvider";
+import { Config } from "../Config";
 
 export class ChatOpenAiFake extends BaseChatModel {
     request?: BaseChatMessage[];
@@ -48,6 +49,7 @@ export class ChatGptServiceFakeFactory {
     static create(gptModelsProvider: GptModelsProvider): ChatGptService {
         return new ChatGptService(
             gptModelsProvider,
+            new Config(),
             undefined as any,
             undefined as any,
             undefined as any,
@@ -58,6 +60,8 @@ export class ChatGptServiceFakeFactory {
             new FakeToolFactory() as any,
             new FakeToolFactory() as any,
             new FakeToolAsyncFactory() as any,
+            undefined as any,
+            undefined as any,
         );
     }
 }

@@ -3,6 +3,14 @@ import assert from "assert";
 
 /** The configuration options, taken from .env */
 export class Config {
+    /**
+     * Whether to use GPT-4 or ChatGPT for LangChain agent and tools.
+     * 
+     * true = GPT-4
+     * false = ChatGPT
+     */
+    public useGpt4: boolean = false;
+
     /** The bot's Telegram username (without @). */
     public readonly username: string;
 

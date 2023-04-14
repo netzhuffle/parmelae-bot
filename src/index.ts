@@ -17,7 +17,6 @@ import { ChatOpenAI } from "langchain/chat_models/openai";
 import { CallbackManager } from "langchain/callbacks";
 import { ConsoleCallbackHandler } from "langchain/callbacks";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { OpenAI } from "langchain/llms/openai";
 
 const config = container.resolve(Config);
 if (config.sentryDsn) {
@@ -52,6 +51,11 @@ container.register(GptModelsProvider, {
         }),
         gpt4: new ChatOpenAI({
             modelName: 'gpt-4',
+            callbackManager: container.resolve(CallbackManager),
+        }),
+        gpt4Strict: new ChatOpenAI({
+            modelName: 'gpt-4',
+            temperature: 0,
             callbackManager: container.resolve(CallbackManager),
         }),
         embeddings: new OpenAIEmbeddings(),

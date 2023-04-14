@@ -33,6 +33,9 @@ import { SwissConstitutionQaToolFactory } from "./Tools/SwissConstitutionQaToolF
 import { WebBrowserToolFactory } from "./Tools/WebBrowserToolFactory";
 import { GoogleSearchToolFactory } from "./Tools/GoogleSearchToolFactory";
 import { GitHubToolFactory } from "./Tools/GitHubToolFactory";
+import { GptModelQueryTool } from "./Tools/GptModelQueryTool";
+import { GptModelSetterTool } from "./Tools/GptModelSetterTool";
+import { Config } from "./Config";
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate {
@@ -71,6 +74,7 @@ export class ChatGptService {
 
     constructor(
         private readonly models: GptModelsProvider,
+        private readonly config: Config,
         private readonly callbackManager: CallbackManager,
         private readonly dallEToolFactory: DallEToolFactory,
         minecraftStatusTool: MinecraftStatusTool,
@@ -81,6 +85,8 @@ export class ChatGptService {
         webBrowserToolFactory: WebBrowserToolFactory,
         googleSearchToolFactory: GoogleSearchToolFactory,
         gitHubToolFactory: GitHubToolFactory,
+        gptModelQueryTool: GptModelQueryTool,
+        gptModelSetterTool: GptModelSetterTool,
     ) {
         this.tools = [
             ...this.tools,
@@ -90,6 +96,8 @@ export class ChatGptService {
             minecraftBackupTool,
             webBrowserToolFactory.create(),
             googleSearchToolFactory.create(),
+            gptModelQueryTool,
+            gptModelSetterTool,
         ];
         const tools = this.tools;
         swissConstitutionQaToolFactory.create().then(tool => tools.push(tool));
@@ -144,7 +152,7 @@ export class ChatGptService {
 
         const llmChain = new LLMChain({
             prompt,
-            llm: this.models.chatGpt,
+            llm: this.config.useGpt4 ? this.models.gpt4 : this.models.chatGpt,
             callbackManager: this.callbackManager,
             verbose: true,
         });

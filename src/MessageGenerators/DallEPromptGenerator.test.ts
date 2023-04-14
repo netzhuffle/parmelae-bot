@@ -13,6 +13,7 @@ test('generate', async () => {
                     chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
                     chatGptStrict: undefined as any,
                     gpt4: undefined as any,
+                    gpt4Strict: undefined as any,
                     embeddings: undefined as any,
                 }),
         )
