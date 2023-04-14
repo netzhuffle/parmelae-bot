@@ -8,14 +8,14 @@ import { Config } from "../Config";
 import { CallbackManager } from "langchain/callbacks";
 
 @singleton()
-export class SwissConstitutionQaTool {
+export class SwissConstitutionQaToolFactory {
     constructor(
         private readonly chatGptModelsProvider: GptModelsProvider,
         private readonly config: Config,
         private readonly callbackManager: CallbackManager,
     ) { }
 
-    async get(): Promise<ChainTool> {
+    async create(): Promise<ChainTool> {
         const client = new PineconeClient();
         await client.init({
             apiKey: this.config.pineconeApiKey,

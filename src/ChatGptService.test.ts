@@ -1,53 +1,18 @@
-import { ChatGptService, UserMessagePromptTemplate } from "./ChatGptService";
+import { UserMessagePromptTemplate } from "./ChatGptService";
 import { ChatGptRoles } from "./MessageGenerators/ChatGptMessage";
 import { ChatGptModels, GptModelsProvider } from "./GptModelsProvider";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { AIChatMessage, BaseChatMessage, HumanChatMessage, SystemChatMessage } from "langchain/schema";
-import { BaseChatModel } from "langchain/chat_models/base";
+import { AIChatMessage, HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import {
     AIMessagePromptTemplate,
     ChatPromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
-
-class ChatOpenAiFake extends BaseChatModel {
-    request?: BaseChatMessage[];
-
-    constructor(private readonly response?: BaseChatMessage) {
-        super({});
-    }
-
-    _llmType() {
-        return 'openai-fake'
-    }
-
-    _combineLLMOutput() {
-        return {};
-    }
-
-    async _generate(messages: BaseChatMessage[], stop?: string[]) {
-        this.request = messages;
-
-        return {
-            generations: this.response ? [
-                {
-                    text: this.response.text,
-                    message: this.response
-                }
-            ] : [],
-        };
-    }
-}
-
-class FakeToolProvider {
-    get(): Promise<any> {
-        return Promise.resolve(undefined as any);
-    }
-}
+import { ChatGptServiceFakeFactory, ChatOpenAiFake } from "./Fakes/ChatGptServiceFakeFactory";
 
 test('generate message', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
-    const sut = new ChatGptService(
+    const sut = ChatGptServiceFakeFactory.create(
         new GptModelsProvider(
             {
                 chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
@@ -55,13 +20,6 @@ test('generate message', async () => {
                 gpt4: undefined as any,
                 embeddings: undefined as any,
             }),
-        undefined as any,
-        undefined as any,
-        undefined as any,
-        undefined as any,
-        undefined as any,
-        undefined as any,
-        new FakeToolProvider() as any,
     );
     const prompt = ChatPromptTemplate.fromPromptMessages([
         SystemMessagePromptTemplate.fromTemplate('System Message'),
