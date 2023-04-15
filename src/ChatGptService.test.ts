@@ -1,4 +1,4 @@
-import { UserMessagePromptTemplate } from "./ChatGptService";
+import { ChatGptService, UserMessagePromptTemplate } from "./ChatGptService";
 import { ChatGptRoles } from "./MessageGenerators/ChatGptMessage";
 import { ChatGptModels, GptModelsProvider } from "./GptModelsProvider";
 import { ChatOpenAI } from "langchain/chat_models/openai";
@@ -8,19 +8,19 @@ import {
     ChatPromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
-import { ChatGptServiceFakeFactory, ChatOpenAiFake } from "./Fakes/ChatGptServiceFakeFactory";
+import { ChatOpenAiFake } from "./Fakes/ChatOpenAiFake";
 
 test('generate message', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
-    const sut = ChatGptServiceFakeFactory.create(
-        new GptModelsProvider(
-            {
-                chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-                chatGptStrict: undefined as any,
-                gpt4: undefined as any,
-                gpt4Strict: undefined as any,
-                embeddings: undefined as any,
-            }),
+    const sut = new ChatGptService(
+        new GptModelsProvider({
+            chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
+            chatGptStrict: undefined as any,
+            gpt4: undefined as any,
+            gpt4Strict: undefined as any,
+            embeddings: undefined as any,
+        }),
+        undefined as any,
     );
     const prompt = ChatPromptTemplate.fromPromptMessages([
         SystemMessagePromptTemplate.fromTemplate('System Message'),

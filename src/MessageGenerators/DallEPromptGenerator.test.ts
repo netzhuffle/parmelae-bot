@@ -2,20 +2,21 @@ import { AIChatMessage } from "langchain/schema";
 import { DallEPromptGenerator } from "./DallEPromptGenerator";
 import { GptModelsProvider } from "../GptModelsProvider";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { ChatGptServiceFakeFactory, ChatOpenAiFake } from "../Fakes/ChatGptServiceFakeFactory";
+import { ChatOpenAiFake } from "../Fakes/ChatOpenAiFake";
+import { ChatGptService } from "../ChatGptService";
 
 test('generate', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('DALL-E description'));
     const sut = new DallEPromptGenerator(
-        ChatGptServiceFakeFactory.create(
-            new GptModelsProvider(
-                {
-                    chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-                    chatGptStrict: undefined as any,
-                    gpt4: undefined as any,
-                    gpt4Strict: undefined as any,
-                    embeddings: undefined as any,
-                }),
+        new ChatGptService(
+            new GptModelsProvider({
+                chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
+                chatGptStrict: undefined as any,
+                gpt4: undefined as any,
+                gpt4Strict: undefined as any,
+                embeddings: undefined as any,
+            }),
+            undefined as any,
         )
     );
 

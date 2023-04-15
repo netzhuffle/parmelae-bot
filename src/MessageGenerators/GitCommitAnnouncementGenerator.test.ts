@@ -1,21 +1,22 @@
-import { AIChatMessage, BaseChatMessage } from "langchain/schema";
+import { AIChatMessage } from "langchain/schema";
 import { GptModelsProvider } from "../GptModelsProvider";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { GitCommitAnnouncementGenerator } from "./GitCommitAnnouncementGenerator";
-import { ChatGptServiceFakeFactory, ChatOpenAiFake } from "../Fakes/ChatGptServiceFakeFactory";
+import { ChatOpenAiFake } from "../Fakes/ChatOpenAiFake";
+import { ChatGptService } from "../ChatGptService";
 
 test('generate', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('Commit Description'));
     const sut = new GitCommitAnnouncementGenerator(
-        ChatGptServiceFakeFactory.create(
-            new GptModelsProvider(
-                {
-                    chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-                    chatGptStrict: undefined as any,
-                    gpt4: undefined as any,
-                    gpt4Strict: undefined as any,
-                    embeddings: undefined as any,
-                }),
+        new ChatGptService(
+            new GptModelsProvider({
+                chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
+                chatGptStrict: undefined as any,
+                gpt4: undefined as any,
+                gpt4Strict: undefined as any,
+                embeddings: undefined as any,
+            }),
+            undefined as any,
         )
     );
 
