@@ -1,11 +1,11 @@
-import {Message} from "@prisma/client";
+import { Message } from "@prisma/client";
 import assert from "assert";
-import {delay, inject, singleton} from "tsyringe";
-import {Config} from "./Config";
-import {TelegramService} from "./TelegramService";
-import {MessageWithUser} from "./Repositories/Types";
-import {OldMessageReplyGenerator} from "./MessageGenerators/OldMessageReplyGenerator";
-import {ChatGptService} from "./ChatGptService";
+import { Config } from "./Config";
+import { TelegramService } from "./TelegramService";
+import { MessageWithUser } from "./Repositories/Types";
+import { OldMessageReplyGenerator } from "./MessageGenerators/OldMessageReplyGenerator";
+import { ChatGptService } from "./ChatGptService";
+import { injectable } from "inversify";
 
 /**
  * Minimum length to consider reply to a message.
@@ -18,13 +18,12 @@ const MINIMUM_MESSAGE_REPLY_LENGTH = 100;
 const OLD_MESSAGE_REPLY_PROBABILITY = 0.15;
 
 /** Replies to random old messages. */
-@singleton()
+@injectable()
 export class OldMessageReplyService {
     constructor(
         private readonly config: Config,
         private readonly oldMessageReplyGenerator: OldMessageReplyGenerator,
-        // Injection delayed because of dependency loop between TelegramService, MessageStorageService, and OldMessageReplyService.
-        @inject(delay(() => TelegramService)) private readonly telegramService: TelegramService,
+        private readonly telegramService: TelegramService,
     ) {
     }
 

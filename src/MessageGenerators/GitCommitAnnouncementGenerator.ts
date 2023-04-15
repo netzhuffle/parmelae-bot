@@ -4,9 +4,9 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
-import {singleton} from "tsyringe";
-import {ChatGptService} from "../ChatGptService";
-import {ChatGptModels} from "../GptModelsProvider";
+import { ChatGptService } from "../ChatGptService";
+import { ChatGptModels } from "../GptModelsProvider";
+import { injectable } from "inversify";
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
@@ -33,7 +33,7 @@ Also refactor commands to an enum.`),
 ]);
 
 /** Creates new Git commit announcement messages. */
-@singleton()
+@injectable()
 export class GitCommitAnnouncementGenerator {
     constructor(private readonly chatGpt: ChatGptService) {
     }

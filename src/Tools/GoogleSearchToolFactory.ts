@@ -1,8 +1,8 @@
-import { singleton } from "tsyringe";
+import { injectable } from "inversify";
 import { SerpAPI } from "langchain/tools";
 import { Config } from "../Config";
 
-@singleton()
+@injectable()
 export class GoogleSearchToolFactory {
     constructor(
         private readonly config: Config,

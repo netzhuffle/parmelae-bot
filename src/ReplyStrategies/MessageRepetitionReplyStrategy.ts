@@ -1,12 +1,12 @@
 import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import assert from "assert";
 import {TelegramService} from "../TelegramService";
 import {Sticker} from "../Sticker";
 
 /** Repeats a message that two other users wrote. */
-@singleton()
+@injectable()
 export class MessageRepetitionReplyStrategy implements ReplyStrategy {
     private lastMessage: TelegramBot.Message | null = null;
 

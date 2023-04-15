@@ -1,8 +1,8 @@
 import { Tool } from "langchain/agents";
-import { singleton } from "tsyringe";
+import { injectable } from "inversify";
 import { Config } from "../Config";
 
-@singleton()
+@injectable()
 export class GptModelQueryTool extends Tool {
     name = 'gpt-model-query';
 

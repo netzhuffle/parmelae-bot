@@ -1,6 +1,6 @@
 import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {TelegramService} from "../TelegramService";
 
 /** Adjectives: First word of nickname. */
@@ -91,7 +91,7 @@ const NOUNS = [
 ];
 
 /** Replies with a nickname when the text contains <Spitzname>. */
-@singleton()
+@injectable()
 export class NicknameReplyStrategy implements ReplyStrategy {
     constructor(private readonly telegram: TelegramService) {
     }

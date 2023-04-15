@@ -1,7 +1,9 @@
 import * as dotenv from "dotenv";
 import assert from "assert";
+import { injectable } from "inversify";
 
 /** The configuration options, taken from .env */
+@injectable()
 export class Config {
     /**
      * Whether to use GPT-4 or ChatGPT for LangChain agent and tools.

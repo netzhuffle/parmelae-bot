@@ -1,6 +1,6 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
 import {Config} from "../Config";
@@ -10,7 +10,7 @@ import {TelegramService} from "../TelegramService";
 /**
  * Comments a message (/comment command) when somebody replies with (just) the bot’s name.
  */
-@singleton()
+@injectable()
 export class CommentReplyStrategy extends AllowlistedReplyStrategy {
     private readonly onlyUsernameRegex: RegExp;
 

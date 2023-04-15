@@ -1,8 +1,8 @@
 import {PrismaClient} from "@prisma/client";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 
 /** Manages DateTime settings. */
-@singleton()
+@injectable()
 export class DateTimeSettingRepository {
     constructor(private readonly prisma: PrismaClient) {
     }

@@ -1,9 +1,10 @@
 import { ReplyStrategy } from "./ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 import { Config } from "./Config";
-import { inject } from "tsyringe";
+import { injectable } from "inversify";
 
 /** Abstract ReplyStrategy for allowlisted chats and allowlisted private message senders only */
+@injectable()
 export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
     constructor(protected readonly config: Config) {
     }

@@ -1,5 +1,5 @@
 import {OpenAIApi} from "openai";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 
 /**
  * Image size string.
@@ -12,7 +12,7 @@ const SIZE = '1024x1024';
 const ONE_IMAGE = 1;
 
 /** DALL·E Service */
-@singleton()
+@injectable()
 export class DallEService {
     constructor(private readonly openAi: OpenAIApi) {
     }

@@ -1,6 +1,6 @@
 import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import assert from "assert";
 import {Sticker} from "../Sticker";
 import {TelegramService} from "../TelegramService";
@@ -22,7 +22,7 @@ const MESSAGES = [
 ];
 
 /** Welcomes new chat members. */
-@singleton()
+@injectable()
 export class NewMembersReplyStrategy implements ReplyStrategy {
     constructor(private readonly telegram: TelegramService) {
     }

@@ -1,9 +1,9 @@
 import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 
 /** Handles all messages by doing nothing. */
-@singleton()
+@injectable()
 export class NullReplyStrategy implements ReplyStrategy {
     willHandle(_message: TelegramBot.Message): boolean {
         return true;

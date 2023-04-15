@@ -5,9 +5,9 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
-import {singleton} from "tsyringe";
-import {ChatGptService} from "../ChatGptService";
-import {ChatGptModels} from "../GptModelsProvider";
+import { ChatGptService } from "../ChatGptService";
+import { ChatGptModels } from "../GptModelsProvider";
+import { injectable } from "inversify";
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
@@ -30,7 +30,7 @@ const PROMPT = ChatPromptTemplate.fromPromptMessages([
 ]);
 
 /** Creates replies to 7 days old messages. */
-@singleton()
+@injectable()
 export class OldMessageReplyGenerator {
     constructor(private readonly chatGpt: ChatGptService) {
     }

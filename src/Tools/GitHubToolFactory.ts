@@ -1,5 +1,5 @@
 import { ChainTool } from "langchain/tools";
-import { singleton } from "tsyringe";
+import { injectable } from "inversify";
 import { GptModelsProvider } from "../GptModelsProvider";
 import { VectorDBQAChain } from "langchain/chains";
 import { Config } from "../Config";
@@ -8,7 +8,7 @@ import { GithubRepoLoader } from "langchain/document_loaders/web/github";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 
-@singleton()
+@injectable()
 export class GitHubToolFactory {
     constructor(
         private readonly chatGptModelsProvider: GptModelsProvider,

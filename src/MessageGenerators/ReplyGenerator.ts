@@ -1,11 +1,12 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import { singleton } from "tsyringe";
 import { MessageHistoryService } from "../MessageHistoryService";
 import { Config } from "../Config";
 import { ChatGptService, UserMessagePromptTemplate } from "../ChatGptService";
 import { ChatPromptTemplate, AIMessagePromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, HumanMessagePromptTemplate } from "langchain/prompts";
 import { AIChatMessage, BaseChatMessage } from "langchain/schema";
+import { injectable } from "inversify";
+import { ChatGptAgentService } from "../ChatGptAgentService";
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
@@ -331,10 +332,10 @@ const EXAMPLE_CONVERSATIONS: BaseChatMessage[][] = [
  *
  * Can also execute commands within the reply.
  */
-@singleton()
+@injectable()
 export class ReplyGenerator {
     constructor(
-        private readonly chatGpt: ChatGptService,
+        private readonly chatGptAgent: ChatGptAgentService,
         private readonly messageHistory: MessageHistoryService,
         private readonly config: Config,
     ) {
@@ -356,7 +357,7 @@ export class ReplyGenerator {
 
         const example = EXAMPLE_CONVERSATIONS[Math.floor(Math.random() * EXAMPLE_CONVERSATIONS.length)];
         const conversation = await this.getConversation(message);
-        const completion = await this.chatGpt.generateWithAgent(message, PROMPT, example, conversation);
+        const completion = await this.chatGptAgent.generate(message, PROMPT, example, conversation);
         return completion.content;
     }
 

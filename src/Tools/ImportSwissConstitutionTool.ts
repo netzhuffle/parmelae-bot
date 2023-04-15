@@ -3,11 +3,11 @@ import { PuppeteerWebBaseLoader } from "langchain/document_loaders/web/puppeteer
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { PineconeStore } from "langchain/vectorstores/pinecone";
-import { singleton } from "tsyringe";
+import { injectable } from "inversify";
 import { Config } from "../Config";
 import { GptModelsProvider } from "../GptModelsProvider";
 
-@singleton()
+@injectable()
 export class ImportSwissConstitutionTool extends Tool {
     name = 'import-swiss-constitution';
 

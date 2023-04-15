@@ -1,16 +1,16 @@
 import TelegramBot from "node-telegram-bot-api";
-import {delay, inject, singleton} from "tsyringe";
-import {DallEService} from "../DallEService";
-import {DallEPromptGenerator} from "../MessageGenerators/DallEPromptGenerator";
-import {TelegramService} from "../TelegramService";
-import {DallETool} from "./DallETool";
+import { DallEService } from "../DallEService";
+import { DallEPromptGenerator } from "../MessageGenerators/DallEPromptGenerator";
+import { TelegramService } from "../TelegramService";
+import { DallETool } from "./DallETool";
+import { injectable } from "inversify";
 
-@singleton()
+@injectable()
 export class DallEToolFactory {
     constructor(
         private readonly dallEPromptGenerator: DallEPromptGenerator,
         private readonly dallE: DallEService,
-        @inject(delay(() => TelegramService)) private readonly telegram: TelegramService,
+        private readonly telegram: TelegramService,
     ) {
     }
 

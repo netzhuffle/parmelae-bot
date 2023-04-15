@@ -1,8 +1,8 @@
 import {exec} from "child_process";
 import {Tool} from "langchain/agents";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 
-@singleton()
+@injectable()
 export class MinecraftBackupTool extends Tool {
     name = 'minecraft-backup';
 

@@ -4,9 +4,9 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate
 } from "langchain/prompts";
-import {delay, inject, singleton} from "tsyringe";
-import {ChatGptService} from "../ChatGptService";
-import {ChatGptModels} from "../GptModelsProvider";
+import { ChatGptService } from "../ChatGptService";
+import { ChatGptModels } from "../GptModelsProvider";
+import { injectable } from "inversify";
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
@@ -19,10 +19,10 @@ const PROMPT = ChatPromptTemplate.fromPromptMessages([
 ]);
 
 /** Creates Dall-E prompts. */
-@singleton()
+@injectable()
 export class DallEPromptGenerator {
     constructor(
-        @inject(delay(() => ChatGptService)) private readonly chatGpt: ChatGptService
+        private readonly chatGpt: ChatGptService
     ) {
     }
 

@@ -1,11 +1,11 @@
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import assert from "assert";
 import {PrivateChatReplyStrategy} from "../PrivateChatReplyStrategy";
 import {TelegramService} from "../TelegramService";
 
 /** Reply with a Sticker file_id when Sticker sent in private chat. */
-@singleton()
+@injectable()
 export class StickerIdReplyStrategy extends PrivateChatReplyStrategy {
     constructor(private readonly telegram: TelegramService) {
         super();

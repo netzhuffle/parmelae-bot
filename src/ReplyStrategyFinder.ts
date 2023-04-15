@@ -2,7 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 import {NullReplyStrategy} from "./ReplyStrategies/NullReplyStrategy";
 import {ReplyStrategy} from "./ReplyStrategy";
 import assert from "assert";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {StickerIdReplyStrategy} from "./ReplyStrategies/StickerIdReplyStrategy";
 import {NewMembersReplyStrategy} from "./ReplyStrategies/NewMembersReplyStrategy";
 import {CommandReplyStrategy} from "./ReplyStrategies/CommandReplyStrategy";
@@ -14,7 +14,7 @@ import {RandomizedStickerReplyStrategy} from "./ReplyStrategies/RandomizedSticke
 import {CommentReplyStrategy} from "./ReplyStrategies/CommentReplyStrategy";
 
 /** Finds the ReplyStrategy to handle a given message. */
-@singleton()
+@injectable()
 export class ReplyStrategyFinder {
     /** All possible strategies, in order. One strategy must handle the message. */
     private readonly strategies: readonly ReplyStrategy[];

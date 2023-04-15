@@ -1,10 +1,10 @@
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {Sticker} from "./Sticker";
 import {MessageStorageService} from "./MessageStorageService";
 
 /** Service to interact with Telegram */
-@singleton()
+@injectable()
 export class TelegramService {
     constructor(
         private readonly telegram: TelegramBot,

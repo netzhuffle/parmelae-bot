@@ -1,13 +1,13 @@
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { ChainTool } from "langchain/tools";
 import { PineconeStore } from "langchain/vectorstores/pinecone";
-import { singleton } from "tsyringe";
+import { injectable } from "inversify";
 import { GptModelsProvider } from "../GptModelsProvider";
 import { VectorDBQAChain } from "langchain/chains";
 import { Config } from "../Config";
 import { CallbackManager } from "langchain/callbacks";
 
-@singleton()
+@injectable()
 export class SwissConstitutionQaToolFactory {
     constructor(
         private readonly chatGptModelsProvider: GptModelsProvider,

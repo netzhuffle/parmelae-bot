@@ -1,10 +1,10 @@
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {MessageRepository} from "./Repositories/MessageRepository";
 import {MessageWithUser, MessageWithUserAndReplyToMessage} from "./Repositories/Types";
 
 /** Finds the conversation history. */
-@singleton()
+@injectable()
 export class MessageHistoryService {
     constructor(private readonly messageRepository: MessageRepository) {
     }

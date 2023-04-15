@@ -1,7 +1,9 @@
-import {ReplyStrategy} from "./ReplyStrategy";
+import { injectable } from "inversify";
+import { ReplyStrategy } from "./ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
 
 /** Abstract ReplyStrategy for private chats only */
+@injectable()
 export abstract class PrivateChatReplyStrategy implements ReplyStrategy {
     willHandle(message: TelegramBot.Message): boolean {
         if (message.chat.type !== 'private') {

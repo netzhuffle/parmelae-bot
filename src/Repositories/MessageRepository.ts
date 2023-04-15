@@ -1,7 +1,7 @@
 import {Message, Prisma, PrismaClient} from "@prisma/client";
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {MessageWithUser, MessageWithUserAndReplyToMessage} from "./Types";
 
 /** Number of milliseconds in a day */
@@ -14,7 +14,7 @@ const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 const DEBUG_REGEX = /₍[₀₁₂₃₄₅₆₇₈₉₊₋₌ₐₑₒₓₔ]+₎$/;
 
 /** Repository for messages */
-@singleton()
+@injectable()
 export class MessageRepository {
     constructor(private readonly prisma: PrismaClient) {
     }

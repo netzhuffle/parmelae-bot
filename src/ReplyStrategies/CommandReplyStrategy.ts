@@ -1,5 +1,5 @@
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import assert from "assert";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {CommandService} from "../CommandService";
@@ -11,7 +11,7 @@ import {TelegramService} from "../TelegramService";
 const COMMAND_NAME = /^\/(.*)@/;
 
 /** Executes commands written as /xyz@BotName in allowlisted chats. */
-@singleton()
+@injectable()
 export class CommandReplyStrategy extends AllowlistedReplyStrategy {
     constructor(
         private readonly command: CommandService,

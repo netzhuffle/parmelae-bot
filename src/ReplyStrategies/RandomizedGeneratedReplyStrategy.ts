@@ -1,6 +1,6 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
 import {Config} from "../Config";
 import {TelegramService} from "../TelegramService";
@@ -10,7 +10,7 @@ import {ReplyGenerator} from "../MessageGenerators/ReplyGenerator";
 const RANDOM_REPLY_PROBABILITY = 0.035;
 
 /** Picks a message by random chance to reply with the reply generator. */
-@singleton()
+@injectable()
 export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
     constructor(
         private readonly telegram: TelegramService,

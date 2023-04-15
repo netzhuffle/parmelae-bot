@@ -1,15 +1,15 @@
 import assert from "assert";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
-import {AllowlistedReplyStrategy} from "../AllowlistedReplyStrategy";
-import {Config} from "../Config";
-import {TelegramService} from "../TelegramService";
-import {ReplyGenerator} from "../MessageGenerators/ReplyGenerator";
+import { injectable } from "inversify";
+import { AllowlistedReplyStrategy } from "../AllowlistedReplyStrategy";
+import { Config } from "../Config";
+import { TelegramService } from "../TelegramService";
+import { ReplyGenerator } from "../MessageGenerators/ReplyGenerator";
 
 /**
  * Handles messages mentioning or replying to the bot in allowlisted chats.
  */
-@singleton()
+@injectable()
 export class BotMentionReplyStrategy extends AllowlistedReplyStrategy {
     constructor(
         private readonly telegram: TelegramService,

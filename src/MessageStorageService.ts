@@ -1,7 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
-import {MessageRepository} from "./Repositories/MessageRepository";
-import {OldMessageReplyService} from "./OldMessageReplyService";
+import { injectable } from "inversify";
+import { MessageRepository } from "./Repositories/MessageRepository";
+import { OldMessageReplyService } from "./OldMessageReplyService";
 
 /** First hour to reply to old messages in. */
 const MAIN_CHAT_TIME_STARTING_HOUR = 11;
@@ -13,11 +13,10 @@ const MAIN_CHAT_TIME_ENDING_HOUR = 23;
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 
 /** Handles the message database storage. */
-@singleton()
+@injectable()
 export class MessageStorageService {
     constructor(
         private readonly messageRepository: MessageRepository,
-        private readonly oldMessageReplyService: OldMessageReplyService,
     ) {
     }
 
@@ -37,25 +36,25 @@ export class MessageStorageService {
      * Waits until random time between main chat time to execute the deletion. Instantly deletes if currently in between
      * main chat time. Schedules daily deletion.
      */
-    startDailyDeletion(): void {
+    startDailyDeletion(oldMessageReplyService: OldMessageReplyService): void {
         const nowInMilliseconds = Date.now();
         const now = new Date();
         const todaysMainChatStartTimeInMilliseconds = now.setHours(MAIN_CHAT_TIME_STARTING_HOUR, 0, 0, 0);
         const todaysMainChatEndTimeInMilliseconds = now.setHours(MAIN_CHAT_TIME_ENDING_HOUR, 59, 59, 999);
         if (nowInMilliseconds >= todaysMainChatStartTimeInMilliseconds && nowInMilliseconds <= todaysMainChatEndTimeInMilliseconds) {
-            this.deleteAndScheduleNext();
+            this.deleteAndScheduleNext(oldMessageReplyService);
         } else {
-            this.scheduleNextDeletion();
+            this.scheduleNextDeletion(oldMessageReplyService);
         }
     }
 
-    private async deleteAndScheduleNext(): Promise<void> {
+    private async deleteAndScheduleNext(oldMessageReplyService: OldMessageReplyService): Promise<void> {
         const deletedMessages = await this.messageRepository.deleteOld();
-        await this.oldMessageReplyService.reply(deletedMessages);
-        this.scheduleNextDeletion();
+        await oldMessageReplyService.reply(deletedMessages);
+        this.scheduleNextDeletion(oldMessageReplyService);
     }
 
-    private scheduleNextDeletion() {
+    private scheduleNextDeletion(oldMessageReplyService: OldMessageReplyService) {
         const mainChatLengthInHours = MAIN_CHAT_TIME_ENDING_HOUR - MAIN_CHAT_TIME_STARTING_HOUR + 1;
         const mainChatLengthInMilliseconds = mainChatLengthInHours * HOUR_IN_MILLISECONDS;
         const randomMillisecondInMainChatTime = Math.floor(Math.random() * mainChatLengthInMilliseconds);
@@ -63,6 +62,6 @@ export class MessageStorageService {
         tomorrowMainChatStartTimeDate.setDate(tomorrowMainChatStartTimeDate.getDate() + 1);
         const tomorrowMainChatStartTimeInMilliseconds = tomorrowMainChatStartTimeDate.setHours(MAIN_CHAT_TIME_STARTING_HOUR, 0, 0, 0);
         const waitingTimeInMilliseconds = tomorrowMainChatStartTimeInMilliseconds + randomMillisecondInMainChatTime - Date.now();
-        setTimeout(this.deleteAndScheduleNext.bind(this), waitingTimeInMilliseconds);
+        setTimeout(this.deleteAndScheduleNext.bind(this, oldMessageReplyService), waitingTimeInMilliseconds);
     }
 }

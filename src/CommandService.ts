@@ -1,14 +1,14 @@
 import TelegramBot from "node-telegram-bot-api";
-import { delay, inject, singleton } from "tsyringe";
 import { Command, Commands } from "./Command";
 import { ReplyGenerator } from "./MessageGenerators/ReplyGenerator";
 import { NotExhaustiveSwitchError } from "./NotExhaustiveSwitchError";
+import { injectable } from "inversify";
 
 /** Executes a command */
-@singleton()
+@injectable()
 export class CommandService {
     constructor(
-        @inject(delay(() => ReplyGenerator)) private readonly replyGenerator: ReplyGenerator,
+        private readonly replyGenerator: ReplyGenerator,
     ) {
     }
 

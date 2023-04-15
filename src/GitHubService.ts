@@ -1,5 +1,5 @@
 import {Octokit} from "octokit";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {DateTimeSettingRepository} from "./Repositories/DateTimeSettingRepository";
 import {TelegramService} from "./TelegramService";
 import {Config} from "./Config";
@@ -18,7 +18,7 @@ type Commit = {
 const LAST_COMMIT_DATE_TIME_SETTING = 'last commit DateTime';
 
 /** Announces new commits on GitHub */
-@singleton()
+@injectable()
 export class GitHubService {
     private lastCommitDateTime: Date | null = null;
 

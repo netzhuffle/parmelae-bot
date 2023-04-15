@@ -1,10 +1,10 @@
-import { singleton } from "tsyringe";
+import { injectable } from "inversify";
 import { GptModelsProvider } from "../GptModelsProvider";
 import { CallbackManager } from "langchain/callbacks";
 import { WebBrowser } from "langchain/tools/webbrowser";
 import { Config } from "../Config";
 
-@singleton()
+@injectable()
 export class WebBrowserToolFactory {
     constructor(
         private readonly config: Config,

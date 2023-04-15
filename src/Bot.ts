@@ -1,15 +1,16 @@
 import TelegramBot from "node-telegram-bot-api";
 import assert from "assert";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {ReplyStrategyFinder} from "./ReplyStrategyFinder";
 import {Config} from './Config';
 import {MessageStorageService} from "./MessageStorageService";
 import {GitHubService} from "./GitHubService";
+import { OldMessageReplyService } from "./OldMessageReplyService";
 
 /**
  * The most helpful bot in the world
  */
-@singleton()
+@injectable()
 export class Bot {
     /** The last sent message */
     private lastMessage: TelegramBot.Message | null = null;
@@ -20,6 +21,7 @@ export class Bot {
         private readonly config: Config,
         private readonly messageStorageService: MessageStorageService,
         private readonly gitHubService: GitHubService,
+        private readonly oldMessageReplyService: OldMessageReplyService,
     ) {
     }
 
@@ -34,7 +36,7 @@ export class Bot {
         this.telegram.getMe().then((me): void => {
             assert(me.username === this.config.username);
         });
-        this.messageStorageService.startDailyDeletion();
+        this.messageStorageService.startDailyDeletion(this.oldMessageReplyService);
         this.gitHubService.announceNewCommits();
     }
 

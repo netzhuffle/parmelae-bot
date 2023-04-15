@@ -1,6 +1,6 @@
 import {ReplyStrategy} from "../ReplyStrategy";
 import TelegramBot from "node-telegram-bot-api";
-import {singleton} from "tsyringe";
+import {injectable} from "inversify";
 import {Sticker} from "../Sticker";
 import {TelegramService} from "../TelegramService";
 
@@ -18,7 +18,7 @@ const STICKERS = [
 ];
 
 /** Picks a message by random chance to reply with a random sticker. */
-@singleton()
+@injectable()
 export class RandomizedStickerReplyStrategy implements ReplyStrategy {
     constructor(private readonly telegram: TelegramService) {
     }
