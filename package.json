@@ -2,9 +2,9 @@
   "private": true,
   "main": "built/index.js",
   "scripts": {
-    "format": "prettier --write src/**/*",
+    "format": "prettier --write src",
     "build": "tsc",
-    "lint": "eslint . --ext ts",
+    "lint": "eslint src --ext ts",
     "test": "jest",
     "checks": "npm run format && npm run build && npm run lint && npm run test",
     "migrate": "prisma migrate dev",
