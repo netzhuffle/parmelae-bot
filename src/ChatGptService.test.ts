@@ -6,21 +6,23 @@ import { AIChatMessage, HumanChatMessage, SystemChatMessage } from "langchain/sc
 import {
     AIMessagePromptTemplate,
     ChatPromptTemplate,
-    SystemMessagePromptTemplate
+    SystemMessagePromptTemplate,
 } from "langchain/prompts";
 import { ChatOpenAiFake } from "./Fakes/ChatOpenAiFake";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { CallbackManager } from "langchain/callbacks";
 
 test('generate message', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
     const sut = new ChatGptService(
         new GptModelsProvider({
             chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-            chatGptStrict: undefined as any,
-            gpt4: undefined as any,
-            gpt4Strict: undefined as any,
-            embeddings: undefined as any,
+            chatGptStrict: undefined as unknown as ChatOpenAI,
+            gpt4: undefined as unknown as ChatOpenAI,
+            gpt4Strict: undefined as unknown as ChatOpenAI,
+            embeddings: undefined as unknown as OpenAIEmbeddings,
         }),
-        undefined as any,
+        undefined as unknown as CallbackManager,
     );
     const prompt = ChatPromptTemplate.fromPromptMessages([
         SystemMessagePromptTemplate.fromTemplate('System Message'),

@@ -11,7 +11,7 @@ export class Config {
      * true = GPT-4
      * false = ChatGPT
      */
-    public useGpt4: boolean = false;
+    public useGpt4 = false;
 
     /** The bot's Telegram username (without @). */
     public readonly username: string;
@@ -84,13 +84,13 @@ export class Config {
         assert(process.env.CHAT_ALLOWLIST, 'You must define CHAT_ALLOWLIST in .env');
         this.chatAllowlist = process.env.CHAT_ALLOWLIST.split(",").map(Number);
         this.chatAllowlist.forEach(
-            chat => assert(!isNaN(chat), 'CHAT_ALLOWLIST must contain only numbers')
+            chat => assert(!isNaN(chat), 'CHAT_ALLOWLIST must contain only numbers'),
         );
 
         assert(process.env.NEW_COMMITS_ANNOUNCEMENT_CHATS, 'You must define NEW_COMMIT_ANNOUNCEMENT_CHATS in .env');
         this.newCommitAnnouncementChats = process.env.NEW_COMMITS_ANNOUNCEMENT_CHATS.split(",").map(Number);
         this.newCommitAnnouncementChats.forEach(
-            chat => assert(!isNaN(chat), 'NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers')
+            chat => assert(!isNaN(chat), 'NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers'),
         );
     }
 }

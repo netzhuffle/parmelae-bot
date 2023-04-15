@@ -8,7 +8,7 @@ export class MinecraftStatusTool extends Tool {
 
     description = 'Checks if the minecraft server is running. Gives back the status. Input should be an empty string.';
 
-    protected _call(arg: string): Promise<string> {
+    protected _call(): Promise<string> {
         return new Promise<string>((resolve) => {
             exec('/home/jannis/parmelae-bot/cmd/statusminecraft', (error, stdout, stderr) => {
                 if (error) {

@@ -8,7 +8,7 @@ export class MinecraftBackupTool extends Tool {
 
     description = 'Creates a backup of the minecraft server and updates the map. Gives back the output and the map URL. Input should be an empty string.';
 
-    protected _call(arg: string): Promise<string> {
+    protected _call(): Promise<string> {
         return new Promise<string>((resolve) => {
             exec('/home/jannis/parmelae-bot/cmd/statusminecraft', (error, stdout, stderr) => {
                 if (error) {

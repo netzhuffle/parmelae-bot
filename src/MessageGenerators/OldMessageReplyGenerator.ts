@@ -3,7 +3,7 @@ import {
     AIMessagePromptTemplate,
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate
+    SystemMessagePromptTemplate,
 } from "langchain/prompts";
 import { ChatGptService } from "../ChatGptService";
 import { ChatGptModels } from "../GptModelsProvider";

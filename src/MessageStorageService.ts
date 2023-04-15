@@ -48,9 +48,10 @@ export class MessageStorageService {
         }
     }
 
-    private async deleteAndScheduleNext(oldMessageReplyService: OldMessageReplyService): Promise<void> {
-        const deletedMessages = await this.messageRepository.deleteOld();
-        await oldMessageReplyService.reply(deletedMessages);
+    private deleteAndScheduleNext(oldMessageReplyService: OldMessageReplyService) {
+        this.messageRepository.deleteOld()
+            .then(deletedMessages => oldMessageReplyService.reply(deletedMessages))
+            .catch(e => console.error('old messages could not be deleted or replied to', e));
         this.scheduleNextDeletion(oldMessageReplyService);
     }
 

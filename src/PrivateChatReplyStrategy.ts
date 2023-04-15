@@ -21,5 +21,5 @@ export abstract class PrivateChatReplyStrategy implements ReplyStrategy {
      */
     abstract willHandlePrivate(message: TelegramBot.Message): boolean;
 
-    abstract handle(message: TelegramBot.Message): void;
+    abstract handle(message: TelegramBot.Message): Promise<void>;
 }

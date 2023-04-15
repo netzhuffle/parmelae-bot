@@ -21,7 +21,7 @@ export class TelegramService {
     async send(message: string | Sticker, chat: TelegramBot.Chat | number): Promise<void> {
         const chatId = typeof chat === "number" ? chat : chat.id;
         if (message instanceof Sticker) {
-            this.telegram.sendSticker(chatId, message.fileId);
+            await this.telegram.sendSticker(chatId, message.fileId);
         } else {
             const sentMessage = await this.telegram.sendMessage(chatId, message);
             await this.messageStorageService.store(sentMessage);
@@ -39,7 +39,7 @@ export class TelegramService {
         chat: { id: number }
     }): Promise<void> {
         if (reply instanceof Sticker) {
-            this.telegram.sendSticker(message.chat.id, reply.fileId, {reply_to_message_id: message.message_id});
+            await this.telegram.sendSticker(message.chat.id, reply.fileId, {reply_to_message_id: message.message_id});
         } else {
             const sentMessage = await this.telegram.sendMessage(message.chat.id, reply, {reply_to_message_id: message.message_id});
             await this.messageStorageService.store(sentMessage);
@@ -56,7 +56,7 @@ export class TelegramService {
     async replyWithImage(url: string, caption: string, message: TelegramBot.Message): Promise<void> {
         await this.telegram.sendPhoto(message.chat.id, url, {
             caption: caption,
-            reply_to_message_id: message.message_id
+            reply_to_message_id: message.message_id,
         });
     }
 }

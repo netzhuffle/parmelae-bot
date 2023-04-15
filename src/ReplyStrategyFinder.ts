@@ -29,7 +29,7 @@ export class ReplyStrategyFinder {
         nicknameReplyStrategy: NicknameReplyStrategy,
         randomizedGeneratedReplyStrategy: RandomizedGeneratedReplyStrategy,
         randomizedStickerReplyStrategy: RandomizedStickerReplyStrategy,
-        nullReplyStrategy: NullReplyStrategy
+        nullReplyStrategy: NullReplyStrategy,
     ) {
         this.strategies = [
             // Replies with Sticker file_id in private chats.
@@ -60,7 +60,7 @@ export class ReplyStrategyFinder {
             randomizedStickerReplyStrategy,
 
             // Do nothing (catch all last rule).
-            nullReplyStrategy
+            nullReplyStrategy,
         ];
     }
 

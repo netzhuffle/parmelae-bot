@@ -1,5 +1,5 @@
 import { BaseChatModel } from "langchain/chat_models/base";
-import { BaseChatMessage } from "langchain/schema";
+import { BaseChatMessage, ChatResult } from "langchain/schema";
 
 export class ChatOpenAiFake extends BaseChatModel {
     request?: BaseChatMessage[];
@@ -8,24 +8,24 @@ export class ChatOpenAiFake extends BaseChatModel {
         super({});
     }
 
-    _llmType() {
+    _llmType(): string {
         return 'openai-fake'
     }
 
-    _combineLLMOutput() {
+    _combineLLMOutput(): object {
         return {};
     }
 
-    async _generate(messages: BaseChatMessage[], stop?: string[]) {
+    _generate(messages: BaseChatMessage[]): Promise<ChatResult> {
         this.request = messages;
 
-        return {
+        return Promise.resolve({
             generations: this.response ? [
                 {
                     text: this.response.text,
-                    message: this.response
-                }
+                    message: this.response,
+                },
             ] : [],
-        };
+        });
     }
 }

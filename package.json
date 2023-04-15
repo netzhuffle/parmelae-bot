@@ -3,7 +3,9 @@
   "main": "built/index.js",
   "scripts": {
     "build": "tsc",
+    "lint": "eslint . --ext ts",
     "test": "jest",
+    "checks": "npm run build && npm run lint && npm run test",
     "migrate": "prisma migrate dev",
     "run-dev": "ts-node-dev src/index.ts",
     "migrate-prod": "prisma migrate deploy"
@@ -35,6 +37,7 @@
     "@types/node-telegram-bot-api": "^0.61.3",
     "@types/sqlite3": "^3.1.8",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
     "eslint": "^8.38.0",
     "eslint-config-standard-with-typescript": "^34.0.1",
     "eslint-plugin-import": "^2.27.5",

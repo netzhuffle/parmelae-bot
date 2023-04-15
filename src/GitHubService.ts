@@ -82,7 +82,7 @@ export class GitHubService {
         }
 
         const announcementText = await this.gitCommitAnnounceGenerator.generate(commitMessage);
-        let promises: Promise<void>[] = [];
+        const promises: Promise<void>[] = [];
         this.config.newCommitAnnouncementChats.forEach(chat => {
             promises.push(this.telegramService.send(announcementText, chat));
         });

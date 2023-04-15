@@ -25,7 +25,7 @@ export class GptModelSetterTool extends Tool {
         return Promise.resolve(
             'Success: ' +
             (this.config.useGpt4 ? 'GPT-4' : 'ChatGPT') +
-            ' will be used from now on.'
+            ' will be used from now on.',
         );
     }
 }

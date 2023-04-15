@@ -4,14 +4,15 @@ module.exports = {
     es2021: true,
     jest: true,
   },
-  extends: 'standard-with-typescript',
-  overrides: [
+  extends: [
+    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module'
+    project: './tsconfig.json',
   },
   rules: {
-    'comma-dangle': 'always-multiline',
-  }
-}
+    '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
+  },
+};

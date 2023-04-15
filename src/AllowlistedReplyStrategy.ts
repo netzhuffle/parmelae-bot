@@ -25,5 +25,5 @@ export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
      */
     abstract willHandleAllowlisted(message: TelegramBot.Message): boolean;
 
-    abstract handle(message: TelegramBot.Message): void;
+    abstract handle(message: TelegramBot.Message): Promise<void>;
 }

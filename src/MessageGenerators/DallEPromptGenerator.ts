@@ -2,7 +2,7 @@ import {
     AIMessagePromptTemplate,
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate
+    SystemMessagePromptTemplate,
 } from "langchain/prompts";
 import { ChatGptService } from "../ChatGptService";
 import { ChatGptModels } from "../GptModelsProvider";
@@ -22,7 +22,7 @@ const PROMPT = ChatPromptTemplate.fromPromptMessages([
 @injectable()
 export class DallEPromptGenerator {
     constructor(
-        private readonly chatGpt: ChatGptService
+        private readonly chatGpt: ChatGptService,
     ) {
     }
 

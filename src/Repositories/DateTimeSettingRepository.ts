@@ -18,15 +18,15 @@ export class DateTimeSettingRepository {
     async get(setting: string, startingValue: Date): Promise<Date> {
         let dateTimeSetting = await this.prisma.dateTimeSetting.findUnique({
             where: {
-                setting
-            }
+                setting,
+            },
         });
         if (!dateTimeSetting) {
             dateTimeSetting = await this.prisma.dateTimeSetting.create({
                 data: {
                     setting,
                     dateTime: startingValue,
-                }
+                },
             });
         }
         return dateTimeSetting.dateTime;
@@ -40,8 +40,8 @@ export class DateTimeSettingRepository {
     async update(setting: string, newDate: Date): Promise<void> {
         const oldSetting = await this.prisma.dateTimeSetting.findUnique({
             where: {
-                setting
-            }
+                setting,
+            },
         });
         const oldDate = oldSetting?.dateTime;
         if (oldDate && oldDate >= newDate) {
@@ -57,7 +57,7 @@ export class DateTimeSettingRepository {
             data: {
                 setting,
                 dateTime: newDate,
-            }
+            },
         });
     }
 }

@@ -69,7 +69,7 @@ export class ChatGptService {
             verbose: true,
         });
         const response = await chain.call(promptValues);
-
+        assert(typeof response.text === "string");
         return {
             role: ChatGptRoles.Assistant,
             content: response.text,

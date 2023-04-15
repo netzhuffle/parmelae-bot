@@ -35,19 +35,20 @@ export class NewMembersReplyStrategy implements ReplyStrategy {
         return message.new_chat_members.length >= 1;
     }
 
-    handle(message: TelegramBot.Message): void {
+    async handle(message: TelegramBot.Message): Promise<void> {
         assert(message.new_chat_members);
 
-        message.new_chat_members.forEach(user => {
+        const promises = message.new_chat_members.map(user => {
             let randomMessage = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
             if (this.isString(randomMessage)) {
                 randomMessage = randomMessage.replace(/%u/, user.first_name);
             }
-            this.telegram.reply(randomMessage, message);
+            return this.telegram.reply(randomMessage, message);
         });
+        await Promise.all(promises);
     }
 
-    private isString(variable: any): variable is string {
+    private isString(variable: string | Sticker): variable is string {
         return typeof variable === 'string';
     }
 }

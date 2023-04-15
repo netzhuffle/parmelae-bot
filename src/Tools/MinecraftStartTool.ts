@@ -8,7 +8,7 @@ export class MinecraftStartTool extends Tool {
 
     description = 'Starts the minecraft server. Gives back the output and the map URL. Input should be an empty string.';
 
-    protected _call(arg: string): Promise<string> {
+    protected _call(): Promise<string> {
         return new Promise<string>((resolve) => {
             exec('/home/jannis/parmelae-bot/cmd/startminecraft', (error, stdout, stderr) => {
                 if (error) {

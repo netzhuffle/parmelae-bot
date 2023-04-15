@@ -27,8 +27,8 @@ export class RandomizedStickerReplyStrategy implements ReplyStrategy {
         return message.from !== undefined && Math.random() < RANDOM_REPLY_PROBABILITY;
     }
 
-    handle(message: TelegramBot.Message): void {
+    handle(message: TelegramBot.Message): Promise<void> {
         const sticker = STICKERS[Math.floor(Math.random() * STICKERS.length)];
-        this.telegram.reply(sticker, message);
+        return this.telegram.reply(sticker, message);
     }
 }

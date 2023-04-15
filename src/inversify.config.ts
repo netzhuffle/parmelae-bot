@@ -38,21 +38,21 @@ container.bind(GptModelsProvider).toDynamicValue(() =>
             callbackManager: container.resolve(CallbackManager),
         }),
         embeddings: new OpenAIEmbeddings(),
-    })
+    }),
 );
 container.bind(Octokit).toDynamicValue((context) =>
     new Octokit({
         auth: context.container.get(Config).gitHubPersonalAccessToken,
         userAgent: 'parmelae-bot',
         timeZone: 'Europe/Zurich',
-    })
+    }),
 );
 container.bind(OpenAIApi).toDynamicValue((context) =>
     new OpenAIApi(
         new Configuration({
-            apiKey: context.container.get(Config).openAiKey
-        })
-    )
+            apiKey: context.container.get(Config).openAiKey,
+        }),
+    ),
 );
 container.bind(PrismaClient).toDynamicValue(() => new PrismaClient());
 container.bind(TelegramBot).toDynamicValue((context) =>
@@ -60,8 +60,8 @@ container.bind(TelegramBot).toDynamicValue((context) =>
         context.container.get(Config).telegramToken,
         {
             polling: true,
-        }
-    )
+        },
+    ),
 );
 
 export default container;

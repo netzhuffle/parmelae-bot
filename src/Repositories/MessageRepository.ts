@@ -32,7 +32,7 @@ export class MessageRepository {
             include: {
                 from: true,
                 replyToMessage: true,
-            }
+            },
         });
     }
 
@@ -62,7 +62,7 @@ export class MessageRepository {
                 text: this.stripDebugFromText(message.text),
                 replyToMessage: replyToMessage ?? undefined,
                 from: this.connectUser(message.from),
-            }
+            },
         });
     }
 
@@ -74,7 +74,7 @@ export class MessageRepository {
                 chatId: chatId,
                 messageId: {
                     lt: beforeMessageId,
-                }
+                },
             },
             orderBy: {
                 messageId: 'desc',
@@ -101,7 +101,7 @@ export class MessageRepository {
             where: where7DaysAgo,
             include: {
                 from: true,
-            }
+            },
         });
         await this.prisma.message.deleteMany({
             where: where7DaysAgo,
@@ -131,7 +131,7 @@ export class MessageRepository {
         return {
             connectOrCreate: {
                 where: {
-                    id: chat.id
+                    id: chat.id,
                 },
                 create: {
                     id: chat.id,
@@ -140,8 +140,8 @@ export class MessageRepository {
                     username: chat.username,
                     firstName: chat.first_name,
                     lastName: chat.last_name,
-                }
-            }
+                },
+            },
         };
     }
 
@@ -149,7 +149,7 @@ export class MessageRepository {
         return {
             connectOrCreate: {
                 where: {
-                    id: user.id
+                    id: user.id,
                 },
                 create: {
                     id: user.id,
@@ -158,8 +158,8 @@ export class MessageRepository {
                     lastName: user.last_name,
                     username: user.username,
                     languageCode: user.language_code,
-                }
-            }
+                },
+            },
         };
     }
 
@@ -181,7 +181,7 @@ export class MessageRepository {
                     messageId: replyToMessage.messageId,
                     chatId: replyToMessage.chatId,
                 },
-            }
+            },
         };
     }
 

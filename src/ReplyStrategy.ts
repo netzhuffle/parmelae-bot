@@ -16,5 +16,5 @@ export interface ReplyStrategy {
      *
      * @param message - The message to handle
      */
-    handle(message: TelegramBot.Message): void;
+    handle(message: TelegramBot.Message): Promise<void>;
 }

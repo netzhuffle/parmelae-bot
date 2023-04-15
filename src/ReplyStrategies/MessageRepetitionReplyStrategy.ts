@@ -37,12 +37,12 @@ export class MessageRepetitionReplyStrategy implements ReplyStrategy {
         return false;
     }
 
-    handle(message: TelegramBot.Message): void {
+    async handle(message: TelegramBot.Message): Promise<void> {
         if (message.text) {
-            this.telegram.send(message.text, message.chat);
-        } else {
-            assert(message.sticker);
-            this.telegram.send(new Sticker(message.sticker.file_id), message.chat);
+            return this.telegram.send(message.text, message.chat);
         }
+        
+        assert(message.sticker);
+        return this.telegram.send(new Sticker(message.sticker.file_id), message.chat);
     }
 }

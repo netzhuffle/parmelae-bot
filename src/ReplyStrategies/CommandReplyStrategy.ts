@@ -25,15 +25,15 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
         return message.text !== undefined && COMMAND_NAME.test(message.text);
     }
 
-    handle(message: TelegramBot.Message) {
+    async handle(message: TelegramBot.Message): Promise<void> {
         assert(message.text !== undefined);
 
         const commandMatches = message.text.match(COMMAND_NAME);
         assert(commandMatches && commandMatches.length >= 2);
         const command = this.getCommand(commandMatches[1]);
 
-        this.command.execute(command, message)
-            .then(reply => this.telegram.reply(reply, message));
+        const reply = await this.command.execute(command, message)
+        return this.telegram.reply(reply, message);
     }
 
     private getCommand(command: string): Command {

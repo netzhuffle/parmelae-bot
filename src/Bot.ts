@@ -29,15 +29,15 @@ export class Bot {
      * Sets the handler to listen to messages
      */
     start(): void {
-        this.telegram.on('message', async (message): Promise<void> => {
-            await this.handleMessage(message);
+        this.telegram.on('message', (message) => {
+            this.handleMessage(message).catch(e => console.error('Could not handle message', e));
         });
         this.telegram.on('polling_error', console.error);
-        this.telegram.getMe().then((me): void => {
+        this.telegram.getMe().then((me) => {
             assert(me.username === this.config.username);
-        });
+        }).catch(e => console.error('Could not fetch bot username', e));
         this.messageStorageService.startDailyDeletion(this.oldMessageReplyService);
-        this.gitHubService.announceNewCommits();
+        this.gitHubService.announceNewCommits().catch(e => console.error('Could not announce new commits', e));
     }
 
     /**
@@ -48,6 +48,6 @@ export class Bot {
     async handleMessage(message: TelegramBot.Message): Promise<void> {
         await this.messageStorageService.store(message);
         const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
-        replyStrategy.handle(message);
+        return replyStrategy.handle(message);
     }
 }

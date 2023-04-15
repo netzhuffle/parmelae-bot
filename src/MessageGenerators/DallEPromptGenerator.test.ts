@@ -4,6 +4,8 @@ import { GptModelsProvider } from "../GptModelsProvider";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { ChatOpenAiFake } from "../Fakes/ChatOpenAiFake";
 import { ChatGptService } from "../ChatGptService";
+import { CallbackManager } from "langchain/callbacks";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 
 test('generate', async () => {
     const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('DALL-E description'));
@@ -11,13 +13,13 @@ test('generate', async () => {
         new ChatGptService(
             new GptModelsProvider({
                 chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-                chatGptStrict: undefined as any,
-                gpt4: undefined as any,
-                gpt4Strict: undefined as any,
-                embeddings: undefined as any,
+                chatGptStrict: undefined as unknown as ChatOpenAI,
+                gpt4: undefined as unknown as ChatOpenAI,
+                gpt4Strict: undefined as unknown as ChatOpenAI,
+                embeddings: undefined as unknown as OpenAIEmbeddings,
             }),
-            undefined as any,
-        )
+            undefined as unknown as CallbackManager,
+        ),
     );
 
     const response = await sut.generate('image description');

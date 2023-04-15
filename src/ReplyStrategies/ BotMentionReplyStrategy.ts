@@ -27,10 +27,10 @@ export class BotMentionReplyStrategy extends AllowlistedReplyStrategy {
         return message.text.includes(`@${this.config.username}`) || message.reply_to_message?.from?.username === this.config.username;
     }
 
-    handle(message: TelegramBot.Message): void {
+    async handle(message: TelegramBot.Message): Promise<void> {
         assert(message.text !== undefined);
 
-        this.replyGenerator.generate(message)
-            .then((text: string) => this.telegram.send(text, message.chat));
+        const text = await this.replyGenerator.generate(message);
+        return this.telegram.send(text, message.chat);
     }
 }

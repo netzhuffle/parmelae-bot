@@ -25,10 +25,10 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
         return message.text !== undefined && Math.random() < RANDOM_REPLY_PROBABILITY;
     }
 
-    handle(message: TelegramBot.Message): void {
+    async handle(message: TelegramBot.Message): Promise<void> {
         assert(message.text !== undefined);
 
-        this.replyGenerator.generate(message)
-            .then((text: string) => this.telegram.reply(text, message));
+        const reply = await this.replyGenerator.generate(message)
+        return this.telegram.reply(reply, message);
     }
 }

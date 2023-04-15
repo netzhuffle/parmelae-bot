@@ -34,7 +34,7 @@ const ADJECTIVES = [
     'Berry',
     'Itsy Bitsy',
     'Lil',
-    'Swooping'
+    'Swooping',
 ];
 
 /** Nouns: Second word of nickname. */
@@ -87,7 +87,7 @@ const NOUNS = [
     'Chiquitita',
     'Face',
     'Snuggles',
-    'Charmy'
+    'Charmy',
 ];
 
 /** Replies with a nickname when the text contains <Spitzname>. */
@@ -100,10 +100,10 @@ export class NicknameReplyStrategy implements ReplyStrategy {
         return message.text?.includes('<Spitzname>') ?? false;
     }
 
-    handle(message: TelegramBot.Message): void {
+    handle(message: TelegramBot.Message): Promise<void> {
         const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
         const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
 
-        this.telegram.reply(`${adjective} ${noun}`, message);
+        return this.telegram.reply(`${adjective} ${noun}`, message);
     }
 }

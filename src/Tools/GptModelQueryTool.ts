@@ -14,7 +14,7 @@ export class GptModelQueryTool extends Tool {
         super();
     }
 
-    protected _call(arg: string): Promise<string> {
+    protected _call(): Promise<string> {
         return Promise.resolve(this.config.useGpt4 ? 'GPT-4' : 'ChatGPT');
     }
 }

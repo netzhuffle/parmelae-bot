@@ -11,7 +11,7 @@ import {Prisma} from "@prisma/client";
 const messageWithUser = Prisma.validator<Prisma.MessageArgs>()({
     include: {
         from: true,
-    }
+    },
 });
 
 /** Message including the User relation. */
@@ -22,7 +22,7 @@ const messageWithUserAndReplyToMessage = Prisma.validator<Prisma.MessageArgs>()(
     include: {
         from: true,
         replyToMessage: true,
-    }
+    },
 });
 
 /** Message including the User and ReplyToMessage relations. */

@@ -27,10 +27,10 @@ export class CommentReplyStrategy extends AllowlistedReplyStrategy {
         return message.text !== undefined && this.onlyUsernameRegex.test(message.text);
     }
 
-    handle(message: TelegramBot.Message): void {
+    async handle(message: TelegramBot.Message): Promise<void> {
         assert(message.text !== undefined);
 
-        this.command.execute(Commands.Comment, message)
-            .then(reply => this.telegram.reply(reply, message));
+        const reply = await this.command.execute(Commands.Comment, message)
+        return this.telegram.reply(reply, message);
     }
 }

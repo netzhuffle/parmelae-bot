@@ -62,8 +62,12 @@ export class ChatGptAgentService {
             gptModelSetterTool,
         ];
         const tools = this.tools;
-        swissConstitutionQaToolFactory.create().then(tool => tools.push(tool));
-        gitHubToolFactory.create().then(tool => tools.push(tool));
+        swissConstitutionQaToolFactory.create()
+            .then(tool => tools.push(tool))
+            .catch(e => console.error('Could not create swiss-constitution-qa tool, continuing without', e));
+        gitHubToolFactory.create()
+            .then(tool => tools.push(tool))
+            .catch(e => console.error('Could not create github-qa tool, continuing without', e));
     }
 
     /**
@@ -76,7 +80,7 @@ export class ChatGptAgentService {
         prompt: BasePromptTemplate,
         example: BaseChatMessage[],
         conversation: BaseChatMessage[],
-        retries: number = 0,
+        retries = 0,
     ): Promise<ChatGptMessage> {
         assert(message.from);
 
@@ -112,7 +116,6 @@ export class ChatGptAgentService {
             verbose: true,
             callbackManager: this.callbackManager,
         });
-        console.log(executor.memory?.loadMemoryVariables)
 
         try {
             const response = await executor.call({
@@ -120,14 +123,17 @@ export class ChatGptAgentService {
                 tool_names: toolNames,
                 example,
             });
+            assert(typeof response.output === 'string');
             return {
                 role: ChatGptRoles.Assistant,
                 content: response.output,
             };
-        } catch (error: any) {
+        } catch (error) {
             if (retries < 1) {
                 return this.generate(message, prompt, example, conversation, retries + 1);
             }
+            console.error('Error when generating agent message', error);
+            assert(error instanceof Error);
             return {
                 role: ChatGptRoles.Assistant,
                 content: `Fehler: ${error.message}`,

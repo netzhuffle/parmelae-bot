@@ -15,9 +15,9 @@ export class StickerIdReplyStrategy extends PrivateChatReplyStrategy {
         return message.sticker !== undefined;
     }
 
-    handle(message: TelegramBot.Message) {
+    handle(message: TelegramBot.Message): Promise<void> {
         assert(message.sticker !== undefined);
-
-        this.telegram.reply('Sticker file_id: ' + message.sticker.file_id, message);
+        
+        return this.telegram.reply('Sticker file_id: ' + message.sticker.file_id, message);
     }
 }

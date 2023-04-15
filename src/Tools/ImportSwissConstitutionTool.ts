@@ -20,7 +20,7 @@ export class ImportSwissConstitutionTool extends Tool {
         super();
     }
 
-    protected async _call(arg: string): Promise<string> {
+    protected async _call(): Promise<string> {
         const loader = new PuppeteerWebBaseLoader('https://www.fedlex.admin.ch/eli/cc/1999/404/de', {
             gotoOptions: {
                 waitUntil: 'networkidle0',
