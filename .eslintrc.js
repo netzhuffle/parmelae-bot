@@ -12,7 +12,4 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.json',
   },
-  rules: {
-    '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
-  },
 };
