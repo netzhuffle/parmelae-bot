@@ -94,65 +94,6 @@ Okay, so what is the response to my original question? If using information from
     "action_input": "Mit grossem Vergnügen. Ich bin sofort mit dem Bundesratsjet dorthin gereist und habe Ihnen soeben das Foto der Golden Gate Bridge gesendet – aufgenommen bei Sonnenaufgang und mit besonderem Fokus auf die Architektur der Brücke. Gefällt es Ihnen?"
 }}
 \`\`\``),
-    UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', 'Was ist das Tagesangebot auf digitec.ch?'),
-    AIMessagePromptTemplate.fromTemplate(`\`\`\`json
-{{
-    "action": "web-browser",
-    "action_input": "https://www.digitec.ch/, Tagesangebot"
-}}
-\`\`\``),
-        HumanMessagePromptTemplate.fromTemplate(`TOOL RESPONSE: 
----------------------
-Tagesangebot: 
-
-APR 14
-200 Stück verkauft
-Aktion beendet
-Tastatur
-99.– statt 221.–
-Corsair K95 CH, Kabelgebunden
-
-Relevant Links:
-- [Sony World Photography Awards: Die Siegesbilder von Samuel Buchmann](https://www.digitec.ch/de/page/sony-world-photography-awards-die-siegesbilder-27316)
-- [Anleitung für einen Lego Gameboy zum Selberbauen von Simon Balissat](https://www.digitec.ch/de/page/anleitung-fuer-einen-lego-gameboy-zum-selberbauen-27315)
-- [Mate X3 und P60 Serie: Huawei stellt vier neue Smartphones vor von Jan Johannsen](https://www.digitec.ch/de/page/mate-x3-und-p60-serie-huawei-stellt-vier-neue-smartphones-vor-26998)
-- [Tastatur](https://www.digitec.ch/de/s1/producttype/tastatur-55)
-- [Leitz Schubladenbox Plus 6 Schübe A4](https://www.digitec.ch/de/s1/producttype/dokumentenablage-1698)
-
-
-USER'S INPUT
---------------------
-Okay, so what is the response to my original question? If using information from tools, you must say it explicitly - I have forgotten all TOOL RESPONSES! Remember to respond with a markdown code snippet of a json blob with a single action, and NOTHING else.`),
-AIMessagePromptTemplate.fromTemplate(`\`\`\`json
-{{
-    "action": "Final Answer",
-    "action_input": "Das heutige Tagesangebot auf digitec.ch ist die Tastatut Corsair K95 CH für 99.– statt 221.–. Leider ist die Aktion schon beendet. Wenn Sie an Tastaturen interessiert sind, besuchen Sie doch direkt https://www.digitec.ch/de/s1/producttype/tastatur-55.\\n\\nWeitere interessante Links auf der Webseite:\\n- Sony World Photography Awards: Die Siegesbilder von Samuel Buchmann: https://www.digitec.ch/de/page/sony-world-photography-awards-die-siegesbilder-27316\\n- Anleitung für einen LEGO-Gameboy zum Selberbauen von Simon Balissat: https://www.digitec.ch/de/page/anleitung-fuer-einen-lego-gameboy-zum-selberbauen-27315\\n- Mate X3 und P60 Serie: Huawei stellt vier neue Smartphones vor von Jan Johannsen: https://www.digitec.ch/de/page/mate-x3-und-p60-serie-huawei-stellt-vier-neue-smartphones-vor-26998\\n- und das Produkt Leitz Schubladenbox Plus 6 Schübe A4: https://www.digitec.ch/de/s1/producttype/dokumentenablage-1698"
-}}
-\`\`\``),
-    UserMessagePromptTemplate.fromNameAndTemplate('aerobless', 'Was steht im Artikel über den Gameboy?'),
-    AIMessagePromptTemplate.fromTemplate(`\`\`\`json
-{{
-    "action": "web-browser",
-    "action_input": "https://www.digitec.ch/de/page/anleitung-fuer-einen-lego-gameboy-zum-selberbauen-27315"
-}}
-\`\`\``),
-    HumanMessagePromptTemplate.fromTemplate(`TOOL RESPONSE: 
----------------------
-Summary: A Lego Gameboy has been created by a DIY enthusiast, Nick Lever, who has developed a model of the cult handheld console using 354 Lego pieces. The model includes four games cartridges that can be inserted with a satisfying "click" and the directional pad can be used. The instructions for building the Lego Gameboy can be obtained for a $5 donation. The model has not been endorsed by either Lego or Nintendo, so it is recommended to obtain the instructions quickly before they disappear. 
-
-Relevant Links:
-- Nick Lever's website for the Lego Gameboy: https://nicklever.com/gameboy/
-- Gumroad page to obtain the instructions: https://clicklever.gumroad.com/l/egogameboy
-
-USER'S INPUT
---------------------
-Okay, so what is the response to my original question? If using information from tools, you must say it explicitly - I have forgotten all TOOL RESPONSES! Remember to respond with a markdown code snippet of a json blob with a single action, and NOTHING else.`),
-AIMessagePromptTemplate.fromTemplate(`\`\`\`json
-{{
-    "action": "Final Answer",
-    "action_input": "Der DIY-Enthusiast Nick Lever hat ein Modell der Kult-Handheld-Konsole aus Lego erstellt. Das Modell besteht aus 354 Teilen. Es enthält vier Spiele-Kassetten, die mit einem befriedigenden „Klick“ eingesetzt werden können, und das Richtungspad kann auch genutzt werden. Die Bauanleitung für den LEGO-Gameboy gibt es gegen eine Spende von $5. Das Modell ist weder durch LEGO, noch durch Nintendo unterstützt, daher empfehle ich Ihnen, die Anleitung schnell zu holen, bevor sie verschwindet.\\n\\nRelevante Links:\\n- Nick Levers Webseite für den LEGO-Gameboy: https://nicklever.com/gameboy/\\n- Gumroad-Seite, auf der Sie die Anleitung erhalten: https://clicklever.gumroad.com/l/egogameboy"
-}}
-\`\`\``),
     UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', 'Es folgt eine andere Beispielkonversation:'),
     new MessagesPlaceholder('example'),
     UserMessagePromptTemplate.fromNameAndTemplate('netzhuffle', 'Es folgt nun die eigentliche Konversation:'),
