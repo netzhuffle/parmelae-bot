@@ -1,4 +1,4 @@
 #!/bin/sh
-sudo /usr/local/bin/mscs start zebenwusch
-echo "https://jannis.rocks/maps/zebenwusch/"
+/usr/local/bin/mscs start atm8
+echo "https://jannis.rocks/maps/atm8/"
 

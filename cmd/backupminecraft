@@ -1,3 +1,2 @@
 #!/bin/bash
-sudo /usr/local/bin/mscs backup zebenwusch && sudo /usr/local/bin/mscs map zebenwusch && echo "https://jannis.rocks/maps/zebenwusch/"
-
+/usr/local/bin/mscs backup atm8 && /usr/local/bin/mscs map atm8 && echo "https://jannis.rocks/maps/atm8/"
