@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/local/bin/mscs backup atm8 && /usr/local/bin/mscs map atm8 && echo "https://jannis.rocks/maps/atm8/"
+sudo /usr/local/bin/mscs backup atm8 && sudo /usr/local/bin/mscs map atm8 && echo "https://jannis.rocks/maps/atm8/"

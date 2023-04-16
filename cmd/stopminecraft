@@ -1,2 +1,2 @@
 #!/bin/sh
-/usr/local/bin/mscs stop atm8; /home/jannis/parmelae-bot/cmd/backupminecraft
+sudo /usr/local/bin/mscs stop atm8; /home/jannis/parmelae-bot/cmd/backupminecraft
