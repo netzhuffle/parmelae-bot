@@ -12,7 +12,7 @@ export class MinecraftBackupTool extends Tool {
   protected _call(): Promise<string> {
     return new Promise<string>((resolve) => {
       exec(
-        '/home/jannis/parmelae-bot/cmd/statusminecraft',
+        '/home/jannis/parmelae-bot/cmd/backupminecraft',
         (error, stdout, stderr) => {
           if (error) {
             resolve('Error: ' + stderr.trim());
