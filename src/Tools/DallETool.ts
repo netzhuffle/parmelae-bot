@@ -1,8 +1,8 @@
-import { Tool } from 'langchain/agents';
 import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator';
 import { DallEService } from '../DallEService';
 import { TelegramService } from '../TelegramService';
 import TelegramBot from 'node-telegram-bot-api';
+import { Tool } from 'langchain/tools';
 
 export class DallETool extends Tool {
   name = 'dall-e';

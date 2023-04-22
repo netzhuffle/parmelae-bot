@@ -1,6 +1,6 @@
-import { Tool } from 'langchain/agents';
 import { injectable } from 'inversify';
 import { Config } from '../Config';
+import { Tool } from 'langchain/tools';
 
 @injectable()
 export class GptModelQueryTool extends Tool {

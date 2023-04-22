@@ -13,12 +13,12 @@ const PROMPT = ChatPromptTemplate.fromPromptMessages([
   SystemMessagePromptTemplate.fromTemplate(
     'Generiere einen Dall-E-Prompt für wunderschöne Kunst oder Fotos basierend auf einer simplen Anfrage. Dall-E-Prompts sind englisch, übertrieben detailliert beschrieben, mit hohen Qualitätsforderungen, jedoch nah an der ursprünglichen Anfrage.',
   ),
-  HumanMessagePromptTemplate.fromTemplate('Ich male einen Hamster für Sie.'),
+  HumanMessagePromptTemplate.fromTemplate('Zeichnung eines Hamsters'),
   AIMessagePromptTemplate.fromTemplate(
     'Drawing of a hamster, high quality, professional drawing, highly detailed epic, trending on art station.',
   ),
   HumanMessagePromptTemplate.fromTemplate(
-    'Ihr Wunsch ist mir Befehl. Hier ist ein Bild des Bundeshauses in Bern. Vielen Dank für die Anfrage!',
+    'Foto des Bundeshaus in Bern',
   ),
   AIMessagePromptTemplate.fromTemplate(
     'Photo of the Swiss Federal Palace, in 4k high resolution, professional photo for magazine, 35mm camera 3.4f, hyper detailed.',

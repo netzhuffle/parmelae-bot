@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
-import { Tool } from 'langchain/agents';
 import { injectable } from 'inversify';
+import { Tool } from 'langchain/tools';
 
 @injectable()
 export class MinecraftStatusTool extends Tool {

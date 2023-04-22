@@ -32,9 +32,11 @@ export class SwissConstitutionQaToolFactory {
         ? this.chatGptModelsProvider.gpt4Strict
         : this.chatGptModelsProvider.chatGptStrict,
       vectorStore,
+      {
+        callbackManager: this.callbackManager,
+        verbose: true,
+      },
     );
-    chain.callbackManager = this.callbackManager;
-    chain.verbose = true;
 
     return new ChainTool({
       name: 'swiss-constitution-qa',

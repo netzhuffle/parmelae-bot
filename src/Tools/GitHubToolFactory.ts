@@ -38,9 +38,11 @@ export class GitHubToolFactory {
         ? this.chatGptModelsProvider.gpt4Strict
         : this.chatGptModelsProvider.chatGptStrict,
       vectorStore,
+      {
+        callbackManager: this.callbackManager,
+        verbose: true,
+      },
     );
-    chain.callbackManager = this.callbackManager;
-    chain.verbose = true;
 
     return new ChainTool({
       name: 'github-qa',

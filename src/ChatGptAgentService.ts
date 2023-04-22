@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { AgentExecutor, ChatConversationalAgent, Tool } from 'langchain/agents';
+import { AgentExecutor, ChatConversationalAgent } from 'langchain/agents';
 import { CallbackManager } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
 import { BasePromptTemplate } from 'langchain/prompts';
@@ -25,8 +25,9 @@ import { GitHubToolFactory } from './Tools/GitHubToolFactory';
 import { GptModelQueryTool } from './Tools/GptModelQueryTool';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool';
 import { Config } from './Config';
+import { Tool } from 'langchain/tools';
 
-/** ChatGPT Service */
+/** ChatGPT Agent Service */
 @injectable()
 export class ChatGptAgentService {
   private readonly tools: Tool[] = [new Calculator()];
