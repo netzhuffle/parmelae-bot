@@ -17,9 +17,7 @@ const PROMPT = ChatPromptTemplate.fromPromptMessages([
   AIMessagePromptTemplate.fromTemplate(
     'Drawing of a hamster, high quality, professional drawing, highly detailed epic, trending on art station.',
   ),
-  HumanMessagePromptTemplate.fromTemplate(
-    'Foto des Bundeshaus in Bern',
-  ),
+  HumanMessagePromptTemplate.fromTemplate('Foto des Bundeshaus in Bern'),
   AIMessagePromptTemplate.fromTemplate(
     'Photo of the Swiss Federal Palace, in 4k high resolution, professional photo for magazine, 35mm camera 3.4f, hyper detailed.',
   ),

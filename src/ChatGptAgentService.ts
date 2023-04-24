@@ -133,7 +133,7 @@ export class ChatGptAgentService {
         content: response.output,
       };
     } catch (error) {
-      if (retries < 1) {
+      if (retries < 2) {
         return this.generate(
           message,
           prompt,
