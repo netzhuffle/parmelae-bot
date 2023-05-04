@@ -45,14 +45,14 @@ export class Config {
    *
    * Can be private chats, groups, supergroups, or channels.
    */
-  public readonly chatAllowlist: readonly number[];
+  public readonly chatAllowlist: readonly bigint[];
 
   /**
    * New Git commits are announced in these chats.
    *
    * Can be private chats, groups, supergroups, or channels.
    */
-  public readonly newCommitAnnouncementChats: readonly number[];
+  public readonly newCommitAnnouncementChats: readonly bigint[];
 
   constructor() {
     dotenv.config();
@@ -103,22 +103,32 @@ export class Config {
       process.env.CHAT_ALLOWLIST,
       'You must define CHAT_ALLOWLIST in .env',
     );
-    this.chatAllowlist = process.env.CHAT_ALLOWLIST.split(',').map(Number);
-    this.chatAllowlist.forEach((chat) =>
-      assert(!isNaN(chat), 'CHAT_ALLOWLIST must contain only numbers'),
-    );
+    const chatAllowlistStrings = process.env.CHAT_ALLOWLIST.split(',');
+    this.chatAllowlist = chatAllowlistStrings.map((n) => {
+      try {
+        return BigInt(n);
+      } catch (e) {
+        assert(false, 'CHAT_ALLOWLIST must contain only numbers');
+      }
+    });
 
     assert(
       process.env.NEW_COMMITS_ANNOUNCEMENT_CHATS,
       'You must define NEW_COMMIT_ANNOUNCEMENT_CHATS in .env',
     );
-    this.newCommitAnnouncementChats =
-      process.env.NEW_COMMITS_ANNOUNCEMENT_CHATS.split(',').map(Number);
-    this.newCommitAnnouncementChats.forEach((chat) =>
-      assert(
-        !isNaN(chat),
-        'NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers',
-      ),
+    const newCommitAnnouncementChatStrings =
+      process.env.NEW_COMMITS_ANNOUNCEMENT_CHATS.split(',');
+    this.newCommitAnnouncementChats = newCommitAnnouncementChatStrings.map(
+      (chat) => {
+        try {
+          return BigInt(chat);
+        } catch (e) {
+          assert(
+            false,
+            'NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers',
+          );
+        }
+      },
     );
   }
 }

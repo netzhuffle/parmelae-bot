@@ -1,34 +1,32 @@
 import { ReplyStrategy } from '../ReplyStrategy';
-import TelegramBot from 'node-telegram-bot-api';
 import { injectable } from 'inversify';
-import assert from 'assert';
 import { TelegramService } from '../TelegramService';
 import { Sticker } from '../Sticker';
+import { Message } from '@prisma/client';
 
 /** Repeats a message that two other users wrote. */
 @injectable()
 export class MessageRepetitionReplyStrategy implements ReplyStrategy {
-  private lastMessage: TelegramBot.Message | null = null;
+  private lastMessage: Message | null = null;
 
   constructor(private telegram: TelegramService) {}
 
-  willHandle(message: TelegramBot.Message): boolean {
-    if (this.lastMessage?.from?.first_name === message.from?.first_name) {
+  willHandle(message: Message): boolean {
+    if (this.lastMessage?.fromId === message.fromId) {
       // Same author: Don’t repeat.
       this.lastMessage = message;
       return false;
     }
 
-    if (message.text && this.lastMessage?.text === message.text) {
+    if (this.lastMessage?.text === message.text) {
       // Same text: Repeat.
       this.lastMessage = null;
       return true;
     }
 
     if (
-      message.sticker &&
-      this.lastMessage?.sticker?.file_unique_id ===
-        message.sticker.file_unique_id
+      message.stickerFileId &&
+      this.lastMessage?.stickerFileId === message.stickerFileId
     ) {
       // Same sticker: Repeat.
       this.lastMessage = null;
@@ -40,15 +38,14 @@ export class MessageRepetitionReplyStrategy implements ReplyStrategy {
     return false;
   }
 
-  async handle(message: TelegramBot.Message): Promise<void> {
-    if (message.text) {
-      return this.telegram.send(message.text, message.chat);
+  async handle(message: Message): Promise<void> {
+    if (message.stickerFileId) {
+      return this.telegram.send(
+        new Sticker(message.stickerFileId),
+        message.chatId,
+      );
     }
 
-    assert(message.sticker);
-    return this.telegram.send(
-      new Sticker(message.sticker.file_id),
-      message.chat,
-    );
+    return this.telegram.send(message.text, message.chatId);
   }
 }

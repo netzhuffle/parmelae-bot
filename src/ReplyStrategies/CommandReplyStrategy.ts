@@ -1,4 +1,3 @@
-import TelegramBot from 'node-telegram-bot-api';
 import { injectable } from 'inversify';
 import assert from 'assert';
 import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy';
@@ -6,6 +5,8 @@ import { CommandService } from '../CommandService';
 import { Config } from '../Config';
 import { Command, Commands } from '../Command';
 import { TelegramService } from '../TelegramService';
+import { Message } from '@prisma/client';
+import { MessageWithReplyTo } from '../Repositories/Types';
 
 /** Regex matching the command name. */
 const COMMAND_NAME = /^\/(.*)@/;
@@ -21,13 +22,11 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
     super(config);
   }
 
-  willHandleAllowlisted(message: TelegramBot.Message): boolean {
-    return message.text !== undefined && COMMAND_NAME.test(message.text);
+  willHandleAllowlisted(message: Message): boolean {
+    return COMMAND_NAME.test(message.text);
   }
 
-  async handle(message: TelegramBot.Message): Promise<void> {
-    assert(message.text !== undefined);
-
+  async handle(message: MessageWithReplyTo): Promise<void> {
     const commandMatches = message.text.match(COMMAND_NAME);
     assert(commandMatches && commandMatches.length >= 2);
     const command = this.getCommand(commandMatches[1]);

@@ -1,17 +1,22 @@
-import { Message, Prisma, PrismaClient } from '@prisma/client';
-import assert from 'assert';
-import TelegramBot from 'node-telegram-bot-api';
+import {
+  Chat,
+  Message as SimpleMessage,
+  Prisma,
+  PrismaClient,
+  User,
+} from '@prisma/client';
 import { injectable } from 'inversify';
-import { MessageWithUser, MessageWithUserAndReplyToMessage } from './Types';
+import {
+  MessageWithRelations,
+  MessageWithUser,
+  MessageWithUserAndReplyTo,
+} from './Types';
 
 /** Number of milliseconds in a day */
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 
 /** Number of milliseconds in 7 days */
 const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
-
-/** An experiment adds a debug part at the end of the message in the form of “(₇₅₄₁₀₃₆₂)” that needs to be removed. */
-const DEBUG_REGEX = /₍[₀₁₂₃₄₅₆₇₈₉₊₋₌ₐₑₒₓₔ]+₎$/;
 
 /** Repository for messages */
 @injectable()
@@ -23,9 +28,7 @@ export class MessageRepository {
    *
    * The message must be in the database.
    */
-  async get(
-    message: Message | TelegramBot.Message,
-  ): Promise<MessageWithUserAndReplyToMessage> {
+  async get(message: SimpleMessage): Promise<MessageWithUserAndReplyTo> {
     return this.prisma.message.findUniqueOrThrow({
       where: {
         id: this.getMessageId(message),
@@ -38,11 +41,7 @@ export class MessageRepository {
   }
 
   /** Stores a message and its author. */
-  async store(message: TelegramBot.Message): Promise<void> {
-    // Only store messages from a user that contain text.
-    assert(message.from);
-    assert(message.text);
-
+  async store(message: MessageWithRelations): Promise<void> {
     const databaseMessage = await this.prisma.message.findUnique({
       where: {
         id: this.getMessageId(message),
@@ -53,18 +52,17 @@ export class MessageRepository {
       return;
     }
 
-    const replyToMessage = message.reply_to_message
-      ? await this.connectReplyToMessage(message.reply_to_message)
-      : null;
+    const replyToMessage = await this.connectReplyToMessage(message);
     await this.prisma.message.create({
       data: {
-        messageId: message.message_id,
+        messageId: message.messageId,
         chat: this.connectChat(message.chat),
-        sentAt: this.getDate(message.date),
-        editedAt: this.getOptionalDate(message.edit_date),
-        text: this.stripDebugFromText(message.text),
+        sentAt: message.sentAt,
+        editedAt: message.editedAt,
+        text: message.text,
         replyToMessage: replyToMessage ?? undefined,
         from: this.connectUser(message.from),
+        newChatMembers: this.connectNewChatMembers(message),
       },
     });
   }
@@ -73,7 +71,7 @@ export class MessageRepository {
   async getLastChatMessage(
     chatId: bigint | number,
     beforeMessageId: number,
-  ): Promise<MessageWithUserAndReplyToMessage | null> {
+  ): Promise<MessageWithUserAndReplyTo | null> {
     // Assumes that messageIds in the same chat are always increasing.
     return this.prisma.message.findFirst({
       where: {
@@ -116,29 +114,16 @@ export class MessageRepository {
   }
 
   private getMessageId(
-    message: Message | TelegramBot.Message,
+    message: SimpleMessage,
   ): Prisma.MessageIdCompoundUniqueInput {
-    if (this.isTelegramMessage(message)) {
-      return {
-        messageId: message.message_id,
-        chatId: message.chat.id,
-      };
-    }
-
     return {
       messageId: message.messageId,
       chatId: message.chatId,
     };
   }
 
-  private isTelegramMessage(
-    message: Message | TelegramBot.Message,
-  ): message is TelegramBot.Message {
-    return (message as TelegramBot.Message).message_id !== undefined;
-  }
-
   private connectChat(
-    chat: TelegramBot.Chat,
+    chat: Chat,
   ): Prisma.ChatCreateNestedOneWithoutMessagesInput {
     return {
       connectOrCreate: {
@@ -146,19 +131,14 @@ export class MessageRepository {
           id: chat.id,
         },
         create: {
-          id: chat.id,
-          type: chat.type,
-          title: chat.title,
-          username: chat.username,
-          firstName: chat.first_name,
-          lastName: chat.last_name,
+          ...chat,
         },
       },
     };
   }
 
   private connectUser(
-    user: TelegramBot.User,
+    user: User,
   ): Prisma.UserCreateNestedOneWithoutMessagesInput {
     return {
       connectOrCreate: {
@@ -166,19 +146,41 @@ export class MessageRepository {
           id: user.id,
         },
         create: {
-          id: user.id,
-          isBot: user.is_bot,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          username: user.username,
-          languageCode: user.language_code,
+          ...user,
         },
       },
     };
   }
 
+  private connectNewChatMembers(
+    message: MessageWithRelations,
+  ):
+    | Prisma.ChatEntryMessagesUsersCreateNestedManyWithoutMessageInput
+    | undefined {
+    if (!message.newChatMembers?.length) {
+      return undefined;
+    }
+
+    return {
+      connectOrCreate: message.newChatMembers.map((chatEntryMessageUser) => ({
+        where: {
+          id: {
+            messageId: chatEntryMessageUser.messageId,
+            chatId: chatEntryMessageUser.chatId,
+            userId: chatEntryMessageUser.userId,
+          },
+        },
+        create: {
+          messageId: chatEntryMessageUser.messageId,
+          chatId: chatEntryMessageUser.chatId,
+          user: this.connectUser(chatEntryMessageUser.user),
+        },
+      })),
+    };
+  }
+
   private async connectReplyToMessage(
-    message: TelegramBot.Message,
+    message: SimpleMessage,
   ): Promise<Prisma.MessageCreateNestedOneWithoutRepliesInput | null> {
     // Querying to make sure the message replied to exists in the database.
     const replyToMessage = await this.prisma.message.findUnique({
@@ -193,24 +195,8 @@ export class MessageRepository {
 
     return {
       connect: {
-        id: {
-          messageId: replyToMessage.messageId,
-          chatId: replyToMessage.chatId,
-        },
+        id: this.getMessageId(replyToMessage),
       },
     };
-  }
-
-  private getDate(unixTimestamp: number): Date {
-    return new Date(unixTimestamp * 1000);
-  }
-
-  private getOptionalDate(unixTimestamp?: number): Date | null {
-    return unixTimestamp ? this.getDate(unixTimestamp) : null;
-  }
-
-  /** An experiment adds a debug part at the end of the message in the form of “(₇₅₄₁₀₃₆₂)” that needs to be removed. */
-  private stripDebugFromText(text: string): string {
-    return text.replace(DEBUG_REGEX, '');
   }
 }

@@ -1,10 +1,9 @@
-import assert from 'assert';
-import TelegramBot from 'node-telegram-bot-api';
 import { injectable } from 'inversify';
 import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy';
 import { Config } from '../Config';
 import { TelegramService } from '../TelegramService';
 import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator';
+import { Message } from '@prisma/client';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;
@@ -20,15 +19,11 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
     super(config);
   }
 
-  willHandleAllowlisted(message: TelegramBot.Message): boolean {
-    return (
-      message.text !== undefined && Math.random() < RANDOM_REPLY_PROBABILITY
-    );
+  willHandleAllowlisted(): boolean {
+    return Math.random() < RANDOM_REPLY_PROBABILITY;
   }
 
-  async handle(message: TelegramBot.Message): Promise<void> {
-    assert(message.text !== undefined);
-
+  async handle(message: Message): Promise<void> {
     const reply = await this.replyGenerator.generate(message);
     return this.telegram.reply(reply, message);
   }

@@ -1,8 +1,8 @@
 import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator';
 import { DallEService } from '../DallEService';
 import { TelegramService } from '../TelegramService';
-import TelegramBot from 'node-telegram-bot-api';
 import { Tool } from 'langchain/tools';
+import { Message } from '@prisma/client';
 
 export class DallETool extends Tool {
   name = 'dall-e';
@@ -14,7 +14,7 @@ Input should be a brief image description, make sure to say if it should be a dr
     private readonly dallEPromptGenerator: DallEPromptGenerator,
     private readonly dallE: DallEService,
     private readonly telegram: TelegramService,
-    private readonly message: TelegramBot.Message,
+    private readonly message: Message,
   ) {
     super();
   }

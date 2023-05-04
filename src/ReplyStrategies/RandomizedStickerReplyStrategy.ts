@@ -1,8 +1,8 @@
 import { ReplyStrategy } from '../ReplyStrategy';
-import TelegramBot from 'node-telegram-bot-api';
 import { injectable } from 'inversify';
 import { Sticker } from '../Sticker';
 import { TelegramService } from '../TelegramService';
+import { Message } from '@prisma/client';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.00035;
@@ -34,13 +34,11 @@ const STICKERS = [
 export class RandomizedStickerReplyStrategy implements ReplyStrategy {
   constructor(private readonly telegram: TelegramService) {}
 
-  willHandle(message: TelegramBot.Message): boolean {
-    return (
-      message.from !== undefined && Math.random() < RANDOM_REPLY_PROBABILITY
-    );
+  willHandle(): boolean {
+    return Math.random() < RANDOM_REPLY_PROBABILITY;
   }
 
-  handle(message: TelegramBot.Message): Promise<void> {
+  handle(message: Message): Promise<void> {
     const sticker = STICKERS[Math.floor(Math.random() * STICKERS.length)];
     return this.telegram.reply(sticker, message);
   }

@@ -1,9 +1,9 @@
 import { ReplyStrategy } from '../ReplyStrategy';
-import TelegramBot from 'node-telegram-bot-api';
 import { injectable } from 'inversify';
 import assert from 'assert';
 import { Sticker } from '../Sticker';
 import { TelegramService } from '../TelegramService';
+import { MessageWithRelations } from '../Repositories/Types';
 
 /** Possible messages. %u will be replaced with the user’s first name. */
 const MESSAGES = [
@@ -33,26 +33,27 @@ const MESSAGES = [
   ),
 ];
 
+const USER_REPLACEMENT_REG_EXP = /%u/g;
+
 /** Welcomes new chat members. */
 @injectable()
 export class NewMembersReplyStrategy implements ReplyStrategy {
   constructor(private readonly telegram: TelegramService) {}
 
-  willHandle(message: TelegramBot.Message): boolean {
-    if (message.new_chat_members === undefined) {
-      return false;
-    }
-
-    return message.new_chat_members.length >= 1;
+  willHandle(message: MessageWithRelations): boolean {
+    return message.newChatMembers.length >= 1;
   }
 
-  async handle(message: TelegramBot.Message): Promise<void> {
-    assert(message.new_chat_members);
+  async handle(message: MessageWithRelations): Promise<void> {
+    assert(message.newChatMembers.length);
 
-    const promises = message.new_chat_members.map((user) => {
+    const promises = message.newChatMembers.map((chatEntryMessageUser) => {
       let randomMessage = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
       if (this.isString(randomMessage)) {
-        randomMessage = randomMessage.replace(/%u/, user.first_name);
+        randomMessage = randomMessage.replace(
+          USER_REPLACEMENT_REG_EXP,
+          chatEntryMessageUser.user.firstName,
+        );
       }
       return this.telegram.reply(randomMessage, message);
     });

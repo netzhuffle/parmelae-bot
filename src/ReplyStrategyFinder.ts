@@ -1,4 +1,3 @@
-import TelegramBot from 'node-telegram-bot-api';
 import { NullReplyStrategy } from './ReplyStrategies/NullReplyStrategy';
 import { ReplyStrategy } from './ReplyStrategy';
 import assert from 'assert';
@@ -12,6 +11,7 @@ import { NicknameReplyStrategy } from './ReplyStrategies/NicknameReplyStrategy';
 import { RandomizedGeneratedReplyStrategy } from './ReplyStrategies/RandomizedGeneratedReplyStrategy';
 import { RandomizedStickerReplyStrategy } from './ReplyStrategies/RandomizedStickerReplyStrategy';
 import { CommentReplyStrategy } from './ReplyStrategies/CommentReplyStrategy';
+import { MessageWithRelations } from './Repositories/Types';
 
 /** Finds the ReplyStrategy to handle a given message. */
 @injectable()
@@ -69,7 +69,7 @@ export class ReplyStrategyFinder {
    *
    * Will try every strategy in order until one likes to handle it.
    */
-  getHandlingStrategy(message: TelegramBot.Message): ReplyStrategy {
+  getHandlingStrategy(message: MessageWithRelations): ReplyStrategy {
     for (const strategy of this.strategies) {
       if (strategy.willHandle(message)) {
         return strategy;

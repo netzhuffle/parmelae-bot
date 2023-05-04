@@ -1,27 +1,26 @@
 import TelegramBot from 'node-telegram-bot-api';
 import assert from 'assert';
 import { injectable } from 'inversify';
-import { ReplyStrategyFinder } from './ReplyStrategyFinder';
 import { Config } from './Config';
 import { MessageStorageService } from './MessageStorageService';
 import { GitHubService } from './GitHubService';
 import { OldMessageReplyService } from './OldMessageReplyService';
+import { MessageService } from './MessageService';
+import { ReplyStrategyFinder } from './ReplyStrategyFinder';
 
 /**
  * The most helpful bot in the world
  */
 @injectable()
 export class Bot {
-  /** The last sent message */
-  private lastMessage: TelegramBot.Message | null = null;
-
   constructor(
-    private readonly replyStrategyFinder: ReplyStrategyFinder,
     private readonly telegram: TelegramBot,
     private readonly config: Config,
-    private readonly messageStorageService: MessageStorageService,
-    private readonly gitHubService: GitHubService,
+    private readonly messageStorage: MessageStorageService,
+    private readonly gitHub: GitHubService,
     private readonly oldMessageReplyService: OldMessageReplyService,
+    private readonly newMessageService: MessageService,
+    private readonly replyStrategyFinder: ReplyStrategyFinder,
   ) {}
 
   /**
@@ -40,19 +39,24 @@ export class Bot {
         assert(me.username === this.config.username);
       })
       .catch((e) => console.error('Could not fetch bot username', e));
-    this.messageStorageService.startDailyDeletion(this.oldMessageReplyService);
-    this.gitHubService
+    this.messageStorage.startDailyDeletion(this.oldMessageReplyService);
+    this.gitHub
       .announceNewCommits()
       .catch((e) => console.error('Could not announce new commits', e));
   }
 
   /**
-   * Handles new messages and replies if necessary
+   * Handles new messages and replies if necessary.
    *
-   * @param message - The message to reply to
+   * @param telegramMessage - The message to reply to
    */
-  async handleMessage(message: TelegramBot.Message): Promise<void> {
-    await this.messageStorageService.store(message);
+  async handleMessage(telegramMessage: TelegramBot.Message): Promise<void> {
+    const message = await this.newMessageService.storeIncoming(telegramMessage);
+    if (!message) {
+      console.log('Unknown message type, cannot handle.');
+      return;
+    }
+
     const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
     return replyStrategy.handle(message);
   }

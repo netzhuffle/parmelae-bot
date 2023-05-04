@@ -1,5 +1,3 @@
-import assert from 'assert';
-import TelegramBot from 'node-telegram-bot-api';
 import { MessageHistoryService } from '../MessageHistoryService';
 import { Config } from '../Config';
 import { ChatGptService, UserMessagePromptTemplate } from '../ChatGptService';
@@ -13,6 +11,7 @@ import {
 import { AIChatMessage, BaseChatMessage } from 'langchain/schema';
 import { injectable } from 'inversify';
 import { ChatGptAgentService } from '../ChatGptAgentService';
+import { Message } from '@prisma/client';
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
@@ -441,8 +440,7 @@ export class ReplyGenerator {
    * @param message - The message to reply to
    * @return The reply text
    */
-  async generate(message: TelegramBot.Message): Promise<string> {
-    assert(message.text && message.from);
+  async generate(message: Message): Promise<string> {
     if (message.text.length >= ChatGptService.MAX_INPUT_TEXT_LENGTH) {
       return 'Entschuldigen Sie bitte, aber der Text ist zu lang. GPT kostet Geld nach Textlänge und @netzhuffle ist kein Millionär …';
     }
@@ -461,9 +459,7 @@ export class ReplyGenerator {
     return completion.content;
   }
 
-  private async getConversation(
-    message: TelegramBot.Message,
-  ): Promise<BaseChatMessage[]> {
+  private async getConversation(message: Message): Promise<BaseChatMessage[]> {
     const historyMessages = await this.messageHistory.getHistory(message);
     return historyMessages
       .filter(

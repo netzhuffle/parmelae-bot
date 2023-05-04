@@ -1,10 +1,10 @@
-import TelegramBot from 'node-telegram-bot-api';
 import { injectable } from 'inversify';
 import { MessageRepository } from './Repositories/MessageRepository';
 import {
   MessageWithUser,
-  MessageWithUserAndReplyToMessage,
+  MessageWithUserAndReplyTo,
 } from './Repositories/Types';
+import { Message } from '@prisma/client';
 
 /** Finds the conversation history. */
 @injectable()
@@ -19,14 +19,14 @@ export class MessageHistoryService {
    * @param toMessage - The message to find history to. Must be stored in the database.
    * @return History, from oldest to newest, including the message requested the history for.
    */
-  async getHistory(toMessage: TelegramBot.Message): Promise<MessageWithUser[]> {
+  async getHistory(toMessage: Message): Promise<MessageWithUser[]> {
     const message = await this.messageRepository.get(toMessage);
     return this.getHistoryForMessages([message]);
   }
 
   /** Recursively fetches older messages until 10 messages are found or there are no more old messages. */
   private async getHistoryForMessages(
-    messages: MessageWithUserAndReplyToMessage[],
+    messages: MessageWithUserAndReplyTo[],
   ): Promise<MessageWithUser[]> {
     if (messages.length >= 10) {
       return messages;

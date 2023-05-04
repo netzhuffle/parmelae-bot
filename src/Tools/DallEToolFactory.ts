@@ -1,4 +1,4 @@
-import TelegramBot from 'node-telegram-bot-api';
+import { Message } from '@prisma/client';
 import { DallEService } from '../DallEService';
 import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator';
 import { TelegramService } from '../TelegramService';
@@ -18,7 +18,7 @@ export class DallEToolFactory {
    *
    * @param forMessage - The message the DALL-E tool should reply to
    */
-  create(forMessage: TelegramBot.Message): DallETool {
+  create(forMessage: Message): DallETool {
     return new DallETool(
       this.dallEPromptGenerator,
       this.dallE,

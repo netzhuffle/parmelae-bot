@@ -31,3 +31,4 @@ tasks:
 vscode:
   extensions:
     - dbaeumer.vscode-eslint
+    - Prisma.prisma

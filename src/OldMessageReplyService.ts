@@ -1,5 +1,4 @@
 import { Message } from '@prisma/client';
-import assert from 'assert';
 import { Config } from './Config';
 import { TelegramService } from './TelegramService';
 import { MessageWithUser } from './Repositories/Types';
@@ -51,15 +50,8 @@ export class OldMessageReplyService {
   }
 
   private async replyToMessage(message: Message) {
-    assert(message.text);
-
     const reply = await this.oldMessageReplyGenerator.generate(message.text);
-    await this.telegramService.reply(reply, {
-      message_id: message.messageId,
-      chat: {
-        id: Number(message.chatId),
-      },
-    });
+    await this.telegramService.reply(reply, message);
   }
 
   private mayReplyToOldMessage(message: MessageWithUser): boolean {
@@ -68,7 +60,7 @@ export class OldMessageReplyService {
       return false;
     }
 
-    if (!this.config.chatAllowlist.includes(Number(message.chatId))) {
+    if (!this.config.chatAllowlist.includes(message.chatId)) {
       // Restrict to messages in allowlisted chats.
       return false;
     }

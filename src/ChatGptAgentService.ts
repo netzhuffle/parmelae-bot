@@ -6,7 +6,6 @@ import { BasePromptTemplate } from 'langchain/prompts';
 import { BaseChatMessage } from 'langchain/schema';
 import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
 import { Calculator } from 'langchain/tools/calculator';
-import TelegramBot from 'node-telegram-bot-api';
 import { injectable } from 'inversify';
 import { GptModelsProvider } from './GptModelsProvider';
 import {
@@ -26,6 +25,7 @@ import { GptModelQueryTool } from './Tools/GptModelQueryTool';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool';
 import { Config } from './Config';
 import { Tool } from 'langchain/tools';
+import { Message } from '@prisma/client';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -83,14 +83,12 @@ export class ChatGptAgentService {
    * @param prompt - Prompt Template with the following placeholders: {tools}, {tool_names}, MessagesPlaceholder('example'), MessagesPlaceholder('conversation'), MessagesPlaceholder('agent_scratchpad')
    */
   async generate(
-    message: TelegramBot.Message,
+    message: Message,
     prompt: BasePromptTemplate,
     example: BaseChatMessage[],
     conversation: BaseChatMessage[],
     retries = 0,
   ): Promise<ChatGptMessage> {
-    assert(message.from);
-
     const tools = [...this.tools, this.dallEToolFactory.create(message)];
     ChatConversationalAgent.validateTools(this.tools);
     const toolStrings = tools

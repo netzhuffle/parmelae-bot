@@ -1,18 +1,18 @@
-import assert from 'assert';
-import TelegramBot from 'node-telegram-bot-api';
 import { injectable } from 'inversify';
 import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy';
 import { CommandService } from '../CommandService';
 import { Config } from '../Config';
 import { Commands } from '../Command';
 import { TelegramService } from '../TelegramService';
+import { MessageWithReplyTo } from '../Repositories/Types';
+import { Message } from '@prisma/client';
 
 /**
  * Comments a message (/comment command) when somebody replies with (just) the bot’s name.
  */
 @injectable()
 export class CommentReplyStrategy extends AllowlistedReplyStrategy {
-  private readonly onlyUsernameRegex: RegExp;
+  private readonly onlyUsernameRegExp: RegExp;
 
   constructor(
     private readonly command: CommandService,
@@ -20,21 +20,17 @@ export class CommentReplyStrategy extends AllowlistedReplyStrategy {
     private readonly telegram: TelegramService,
   ) {
     super(config);
-    this.onlyUsernameRegex = new RegExp(
-      `^@\w*${this.config.username}\w*$`,
+    this.onlyUsernameRegExp = new RegExp(
+      `^\\w*@${this.config.username}\\w*$`,
       'is',
     );
   }
 
-  willHandleAllowlisted(message: TelegramBot.Message): boolean {
-    return (
-      message.text !== undefined && this.onlyUsernameRegex.test(message.text)
-    );
+  willHandleAllowlisted(message: Message): boolean {
+    return this.onlyUsernameRegExp.test(message.text);
   }
 
-  async handle(message: TelegramBot.Message): Promise<void> {
-    assert(message.text !== undefined);
-
+  async handle(message: MessageWithReplyTo): Promise<void> {
     const reply = await this.command.execute(Commands.Comment, message);
     return this.telegram.reply(reply, message);
   }

@@ -7,27 +7,63 @@
 
 import { Prisma } from '@prisma/client';
 
-/** Validator for Message including the User relation. */
-const messageWithUser = Prisma.validator<Prisma.MessageArgs>()({
+/** Type value for a message including relations. */
+const MESSAGE_WITH_RELATIONS = Prisma.validator<Prisma.MessageArgs>()({
+  include: {
+    chat: true,
+    from: true,
+    replyToMessage: {
+      include: {
+        from: true,
+      },
+    },
+    newChatMembers: {
+      include: {
+        user: true,
+      },
+    },
+  },
+});
+
+/** Message including relations. */
+export type MessageWithRelations = Prisma.MessageGetPayload<
+  typeof MESSAGE_WITH_RELATIONS
+>;
+
+/** Type value for a message including the user relation. */
+const MESSAGE_WITH_USER_RELATION = Prisma.validator<Prisma.MessageArgs>()({
   include: {
     from: true,
   },
 });
 
-/** Message including the User relation. */
-export type MessageWithUser = Prisma.MessageGetPayload<typeof messageWithUser>;
+/** Message including the user relation. */
+export type MessageWithUser = Prisma.MessageGetPayload<
+  typeof MESSAGE_WITH_USER_RELATION
+>;
 
-/** Validator for Message including the User and ReplyToMessage relations. */
-const messageWithUserAndReplyToMessage = Prisma.validator<Prisma.MessageArgs>()(
-  {
+/** Type value for a message including the reply-to relation. */
+const MESSAGE_WITH_REPLY_TO_RELATION = Prisma.validator<Prisma.MessageArgs>()({
+  include: {
+    replyToMessage: true,
+  },
+});
+
+/** Message including the reply-to relation. */
+export type MessageWithReplyTo = Prisma.MessageGetPayload<
+  typeof MESSAGE_WITH_REPLY_TO_RELATION
+>;
+
+/** Type value for a message including the user and reply-to relations. */
+const MESSAGE_WITH_USER_AND_REPLY_TO_RELATIONS =
+  Prisma.validator<Prisma.MessageArgs>()({
     include: {
       from: true,
       replyToMessage: true,
     },
-  },
-);
+  });
 
-/** Message including the User and ReplyToMessage relations. */
-export type MessageWithUserAndReplyToMessage = Prisma.MessageGetPayload<
-  typeof messageWithUserAndReplyToMessage
+/** Message including the user and reply-to relations. */
+export type MessageWithUserAndReplyTo = Prisma.MessageGetPayload<
+  typeof MESSAGE_WITH_USER_AND_REPLY_TO_RELATIONS
 >;
