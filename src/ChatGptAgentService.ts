@@ -26,6 +26,7 @@ import { GptModelSetterTool } from './Tools/GptModelSetterTool';
 import { Config } from './Config';
 import { Tool } from 'langchain/tools';
 import { Message } from '@prisma/client';
+import { DiceToolFactory } from './Tools/DiceToolFactory';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -37,29 +38,36 @@ export class ChatGptAgentService {
     private readonly config: Config,
     private readonly callbackManager: CallbackManager,
     private readonly dallEToolFactory: DallEToolFactory,
+    private readonly diceToolFactory: DiceToolFactory,
+    gitHubToolFactory: GitHubToolFactory,
+    googleSearchToolFactory: GoogleSearchToolFactory,
+    gptModelQueryTool: GptModelQueryTool,
+    gptModelSetterTool: GptModelSetterTool,
     minecraftStatusTool: MinecraftStatusTool,
     minecraftStartTool: MinecraftStartTool,
     minecraftStopTool: MinecraftStopTool,
     minecraftBackupTool: MinecraftBackupTool,
     swissConstitutionQaToolFactory: SwissConstitutionQaToolFactory,
     webBrowserToolFactory: WebBrowserToolFactory,
-    googleSearchToolFactory: GoogleSearchToolFactory,
-    gitHubToolFactory: GitHubToolFactory,
-    gptModelQueryTool: GptModelQueryTool,
-    gptModelSetterTool: GptModelSetterTool,
   ) {
     this.tools = [
       ...this.tools,
+      googleSearchToolFactory.create(),
+      gptModelQueryTool,
+      gptModelSetterTool,
       minecraftStatusTool,
       minecraftStartTool,
       minecraftStopTool,
       minecraftBackupTool,
       webBrowserToolFactory.create(),
-      googleSearchToolFactory.create(),
-      gptModelQueryTool,
-      gptModelSetterTool,
     ];
     const tools = this.tools;
+    gitHubToolFactory
+      .create()
+      .then((tool) => tools.push(tool))
+      .catch((e) =>
+        console.error('Could not create github-qa tool, continuing without', e),
+      );
     swissConstitutionQaToolFactory
       .create()
       .then((tool) => tools.push(tool))
@@ -68,12 +76,6 @@ export class ChatGptAgentService {
           'Could not create swiss-constitution-qa tool, continuing without',
           e,
         ),
-      );
-    gitHubToolFactory
-      .create()
-      .then((tool) => tools.push(tool))
-      .catch((e) =>
-        console.error('Could not create github-qa tool, continuing without', e),
       );
   }
 
@@ -89,7 +91,11 @@ export class ChatGptAgentService {
     conversation: BaseChatMessage[],
     retries = 0,
   ): Promise<ChatGptMessage> {
-    const tools = [...this.tools, this.dallEToolFactory.create(message)];
+    const tools = [
+      ...this.tools,
+      this.dallEToolFactory.create(message),
+      this.diceToolFactory.create(message.chatId),
+    ];
     ChatConversationalAgent.validateTools(this.tools);
     const toolStrings = tools
       .map((tool) => `${tool.name}: ${tool.description}`)

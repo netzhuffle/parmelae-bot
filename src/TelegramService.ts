@@ -3,8 +3,9 @@ import { injectable } from 'inversify';
 import { Sticker } from './Sticker';
 import { Message } from '@prisma/client';
 import { MessageService } from './MessageService';
+import { assert } from 'console';
 
-/** Service to interact with Telegram */
+/** Service to interact with Telegram. */
 @injectable()
 export class TelegramService {
   constructor(
@@ -13,10 +14,10 @@ export class TelegramService {
   ) {}
 
   /**
-   * Send a message or sticker
+   * Send a message or sticker.
    *
-   * @param message - The text or Sticker to send
-   * @param chat - The chat to send in
+   * @param message - The text or Sticker to send.
+   * @param chat - The chat to send in.
    */
   async send(message: string | Sticker, chatId: bigint): Promise<void> {
     if (message instanceof Sticker) {
@@ -31,10 +32,25 @@ export class TelegramService {
   }
 
   /**
-   * Replies to a message
+   * Sends an animated emoji landing on a random value.
    *
-   * @param reply - The text or Sticker to send
-   * @param message - The message to reply to
+   * @param emoji - The animation to base on. Must be one of “🎲”, “🎯”, “🏀”, “⚽”, “🎳”, or “🎰”.
+   * @param chatId - The chat to send in.
+   *
+   * @return The sent message.
+   */
+  async sendDice(emoji: string, chatId: bigint): Promise<TelegramBot.Message> {
+    assert(['🎲', '🎯', '🏀', '⚽', '🎳', '🎰'].includes(emoji));
+    return this.telegram.sendDice(Number(chatId), {
+      emoji,
+    });
+  }
+
+  /**
+   * Replies to a message.
+   *
+   * @param reply - The text or Sticker to send.
+   * @param message - The message to reply to.
    */
   async reply(reply: string | Sticker, message: Message): Promise<void> {
     if (reply instanceof Sticker) {
@@ -52,11 +68,11 @@ export class TelegramService {
   }
 
   /**
-   * Replies an image to a message
+   * Replies an image to a message.
    *
-   * @param url - The image URL
-   * @param caption - The image caption
-   * @param message - The message to reply to
+   * @param url - The image URL.
+   * @param caption - The image caption.
+   * @param message - The message to reply to.
    */
   async replyWithImage(
     url: string,

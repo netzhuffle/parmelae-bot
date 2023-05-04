@@ -167,7 +167,17 @@ export class MessageService {
 
     if (message.dice) {
       const dice = message.dice;
-      return `[${dice.emoji}: ${dice.value}]`;
+      const emoji = dice.emoji;
+      if (emoji === '🎲') {
+        return `[🎲 gewürfelt: ${dice.value}]`;
+      }
+      if (emoji === '🎰') {
+        return dice.value !== 64
+          ? '[Spiel 🎰: verloren (keine 777)]'
+          : '[Spiel 🎰: gewonnen! (777)]';
+      }
+      const max = ['🎯', '🎳'].includes(emoji) ? 6 : 5;
+      return `[Spiel ${emoji}: ${dice.value} von max. ${max} Punkten erzielt]`;
     }
 
     if (message.document) {
