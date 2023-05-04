@@ -42,7 +42,7 @@ Nutzen Sie dies, wenn Sie die finale Antwort im Telegram-Chat schreiben möchten
 \`\`\`json
 {{
     "action": "Final Answer",
-    "action_input": string (Hier sollten Sie Ihre Nachricht schreiben)
+    "action_input": string (Hier sollten Sie Ihre Nachricht schreiben – achten Sie auf einen gültigen JSON-String, z. B. mittels \\\\n statt \\n)
 }}
 \`\`\`
 `),
