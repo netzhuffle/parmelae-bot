@@ -27,6 +27,7 @@ import { Config } from './Config';
 import { Tool } from 'langchain/tools';
 import { Message } from '@prisma/client';
 import { DiceToolFactory } from './Tools/DiceToolFactory';
+import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -39,6 +40,7 @@ export class ChatGptAgentService {
     private readonly callbackManager: CallbackManager,
     private readonly dallEToolFactory: DallEToolFactory,
     private readonly diceToolFactory: DiceToolFactory,
+    private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     gptModelQueryTool: GptModelQueryTool,
@@ -95,6 +97,7 @@ export class ChatGptAgentService {
       ...this.tools,
       this.dallEToolFactory.create(message),
       this.diceToolFactory.create(message.chatId),
+      this.intermediateAnswerToolFactory.create(message),
     ];
     ChatConversationalAgent.validateTools(this.tools);
     const toolStrings = tools

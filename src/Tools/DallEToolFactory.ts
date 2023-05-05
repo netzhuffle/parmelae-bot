@@ -16,7 +16,7 @@ export class DallEToolFactory {
   /**
    * Creates the DALL-E tool.
    *
-   * @param forMessage - The message the DALL-E tool should reply to
+   * @param forMessage - The message the DALL-E tool should reply to.
    */
   create(forMessage: Message): DallETool {
     return new DallETool(
