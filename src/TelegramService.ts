@@ -20,15 +20,16 @@ export class TelegramService {
    * @param chat - The chat to send in.
    */
   async send(message: string | Sticker, chatId: bigint): Promise<void> {
+    let sentMessage: TelegramBot.Message;
     if (message instanceof Sticker) {
-      await this.telegram.sendSticker(Number(chatId), message.fileId);
-    } else {
-      const sentMessage = await this.telegram.sendMessage(
+      sentMessage = await this.telegram.sendSticker(
         Number(chatId),
-        message,
+        message.fileId,
       );
-      await this.messageService.storeSent(sentMessage);
+    } else {
+      sentMessage = await this.telegram.sendMessage(Number(chatId), message);
     }
+    await this.messageService.storeSent(sentMessage);
   }
 
   /**
@@ -41,9 +42,11 @@ export class TelegramService {
    */
   async sendDice(emoji: string, chatId: bigint): Promise<TelegramBot.Message> {
     assert(['🎲', '🎯', '🏀', '⚽', '🎳', '🎰'].includes(emoji));
-    return this.telegram.sendDice(Number(chatId), {
+    const sentMessage = await this.telegram.sendDice(Number(chatId), {
       emoji,
     });
+    await this.messageService.storeSent(sentMessage);
+    return sentMessage;
   }
 
   /**
@@ -53,18 +56,23 @@ export class TelegramService {
    * @param message - The message to reply to.
    */
   async reply(reply: string | Sticker, message: Message): Promise<void> {
+    let sentMessage: TelegramBot.Message;
     if (reply instanceof Sticker) {
-      await this.telegram.sendSticker(Number(message.chatId), reply.fileId, {
-        reply_to_message_id: message.messageId,
-      });
+      sentMessage = await this.telegram.sendSticker(
+        Number(message.chatId),
+        reply.fileId,
+        {
+          reply_to_message_id: message.messageId,
+        },
+      );
     } else {
-      const sentMessage = await this.telegram.sendMessage(
+      sentMessage = await this.telegram.sendMessage(
         Number(message.chatId),
         reply,
         { reply_to_message_id: message.messageId },
       );
-      await this.messageService.storeSent(sentMessage);
     }
+    await this.messageService.storeSent(sentMessage);
   }
 
   /**
@@ -77,11 +85,11 @@ export class TelegramService {
   async replyWithImage(
     url: string,
     caption: string,
-    message: Message,
+    chatId: bigint,
   ): Promise<void> {
-    await this.telegram.sendPhoto(Number(message.chatId), url, {
+    const sentMessage = await this.telegram.sendPhoto(Number(chatId), url, {
       caption: caption,
-      reply_to_message_id: message.messageId,
     });
+    await this.messageService.storeSent(sentMessage);
   }
 }

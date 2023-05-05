@@ -1,10 +1,4 @@
-import {
-  Chat,
-  Message as SimpleMessage,
-  Prisma,
-  PrismaClient,
-  User,
-} from '@prisma/client';
+import { Chat, Message, Prisma, PrismaClient, User } from '@prisma/client';
 import { injectable } from 'inversify';
 import {
   MessageWithRelations,
@@ -28,7 +22,7 @@ export class MessageRepository {
    *
    * The message must be in the database.
    */
-  async get(message: SimpleMessage): Promise<MessageWithUserAndReplyTo> {
+  async get(message: Message): Promise<MessageWithUserAndReplyTo> {
     return this.prisma.message.findUniqueOrThrow({
       where: {
         id: this.getMessageId(message),
@@ -52,7 +46,9 @@ export class MessageRepository {
       return;
     }
 
-    const replyToMessage = await this.connectReplyToMessage(message);
+    const replyToMessage = message.replyToMessage
+      ? await this.connectReplyToMessage(message.replyToMessage)
+      : undefined;
     await this.prisma.message.create({
       data: {
         messageId: message.messageId,
@@ -60,7 +56,7 @@ export class MessageRepository {
         sentAt: message.sentAt,
         editedAt: message.editedAt,
         text: message.text,
-        replyToMessage: replyToMessage ?? undefined,
+        replyToMessage: replyToMessage,
         from: this.connectUser(message.from),
         newChatMembers: this.connectNewChatMembers(message),
       },
@@ -113,9 +109,7 @@ export class MessageRepository {
     return messagesToDelete;
   }
 
-  private getMessageId(
-    message: SimpleMessage,
-  ): Prisma.MessageIdCompoundUniqueInput {
+  private getMessageId(message: Message): Prisma.MessageIdCompoundUniqueInput {
     return {
       messageId: message.messageId,
       chatId: message.chatId,
@@ -180,8 +174,8 @@ export class MessageRepository {
   }
 
   private async connectReplyToMessage(
-    message: SimpleMessage,
-  ): Promise<Prisma.MessageCreateNestedOneWithoutRepliesInput | null> {
+    message: Message,
+  ): Promise<Prisma.MessageCreateNestedOneWithoutRepliesInput | undefined> {
     // Querying to make sure the message replied to exists in the database.
     const replyToMessage = await this.prisma.message.findUnique({
       where: {
@@ -190,7 +184,7 @@ export class MessageRepository {
     });
 
     if (!replyToMessage) {
-      return null;
+      return undefined;
     }
 
     return {

@@ -15,7 +15,7 @@ Input should be a brief image description, make sure to say if it should be a dr
     private readonly dallEPromptGenerator: DallEPromptGenerator,
     private readonly dallE: DallEService,
     private readonly telegram: TelegramService,
-    private readonly message: Message,
+    private readonly chatId: bigint,
   ) {
     super();
   }
@@ -26,7 +26,7 @@ Input should be a brief image description, make sure to say if it should be a dr
     if (!imageUrl) {
       return 'You could not send the image due to technical difficulties.';
     }
-    await this.telegram.replyWithImage(imageUrl, dallEPrompt, this.message);
+    await this.telegram.replyWithImage(imageUrl, dallEPrompt, this.chatId);
     return `Successfully sent the image to the Telegram chat: ${dallEPrompt}`;
   }
 }

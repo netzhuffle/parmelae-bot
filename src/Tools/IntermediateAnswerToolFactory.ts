@@ -1,4 +1,3 @@
-import { Message } from '@prisma/client';
 import { TelegramService } from '../TelegramService';
 import { injectable } from 'inversify';
 import { IntermediateAnswerTool } from './IntermediateAnswerTool';
@@ -10,9 +9,9 @@ export class IntermediateAnswerToolFactory {
   /**
    * Creates the intermediate answer tool.
    *
-   * @param forMessage - The message the tool should reply to.
+   * @param chatId - The chat to write in.
    */
-  create(forMessage: Message): IntermediateAnswerTool {
-    return new IntermediateAnswerTool(this.telegram, forMessage);
+  create(chatId: bigint): IntermediateAnswerTool {
+    return new IntermediateAnswerTool(this.telegram, chatId);
   }
 }

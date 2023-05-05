@@ -93,11 +93,12 @@ export class ChatGptAgentService {
     conversation: BaseChatMessage[],
     retries = 0,
   ): Promise<ChatGptMessage> {
+    const chatId = message.chatId;
     const tools = [
       ...this.tools,
-      this.dallEToolFactory.create(message),
-      this.diceToolFactory.create(message.chatId),
-      this.intermediateAnswerToolFactory.create(message),
+      this.dallEToolFactory.create(chatId),
+      this.diceToolFactory.create(chatId),
+      this.intermediateAnswerToolFactory.create(chatId),
     ];
     ChatConversationalAgent.validateTools(this.tools);
     const toolStrings = tools

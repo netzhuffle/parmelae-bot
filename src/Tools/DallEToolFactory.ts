@@ -1,4 +1,3 @@
-import { Message } from '@prisma/client';
 import { DallEService } from '../DallEService';
 import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator';
 import { TelegramService } from '../TelegramService';
@@ -16,14 +15,14 @@ export class DallEToolFactory {
   /**
    * Creates the DALL-E tool.
    *
-   * @param forMessage - The message the DALL-E tool should reply to.
+   * @param chatId - The chat the image should be sent in.
    */
-  create(forMessage: Message): DallETool {
+  create(chatId: bigint): DallETool {
     return new DallETool(
       this.dallEPromptGenerator,
       this.dallE,
       this.telegram,
-      forMessage,
+      chatId,
     );
   }
 }

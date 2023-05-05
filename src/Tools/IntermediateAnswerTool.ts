@@ -1,6 +1,5 @@
 import { TelegramService } from '../TelegramService';
 import { Tool } from 'langchain/tools';
-import { Message } from '@prisma/client';
 
 export class IntermediateAnswerTool extends Tool {
   name = 'intermediate-answer';
@@ -11,14 +10,14 @@ Remember: To send your final answer to telegram, you must use the "Final Answer"
 
   constructor(
     private readonly telegram: TelegramService,
-    private readonly message: Message,
+    private readonly chatId: bigint,
   ) {
     super();
   }
 
   protected async _call(arg: string): Promise<string> {
     try {
-      await this.telegram.reply(arg, this.message);
+      await this.telegram.send(arg, this.chatId);
     } catch (e) {
       return 'Error: Could not send text to telegram';
     }
