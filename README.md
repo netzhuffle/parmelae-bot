@@ -1,6 +1,12 @@
 # Parmelä Bot
 
-The most helpful bot you’ve ever seen on Telegram.
+“The most helpful bot you’ve ever seen on Telegram.”
+
+This is a personal fun project to try various AI and Telegram bot things.
+
+It is not set up for general usage and breaks most software development practices for good code.
+
+Test coverage is terrible, but I do have lots of fun trying out new things here and there.
 
 # Prepare for development
 
