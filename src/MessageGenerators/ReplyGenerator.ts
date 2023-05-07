@@ -82,7 +82,7 @@ Final Answer: Ich habe in der Verfassung nachgelesen: Laut Art. 77 (Wald) Abs. 1
     'bugybunny',
     'Bitte machen Sie ein Foto der Golden Gate Bridge',
   ),
-  HumanMessagePromptTemplate.fromTemplate(`Bitte antworten Sie auf die zuletzt geschriebene Nachricht. Denken Sie daran, dass Sie das Format Question/(Thought/Action/Observation)/Thought/Final Answer verwenden müssen.
+  HumanMessagePromptTemplate.fromTemplate(`Bitte antworten Sie auf die zuletzt geschriebene Nachricht. Denken Sie daran, dass Sie das Format Message/(Thought/Action/Observation)/Thought/Final Answer verwenden müssen.
 
 This was your previous work (but I haven't seen any of it! I only see what you return as final answer):
 Message: Bitte machen Sie ein Foto der Golden Gate Bridge
@@ -115,7 +115,7 @@ Final Answer: Ich habe Ihnen soeben das Foto der Golden Gate Bridge gesendet –
     'Es folgt nun die eigentliche Konversation:',
   ),
   new MessagesPlaceholder('conversation'),
-  HumanMessagePromptTemplate.fromTemplate(`Bitte antworten Sie auf die zuletzt geschriebene Nachricht. Denken Sie daran, dass Sie das Format Question/(Thought/Action/Observation)/Thought/Final Answer verwenden müssen, auch wenn die Nachricht keine Frage ist.
+  HumanMessagePromptTemplate.fromTemplate(`Bitte antworten Sie auf die zuletzt geschriebene Nachricht. Denken Sie daran, dass Sie das Format Message/(Thought/Action/Observation)/Thought/Final Answer verwenden müssen, auch wenn die Nachricht keine Frage ist.
 
 {agent_scratchpad}`),
 ]);
@@ -394,8 +394,7 @@ export class ReplyGenerator {
       )
       .map((message) => {
         if (message.from.username === this.config.username) {
-          const text =
-            message.text?.replace(/["\\\r\n]/g, '\\$&') ?? 'Ich bin sprachlos.';
+          const text = message.text ?? 'Ich bin sprachlos.';
           return new AIChatMessage(`Message: ${lastMessage}
 Thought: Hierauf kann ich direkt antworten.
 Final Answer: ${text}`);
