@@ -113,7 +113,7 @@ export class ChatGptAgentService {
     });
     const agent = new ChatAgent({
       llmChain,
-      allowedTools: tools.map(tool => tool.name),
+      allowedTools: tools.map((tool) => tool.name),
     });
     const executor = AgentExecutor.fromAgentAndTools({
       agent,

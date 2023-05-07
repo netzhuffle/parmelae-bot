@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
-import { SerpAPI } from 'langchain/tools';
 import { Config } from '../Config';
+import { SerpAPI } from './SerpAPI';
 
 @injectable()
 export class GoogleSearchToolFactory {
