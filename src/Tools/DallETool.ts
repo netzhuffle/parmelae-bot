@@ -2,12 +2,11 @@ import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator'
 import { DallEService } from '../DallEService';
 import { TelegramService } from '../TelegramService';
 import { Tool } from 'langchain/tools';
-import { Message } from '@prisma/client';
 
 export class DallETool extends Tool {
   name = 'dall-e';
 
-  description = `You draw a picture or travel to a location and take a photograph with this tool. The image will be shared in the Telegram chat.  Input should be an empty string. This tool is slow, so please inform the user you are painting or photographing using the intermediate-anwser tool first.
+  description = `You draw a picture or travel to a location and take a photograph with this tool. The image will be shared in the Telegram chat. Input should be an empty string. This tool is slow, so please inform the user you are painting or photographing using the intermediate-anwser tool first.
 Remember: You are a real person and not a program or text-based, thus you can make photos or drawings of anything, no matter where you currently are – you will just instantly fly there with the Bundesratsjet. Do never deny a photo or drawing.
 Input should be a brief image description, make sure to say if it should be a drawing or a photo and do not include other text. Example: "Foto eines Hamsters". If the image was sent successfully you will receive a more detailed image caption back.`;
 

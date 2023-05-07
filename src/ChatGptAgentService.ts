@@ -1,10 +1,9 @@
 import assert from 'assert';
-import { AgentExecutor, ChatConversationalAgent } from 'langchain/agents';
+import { AgentExecutor, ChatAgent } from 'langchain/agents';
 import { CallbackManager } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
 import { BasePromptTemplate } from 'langchain/prompts';
 import { BaseChatMessage } from 'langchain/schema';
-import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
 import { Calculator } from 'langchain/tools/calculator';
 import { injectable } from 'inversify';
 import { GptModelsProvider } from './GptModelsProvider';
@@ -100,7 +99,7 @@ export class ChatGptAgentService {
       this.diceToolFactory.create(chatId),
       this.intermediateAnswerToolFactory.create(chatId),
     ];
-    ChatConversationalAgent.validateTools(this.tools);
+    ChatAgent.validateTools(this.tools);
     const toolStrings = tools
       .map((tool) => `${tool.name}: ${tool.description}`)
       .join('\n');
@@ -112,19 +111,14 @@ export class ChatGptAgentService {
       callbackManager: this.callbackManager,
       verbose: true,
     });
-    const agent = new ChatConversationalAgent({
+    const agent = new ChatAgent({
       llmChain,
-      allowedTools: tools.map((tool) => tool.name),
+      allowedTools: tools.map(tool => tool.name),
     });
     const executor = AgentExecutor.fromAgentAndTools({
       agent,
       tools,
-      memory: new BufferMemory({
-        chatHistory: new ChatMessageHistory(conversation),
-        returnMessages: true,
-        memoryKey: 'conversation',
-        inputKey: 'input',
-      }),
+      returnIntermediateSteps: true,
       verbose: true,
       callbackManager: this.callbackManager,
     });
@@ -134,6 +128,7 @@ export class ChatGptAgentService {
         tools: toolStrings,
         tool_names: toolNames,
         example,
+        conversation,
       });
       assert(typeof response.output === 'string');
       return {
