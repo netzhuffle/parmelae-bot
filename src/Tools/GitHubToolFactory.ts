@@ -47,7 +47,7 @@ export class GitHubToolFactory {
     return new ChainTool({
       name: 'github-qa',
       description:
-        'Use to answer questions about your source code in your GitHub repository. Input should be a fully formed question that does not mention GitHub.',
+        'Use to answer questions about the @ParmelaeBot source code within your own GitHub repository. Input should be a fully formed question that does not mention GitHub.',
       chain,
     });
   }
