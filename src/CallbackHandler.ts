@@ -15,7 +15,7 @@ export class CallbackHandler extends BaseCallbackHandler {
   }
 
   async handleAgentAction(action: AgentAction): Promise<void> {
-    if (action.tool === IntermediateAnswerTool.name) {
+    if (action.tool === IntermediateAnswerTool.toolName) {
       return;
     }
 
