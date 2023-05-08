@@ -14,7 +14,6 @@ import {
 } from 'langchain/prompts';
 import { ChatOpenAiFake } from './Fakes/ChatOpenAiFake';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { CallbackManager } from 'langchain/callbacks';
 
 test('generate message', async () => {
   const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
@@ -26,7 +25,6 @@ test('generate message', async () => {
       gpt4Strict: undefined as unknown as ChatOpenAI,
       embeddings: undefined as unknown as OpenAIEmbeddings,
     }),
-    undefined as unknown as CallbackManager,
   );
   const prompt = ChatPromptTemplate.fromPromptMessages([
     SystemMessagePromptTemplate.fromTemplate('System Message'),

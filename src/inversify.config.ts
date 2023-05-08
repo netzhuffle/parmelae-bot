@@ -1,6 +1,5 @@
 import '@abraham/reflection';
 import { Container } from 'inversify';
-import { CallbackManager, ConsoleCallbackHandler } from 'langchain/callbacks';
 import { GptModelsProvider } from './GptModelsProvider';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
@@ -16,31 +15,26 @@ const container = new Container({
   skipBaseClassChecks: true,
 });
 
-container.bind(CallbackManager).toDynamicValue(() => {
-  const callbackManager = new CallbackManager();
-  callbackManager.addHandler(new ConsoleCallbackHandler());
-  return callbackManager;
-});
 container.bind(GptModelsProvider).toDynamicValue(
   () =>
     new GptModelsProvider({
       chatGpt: new ChatOpenAI({
         modelName: 'gpt-3.5-turbo',
-        callbackManager: container.resolve(CallbackManager),
+        verbose: true,
       }),
       chatGptStrict: new ChatOpenAI({
         modelName: 'gpt-3.5-turbo',
         temperature: 0,
-        callbackManager: container.resolve(CallbackManager),
+        verbose: true,
       }),
       gpt4: new ChatOpenAI({
         modelName: 'gpt-4',
-        callbackManager: container.resolve(CallbackManager),
+        verbose: true,
       }),
       gpt4Strict: new ChatOpenAI({
         modelName: 'gpt-4',
         temperature: 0,
-        callbackManager: container.resolve(CallbackManager),
+        verbose: true,
       }),
       embeddings: new OpenAIEmbeddings(),
     }),

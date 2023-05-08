@@ -1,5 +1,4 @@
 import assert from 'assert';
-import { CallbackManager } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
 import {
   BasePromptTemplate,
@@ -51,10 +50,7 @@ export class ChatGptService {
   /** Maximum number of characters in input text to avoid high cost. */
   static readonly MAX_INPUT_TEXT_LENGTH = 1200;
 
-  constructor(
-    private readonly models: GptModelsProvider,
-    private readonly callbackManager: CallbackManager,
-  ) {}
+  constructor(private readonly models: GptModelsProvider) {}
 
   /**
    * Generates and returns a message using a prompt and model.
@@ -67,7 +63,6 @@ export class ChatGptService {
     const chain = new LLMChain({
       prompt,
       llm: this.models.getModel(model),
-      callbackManager: this.callbackManager,
       verbose: true,
     });
     const response = await chain.call(promptValues);

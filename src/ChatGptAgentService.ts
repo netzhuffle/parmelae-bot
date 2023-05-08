@@ -1,6 +1,5 @@
 import assert from 'assert';
 import { AgentExecutor, ChatAgent } from 'langchain/agents';
-import { CallbackManager } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
 import { BasePromptTemplate } from 'langchain/prompts';
 import { BaseChatMessage } from 'langchain/schema';
@@ -27,6 +26,7 @@ import { Tool } from 'langchain/tools';
 import { Message } from '@prisma/client';
 import { DiceToolFactory } from './Tools/DiceToolFactory';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory';
+import { CallbackHandlerFactory } from './CallbackHandlerFactory';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -36,7 +36,7 @@ export class ChatGptAgentService {
   constructor(
     private readonly models: GptModelsProvider,
     private readonly config: Config,
-    private readonly callbackManager: CallbackManager,
+    private readonly callbackHandlerFactory: CallbackHandlerFactory,
     private readonly dallEToolFactory: DallEToolFactory,
     private readonly diceToolFactory: DiceToolFactory,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
@@ -105,10 +105,11 @@ export class ChatGptAgentService {
       .join('\n');
     const toolNames = tools.map((tool) => tool.name).join(', ');
 
+    const callbackHandler = this.callbackHandlerFactory.create(chatId);
     const llmChain = new LLMChain({
       prompt,
       llm: this.config.useGpt4 ? this.models.gpt4 : this.models.chatGpt,
-      callbackManager: this.callbackManager,
+      callbacks: [callbackHandler],
       verbose: true,
     });
     const agent = new ChatAgent({
@@ -119,8 +120,8 @@ export class ChatGptAgentService {
       agent,
       tools,
       returnIntermediateSteps: true,
+      callbacks: [callbackHandler],
       verbose: true,
-      callbackManager: this.callbackManager,
     });
 
     try {

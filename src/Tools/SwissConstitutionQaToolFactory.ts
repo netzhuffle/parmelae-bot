@@ -5,14 +5,12 @@ import { injectable } from 'inversify';
 import { GptModelsProvider } from '../GptModelsProvider';
 import { VectorDBQAChain } from 'langchain/chains';
 import { Config } from '../Config';
-import { CallbackManager } from 'langchain/callbacks';
 
 @injectable()
 export class SwissConstitutionQaToolFactory {
   constructor(
     private readonly chatGptModelsProvider: GptModelsProvider,
     private readonly config: Config,
-    private readonly callbackManager: CallbackManager,
   ) {}
 
   async create(): Promise<ChainTool> {
@@ -33,7 +31,6 @@ export class SwissConstitutionQaToolFactory {
         : this.chatGptModelsProvider.chatGptStrict,
       vectorStore,
       {
-        callbackManager: this.callbackManager,
         verbose: true,
       },
     );

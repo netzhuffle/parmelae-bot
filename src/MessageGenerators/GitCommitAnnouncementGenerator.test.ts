@@ -5,7 +5,6 @@ import { GitCommitAnnouncementGenerator } from './GitCommitAnnouncementGenerator
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake';
 import { ChatGptService } from '../ChatGptService';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { CallbackManager } from 'langchain/callbacks';
 
 test('generate', async () => {
   const chatOpenAiFake = new ChatOpenAiFake(
@@ -20,7 +19,6 @@ test('generate', async () => {
         gpt4Strict: undefined as unknown as ChatOpenAI,
         embeddings: undefined as unknown as OpenAIEmbeddings,
       }),
-      undefined as unknown as CallbackManager,
     ),
   );
 

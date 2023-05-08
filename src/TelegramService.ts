@@ -14,22 +14,31 @@ export class TelegramService {
   ) {}
 
   /**
-   * Send a message or sticker.
+   * Send a message or sticker and stores the message in the database.
    *
    * @param message - The text or Sticker to send.
    * @param chat - The chat to send in.
    */
   async send(message: string | Sticker, chatId: bigint): Promise<void> {
-    let sentMessage: TelegramBot.Message;
-    if (message instanceof Sticker) {
-      sentMessage = await this.telegram.sendSticker(
-        Number(chatId),
-        message.fileId,
-      );
-    } else {
-      sentMessage = await this.telegram.sendMessage(Number(chatId), message);
-    }
+    const sentMessage = await this.sendWithoutStoring(message, chatId);
     await this.messageService.storeSent(sentMessage);
+  }
+
+  /**
+   * Send a message or sticker and without storing in the database.
+   *
+   * @param message - The text or Sticker to send.
+   * @param chat - The chat to send in.
+   */
+  async sendWithoutStoring(
+    message: string | Sticker,
+    chatId: bigint,
+  ): Promise<TelegramBot.Message> {
+    if (message instanceof Sticker) {
+      return this.telegram.sendSticker(Number(chatId), message.fileId);
+    } else {
+      return this.telegram.sendMessage(Number(chatId), message);
+    }
   }
 
   /**
