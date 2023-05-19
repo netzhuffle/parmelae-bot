@@ -28,15 +28,6 @@ export class Config {
   /** The GitHub Personal Access Token. */
   public readonly gitHubPersonalAccessToken: string;
 
-  /** The Pinecone API key. */
-  public readonly pineconeApiKey: string;
-
-  /** The Pinecone environment. */
-  public readonly pineconeEnvironment: string;
-
-  /** The Pinecone index. */
-  public readonly pineconeIndex: string;
-
   /** The SerpAPI API key. */
   public readonly serpApiApiKey: string;
 
@@ -79,19 +70,6 @@ export class Config {
       'You must define GIT_HUB_PERSONAL_ACCESS_TOKEN in.env',
     );
     this.gitHubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
-
-    assert(
-      process.env.PINECONE_API_KEY,
-      'You must define PINECONE_API_KEY in .env',
-    );
-    this.pineconeApiKey = process.env.PINECONE_API_KEY;
-    assert(
-      process.env.PINECONE_ENVIRONMENT,
-      'You must define PINECONE_ENVIRONMENT in.env',
-    );
-    this.pineconeEnvironment = process.env.PINECONE_ENVIRONMENT;
-    assert(process.env.PINECONE_INDEX, 'You must define PINECONE_INDEX in.env');
-    this.pineconeIndex = process.env.PINECONE_INDEX;
 
     assert(
       process.env.SERPAPI_API_KEY,

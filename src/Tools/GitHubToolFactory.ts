@@ -3,34 +3,18 @@ import { injectable } from 'inversify';
 import { GptModelsProvider } from '../GptModelsProvider';
 import { VectorDBQAChain } from 'langchain/chains';
 import { Config } from '../Config';
-import { GithubRepoLoader } from 'langchain/document_loaders/web/github';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+import { GitHubVectorStore } from '../VectorStores/GitHubVectorStore';
 
 @injectable()
 export class GitHubToolFactory {
   constructor(
+    private readonly vectorStore: GitHubVectorStore,
     private readonly chatGptModelsProvider: GptModelsProvider,
     private readonly config: Config,
   ) {}
 
   async create(): Promise<ChainTool> {
-    const loader = new GithubRepoLoader(
-      'https://github.com/netzhuffle/parmelae-bot',
-      {
-        accessToken: this.config.gitHubPersonalAccessToken,
-      },
-    );
-    const docs = await loader.load();
-    const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 2000,
-      chunkOverlap: 200,
-    });
-    const splitDocs = await splitter.splitDocuments(docs);
-    const vectorStore = await MemoryVectorStore.fromDocuments(
-      splitDocs,
-      this.chatGptModelsProvider.embeddings,
-    );
+    const vectorStore = await this.vectorStore.get();
     const chain = VectorDBQAChain.fromLLM(
       this.config.useGpt4
         ? this.chatGptModelsProvider.gpt4Strict
