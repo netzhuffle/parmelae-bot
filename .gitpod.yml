@@ -26,7 +26,6 @@ tasks:
           echo "${DOTENV}" | base64 -d > .env
         fi
       fi
-      [ -f .env ] && npm run run-dev
 
 vscode:
   extensions:
