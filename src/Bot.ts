@@ -7,6 +7,8 @@ import { GitHubService } from './GitHubService';
 import { OldMessageReplyService } from './OldMessageReplyService';
 import { MessageService } from './MessageService';
 import { ReplyStrategyFinder } from './ReplyStrategyFinder';
+import * as Sentry from '@sentry/node';
+import { ScheduledMessageService } from './ScheduledMessageService';
 
 /**
  * The most helpful bot in the world
@@ -21,6 +23,7 @@ export class Bot {
     private readonly oldMessageReplyService: OldMessageReplyService,
     private readonly newMessageService: MessageService,
     private readonly replyStrategyFinder: ReplyStrategyFinder,
+    private readonly scheduledMessageService: ScheduledMessageService,
   ) {}
 
   /**
@@ -38,11 +41,10 @@ export class Bot {
       .then((me) => {
         assert(me.username === this.config.username);
       })
-      .catch((e) => console.error('Could not fetch bot username', e));
+      .catch(Sentry.captureException);
     this.messageStorage.startDailyDeletion(this.oldMessageReplyService);
-    this.gitHub
-      .announceNewCommits()
-      .catch((e) => console.error('Could not announce new commits', e));
+    this.gitHub.announceNewCommits().catch(Sentry.captureException);
+    this.scheduledMessageService.schedule().catch(Sentry.captureException);
   }
 
   /**

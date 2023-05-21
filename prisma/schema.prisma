@@ -9,13 +9,24 @@ datasource db {
 }
 
 model Chat {
-  id        BigInt    @id
-  type      String
-  title     String?
-  username  String?
-  firstName String?
-  lastName  String?
-  messages  Message[]
+  id                BigInt             @id
+  type              String
+  title             String?
+  username          String?
+  firstName         String?
+  lastName          String?
+  messages          Message[]
+  scheduledMessages ScheduledMessage[]
+}
+
+model ChatEntryMessagesUsers {
+  message   Message @relation(fields: [messageId, chatId], references: [messageId, chatId])
+  messageId Int
+  chatId    BigInt
+  user      User    @relation(fields: [userId], references: [id])
+  userId    BigInt
+
+  @@id([messageId, chatId, userId], name: "id")
 }
 
 model DateTimeSetting {
@@ -42,6 +53,17 @@ model Message {
   @@id([messageId, chatId], name: "id")
 }
 
+model ScheduledMessage {
+  id          Int      @id @default(autoincrement())
+  chat        Chat     @relation(fields: [chatId], references: [id])
+  chatId      BigInt
+  from        User     @relation(fields: [fromId], references: [id])
+  fromId      BigInt
+  sendAt      DateTime
+  scheduledAt DateTime @default(now())
+  text        String
+}
+
 model User {
   id                BigInt                   @id
   isBot             Boolean
@@ -51,14 +73,5 @@ model User {
   languageCode      String?
   messages          Message[]
   chatEntryMessages ChatEntryMessagesUsers[]
-}
-
-model ChatEntryMessagesUsers {
-  message   Message @relation(fields: [messageId, chatId], references: [messageId, chatId])
-  messageId Int
-  chatId    BigInt
-  user      User    @relation(fields: [userId], references: [id])
-  userId    BigInt
-
-  @@id([messageId, chatId, userId], name: "id")
+  scheduledMessages ScheduledMessage[]
 }

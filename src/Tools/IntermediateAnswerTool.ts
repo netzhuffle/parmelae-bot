@@ -5,9 +5,8 @@ export class IntermediateAnswerTool extends Tool {
   static readonly toolName = 'intermediate-answer';
   name = IntermediateAnswerTool.toolName;
 
-  description = `To send a message to the telegram chat that is not your final answer to the query. Input is the text to send.
-Use before using a slow tool (by example minecraft-backup or dall-e) or just to say what you will do next (like a Google Search or visit a website) without stopping what you are doing yet.
-Remember: To send your final answer to telegram, you must use the "Final Answer" action instead of this tool.`;
+  description =
+    'To send a message to the telegram chat that is not your final answer to the query. Input is the text to send. Use before using a slow tool (by example minecraft-backup or dall-e) or just to say what you will do next (like a Google Search or visit a website) without stopping what you are doing yet. Remember: To send your final answer to telegram, you must use the "Final Answer" action instead of this tool.';
 
   constructor(
     private readonly telegram: TelegramService,
