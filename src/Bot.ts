@@ -35,7 +35,9 @@ export class Bot {
         console.error('Could not handle message', e),
       );
     });
-    this.telegram.on('polling_error', console.error);
+    this.telegram.on('polling_error', Sentry.captureException);
+    this.telegram.on('webhook_error', Sentry.captureException);
+    this.telegram.on('error', Sentry.captureException);
     this.telegram
       .getMe()
       .then((me) => {
