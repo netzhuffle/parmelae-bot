@@ -1,69 +1,91 @@
 import { injectable } from 'inversify';
-import TelegramBot from 'node-telegram-bot-api';
 import { MessageStorageService } from './MessageStorageService';
 import { Chat, User } from '@prisma/client';
 import assert from 'assert';
 import { MessageWithRelations } from './Repositories/Types';
+import * as Typegram from 'telegraf/typings/core/types/typegram';
+
+type SupportedMessage =
+  | Typegram.Message.TextMessage
+  | Typegram.Message.AnimationMessage
+  | Typegram.Message.AudioMessage
+  | Typegram.Message.ContactMessage
+  | Typegram.Message.DiceMessage
+  | Typegram.Message.DocumentMessage
+  | Typegram.Message.GameMessage
+  | Typegram.Message.LocationMessage
+  | Typegram.Message.NewChatMembersMessage
+  | Typegram.Message.PhotoMessage
+  | Typegram.Message.PollMessage
+  | Typegram.Message.StickerMessage
+  | Typegram.Message.VideoMessage
+  | Typegram.Message.VoiceMessage
+  | Typegram.Message.VenueMessage;
 
 /** Handles Telegram messages. */
 @injectable()
 export class MessageService {
   constructor(private readonly messageStorage: MessageStorageService) {}
 
-  /**
-   * Stores and returns a new message coming from Telegram.
-   */
+  /** Stores and returns a new message coming from Telegram. */
   async storeIncoming(
-    telegramMessage: TelegramBot.Message,
-  ): Promise<MessageWithRelations | null> {
-    if (!telegramMessage.from || !this.isSupported(telegramMessage)) {
-      return null;
-    }
-
+    telegramMessage: SupportedMessage,
+  ): Promise<MessageWithRelations> {
+    assert(this.isSupported(telegramMessage));
     const message = this.getMessage(telegramMessage);
     await this.messageStorage.store(message);
     return message;
   }
 
-  /**
-   * Stores a message sent to Telegram.
-   */
-  async storeSent(telegramMessage: TelegramBot.Message): Promise<void> {
-    assert(telegramMessage.from && this.isSupported(telegramMessage));
+  /** Stores a message sent to Telegram. */
+  async storeSent(telegramMessage: SupportedMessage): Promise<void> {
+    assert(this.isSupported(telegramMessage));
 
     const message = this.getMessage(telegramMessage);
     return this.messageStorage.store(message);
   }
 
-  /** Whether a telegram message is supported by the bot. */
-  private isSupported(message: TelegramBot.Message): boolean {
+  /** Wether the message is supported. */
+  isSupported(message: Typegram.Message): message is SupportedMessage {
     if (!message.from) {
       // Can only store messages with a sender.
       return false;
     }
 
     if (
-      !message.text &&
-      !message.animation &&
-      !message.audio &&
-      !message.contact &&
-      !message.dice &&
-      !message.document &&
-      !message.game &&
-      !message.location &&
-      !message.new_chat_members?.length &&
-      !message.photo &&
-      !message.poll &&
-      !message.sticker &&
-      !message.video &&
-      !message.voice &&
-      !message.venue
+      !('text' in message) &&
+      !('animation' in message) &&
+      !('audio' in message) &&
+      !('contact' in message) &&
+      !('dice' in message) &&
+      !('document' in message) &&
+      !('game' in message) &&
+      !('location' in message) &&
+      !('new_chat_members' in message && message.new_chat_members.length) &&
+      !('photo' in message) &&
+      !('poll' in message) &&
+      !('sticker' in message) &&
+      !('video' in message) &&
+      !('voice' in message) &&
+      !('venue' in message)
     ) {
       // Unsuported message type.
       return false;
     }
 
     return true;
+  }
+
+  private isStickerMessage(
+    message: Typegram.Message,
+  ): message is Typegram.Message.StickerMessage {
+    return 'sticker' in message;
+  }
+
+  private isNewChatMembersMessage(
+    message: Typegram.Message,
+  ): message is Typegram.Message.NewChatMembersMessage {
+    return 'new_chat_members' in message;
   }
 
   private getDate(unixTimestamp: number): Date {
@@ -74,18 +96,19 @@ export class MessageService {
     return unixTimestamp ? this.getDate(unixTimestamp) : null;
   }
 
-  private getChat(telegramChat: TelegramBot.Chat): Chat {
+  private getChat(telegramChat: Typegram.Chat): Chat {
     return {
       id: BigInt(telegramChat.id),
       type: telegramChat.type,
-      title: telegramChat.title ?? null,
-      username: telegramChat.username ?? null,
-      firstName: telegramChat.first_name ?? null,
-      lastName: telegramChat.last_name ?? null,
+      title: ('title' in telegramChat && telegramChat.title) || null,
+      username: ('username' in telegramChat && telegramChat.username) || null,
+      firstName:
+        ('first_name' in telegramChat && telegramChat.first_name) || null,
+      lastName: ('last_name' in telegramChat && telegramChat.last_name) || null,
     };
   }
 
-  private getUser(telegramUser: TelegramBot.User): User {
+  private getUser(telegramUser: Typegram.User): User {
     return {
       id: BigInt(telegramUser.id),
       isBot: telegramUser.is_bot,
@@ -96,12 +119,16 @@ export class MessageService {
     };
   }
 
-  private getMessage(
-    telegramMessage: TelegramBot.Message,
-  ): MessageWithRelations {
+  private getMessage(telegramMessage: SupportedMessage): MessageWithRelations {
     assert(telegramMessage.from);
     const chatId = BigInt(telegramMessage.chat.id);
-    const replyToMessage = telegramMessage.reply_to_message;
+    const replyToMessage =
+      ('reply_to_message' in telegramMessage &&
+        telegramMessage.reply_to_message) ||
+      undefined;
+    const editDate =
+      ('edit_date' in telegramMessage && telegramMessage.edit_date) ||
+      undefined;
     return {
       messageId: telegramMessage.message_id,
       chatId,
@@ -109,15 +136,20 @@ export class MessageService {
       fromId: BigInt(telegramMessage.from.id),
       from: this.getUser(telegramMessage.from),
       sentAt: this.getDate(telegramMessage.date),
-      editedAt: this.getOptionalDate(telegramMessage.edit_date),
-      replyToMessageId: replyToMessage ? replyToMessage.message_id : null,
+      editedAt: this.getOptionalDate(editDate),
+      replyToMessageId: replyToMessage?.message_id ?? null,
       replyToMessageChatId: replyToMessage
         ? BigInt(replyToMessage.chat.id)
         : null,
-      replyToMessage: replyToMessage ? this.getMessage(replyToMessage) : null,
+      replyToMessage:
+        replyToMessage && this.isSupported(replyToMessage)
+          ? this.getMessage(replyToMessage)
+          : null,
       text: this.getMessageText(telegramMessage),
-      stickerFileId: telegramMessage.sticker?.file_id ?? null,
-      newChatMembers: telegramMessage.new_chat_members
+      stickerFileId: this.isStickerMessage(telegramMessage)
+        ? telegramMessage.sticker.file_id
+        : null,
+      newChatMembers: this.isNewChatMembersMessage(telegramMessage)
         ? telegramMessage.new_chat_members.map((user) => ({
             messageId: telegramMessage.message_id,
             chatId,
@@ -128,12 +160,12 @@ export class MessageService {
     };
   }
 
-  private getMessageText(message: TelegramBot.Message): string {
-    if (message.text) {
+  private getMessageText(message: SupportedMessage): string {
+    if ('text' in message) {
       return message.text;
     }
 
-    if (message.animation) {
+    if ('animation' in message) {
       // Must be before message.document, because message.document is also always set for backwards compatibility.
       const animation = message.animation;
       const attachment = animation.file_name
@@ -142,7 +174,7 @@ export class MessageService {
       return message.caption ? `${attachment}: ${message.caption}` : attachment;
     }
 
-    if (message.audio) {
+    if ('audio' in message) {
       const audio = message.audio;
       let info = '';
       if (audio.performer) {
@@ -158,14 +190,14 @@ export class MessageService {
       return message.caption ? `${attachment}: ${message.caption}` : attachment;
     }
 
-    if (message.contact) {
+    if ('contact' in message) {
       const contact = message.contact;
       return contact.last_name
         ? `[🙍 Kontakt: ${contact.first_name} ${contact.last_name}]`
         : `[🙍 Kontakt: ${contact.first_name}]`;
     }
 
-    if (message.dice) {
+    if ('dice' in message) {
       const dice = message.dice;
       const emoji = dice.emoji;
       if (emoji === '🎲') {
@@ -180,7 +212,7 @@ export class MessageService {
       return `[Spiel ${emoji}: ${dice.value} von max. ${max} Punkten erzielt]`;
     }
 
-    if (message.document) {
+    if ('document' in message) {
       // Must be after message.animation, because message.document is also always set for backwards compatibility.
       const document = message.document;
       let attachment: string;
@@ -196,7 +228,7 @@ export class MessageService {
       return message.caption ? `${attachment}: ${message.caption}` : attachment;
     }
 
-    if (message.new_chat_members?.length) {
+    if ('new_chat_members' in message && message.new_chat_members.length) {
       const newChatMembers = message.new_chat_members;
       const names = newChatMembers.map((member) => {
         if (member.username) {
@@ -214,11 +246,11 @@ export class MessageService {
       return `Neue Mitglieder treten dem Chat bei: ${nameList}.`;
     }
 
-    if (message.photo) {
+    if ('photo' in message) {
       return message.caption ? `📸: ${message.caption}` : '📸';
     }
 
-    if (message.poll) {
+    if ('poll' in message) {
       const poll = message.poll;
       let text =
         poll.type === 'quiz'
@@ -230,30 +262,30 @@ export class MessageService {
       return text;
     }
 
-    if (message.sticker) {
+    if ('sticker' in message) {
       return message.sticker.emoji
         ? `[Sticker: ${message.sticker.emoji}]`
         : '[Sticker]';
     }
 
-    if (message.video) {
+    if ('video' in message) {
       const attachment = `[🎬: ${message.video.duration} Sekunden]`;
       return message.caption ? `${attachment}: ${message.caption}` : attachment;
     }
 
-    if (message.voice) {
+    if ('voice' in message) {
       const attachment = `[🎤: ${message.voice.duration} Sekunden]`;
       return message.caption ? `${attachment}: ${message.caption}` : attachment;
     }
 
-    if (message.venue) {
+    if ('venue' in message) {
       // Must be before message.location, because message.location is also always set for backwards compatibility.
       const venue = message.venue;
       const location = venue.location;
-      return `[🏟️ Venue: ${venue.title} (${venue.address}, lat: ${location.latitude}, lng: ${location.longitude})]`;
+      return `[🏟️ POI: ${venue.title} (${venue.address}, lat: ${location.latitude}, lng: ${location.longitude})]`;
     }
 
-    if (message.location) {
+    if ('location' in message) {
       // Must be after message.venue, because message.location is also always set for backwards compatibility.
       const location = message.location;
       return `[📍 (lat: ${location.latitude}, lng: ${location.longitude})]`;
@@ -265,7 +297,7 @@ export class MessageService {
 
 /** Error for a telegram message with unknown type. */
 class UnknownTelegramMessageTypeError extends Error {
-  constructor(message: TelegramBot.Message) {
+  constructor(message: Typegram.Message) {
     const json = JSON.stringify(message);
     super(`Unknown telegram message type: ${json}`);
   }

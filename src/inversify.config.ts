@@ -7,7 +7,7 @@ import { Octokit } from 'octokit';
 import { Configuration, OpenAIApi } from 'openai';
 import { PrismaClient } from '@prisma/client';
 import { Config } from './Config';
-import TelegramBot from 'node-telegram-bot-api';
+import { Telegraf } from 'telegraf';
 
 const container = new Container({
   defaultScope: 'Singleton',
@@ -56,11 +56,10 @@ container.bind(OpenAIApi).toDynamicValue(
     ),
 );
 container.bind(PrismaClient).toDynamicValue(() => new PrismaClient());
-container.bind(TelegramBot).toDynamicValue(
-  (context) =>
-    new TelegramBot(context.container.get(Config).telegramToken, {
-      polling: true,
-    }),
-);
+container
+  .bind(Telegraf)
+  .toDynamicValue(
+    (context) => new Telegraf(context.container.get(Config).telegramToken),
+  );
 
 export default container;

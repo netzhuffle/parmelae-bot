@@ -1,4 +1,3 @@
-import TelegramBot from 'node-telegram-bot-api';
 import assert from 'assert';
 import { injectable } from 'inversify';
 import { Config } from './Config';
@@ -9,37 +8,35 @@ import { MessageService } from './MessageService';
 import { ReplyStrategyFinder } from './ReplyStrategyFinder';
 import * as Sentry from '@sentry/node';
 import { ScheduledMessageService } from './ScheduledMessageService';
+import { Telegraf } from 'telegraf';
+import { message } from 'telegraf/filters';
+import * as Typegram from 'telegraf/typings/core/types/typegram';
 
-/**
- * The most helpful bot in the world
- */
+/** The most helpful bot in the world. */
 @injectable()
 export class Bot {
   constructor(
-    private readonly telegram: TelegramBot,
+    private readonly telegraf: Telegraf,
     private readonly config: Config,
     private readonly messageStorage: MessageStorageService,
     private readonly gitHub: GitHubService,
     private readonly oldMessageReplyService: OldMessageReplyService,
-    private readonly newMessageService: MessageService,
+    private readonly messageService: MessageService,
     private readonly replyStrategyFinder: ReplyStrategyFinder,
     private readonly scheduledMessageService: ScheduledMessageService,
   ) {}
 
-  /**
-   * Sets the handler to listen to messages
-   */
+  /** Sets the handler to listen to messages. */
   start(): void {
-    this.telegram.on('message', (message) => {
-      this.handleMessage(message).catch((e) =>
-        console.error('Could not handle message', e),
-      );
+    this.telegraf.on(message(), (context) => {
+      this.handleMessage(context.message).catch(Sentry.captureException);
     });
-    this.telegram.on('polling_error', Sentry.captureException);
-    this.telegram.on('webhook_error', Sentry.captureException);
-    this.telegram.on('error', Sentry.captureException);
-    this.telegram
-      .getMe()
+    this.telegraf.catch((e) => {
+      Sentry.captureException(e);
+    });
+    this.telegraf
+      .launch()
+      .then(() => this.telegraf.telegram.getMe())
       .then((me) => {
         assert(me.username === this.config.username);
       })
@@ -54,13 +51,11 @@ export class Bot {
    *
    * @param telegramMessage - The message to reply to
    */
-  async handleMessage(telegramMessage: TelegramBot.Message): Promise<void> {
-    const message = await this.newMessageService.storeIncoming(telegramMessage);
-    if (!message) {
-      console.log('Unknown message type, cannot handle.');
+  async handleMessage(telegramMessage: Typegram.Message): Promise<void> {
+    if (!this.messageService.isSupported(telegramMessage)) {
       return;
     }
-
+    const message = await this.messageService.storeIncoming(telegramMessage);
     const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
     return replyStrategy.handle(message);
   }
