@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { ScheduledMessageRepository } from './Repositories/ScheduledMessageRepository';
 import { TelegramService } from './TelegramService';
-import * as Sentry from '@sentry/node';
+import { ErrorService } from './ErrorService';
 
 const ONE_SECOND_IN_MILLISECONDS = 1000;
 
@@ -34,6 +34,6 @@ export class ScheduledMessageService {
     this.telegram
       .send(message, chatId)
       .then(() => this.repository.delete(id))
-      .catch(Sentry.captureException);
+      .catch(ErrorService.log);
   }
 }

@@ -1,7 +1,7 @@
 import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository';
 import { Tool } from 'langchain/tools';
-import * as Sentry from '@sentry/node';
 import { ScheduledMessageService } from '../ScheduledMessageService';
+import { ErrorService } from '../ErrorService';
 
 /** RegExp to check for numeric string. */
 const NUMERIC_REGEXP = /^\d+$/;
@@ -58,7 +58,7 @@ export class ScheduleMessageTool extends Tool {
         seconds * MILLISECONDS_IN_SECOND,
       );
     } catch (e) {
-      Sentry.captureException(e);
+      ErrorService.log(e);
       return 'Error: Failed scheduling the message.';
     }
 

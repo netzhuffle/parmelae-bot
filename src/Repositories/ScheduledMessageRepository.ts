@@ -1,10 +1,6 @@
 import {
-  Chat,
-  Message,
-  Prisma,
   PrismaClient,
   ScheduledMessage,
-  User,
 } from '@prisma/client';
 import { injectable } from 'inversify';
 

@@ -6,11 +6,11 @@ import { GitHubService } from './GitHubService';
 import { OldMessageReplyService } from './OldMessageReplyService';
 import { MessageService } from './MessageService';
 import { ReplyStrategyFinder } from './ReplyStrategyFinder';
-import * as Sentry from '@sentry/node';
 import { ScheduledMessageService } from './ScheduledMessageService';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import * as Typegram from 'telegraf/typings/core/types/typegram';
+import { ErrorService } from './ErrorService';
 
 /** The most helpful bot in the world. */
 @injectable()
@@ -29,21 +29,19 @@ export class Bot {
   /** Sets the handler to listen to messages. */
   start(): void {
     this.telegraf.on(message(), (context) => {
-      this.handleMessage(context.message).catch(Sentry.captureException);
+      this.handleMessage(context.message).catch(ErrorService.log);
     });
-    this.telegraf.catch((e) => {
-      Sentry.captureException(e);
-    });
+    this.telegraf.catch(ErrorService.log);
     this.telegraf
       .launch()
       .then(() => this.telegraf.telegram.getMe())
       .then((me) => {
         assert(me.username === this.config.username);
       })
-      .catch(Sentry.captureException);
+      .catch(ErrorService.log);
     this.messageStorage.startDailyDeletion(this.oldMessageReplyService);
-    this.gitHub.announceNewCommits().catch(Sentry.captureException);
-    this.scheduledMessageService.schedule().catch(Sentry.captureException);
+    this.gitHub.announceNewCommits().catch(ErrorService.log);
+    this.scheduledMessageService.schedule().catch(ErrorService.log);
   }
 
   /**
