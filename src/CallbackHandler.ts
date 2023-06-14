@@ -1,8 +1,9 @@
 import { BaseCallbackHandler } from 'langchain/callbacks';
 import { TelegramService } from './TelegramService';
-import { AgentAction, ChainValues, LLMResult } from 'langchain/schema';
+import { AgentAction, ChainValues } from 'langchain/schema';
 import { IntermediateAnswerTool } from './Tools/IntermediateAnswerTool';
 import { assert } from 'console';
+import { ErrorService } from './ErrorService';
 
 /** Handles LangChain callbacks. */
 export class CallbackHandler extends BaseCallbackHandler {
@@ -38,5 +39,17 @@ export class CallbackHandler extends BaseCallbackHandler {
       assert(typeof outputs.text === 'string');
       this.resolveFullText(outputs.text as string);
     }
+  }
+
+  handleToolError(err: unknown): void {
+    ErrorService.log(err);
+  }
+
+  handleChainError(err: unknown): void {
+    ErrorService.log(err);
+  }
+
+  handleLLMError(err: undefined): void {
+    ErrorService.log(err);
   }
 }

@@ -19,20 +19,20 @@ container.bind(GptModelsProvider).toDynamicValue(
   () =>
     new GptModelsProvider({
       chatGpt: new ChatOpenAI({
-        modelName: 'gpt-3.5-turbo',
+        modelName: 'gpt-3.5-turbo-0613',
         verbose: true,
       }),
       chatGptStrict: new ChatOpenAI({
-        modelName: 'gpt-3.5-turbo',
+        modelName: 'gpt-3.5-turbo-0613',
         temperature: 0,
         verbose: true,
       }),
       gpt4: new ChatOpenAI({
-        modelName: 'gpt-4',
+        modelName: 'gpt-4-0613',
         verbose: true,
       }),
       gpt4Strict: new ChatOpenAI({
-        modelName: 'gpt-4',
+        modelName: 'gpt-4-0613',
         temperature: 0,
         verbose: true,
       }),

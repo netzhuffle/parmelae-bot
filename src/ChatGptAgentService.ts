@@ -29,6 +29,7 @@ import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFac
 import { CallbackHandlerFactory } from './CallbackHandlerFactory';
 import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory';
 import { DateTimeTool } from './Tools/DateTimeTool';
+import { ErrorService } from './ErrorService';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -88,11 +89,11 @@ export class ChatGptAgentService {
   /**
    * Generates and returns a message using an agent executor and tools.
    *
-   * @param prompt - Prompt Template with the following placeholders: {tools}, {tool_names}, MessagesPlaceholder('example'), MessagesPlaceholder('conversation'), MessagesPlaceholder('agent_scratchpad')
+   * @param basePrompt - Prompt Template with the following placeholders: {tools}, {tool_names}, MessagesPlaceholder('example'), MessagesPlaceholder('conversation'), MessagesPlaceholder('agent_scratchpad')
    */
   async generate(
     message: Message,
-    prompt: BasePromptTemplate,
+    basePrompt: BasePromptTemplate,
     example: BaseChatMessage[],
     conversation: BaseChatMessage[],
     retries = 0,
@@ -109,9 +110,11 @@ export class ChatGptAgentService {
     const toolStrings = tools
       .map((tool) => `${tool.name}: ${tool.description}`)
       .join('\n');
-    const toolNames = tools.map((tool) => tool.name).join(', ');
 
     const callbackHandler = this.callbackHandlerFactory.create(chatId);
+    const prompt = await basePrompt.partial({
+      tools: toolStrings,
+    });
     const llmChain = new LLMChain({
       prompt,
       llm: this.config.useGpt4 ? this.models.gpt4 : this.models.chatGpt,
@@ -132,8 +135,6 @@ export class ChatGptAgentService {
 
     try {
       const response = await executor.call({
-        tools: toolStrings,
-        tool_names: toolNames,
         example,
         conversation,
       });
@@ -152,7 +153,7 @@ export class ChatGptAgentService {
           retries + 1,
         );
       }
-      console.error('Error when generating agent message', error);
+      ErrorService.log(error);
       assert(error instanceof Error);
       return {
         role: ChatGptRoles.Assistant,
