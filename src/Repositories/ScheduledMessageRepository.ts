@@ -1,7 +1,4 @@
-import {
-  PrismaClient,
-  ScheduledMessage,
-} from '@prisma/client';
+import { PrismaClient, ScheduledMessage } from '@prisma/client';
 import { injectable } from 'inversify';
 
 /** Repository for scheduled messages */
