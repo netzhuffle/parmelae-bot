@@ -7,9 +7,9 @@ import {
   PromptTemplate,
 } from 'langchain/prompts';
 import {
-  BaseChatMessage,
+  BaseMessage,
   ChainValues,
-  HumanChatMessage,
+  HumanMessage,
   InputValues,
 } from 'langchain/schema';
 import { injectable } from 'inversify';
@@ -21,13 +21,13 @@ import {
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate {
-  async format(values: InputValues): Promise<BaseChatMessage> {
+  async format(values: InputValues): Promise<BaseMessage> {
     if (!this.name) {
       return super.format(values);
     }
 
     const message = await super.format(values);
-    assert(message instanceof HumanChatMessage);
+    assert(message instanceof HumanMessage);
     message.name = this.name;
     return message;
   }
@@ -74,12 +74,10 @@ export class ChatGptService {
   }
 
   /** Returns a human chat message with a username. */
-  static createUserChatMessage(
-    name: string,
-    content: string,
-  ): HumanChatMessage {
-    const message = new HumanChatMessage(content);
-    message.name = name;
-    return message;
+  static createUserChatMessage(name: string, content: string): HumanMessage {
+    return new HumanMessage({
+      name,
+      content,
+    });
   }
 }

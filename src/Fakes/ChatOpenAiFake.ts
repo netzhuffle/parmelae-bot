@@ -1,10 +1,10 @@
 import { BaseChatModel } from 'langchain/chat_models/base';
-import { BaseChatMessage, ChatResult } from 'langchain/schema';
+import { BaseMessage, ChatResult } from 'langchain/schema';
 
 export class ChatOpenAiFake extends BaseChatModel {
-  request?: BaseChatMessage[];
+  request?: BaseMessage[];
 
-  constructor(private readonly response?: BaseChatMessage) {
+  constructor(private readonly response?: BaseMessage) {
     super({});
   }
 
@@ -16,7 +16,7 @@ export class ChatOpenAiFake extends BaseChatModel {
     return {};
   }
 
-  _generate(messages: BaseChatMessage[]): Promise<ChatResult> {
+  _generate(messages: BaseMessage[]): Promise<ChatResult> {
     this.request = messages;
 
     return Promise.resolve({

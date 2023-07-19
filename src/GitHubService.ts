@@ -6,14 +6,14 @@ import { Config } from './Config';
 import { RequestError } from '@octokit/request-error';
 import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator';
 
-type Commit = {
+interface Commit {
   commit: {
     committer: {
       date?: string;
     } | null;
     message: string;
   };
-};
+}
 
 const LAST_COMMIT_DATE_TIME_SETTING = 'last commit DateTime';
 

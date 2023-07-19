@@ -100,11 +100,12 @@ export class MessageService {
     return {
       id: BigInt(telegramChat.id),
       type: telegramChat.type,
-      title: ('title' in telegramChat && telegramChat.title) || null,
-      username: ('username' in telegramChat && telegramChat.username) || null,
-      firstName:
-        ('first_name' in telegramChat && telegramChat.first_name) || null,
-      lastName: ('last_name' in telegramChat && telegramChat.last_name) || null,
+      title: 'title' in telegramChat ? telegramChat.title : null,
+      username:
+        'username' in telegramChat ? telegramChat.username ?? null : null,
+      firstName: 'first_name' in telegramChat ? telegramChat.first_name : null,
+      lastName:
+        'last_name' in telegramChat ? telegramChat.last_name ?? null : null,
     };
   }
 
@@ -123,12 +124,11 @@ export class MessageService {
     assert(telegramMessage.from);
     const chatId = BigInt(telegramMessage.chat.id);
     const replyToMessage =
-      ('reply_to_message' in telegramMessage &&
-        telegramMessage.reply_to_message) ||
-      undefined;
+      'reply_to_message' in telegramMessage
+        ? telegramMessage.reply_to_message
+        : undefined;
     const editDate =
-      ('edit_date' in telegramMessage && telegramMessage.edit_date) ||
-      undefined;
+      'edit_date' in telegramMessage ? telegramMessage.edit_date : undefined;
     return {
       messageId: telegramMessage.message_id,
       chatId,

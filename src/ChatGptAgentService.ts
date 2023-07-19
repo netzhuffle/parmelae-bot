@@ -2,7 +2,7 @@ import assert from 'assert';
 import { AgentExecutor, ChatAgent } from 'langchain/agents';
 import { LLMChain } from 'langchain/chains';
 import { BasePromptTemplate } from 'langchain/prompts';
-import { BaseChatMessage } from 'langchain/schema';
+import { BaseMessage } from 'langchain/schema';
 import { Calculator } from 'langchain/tools/calculator';
 import { injectable } from 'inversify';
 import { GptModelsProvider } from './GptModelsProvider';
@@ -94,8 +94,8 @@ export class ChatGptAgentService {
   async generate(
     message: Message,
     basePrompt: BasePromptTemplate,
-    example: BaseChatMessage[],
-    conversation: BaseChatMessage[],
+    example: BaseMessage[],
+    conversation: BaseMessage[],
     retries = 0,
   ): Promise<ChatGptMessage> {
     const chatId = message.chatId;
