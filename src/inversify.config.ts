@@ -16,27 +16,80 @@ const container = new Container({
 });
 
 container.bind(GptModelsProvider).toDynamicValue(
-  () =>
+  (context) =>
     new GptModelsProvider({
       chatGpt: new ChatOpenAI({
         modelName: 'gpt-3.5-turbo',
+        configuration: {
+          basePath: 'https://oai.hconeai.com/v1',
+          baseOptions: {
+            headers: {
+              'Helicone-Auth': `Bearer ${
+                context.container.get(Config).heliconeApiKey
+              }`,
+            },
+          },
+        },
         verbose: true,
       }),
       chatGptStrict: new ChatOpenAI({
         modelName: 'gpt-3.5-turbo',
         temperature: 0,
+        configuration: {
+          basePath: 'https://oai.hconeai.com/v1',
+          baseOptions: {
+            headers: {
+              'Helicone-Auth': `Bearer ${
+                context.container.get(Config).heliconeApiKey
+              }`,
+            },
+          },
+        },
         verbose: true,
       }),
       gpt4: new ChatOpenAI({
         modelName: 'gpt-4',
+        configuration: {
+          basePath: 'https://oai.hconeai.com/v1',
+          baseOptions: {
+            headers: {
+              'Helicone-Auth': `Bearer ${
+                context.container.get(Config).heliconeApiKey
+              }`,
+            },
+          },
+        },
         verbose: true,
       }),
       gpt4Strict: new ChatOpenAI({
         modelName: 'gpt-4',
         temperature: 0,
+        configuration: {
+          basePath: 'https://oai.hconeai.com/v1',
+          baseOptions: {
+            headers: {
+              'Helicone-Auth': `Bearer ${
+                context.container.get(Config).heliconeApiKey
+              }`,
+            },
+          },
+        },
         verbose: true,
       }),
-      embeddings: new OpenAIEmbeddings(),
+      embeddings: new OpenAIEmbeddings(
+        {},
+        {
+          basePath: 'https://oai.hconeai.com/v1',
+          baseOptions: {
+            headers: {
+              'Helicone-Auth': `Bearer ${
+                context.container.get(Config).heliconeApiKey
+              }`,
+              'Helicone-Cache-Enabled': 'true',
+            },
+          },
+        },
+      ),
     }),
 );
 container.bind(Octokit).toDynamicValue(

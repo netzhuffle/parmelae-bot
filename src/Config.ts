@@ -22,6 +22,9 @@ export class Config {
   /** The OpenAI API auth key. */
   public readonly openAiKey: string;
 
+  /** The Helicone API auth key. */
+  public readonly heliconeApiKey: string;
+
   /** The Sentry DSN (optional). */
   public readonly sentryDsn: string | null;
 
@@ -62,6 +65,12 @@ export class Config {
       'You must define OPENAI_API_KEY in .env',
     );
     this.openAiKey = process.env.OPENAI_API_KEY;
+
+    assert(
+      process.env.HELICONE_API_KEY,
+      'You must define HELICONE_API_KEY in .env',
+    );
+    this.heliconeApiKey = process.env.HELICONE_API_KEY;
 
     this.sentryDsn = process.env.SENTRY_DSN ?? null;
 
