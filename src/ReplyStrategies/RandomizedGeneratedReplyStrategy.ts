@@ -24,6 +24,7 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
   }
 
   async handle(message: Message): Promise<void> {
+    void this.telegram.sendTyping(message.chatId);
     const reply = await this.replyGenerator.generate(message);
     return this.telegram.reply(reply, message);
   }

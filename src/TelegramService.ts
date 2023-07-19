@@ -15,6 +15,15 @@ export class TelegramService {
   ) {}
 
   /**
+   * Display typing.
+   *
+   * @param chat - The chat to be typing in.
+   */
+  async sendTyping(chatId: bigint): Promise<void> {
+    await this.telegraf.telegram.sendChatAction(chatId.toString(), 'typing');
+  }
+
+  /**
    * Send a message or sticker and stores the message in the database.
    *
    * @param message - The text or Sticker to send.

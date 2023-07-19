@@ -27,6 +27,7 @@ export class BotMentionReplyStrategy extends AllowlistedReplyStrategy {
   }
 
   async handle(message: Message): Promise<void> {
+    void this.telegram.sendTyping(message.chatId);
     const text = await this.replyGenerator.generate(message);
     return this.telegram.send(text, message.chatId);
   }

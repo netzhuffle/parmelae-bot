@@ -31,6 +31,7 @@ export class CommentReplyStrategy extends AllowlistedReplyStrategy {
   }
 
   async handle(message: MessageWithReplyTo): Promise<void> {
+    void this.telegram.sendTyping(message.chatId);
     const reply = await this.command.execute(Commands.Comment, message);
     return this.telegram.reply(reply, message);
   }
