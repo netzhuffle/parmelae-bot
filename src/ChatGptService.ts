@@ -18,10 +18,15 @@ import {
   ChatGptMessage,
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage';
+import { TypedPromptInputValues } from 'langchain/dist/prompts/base';
 
 /** Human message template with username. */
-export class UserMessagePromptTemplate extends HumanMessagePromptTemplate {
-  async format(values: InputValues): Promise<BaseMessage> {
+export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
+  InputValues<string>
+> {
+  async format(
+    values: TypedPromptInputValues<InputValues<string>>,
+  ): Promise<BaseMessage> {
     if (!this.name) {
       return super.format(values);
     }
@@ -33,7 +38,9 @@ export class UserMessagePromptTemplate extends HumanMessagePromptTemplate {
   }
 
   constructor(
-    prompt: BaseStringPromptTemplate,
+    prompt: BaseStringPromptTemplate<
+      InputValues<Extract<keyof InputValues<string>, string>>
+    >,
     private readonly name?: string,
   ) {
     super(prompt);
