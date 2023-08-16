@@ -1,14 +1,17 @@
 import assert from 'assert';
 import { LLMChain } from 'langchain/chains';
 import {
+  AIMessagePromptTemplate,
   BasePromptTemplate,
   BaseStringPromptTemplate,
   HumanMessagePromptTemplate,
   PromptTemplate,
 } from 'langchain/prompts';
 import {
+  AIMessage,
   BaseMessage,
   ChainValues,
+  FunctionMessage,
   HumanMessage,
   InputValues,
 } from 'langchain/schema';
@@ -19,6 +22,7 @@ import {
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage';
 import { TypedPromptInputValues } from 'langchain/dist/prompts/base';
+import { ChatCompletionRequestMessageFunctionCall } from 'openai';
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
@@ -35,6 +39,74 @@ export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
     assert(message instanceof HumanMessage);
     message.name = this.name;
     return message;
+  }
+
+  constructor(
+    prompt: BaseStringPromptTemplate<
+      InputValues<Extract<keyof InputValues<string>, string>>
+    >,
+    private readonly name?: string,
+  ) {
+    super(prompt);
+  }
+
+  static fromNameAndTemplate(name: string, template: string) {
+    return new this(PromptTemplate.fromTemplate(template), name);
+  }
+}
+
+/** Human message template with username. */
+export class AIFunctionCallMessagePromptTemplate extends AIMessagePromptTemplate<
+  InputValues<string>
+> {
+  async format(
+    values: TypedPromptInputValues<InputValues<string>>,
+  ): Promise<BaseMessage> {
+    if (!this.functionCall) {
+      return super.format(values);
+    }
+
+    const message = await super.format(values);
+    assert(message instanceof AIMessage);
+    message.additional_kwargs.function_call = this.functionCall;
+    return message;
+  }
+
+  constructor(
+    prompt: BaseStringPromptTemplate<
+      InputValues<Extract<keyof InputValues<string>, string>>
+    >,
+    private readonly functionCall: ChatCompletionRequestMessageFunctionCall,
+  ) {
+    super(prompt);
+  }
+
+  static fromCallAndTemplate(
+    functionCall: ChatCompletionRequestMessageFunctionCall,
+    template: string,
+  ) {
+    return new this(PromptTemplate.fromTemplate(template), functionCall);
+  }
+}
+
+/** Function result message template. */
+export class FunctionMessagePromptTemplate extends HumanMessagePromptTemplate<
+  InputValues<string>
+> {
+  async format(
+    values: TypedPromptInputValues<InputValues<string>>,
+  ): Promise<BaseMessage> {
+    return new FunctionMessage(
+      {
+        content: await this.prompt.format(values),
+        name: this.name,
+      },
+      '',
+    );
+  }
+
+  static fromTemplate(template: string) {
+    return new this(PromptTemplate.fromTemplate(template));
   }
 
   constructor(

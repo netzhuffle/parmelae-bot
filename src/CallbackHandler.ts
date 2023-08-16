@@ -29,8 +29,22 @@ export class CallbackHandler extends BaseCallbackHandler {
       return;
     }
 
+    let input = action.toolInput as string | { input: string } | object;
+    if (typeof input === 'object') {
+      const properties = Object.keys(input);
+      if (
+        properties.length === 1 &&
+        'input' in input &&
+        typeof input.input === 'string'
+      ) {
+        input = input.input;
+      } else {
+        input = JSON.stringify(input);
+      }
+    }
+
     return this.telegram
-      .sendWithoutStoring(`[${action.tool}: ${action.toolInput}]`, this.chatId)
+      .sendWithoutStoring(`[${action.tool}: ${input}]`, this.chatId)
       .then();
   }
 

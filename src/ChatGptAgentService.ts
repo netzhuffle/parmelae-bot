@@ -1,6 +1,5 @@
 import assert from 'assert';
-import { AgentExecutor, ChatAgent } from 'langchain/agents';
-import { LLMChain } from 'langchain/chains';
+import { AgentExecutor } from 'langchain/agents';
 import { BasePromptTemplate } from 'langchain/prompts';
 import { BaseMessage } from 'langchain/schema';
 import { Calculator } from 'langchain/tools/calculator';
@@ -30,6 +29,7 @@ import { CallbackHandlerFactory } from './CallbackHandlerFactory';
 import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory';
 import { DateTimeTool } from './Tools/DateTimeTool';
 import { ErrorService } from './ErrorService';
+import { ChatGptAgent } from './ChatGptAgent';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -98,40 +98,7 @@ export class ChatGptAgentService {
     conversation: BaseMessage[],
     retries = 0,
   ): Promise<ChatGptMessage> {
-    const chatId = message.chatId;
-    const tools = [
-      ...this.tools,
-      this.dallEToolFactory.create(chatId),
-      this.diceToolFactory.create(chatId),
-      this.scheduleMessageToolFactory.create(chatId, message.fromId),
-      this.intermediateAnswerToolFactory.create(chatId),
-    ];
-    ChatAgent.validateTools(this.tools);
-    const toolStrings = tools
-      .map((tool) => `${tool.name}: ${tool.description}`)
-      .join('\n');
-
-    const callbackHandler = this.callbackHandlerFactory.create(chatId);
-    const prompt = await basePrompt.partial({
-      tools: toolStrings,
-    });
-    const llmChain = new LLMChain({
-      prompt,
-      llm: this.config.useGpt4 ? this.models.gpt4 : this.models.chatGpt,
-      callbacks: [callbackHandler],
-      verbose: true,
-    });
-    const agent = new ChatAgent({
-      llmChain,
-      allowedTools: tools.map((tool) => tool.name),
-    });
-    const executor = AgentExecutor.fromAgentAndTools({
-      agent,
-      tools,
-      returnIntermediateSteps: true,
-      callbacks: [callbackHandler],
-      verbose: true,
-    });
+    const executor = this.createAgentExecutor(message, basePrompt);
 
     try {
       const response = await executor.call({
@@ -147,7 +114,7 @@ export class ChatGptAgentService {
       if (retries < 2) {
         return this.generate(
           message,
-          prompt,
+          basePrompt,
           example,
           conversation,
           retries + 1,
@@ -160,5 +127,33 @@ export class ChatGptAgentService {
         content: `Fehler: ${error.message}`,
       };
     }
+  }
+
+  private createAgentExecutor(
+    message: Message,
+    basePrompt: BasePromptTemplate,
+  ): AgentExecutor {
+    const chatId = message.chatId;
+    const tools = [
+      ...this.tools,
+      this.dallEToolFactory.create(chatId),
+      this.diceToolFactory.create(chatId),
+      this.scheduleMessageToolFactory.create(chatId, message.fromId),
+      this.intermediateAnswerToolFactory.create(chatId),
+    ];
+    const callbackHandler = this.callbackHandlerFactory.create(chatId);
+
+    return AgentExecutor.fromAgentAndTools({
+      tags: ['openai-functions'],
+      agent: ChatGptAgent.fromLLMAndTools(
+        this.config.useGpt4 ? this.models.gpt4 : this.models.chatGpt,
+        tools,
+        { basePrompt },
+      ),
+      tools,
+      verbose: true,
+      callbacks: [callbackHandler],
+      returnIntermediateSteps: true,
+    });
   }
 }

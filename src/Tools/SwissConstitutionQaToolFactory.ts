@@ -28,7 +28,7 @@ export class SwissConstitutionQaToolFactory {
     return new ChainTool({
       name: 'swiss-constitution-qa',
       description:
-        'Use to read the Swiss constitution and do research in it. Important: You MUST use this tool before answering any questions about the constitution. Input should be a fully formed question.',
+        'Use to ask a question to the Swiss constitution and do research in it. Important: You MUST use this tool before answering any questions about the constitution. Input should be a fully formed question about what you want to ask the constitution.',
       chain,
     });
   }
