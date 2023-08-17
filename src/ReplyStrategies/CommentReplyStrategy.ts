@@ -4,7 +4,7 @@ import { CommandService } from '../CommandService';
 import { Config } from '../Config';
 import { Commands } from '../Command';
 import { TelegramService } from '../TelegramService';
-import { MessageWithReplyTo } from '../Repositories/Types';
+import { TelegramMessageWithReplyTo } from '../Repositories/Types';
 import { Message } from '@prisma/client';
 
 /**
@@ -30,7 +30,7 @@ export class CommentReplyStrategy extends AllowlistedReplyStrategy {
     return this.onlyUsernameRegExp.test(message.text);
   }
 
-  async handle(message: MessageWithReplyTo): Promise<void> {
+  async handle(message: TelegramMessageWithReplyTo): Promise<void> {
     void this.telegram.sendTyping(message.chatId);
     const reply = await this.command.execute(Commands.Comment, message);
     return this.telegram.reply(reply, message);

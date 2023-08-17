@@ -1,10 +1,10 @@
 import { injectable } from 'inversify';
 import { Sticker } from './Sticker';
-import { Message } from '@prisma/client';
 import { MessageService } from './MessageService';
 import { assert } from 'console';
 import { Telegraf } from 'telegraf';
 import * as Typegram from 'telegraf/typings/core/types/typegram';
+import { TelegramMessage } from './Repositories/Types';
 
 /** Service to interact with Telegram. */
 @injectable()
@@ -83,7 +83,10 @@ export class TelegramService {
    * @param reply - The text or Sticker to send.
    * @param message - The message to reply to.
    */
-  async reply(reply: string | Sticker, message: Message): Promise<void> {
+  async reply(
+    reply: string | Sticker,
+    message: TelegramMessage,
+  ): Promise<void> {
     let sentMessage:
       | Typegram.Message.TextMessage
       | Typegram.Message.StickerMessage;
@@ -92,14 +95,14 @@ export class TelegramService {
         message.chatId.toString(),
         reply.fileId,
         {
-          reply_to_message_id: message.messageId,
+          reply_to_message_id: message.telegramMessageId,
         },
       );
     } else {
       sentMessage = await this.telegraf.telegram.sendMessage(
         message.chatId.toString(),
         reply,
-        { reply_to_message_id: message.messageId },
+        { reply_to_message_id: message.telegramMessageId },
       );
     }
     await this.messageService.storeSent(sentMessage);

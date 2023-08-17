@@ -11,7 +11,7 @@ import { NicknameReplyStrategy } from './ReplyStrategies/NicknameReplyStrategy';
 import { RandomizedGeneratedReplyStrategy } from './ReplyStrategies/RandomizedGeneratedReplyStrategy';
 import { RandomizedStickerReplyStrategy } from './ReplyStrategies/RandomizedStickerReplyStrategy';
 import { CommentReplyStrategy } from './ReplyStrategies/CommentReplyStrategy';
-import { MessageWithRelations } from './Repositories/Types';
+import { TelegramMessageWithRelations } from './Repositories/Types';
 
 /** Finds the ReplyStrategy to handle a given message. */
 @injectable()
@@ -69,7 +69,7 @@ export class ReplyStrategyFinder {
    *
    * Will try every strategy in order until one likes to handle it.
    */
-  getHandlingStrategy(message: MessageWithRelations): ReplyStrategy {
+  getHandlingStrategy(message: TelegramMessageWithRelations): ReplyStrategy {
     for (const strategy of this.strategies) {
       if (strategy.willHandle(message)) {
         return strategy;

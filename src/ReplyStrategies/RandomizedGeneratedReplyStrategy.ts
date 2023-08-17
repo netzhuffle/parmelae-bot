@@ -3,7 +3,7 @@ import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy';
 import { Config } from '../Config';
 import { TelegramService } from '../TelegramService';
 import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator';
-import { Message } from '@prisma/client';
+import { TelegramMessage } from '../Repositories/Types';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;
@@ -23,7 +23,7 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
     return Math.random() < RANDOM_REPLY_PROBABILITY;
   }
 
-  async handle(message: Message): Promise<void> {
+  async handle(message: TelegramMessage): Promise<void> {
     void this.telegram.sendTyping(message.chatId);
     const reply = await this.replyGenerator.generate(message);
     return this.telegram.reply(reply, message);

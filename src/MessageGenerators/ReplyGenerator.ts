@@ -341,7 +341,7 @@ export class ReplyGenerator {
       EXAMPLE_CONVERSATIONS[
         Math.floor(Math.random() * EXAMPLE_CONVERSATIONS.length)
       ];
-    const conversation = await this.getConversation(message);
+    const conversation = await this.getConversation(message.id);
     const completion = await this.chatGptAgent.generate(
       message,
       PROMPT,
@@ -351,8 +351,8 @@ export class ReplyGenerator {
     return completion.content;
   }
 
-  private async getConversation(message: Message): Promise<BaseMessage[]> {
-    const historyMessages = await this.messageHistory.getHistory(message);
+  private async getConversation(messageId: number): Promise<BaseMessage[]> {
+    const historyMessages = await this.messageHistory.getHistory(messageId);
     return historyMessages
       .filter(
         (message) =>

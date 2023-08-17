@@ -1,10 +1,10 @@
-import { Message } from '@prisma/client';
 import { Config } from './Config';
 import { TelegramService } from './TelegramService';
-import { MessageWithUser } from './Repositories/Types';
+import { MessageWithUser, TelegramMessage } from './Repositories/Types';
 import { OldMessageReplyGenerator } from './MessageGenerators/OldMessageReplyGenerator';
 import { ChatGptService } from './ChatGptService';
 import { injectable } from 'inversify';
+import { Message } from '@prisma/client';
 
 /**
  * Minimum length to consider reply to a message.
@@ -40,6 +40,10 @@ export class OldMessageReplyService {
         Math.random() * replyCandidates.length,
       );
       const randomMessage = replyCandidates[randomMessageIndex];
+      if (!this.isTelegramMessage(randomMessage)) {
+        // Should never happen as mayReplyToOldMessage filtered out non-telegram messages.
+        continue;
+      }
       if (Math.random() < OLD_MESSAGE_REPLY_PROBABILITY) {
         await this.replyToMessage(randomMessage);
       }
@@ -49,12 +53,21 @@ export class OldMessageReplyService {
     }
   }
 
-  private async replyToMessage(message: Message) {
+  private isTelegramMessage(message: Message): message is TelegramMessage {
+    return message.telegramMessageId !== null;
+  }
+
+  private async replyToMessage(message: TelegramMessage) {
     const reply = await this.oldMessageReplyGenerator.generate(message.text);
     await this.telegramService.reply(reply, message);
   }
 
   private mayReplyToOldMessage(message: MessageWithUser): boolean {
+    if (!this.isTelegramMessage(message)) {
+      // Only reply to telegram messages.
+      return false;
+    }
+
     if (message.text === null) {
       // Only reply to messages with text.
       return false;

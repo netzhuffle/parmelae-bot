@@ -2,7 +2,7 @@ import { injectable } from 'inversify';
 import assert from 'assert';
 import { PrivateChatReplyStrategy } from '../PrivateChatReplyStrategy';
 import { TelegramService } from '../TelegramService';
-import { Message } from '@prisma/client';
+import { TelegramMessage } from '../Repositories/Types';
 
 /** Reply with a Sticker file_id when Sticker sent in private chat. */
 @injectable()
@@ -11,11 +11,11 @@ export class StickerIdReplyStrategy extends PrivateChatReplyStrategy {
     super();
   }
 
-  willHandlePrivate(message: Message): boolean {
+  willHandlePrivate(message: TelegramMessage): boolean {
     return !!message.stickerFileId;
   }
 
-  handle(message: Message): Promise<void> {
+  handle(message: TelegramMessage): Promise<void> {
     assert(message.stickerFileId);
     return this.telegram.reply(
       `Sticker file_id: ${message.stickerFileId}`,

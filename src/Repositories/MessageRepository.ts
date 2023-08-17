@@ -4,7 +4,11 @@ import {
   MessageWithRelations,
   MessageWithUser,
   MessageWithUserAndReplyTo,
+  TelegramMessage,
+  TelegramMessageWithRelations,
+  UnstoredMessageWithRelations,
 } from './Types';
+import { assert } from 'console';
 
 /** Number of milliseconds in a day */
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
@@ -17,15 +21,11 @@ const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 export class MessageRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  /**
-   * Returns the full message including relations.
-   *
-   * The message must be in the database.
-   */
-  async get(message: Message): Promise<MessageWithUserAndReplyTo> {
+  /** Returns the full message including user and reply-to relations. */
+  async get(id: number): Promise<MessageWithUserAndReplyTo> {
     return this.prisma.message.findUniqueOrThrow({
       where: {
-        id: this.getMessageId(message),
+        id,
       },
       include: {
         from: true,
@@ -34,24 +34,60 @@ export class MessageRepository {
     });
   }
 
-  /** Stores a message and its author. */
-  async store(message: MessageWithRelations): Promise<void> {
-    const databaseMessage = await this.prisma.message.findUnique({
+  /** Returns the full message including all relations. */
+  async getWithAllRelations(id: number): Promise<TelegramMessageWithRelations> {
+    const message = await this.prisma.message.findUniqueOrThrow({
       where: {
-        id: this.getMessageId(message),
+        id,
+        telegramMessageId: {
+          not: null,
+        },
+      },
+      include: {
+        chat: true,
+        from: true,
+        replyToMessage: {
+          include: {
+            from: true,
+          },
+        },
+        newChatMembers: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
-    if (databaseMessage) {
-      // Message already stored.
-      return;
+    this.assertIsTelegramMessageWithRelations(message);
+
+    return message;
+  }
+
+  /** Stores a telegram message and its author. */
+  async store(
+    message: UnstoredMessageWithRelations,
+  ): Promise<TelegramMessageWithRelations> {
+    if (message.telegramMessageId !== null) {
+      const databaseMessage = await this.prisma.message.findUnique({
+        where: {
+          telegramMessageId_chatId: {
+            telegramMessageId: message.telegramMessageId,
+            chatId: message.chat.id,
+          },
+        },
+      });
+      if (databaseMessage) {
+        return this.getWithAllRelations(databaseMessage.id);
+      }
     }
 
-    const replyToMessage = message.replyToMessage
-      ? await this.connectReplyToMessage(message.replyToMessage)
-      : undefined;
-    await this.prisma.message.create({
+    const replyToMessage =
+      message.replyToMessage && this.isTelegramMessage(message.replyToMessage)
+        ? await this.connectReplyToMessage(message.replyToMessage)
+        : undefined;
+    const databaseMessage = await this.prisma.message.create({
       data: {
-        messageId: message.messageId,
+        telegramMessageId: message.telegramMessageId,
         chat: this.connectChat(message.chat),
         sentAt: message.sentAt,
         editedAt: message.editedAt,
@@ -61,23 +97,23 @@ export class MessageRepository {
         newChatMembers: this.connectNewChatMembers(message),
       },
     });
+    return this.getWithAllRelations(databaseMessage.id);
   }
 
-  /** Gets the last message from a chat before the given messageId, if there is any. */
+  /** Gets the last message from a chat before the given message id, if there is any. */
   async getLastChatMessage(
     chatId: bigint | number,
     beforeMessageId: number,
   ): Promise<MessageWithUserAndReplyTo | null> {
-    // Assumes that messageIds in the same chat are always increasing.
     return this.prisma.message.findFirst({
       where: {
         chatId: chatId,
-        messageId: {
+        id: {
           lt: beforeMessageId,
         },
       },
       orderBy: {
-        messageId: 'desc',
+        id: 'desc',
       },
       include: {
         from: true,
@@ -107,13 +143,6 @@ export class MessageRepository {
       where: where7DaysAgo,
     });
     return messagesToDelete;
-  }
-
-  private getMessageId(message: Message): Prisma.MessageIdCompoundUniqueInput {
-    return {
-      messageId: message.messageId,
-      chatId: message.chatId,
-    };
   }
 
   private connectChat(
@@ -147,7 +176,7 @@ export class MessageRepository {
   }
 
   private connectNewChatMembers(
-    message: MessageWithRelations,
+    message: UnstoredMessageWithRelations,
   ):
     | Prisma.ChatEntryMessagesUsersCreateNestedManyWithoutMessageInput
     | undefined {
@@ -160,13 +189,11 @@ export class MessageRepository {
         where: {
           id: {
             messageId: chatEntryMessageUser.messageId,
-            chatId: chatEntryMessageUser.chatId,
             userId: chatEntryMessageUser.userId,
           },
         },
         create: {
           messageId: chatEntryMessageUser.messageId,
-          chatId: chatEntryMessageUser.chatId,
           user: this.connectUser(chatEntryMessageUser.user),
         },
       })),
@@ -174,12 +201,14 @@ export class MessageRepository {
   }
 
   private async connectReplyToMessage(
-    message: Message,
+    message: Omit<TelegramMessage, 'id'>,
   ): Promise<Prisma.MessageCreateNestedOneWithoutRepliesInput | undefined> {
-    // Querying to make sure the message replied to exists in the database.
     const replyToMessage = await this.prisma.message.findUnique({
       where: {
-        id: this.getMessageId(message),
+        telegramMessageId_chatId: {
+          telegramMessageId: message.telegramMessageId,
+          chatId: message.chatId,
+        },
       },
     });
 
@@ -189,8 +218,23 @@ export class MessageRepository {
 
     return {
       connect: {
-        id: this.getMessageId(replyToMessage),
+        id: replyToMessage.id,
       },
     };
+  }
+
+  private isTelegramMessage(
+    message: Omit<Message, 'id'>,
+  ): message is TelegramMessage {
+    return message.telegramMessageId !== null;
+  }
+
+  private assertIsTelegramMessageWithRelations(
+    message: MessageWithRelations,
+  ): asserts message is TelegramMessageWithRelations {
+    assert(this.isTelegramMessage(message));
+    assert(
+      !message.replyToMessage || this.isTelegramMessage(message.replyToMessage),
+    );
   }
 }

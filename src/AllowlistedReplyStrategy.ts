@@ -1,14 +1,17 @@
 import { ReplyStrategy } from './ReplyStrategy';
 import { Config } from './Config';
 import { injectable } from 'inversify';
-import { MessageWithRelations, MessageWithReplyTo } from './Repositories/Types';
+import {
+  TelegramMessageWithRelations,
+  TelegramMessageWithReplyTo,
+} from './Repositories/Types';
 
 /** Abstract ReplyStrategy for allowlisted chats and allowlisted private message senders only */
 @injectable()
 export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
   constructor(protected readonly config: Config) {}
 
-  willHandle(message: MessageWithRelations): boolean {
+  willHandle(message: TelegramMessageWithRelations): boolean {
     if (!this.config.chatAllowlist.includes(message.chatId)) {
       return false;
     }
@@ -22,7 +25,9 @@ export abstract class AllowlistedReplyStrategy implements ReplyStrategy {
    * Will only be called if no other strategy handled the message before and if the message is in an allowlisted chat
    * or if the private message sender is allowlisted.
    */
-  abstract willHandleAllowlisted(message: MessageWithRelations): boolean;
+  abstract willHandleAllowlisted(
+    message: TelegramMessageWithRelations,
+  ): boolean;
 
-  abstract handle(message: MessageWithReplyTo): Promise<void>;
+  abstract handle(message: TelegramMessageWithReplyTo): Promise<void>;
 }

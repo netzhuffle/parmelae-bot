@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import assert from 'assert';
 import { Sticker } from '../Sticker';
 import { TelegramService } from '../TelegramService';
-import { MessageWithRelations } from '../Repositories/Types';
+import { TelegramMessageWithRelations } from '../Repositories/Types';
 
 /** Possible messages. %u will be replaced with the user’s first name. */
 const MESSAGES = [
@@ -40,11 +40,11 @@ const USER_REPLACEMENT_REG_EXP = /%u/g;
 export class NewMembersReplyStrategy implements ReplyStrategy {
   constructor(private readonly telegram: TelegramService) {}
 
-  willHandle(message: MessageWithRelations): boolean {
+  willHandle(message: TelegramMessageWithRelations): boolean {
     return message.newChatMembers.length >= 1;
   }
 
-  async handle(message: MessageWithRelations): Promise<void> {
+  async handle(message: TelegramMessageWithRelations): Promise<void> {
     assert(message.newChatMembers.length);
 
     const promises = message.newChatMembers.map((chatEntryMessageUser) => {

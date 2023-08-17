@@ -1,12 +1,14 @@
 import { injectable } from 'inversify';
 import { ReplyStrategy } from './ReplyStrategy';
-import { Message } from '@prisma/client';
-import { MessageWithRelations } from './Repositories/Types';
+import {
+  TelegramMessage,
+  TelegramMessageWithRelations,
+} from './Repositories/Types';
 
 /** Abstract ReplyStrategy for private chats only */
 @injectable()
 export abstract class PrivateChatReplyStrategy implements ReplyStrategy {
-  willHandle(message: MessageWithRelations): boolean {
+  willHandle(message: TelegramMessageWithRelations): boolean {
     if (message.chat.type !== 'private') {
       return false;
     }
@@ -20,7 +22,7 @@ export abstract class PrivateChatReplyStrategy implements ReplyStrategy {
    * Will only be called if no other strategy handled the message before and if the message is in a private chat with
    * the bot.
    */
-  abstract willHandlePrivate(message: Message): boolean;
+  abstract willHandlePrivate(message: TelegramMessage): boolean;
 
-  abstract handle(message: Message): Promise<void>;
+  abstract handle(message: TelegramMessage): Promise<void>;
 }

@@ -1,7 +1,10 @@
 import { injectable } from 'inversify';
 import { MessageRepository } from './Repositories/MessageRepository';
 import { OldMessageReplyService } from './OldMessageReplyService';
-import { MessageWithRelations } from './Repositories/Types';
+import {
+  TelegramMessageWithRelations,
+  UnstoredMessageWithRelations,
+} from './Repositories/Types';
 
 /** First hour to reply to old messages in. */
 const MAIN_CHAT_TIME_STARTING_HOUR = 11;
@@ -17,9 +20,11 @@ const HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 export class MessageStorageService {
   constructor(private readonly messageRepository: MessageRepository) {}
 
-  /** Stores a message and its author if message type is supported by storage. */
-  async store(message: MessageWithRelations): Promise<void> {
-    await this.messageRepository.store(message);
+  /** Stores a telegram message and its author if message type is supported by storage. */
+  store(
+    message: UnstoredMessageWithRelations,
+  ): Promise<TelegramMessageWithRelations> {
+    return this.messageRepository.store(message);
   }
 
   /**

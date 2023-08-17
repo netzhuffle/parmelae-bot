@@ -2,7 +2,10 @@ import { injectable } from 'inversify';
 import { MessageStorageService } from './MessageStorageService';
 import { Chat, User } from '@prisma/client';
 import assert from 'assert';
-import { MessageWithRelations } from './Repositories/Types';
+import {
+  TelegramMessageWithRelations,
+  UnstoredMessageWithRelations,
+} from './Repositories/Types';
 import * as Typegram from 'telegraf/typings/core/types/typegram';
 
 type SupportedMessage =
@@ -28,17 +31,18 @@ export class MessageService {
   constructor(private readonly messageStorage: MessageStorageService) {}
 
   /** Stores and returns a new message coming from Telegram. */
-  async storeIncoming(
+  storeIncoming(
     telegramMessage: SupportedMessage,
-  ): Promise<MessageWithRelations> {
+  ): Promise<TelegramMessageWithRelations> {
     assert(this.isSupported(telegramMessage));
     const message = this.getMessage(telegramMessage);
-    await this.messageStorage.store(message);
-    return message;
+    return this.messageStorage.store(message);
   }
 
   /** Stores a message sent to Telegram. */
-  async storeSent(telegramMessage: SupportedMessage): Promise<void> {
+  async storeSent(
+    telegramMessage: SupportedMessage,
+  ): Promise<TelegramMessageWithRelations> {
     assert(this.isSupported(telegramMessage));
 
     const message = this.getMessage(telegramMessage);
@@ -120,7 +124,9 @@ export class MessageService {
     };
   }
 
-  private getMessage(telegramMessage: SupportedMessage): MessageWithRelations {
+  private getMessage(
+    telegramMessage: SupportedMessage,
+  ): UnstoredMessageWithRelations {
     assert(telegramMessage.from);
     const chatId = BigInt(telegramMessage.chat.id);
     const replyToMessage =
@@ -130,7 +136,7 @@ export class MessageService {
     const editDate =
       'edit_date' in telegramMessage ? telegramMessage.edit_date : undefined;
     return {
-      messageId: telegramMessage.message_id,
+      telegramMessageId: telegramMessage.message_id,
       chatId,
       chat: this.getChat(telegramMessage.chat),
       fromId: BigInt(telegramMessage.from.id),
@@ -138,9 +144,6 @@ export class MessageService {
       sentAt: this.getDate(telegramMessage.date),
       editedAt: this.getOptionalDate(editDate),
       replyToMessageId: replyToMessage?.message_id ?? null,
-      replyToMessageChatId: replyToMessage
-        ? BigInt(replyToMessage.chat.id)
-        : null,
       replyToMessage:
         replyToMessage && this.isSupported(replyToMessage)
           ? this.getMessage(replyToMessage)

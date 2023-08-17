@@ -4,7 +4,6 @@ import {
   MessageWithUser,
   MessageWithUserAndReplyTo,
 } from './Repositories/Types';
-import { Message } from '@prisma/client';
 
 /** Finds the conversation history. */
 @injectable()
@@ -16,11 +15,11 @@ export class MessageHistoryService {
    *
    * Preceding message is the message replied to, or if it is not a reply, then the message last written before in the
    * same chat, if there is one.
-   * @param toMessage - The message to find history to. Must be stored in the database.
+   * @param toMessageId - The message id to find history to.
    * @return History, from oldest to newest, including the message requested the history for.
    */
-  async getHistory(toMessage: Message): Promise<MessageWithUser[]> {
-    const message = await this.messageRepository.get(toMessage);
+  async getHistory(toMessageId: number): Promise<MessageWithUser[]> {
+    const message = await this.messageRepository.get(toMessageId);
     return this.getHistoryForMessages([message]);
   }
 
@@ -37,7 +36,7 @@ export class MessageHistoryService {
     // If the oldest message is a reply, then the preceding message is the message replied to.
     if (oldestMessage.replyToMessage) {
       const messageRepliedTo = await this.messageRepository.get(
-        oldestMessage.replyToMessage,
+        oldestMessage.replyToMessage.id,
       );
       return this.getHistoryForMessages([messageRepliedTo, ...messages]);
     }
@@ -45,7 +44,7 @@ export class MessageHistoryService {
     // Fallback to last message in chat if there is one.
     const precedingMessage = await this.messageRepository.getLastChatMessage(
       oldestMessage.chatId,
-      oldestMessage.messageId,
+      oldestMessage.id,
     );
     if (precedingMessage) {
       return this.getHistoryForMessages([precedingMessage, ...messages]);

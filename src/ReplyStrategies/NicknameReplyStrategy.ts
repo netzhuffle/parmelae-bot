@@ -1,7 +1,7 @@
 import { ReplyStrategy } from '../ReplyStrategy';
 import { injectable } from 'inversify';
 import { TelegramService } from '../TelegramService';
-import { Message } from '@prisma/client';
+import { TelegramMessage } from '../Repositories/Types';
 
 /** Adjectives: First word of nickname. */
 const ADJECTIVES = [
@@ -95,11 +95,11 @@ const NOUNS = [
 export class NicknameReplyStrategy implements ReplyStrategy {
   constructor(private readonly telegram: TelegramService) {}
 
-  willHandle(message: Message): boolean {
+  willHandle(message: TelegramMessage): boolean {
     return message.text.includes('<Spitzname>');
   }
 
-  handle(message: Message): Promise<void> {
+  handle(message: TelegramMessage): Promise<void> {
     const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
     const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
 

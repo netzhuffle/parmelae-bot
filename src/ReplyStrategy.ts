@@ -1,4 +1,4 @@
-import { MessageWithRelations } from './Repositories/Types';
+import { TelegramMessageWithRelations } from './Repositories/Types';
 
 /** Handles an incoming message if it likes to. */
 export interface ReplyStrategy {
@@ -7,12 +7,12 @@ export interface ReplyStrategy {
    *
    * Will only be called if no other strategy handled the message before.
    */
-  willHandle(message: MessageWithRelations): boolean;
+  willHandle(message: TelegramMessageWithRelations): boolean;
 
   /**
    * Handle the message.
    *
    * Will only be called if the strategy said it will handle the message.
    */
-  handle(message: MessageWithRelations): Promise<void>;
+  handle(message: TelegramMessageWithRelations): Promise<void>;
 }

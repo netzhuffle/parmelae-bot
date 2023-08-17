@@ -2,7 +2,7 @@ import { Command, Commands } from './Command';
 import { ReplyGenerator } from './MessageGenerators/ReplyGenerator';
 import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError';
 import { injectable } from 'inversify';
-import { MessageWithReplyTo } from './Repositories/Types';
+import { TelegramMessageWithReplyTo } from './Repositories/Types';
 
 /** Executes a command */
 @injectable()
@@ -17,7 +17,7 @@ export class CommandService {
    */
   async execute(
     command: Command,
-    message: MessageWithReplyTo,
+    message: TelegramMessageWithReplyTo,
   ): Promise<string> {
     if (command === Commands.Unknown) {
       return 'Dieses Kommando ist unbekannt. Ich weiss nicht, was ich tun soll.';
