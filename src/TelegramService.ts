@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { Sticker } from './Sticker';
-import { MessageService } from './MessageService';
+import { TelegramMessageService } from './TelegramMessageService';
 import { assert } from 'console';
 import { Telegraf } from 'telegraf';
 import * as Typegram from 'telegraf/typings/core/types/typegram';
@@ -11,7 +11,7 @@ import { TelegramMessage } from './Repositories/Types';
 export class TelegramService {
   constructor(
     private readonly telegraf: Telegraf,
-    private readonly messageService: MessageService,
+    private readonly messageService: TelegramMessageService,
   ) {}
 
   /**
@@ -31,7 +31,7 @@ export class TelegramService {
    */
   async send(message: string | Sticker, chatId: bigint): Promise<void> {
     const sentMessage = await this.sendWithoutStoring(message, chatId);
-    await this.messageService.storeSent(sentMessage);
+    await this.messageService.store(sentMessage);
   }
 
   /**
@@ -73,7 +73,7 @@ export class TelegramService {
         emoji,
       },
     );
-    await this.messageService.storeSent(sentMessage);
+    await this.messageService.store(sentMessage);
     return sentMessage;
   }
 
@@ -105,7 +105,7 @@ export class TelegramService {
         { reply_to_message_id: message.telegramMessageId },
       );
     }
-    await this.messageService.storeSent(sentMessage);
+    await this.messageService.store(sentMessage);
   }
 
   /**
@@ -127,6 +127,6 @@ export class TelegramService {
         caption: caption,
       },
     );
-    await this.messageService.storeSent(sentMessage);
+    await this.messageService.store(sentMessage);
   }
 }

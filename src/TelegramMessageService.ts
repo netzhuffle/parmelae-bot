@@ -25,26 +25,16 @@ type SupportedMessage =
   | Typegram.Message.VoiceMessage
   | Typegram.Message.VenueMessage;
 
-/** Handles Telegram messages. */
+/** Handles incoming and outgoing Telegram messages. */
 @injectable()
-export class MessageService {
+export class TelegramMessageService {
   constructor(private readonly messageStorage: MessageStorageService) {}
 
-  /** Stores and returns a new message coming from Telegram. */
-  storeIncoming(
+  /** Stores a message sent to or coming from Telegram. */
+  store(
     telegramMessage: SupportedMessage,
   ): Promise<TelegramMessageWithRelations> {
     assert(this.isSupported(telegramMessage));
-    const message = this.getMessage(telegramMessage);
-    return this.messageStorage.store(message);
-  }
-
-  /** Stores a message sent to Telegram. */
-  async storeSent(
-    telegramMessage: SupportedMessage,
-  ): Promise<TelegramMessageWithRelations> {
-    assert(this.isSupported(telegramMessage));
-
     const message = this.getMessage(telegramMessage);
     return this.messageStorage.store(message);
   }

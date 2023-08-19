@@ -4,7 +4,7 @@ import { Config } from './Config';
 import { MessageStorageService } from './MessageStorageService';
 import { GitHubService } from './GitHubService';
 import { OldMessageReplyService } from './OldMessageReplyService';
-import { MessageService } from './MessageService';
+import { TelegramMessageService } from './TelegramMessageService';
 import { ReplyStrategyFinder } from './ReplyStrategyFinder';
 import { ScheduledMessageService } from './ScheduledMessageService';
 import { Telegraf } from 'telegraf';
@@ -21,7 +21,7 @@ export class Bot {
     private readonly messageStorage: MessageStorageService,
     private readonly gitHub: GitHubService,
     private readonly oldMessageReplyService: OldMessageReplyService,
-    private readonly messageService: MessageService,
+    private readonly messageService: TelegramMessageService,
     private readonly replyStrategyFinder: ReplyStrategyFinder,
     private readonly scheduledMessageService: ScheduledMessageService,
   ) {}
@@ -53,7 +53,7 @@ export class Bot {
     if (!this.messageService.isSupported(telegramMessage)) {
       return;
     }
-    const message = await this.messageService.storeIncoming(telegramMessage);
+    const message = await this.messageService.store(telegramMessage);
     const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
     return replyStrategy.handle(message);
   }
