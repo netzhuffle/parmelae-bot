@@ -16,21 +16,18 @@ import {
   InputValues,
 } from 'langchain/schema';
 import { injectable } from 'inversify';
-import { ChatGptModel, GptModelsProvider } from './GptModelsProvider';
+import { ChatGptModel, GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
   ChatGptRoles,
-} from './MessageGenerators/ChatGptMessage';
-import { TypedPromptInputValues } from 'langchain/dist/prompts/base';
+} from './MessageGenerators/ChatGptMessage.js';
 import { ChatCompletionRequestMessageFunctionCall } from 'openai';
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
   InputValues<string>
 > {
-  async format(
-    values: TypedPromptInputValues<InputValues<string>>,
-  ): Promise<BaseMessage> {
+  async format(values: InputValues<string>): Promise<BaseMessage> {
     if (!this.name) {
       return super.format(values);
     }
@@ -59,9 +56,7 @@ export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
 export class AIFunctionCallMessagePromptTemplate extends AIMessagePromptTemplate<
   InputValues<string>
 > {
-  async format(
-    values: TypedPromptInputValues<InputValues<string>>,
-  ): Promise<BaseMessage> {
+  async format(values: InputValues<string>): Promise<BaseMessage> {
     if (!this.functionCall) {
       return super.format(values);
     }
@@ -93,9 +88,7 @@ export class AIFunctionCallMessagePromptTemplate extends AIMessagePromptTemplate
 export class FunctionMessagePromptTemplate extends HumanMessagePromptTemplate<
   InputValues<string>
 > {
-  async format(
-    values: TypedPromptInputValues<InputValues<string>>,
-  ): Promise<BaseMessage> {
+  async format(values: InputValues<string>): Promise<BaseMessage> {
     return new FunctionMessage(
       {
         content: await this.prompt.format(values),

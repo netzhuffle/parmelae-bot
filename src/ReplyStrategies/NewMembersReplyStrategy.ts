@@ -1,9 +1,9 @@
-import { ReplyStrategy } from '../ReplyStrategy';
+import { ReplyStrategy } from '../ReplyStrategy.js';
 import { injectable } from 'inversify';
 import assert from 'assert';
-import { Sticker } from '../Sticker';
-import { TelegramService } from '../TelegramService';
-import { TelegramMessageWithRelations } from '../Repositories/Types';
+import { Sticker } from '../Sticker.js';
+import { TelegramService } from '../TelegramService.js';
+import { TelegramMessageWithRelations } from '../Repositories/Types.js';
 
 /** Possible messages. %u will be replaced with the user’s first name. */
 const MESSAGES = [

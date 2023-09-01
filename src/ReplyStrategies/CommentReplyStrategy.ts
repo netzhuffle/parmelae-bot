@@ -1,10 +1,10 @@
 import { injectable } from 'inversify';
-import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy';
-import { CommandService } from '../CommandService';
-import { Config } from '../Config';
-import { Commands } from '../Command';
-import { TelegramService } from '../TelegramService';
-import { TelegramMessageWithReplyTo } from '../Repositories/Types';
+import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy.js';
+import { CommandService } from '../CommandService.js';
+import { Config } from '../Config.js';
+import { Commands } from '../Command.js';
+import { TelegramService } from '../TelegramService.js';
+import { TelegramMessageWithReplyTo } from '../Repositories/Types.js';
 import { Message } from '@prisma/client';
 
 /**

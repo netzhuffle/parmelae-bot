@@ -1,12 +1,12 @@
 import { injectable } from 'inversify';
-import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy';
-import { Config } from '../Config';
-import { TelegramService } from '../TelegramService';
-import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator';
+import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy.js';
+import { Config } from '../Config.js';
+import { TelegramService } from '../TelegramService.js';
+import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator.js';
 import {
   TelegramMessage,
   TelegramMessageWithRelations,
-} from '../Repositories/Types';
+} from '../Repositories/Types.js';
 
 /**
  * Handles messages mentioning or replying to the bot in allowlisted chats.

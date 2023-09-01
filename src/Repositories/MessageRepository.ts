@@ -7,7 +7,7 @@ import {
   TelegramMessage,
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
-} from './Types';
+} from './Types.js';
 import { assert } from 'console';
 
 /** Number of milliseconds in a day */

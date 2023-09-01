@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
-import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy';
-import { Config } from '../Config';
-import { TelegramService } from '../TelegramService';
-import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator';
-import { TelegramMessage } from '../Repositories/Types';
+import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy.js';
+import { Config } from '../Config.js';
+import { TelegramService } from '../TelegramService.js';
+import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator.js';
+import { TelegramMessage } from '../Repositories/Types.js';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.035;

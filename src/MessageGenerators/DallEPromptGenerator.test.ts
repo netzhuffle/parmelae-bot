@@ -1,9 +1,9 @@
 import { AIChatMessage } from 'langchain/schema';
-import { DallEPromptGenerator } from './DallEPromptGenerator';
-import { GptModelsProvider } from '../GptModelsProvider';
+import { DallEPromptGenerator } from './DallEPromptGenerator.js';
+import { GptModelsProvider } from '../GptModelsProvider.js';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake';
-import { ChatGptService } from '../ChatGptService';
+import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+import { ChatGptService } from '../ChatGptService.js';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 
 test('generate', async () => {

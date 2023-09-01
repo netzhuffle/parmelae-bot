@@ -1,10 +1,10 @@
 import { injectable } from 'inversify';
-import { MessageRepository } from './Repositories/MessageRepository';
-import { OldMessageReplyService } from './OldMessageReplyService';
+import { MessageRepository } from './Repositories/MessageRepository.js';
+import { OldMessageReplyService } from './OldMessageReplyService.js';
 import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
-} from './Repositories/Types';
+} from './Repositories/Types.js';
 
 /** First hour to reply to old messages in. */
 const MAIN_CHAT_TIME_STARTING_HOUR = 11;

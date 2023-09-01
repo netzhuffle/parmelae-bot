@@ -1,4 +1,4 @@
-import { TelegramService } from '../TelegramService';
+import { TelegramService } from '../TelegramService.js';
 import { Tool } from 'langchain/tools';
 
 export class IntermediateAnswerTool extends Tool {

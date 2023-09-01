@@ -1,10 +1,10 @@
 import { injectable } from 'inversify';
-import { Sticker } from './Sticker';
-import { TelegramMessageService } from './TelegramMessageService';
+import { Sticker } from './Sticker.js';
+import { TelegramMessageService } from './TelegramMessageService.js';
 import { assert } from 'console';
 import { Telegraf } from 'telegraf';
-import * as Typegram from 'telegraf/typings/core/types/typegram';
-import { TelegramMessage } from './Repositories/Types';
+import * as Typegram from 'typegram';
+import { TelegramMessage } from './Repositories/Types.js';
 
 /** Service to interact with Telegram. */
 @injectable()

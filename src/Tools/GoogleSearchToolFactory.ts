@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
-import { Config } from '../Config';
-import { SerpAPI } from './SerpAPI';
+import { Config } from '../Config.js';
+import { SerpAPI } from './SerpAPI.js';
 
 @injectable()
 export class GoogleSearchToolFactory {

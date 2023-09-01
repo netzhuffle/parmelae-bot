@@ -1,17 +1,17 @@
-import { NullReplyStrategy } from './ReplyStrategies/NullReplyStrategy';
-import { ReplyStrategy } from './ReplyStrategy';
+import { NullReplyStrategy } from './ReplyStrategies/NullReplyStrategy.js';
+import { ReplyStrategy } from './ReplyStrategy.js';
 import assert from 'assert';
 import { injectable } from 'inversify';
-import { StickerIdReplyStrategy } from './ReplyStrategies/StickerIdReplyStrategy';
-import { NewMembersReplyStrategy } from './ReplyStrategies/NewMembersReplyStrategy';
-import { CommandReplyStrategy } from './ReplyStrategies/CommandReplyStrategy';
-import { BotMentionReplyStrategy } from './ReplyStrategies/ BotMentionReplyStrategy';
-import { MessageRepetitionReplyStrategy } from './ReplyStrategies/MessageRepetitionReplyStrategy';
-import { NicknameReplyStrategy } from './ReplyStrategies/NicknameReplyStrategy';
-import { RandomizedGeneratedReplyStrategy } from './ReplyStrategies/RandomizedGeneratedReplyStrategy';
-import { RandomizedStickerReplyStrategy } from './ReplyStrategies/RandomizedStickerReplyStrategy';
-import { CommentReplyStrategy } from './ReplyStrategies/CommentReplyStrategy';
-import { TelegramMessageWithRelations } from './Repositories/Types';
+import { StickerIdReplyStrategy } from './ReplyStrategies/StickerIdReplyStrategy.js';
+import { NewMembersReplyStrategy } from './ReplyStrategies/NewMembersReplyStrategy.js';
+import { CommandReplyStrategy } from './ReplyStrategies/CommandReplyStrategy.js';
+import { BotMentionReplyStrategy } from './ReplyStrategies/ BotMentionReplyStrategy.js';
+import { MessageRepetitionReplyStrategy } from './ReplyStrategies/MessageRepetitionReplyStrategy.js';
+import { NicknameReplyStrategy } from './ReplyStrategies/NicknameReplyStrategy.js';
+import { RandomizedGeneratedReplyStrategy } from './ReplyStrategies/RandomizedGeneratedReplyStrategy.js';
+import { RandomizedStickerReplyStrategy } from './ReplyStrategies/RandomizedStickerReplyStrategy.js';
+import { CommentReplyStrategy } from './ReplyStrategies/CommentReplyStrategy.js';
+import { TelegramMessageWithRelations } from './Repositories/Types.js';
 
 /** Finds the ReplyStrategy to handle a given message. */
 @injectable()

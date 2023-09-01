@@ -1,4 +1,4 @@
-import { VectorStore } from 'langchain/dist/vectorstores/base';
+import { VectorStore } from 'langchain/vectorstores/base';
 
 /** A vector store. */
 export interface SingleVectorStore {

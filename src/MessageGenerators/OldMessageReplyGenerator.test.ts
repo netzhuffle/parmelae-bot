@@ -1,9 +1,9 @@
 import { AIChatMessage } from 'langchain/schema';
-import { GptModelsProvider } from '../GptModelsProvider';
+import { GptModelsProvider } from '../GptModelsProvider.js';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { OldMessageReplyGenerator } from './OldMessageReplyGenerator';
-import { ChatGptService } from '../ChatGptService';
-import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake';
+import { OldMessageReplyGenerator } from './OldMessageReplyGenerator.js';
+import { ChatGptService } from '../ChatGptService.js';
+import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 
 test('generate', async () => {

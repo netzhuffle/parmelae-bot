@@ -1,12 +1,12 @@
 import { injectable } from 'inversify';
-import { MessageStorageService } from './MessageStorageService';
+import { MessageStorageService } from './MessageStorageService.js';
 import { Chat, User } from '@prisma/client';
 import assert from 'assert';
 import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
-} from './Repositories/Types';
-import * as Typegram from 'telegraf/typings/core/types/typegram';
+} from './Repositories/Types.js';
+import * as Typegram from 'typegram';
 
 type SupportedMessage =
   | Typegram.Message.TextMessage

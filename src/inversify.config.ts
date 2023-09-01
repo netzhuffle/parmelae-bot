@@ -1,12 +1,12 @@
 import '@abraham/reflection';
 import { Container } from 'inversify';
-import { GptModelsProvider } from './GptModelsProvider';
+import { GptModelsProvider } from './GptModelsProvider.js';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { Octokit } from 'octokit';
 import { Configuration, OpenAIApi } from 'openai';
 import { PrismaClient } from '@prisma/client';
-import { Config } from './Config';
+import { Config } from './Config.js';
 import { Telegraf } from 'telegraf';
 
 const container = new Container({

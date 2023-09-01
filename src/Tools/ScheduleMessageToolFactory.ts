@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
-import { ScheduleMessageTool } from './ScheduleMessageTool';
-import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository';
-import { ScheduledMessageService } from '../ScheduledMessageService';
+import { ScheduleMessageTool } from './ScheduleMessageTool.js';
+import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository.js';
+import { ScheduledMessageService } from '../ScheduledMessageService.js';
 
 /** Factory for the schedule message tool. */
 @injectable()

@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
-import { MessageRepository } from './Repositories/MessageRepository';
+import { MessageRepository } from './Repositories/MessageRepository.js';
 import {
   MessageWithUser,
   MessageWithUserAndReplyTo,
-} from './Repositories/Types';
+} from './Repositories/Types.js';
 
 /** Finds the conversation history. */
 @injectable()

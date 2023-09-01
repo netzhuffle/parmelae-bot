@@ -4,32 +4,32 @@ import { BasePromptTemplate } from 'langchain/prompts';
 import { BaseMessage } from 'langchain/schema';
 import { Calculator } from 'langchain/tools/calculator';
 import { injectable } from 'inversify';
-import { GptModelsProvider } from './GptModelsProvider';
+import { GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
   ChatGptRoles,
-} from './MessageGenerators/ChatGptMessage';
-import { DallEToolFactory } from './Tools/DallEToolFactory';
-import { MinecraftBackupTool } from './Tools/MinecraftBackupTool';
-import { MinecraftStartTool } from './Tools/MinecraftStartTool';
-import { MinecraftStatusTool } from './Tools/MinecraftStatusTool';
-import { MinecraftStopTool } from './Tools/MinecraftStopTool';
-import { SwissConstitutionQaToolFactory } from './Tools/SwissConstitutionQaToolFactory';
-import { WebBrowserToolFactory } from './Tools/WebBrowserToolFactory';
-import { GoogleSearchToolFactory } from './Tools/GoogleSearchToolFactory';
-import { GitHubToolFactory } from './Tools/GitHubToolFactory';
-import { GptModelQueryTool } from './Tools/GptModelQueryTool';
-import { GptModelSetterTool } from './Tools/GptModelSetterTool';
-import { Config } from './Config';
+} from './MessageGenerators/ChatGptMessage.js';
+import { DallEToolFactory } from './Tools/DallEToolFactory.js';
+import { MinecraftBackupTool } from './Tools/MinecraftBackupTool.js';
+import { MinecraftStartTool } from './Tools/MinecraftStartTool.js';
+import { MinecraftStatusTool } from './Tools/MinecraftStatusTool.js';
+import { MinecraftStopTool } from './Tools/MinecraftStopTool.js';
+import { SwissConstitutionQaToolFactory } from './Tools/SwissConstitutionQaToolFactory.js';
+import { WebBrowserToolFactory } from './Tools/WebBrowserToolFactory.js';
+import { GoogleSearchToolFactory } from './Tools/GoogleSearchToolFactory.js';
+import { GitHubToolFactory } from './Tools/GitHubToolFactory.js';
+import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
+import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
+import { Config } from './Config.js';
 import { Tool } from 'langchain/tools';
 import { Message } from '@prisma/client';
-import { DiceToolFactory } from './Tools/DiceToolFactory';
-import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory';
-import { CallbackHandlerFactory } from './CallbackHandlerFactory';
-import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory';
-import { DateTimeTool } from './Tools/DateTimeTool';
-import { ErrorService } from './ErrorService';
-import { ChatGptAgent } from './ChatGptAgent';
+import { DiceToolFactory } from './Tools/DiceToolFactory.js';
+import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
+import { CallbackHandlerFactory } from './CallbackHandlerFactory.js';
+import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
+import { DateTimeTool } from './Tools/DateTimeTool.js';
+import { ErrorService } from './ErrorService.js';
+import { ChatGptAgent } from './ChatGptAgent.js';
 
 /** ChatGPT Agent Service */
 @injectable()

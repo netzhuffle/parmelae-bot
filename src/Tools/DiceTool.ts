@@ -1,5 +1,5 @@
 import { Tool } from 'langchain/tools';
-import { TelegramService } from '../TelegramService';
+import { TelegramService } from '../TelegramService.js';
 
 export class DiceTool extends Tool {
   name = 'dice';

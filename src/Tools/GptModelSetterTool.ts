@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Config } from '../Config';
+import { Config } from '../Config.js';
 import { Tool } from 'langchain/tools';
 
 @injectable()

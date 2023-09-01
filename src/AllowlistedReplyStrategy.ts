@@ -1,10 +1,10 @@
-import { ReplyStrategy } from './ReplyStrategy';
-import { Config } from './Config';
+import { ReplyStrategy } from './ReplyStrategy.js';
+import { Config } from './Config.js';
 import { injectable } from 'inversify';
 import {
   TelegramMessageWithRelations,
   TelegramMessageWithReplyTo,
-} from './Repositories/Types';
+} from './Repositories/Types.js';
 
 /** Abstract ReplyStrategy for allowlisted chats and allowlisted private message senders only */
 @injectable()

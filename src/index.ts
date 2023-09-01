@@ -1,10 +1,8 @@
-import container from './inversify.config';
-import { Config } from './Config';
-import { Bot } from './Bot';
+import container from './inversify.config.js';
+import { Config } from './Config.js';
+import { Bot } from './Bot.js';
 import * as Sentry from '@sentry/node';
 import { RewriteFrames } from '@sentry/integrations';
-
-const rootDirectory = __dirname || process.cwd();
 
 const config = container.get(Config);
 if (config.sentryDsn) {
@@ -13,7 +11,7 @@ if (config.sentryDsn) {
     tracesSampleRate: 0.1,
     integrations: [
       new RewriteFrames({
-        root: rootDirectory,
+        root: process.cwd(),
       }),
     ],
   });
