@@ -240,7 +240,7 @@ export class TelegramMessageService {
     }
 
     if ('photo' in message) {
-      return message.caption ? `📸: ${message.caption}` : '📸';
+      return message.caption ? `[📸: ${message.caption}]` : '[📸]';
     }
 
     if ('poll' in message) {
