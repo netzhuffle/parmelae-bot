@@ -4,9 +4,8 @@ image:
 tasks:
   - name: Prebuild & Run
     init: |
-      npm install
-      npm run build
-      npm run migrate
+      bun install
+      bun run migrate
     command: |
       if [ -f .env ]; then
         # If this workspace already has a .env, don't override it

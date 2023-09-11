@@ -4,10 +4,10 @@
   "scripts": {
     "format": "prettier --write src",
     "schema-format": "prisma format",
-    "build": "tsc",
+    "check-types": "tsc",
     "lint": "eslint src --ext ts",
     "test": "bun test",
-    "checks": "bun run format && bun run schema-format && bun run build && bun run lint && bun run test",
+    "checks": "bun run format && bun run schema-format && bun run check-types && bun run lint && bun run test",
     "migrate": "prisma migrate dev",
     "run-dev": "bun --hot src/index.ts",
     "prisma-studio": "prisma studio",
