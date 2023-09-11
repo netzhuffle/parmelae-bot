@@ -1,6 +1,8 @@
-import { ChatGptService, UserMessagePromptTemplate } from './ChatGptService.js';
-import { ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
-import { ChatGptModels, GptModelsProvider } from './GptModelsProvider.js';
+import '@abraham/reflection';
+import { test, expect } from 'bun:test';
+import { ChatGptService, UserMessagePromptTemplate } from './ChatGptService';
+import { ChatGptRoles } from './MessageGenerators/ChatGptMessage';
+import { ChatGptModels, GptModelsProvider } from './GptModelsProvider';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import {
   AIChatMessage,
@@ -12,7 +14,7 @@ import {
   ChatPromptTemplate,
   SystemMessagePromptTemplate,
 } from 'langchain/prompts';
-import { ChatOpenAiFake } from './Fakes/ChatOpenAiFake.js';
+import { ChatOpenAiFake } from './Fakes/ChatOpenAiFake';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 
 test('generate message', async () => {

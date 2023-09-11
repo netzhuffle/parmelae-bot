@@ -1,4 +1,3 @@
-import * as dotenv from 'dotenv';
 import assert from 'assert';
 import { injectable } from 'inversify';
 
@@ -49,8 +48,6 @@ export class Config {
   public readonly newCommitAnnouncementChats: readonly bigint[];
 
   constructor() {
-    dotenv.config();
-
     assert(process.env.USERNAME, 'You must define USERNAME in .env');
     this.username = process.env.USERNAME;
 

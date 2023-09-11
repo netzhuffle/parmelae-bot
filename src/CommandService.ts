@@ -1,8 +1,8 @@
-import { Command, Commands } from './Command.js';
-import { ReplyGenerator } from './MessageGenerators/ReplyGenerator.js';
-import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
+import { Command, Commands } from './Command';
+import { ReplyGenerator } from './MessageGenerators/ReplyGenerator';
+import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError';
 import { injectable } from 'inversify';
-import { TelegramMessageWithReplyTo } from './Repositories/Types.js';
+import { TelegramMessageWithReplyTo } from './Repositories/Types';
 
 /** Executes a command */
 @injectable()

@@ -1,6 +1,6 @@
-import container from './inversify.config.js';
-import { Config } from './Config.js';
-import { Bot } from './Bot.js';
+import container from './inversify.config';
+import { Config } from './Config';
+import { Bot } from './Bot';
 import * as Sentry from '@sentry/node';
 import { RewriteFrames } from '@sentry/integrations';
 

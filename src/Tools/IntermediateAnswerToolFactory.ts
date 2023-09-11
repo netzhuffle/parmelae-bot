@@ -1,6 +1,6 @@
-import { TelegramService } from '../TelegramService.js';
+import { TelegramService } from '../TelegramService';
 import { injectable } from 'inversify';
-import { IntermediateAnswerTool } from './IntermediateAnswerTool.js';
+import { IntermediateAnswerTool } from './IntermediateAnswerTool';
 
 @injectable()
 export class IntermediateAnswerToolFactory {

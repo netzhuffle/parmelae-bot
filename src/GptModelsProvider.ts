@@ -1,5 +1,5 @@
 import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
+import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 
 export const ChatGptModels = {

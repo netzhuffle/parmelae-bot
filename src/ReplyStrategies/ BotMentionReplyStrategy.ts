@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
-import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy.js';
-import { Config } from '../Config.js';
-import { TelegramService } from '../TelegramService.js';
-import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator.js';
+import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy';
+import { Config } from '../Config';
+import { TelegramService } from '../TelegramService';
+import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator';
 import {
   TelegramMessage,
   TelegramMessageWithRelations,

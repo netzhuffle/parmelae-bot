@@ -1,24 +1,22 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "outDir": "dist",
-    "module": "ES2022",
-    "target": "ES2022",
-    "strict": true,
+    "types": ["bun-types", "@abraham/reflection"],
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+    "allowJs": true,
     "esModuleInterop": true,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "Node",
+    "skipLibCheck": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "skipLibCheck": true
+    "emitDecoratorMetadata": true
   },
   "include": [
-    "src/**/*",
-  ],
-  "ts-node": {
-    "transpileOnly": true,
-    "esm": true,
-  }
+    "src/**/*"
+  ]
 }

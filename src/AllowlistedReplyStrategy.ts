@@ -1,5 +1,5 @@
-import { ReplyStrategy } from './ReplyStrategy.js';
-import { Config } from './Config.js';
+import { ReplyStrategy } from './ReplyStrategy';
+import { Config } from './Config';
 import { injectable } from 'inversify';
 import {
   TelegramMessageWithRelations,

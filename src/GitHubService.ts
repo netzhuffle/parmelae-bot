@@ -1,10 +1,10 @@
 import { Octokit } from 'octokit';
 import { injectable } from 'inversify';
-import { DateTimeSettingRepository } from './Repositories/DateTimeSettingRepository.js';
-import { TelegramService } from './TelegramService.js';
-import { Config } from './Config.js';
+import { DateTimeSettingRepository } from './Repositories/DateTimeSettingRepository';
+import { TelegramService } from './TelegramService';
+import { Config } from './Config';
 import { RequestError } from '@octokit/request-error';
-import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
+import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator';
 
 interface Commit {
   commit: {

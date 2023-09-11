@@ -1,7 +1,7 @@
-import { DallEService } from '../DallEService.js';
-import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator.js';
-import { TelegramService } from '../TelegramService.js';
-import { DallETool } from './DallETool.js';
+import { DallEService } from '../DallEService';
+import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator';
+import { TelegramService } from '../TelegramService';
+import { DallETool } from './DallETool';
 import { injectable } from 'inversify';
 
 @injectable()

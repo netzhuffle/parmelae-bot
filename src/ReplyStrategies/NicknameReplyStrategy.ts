@@ -1,7 +1,7 @@
-import { ReplyStrategy } from '../ReplyStrategy.js';
+import { ReplyStrategy } from '../ReplyStrategy';
 import { injectable } from 'inversify';
-import { TelegramService } from '../TelegramService.js';
-import { TelegramMessage } from '../Repositories/Types.js';
+import { TelegramService } from '../TelegramService';
+import { TelegramMessage } from '../Repositories/Types';
 
 /** Adjectives: First word of nickname. */
 const ADJECTIVES = [

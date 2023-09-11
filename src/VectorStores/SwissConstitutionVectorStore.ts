@@ -1,10 +1,10 @@
 import { VectorStore } from 'langchain/vectorstores/base';
-import { SingleVectorStore } from '../VectorStore.js';
+import { SingleVectorStore } from '../VectorStore';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { HNSWLib } from 'langchain/vectorstores/hnswlib';
 import { injectable } from 'inversify';
-import { GptModelsProvider } from '../GptModelsProvider.js';
+import { GptModelsProvider } from '../GptModelsProvider';
 
 /** Swiss constitution vector store. */
 @injectable()

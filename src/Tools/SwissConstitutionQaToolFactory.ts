@@ -1,9 +1,9 @@
 import { ChainTool } from 'langchain/tools';
 import { injectable } from 'inversify';
-import { GptModelsProvider } from '../GptModelsProvider.js';
+import { GptModelsProvider } from '../GptModelsProvider';
 import { VectorDBQAChain } from 'langchain/chains';
-import { Config } from '../Config.js';
-import { SwissConstitutionVectorStore } from '../VectorStores/SwissConstitutionVectorStore.js';
+import { Config } from '../Config';
+import { SwissConstitutionVectorStore } from '../VectorStores/SwissConstitutionVectorStore';
 
 @injectable()
 export class SwissConstitutionQaToolFactory {

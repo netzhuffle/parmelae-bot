@@ -1,6 +1,6 @@
-import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator.js';
-import { DallEService } from '../DallEService.js';
-import { TelegramService } from '../TelegramService.js';
+import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator';
+import { DallEService } from '../DallEService';
+import { TelegramService } from '../TelegramService';
 import { Tool } from 'langchain/tools';
 
 export class DallETool extends Tool {

@@ -4,8 +4,8 @@ import {
   HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
 } from 'langchain/prompts';
-import { ChatGptService } from '../ChatGptService.js';
-import { ChatGptModels } from '../GptModelsProvider.js';
+import { ChatGptService } from '../ChatGptService';
+import { ChatGptModels } from '../GptModelsProvider';
 import { injectable } from 'inversify';
 
 /** The prompt messages. */

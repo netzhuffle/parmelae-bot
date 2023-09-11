@@ -1,11 +1,11 @@
 import { VectorStore } from 'langchain/vectorstores/base';
-import { SingleVectorStore } from '../VectorStore.js';
+import { SingleVectorStore } from '../VectorStore';
 import { GithubRepoLoader } from 'langchain/document_loaders/web/github';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { HNSWLib } from 'langchain/vectorstores/hnswlib';
 import { injectable } from 'inversify';
-import { GptModelsProvider } from '../GptModelsProvider.js';
-import { Config } from '../Config.js';
+import { GptModelsProvider } from '../GptModelsProvider';
+import { Config } from '../Config';
 
 /** GitHub vector store. */
 @injectable()

@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
-import { ScheduledMessageRepository } from './Repositories/ScheduledMessageRepository.js';
-import { TelegramService } from './TelegramService.js';
-import { ErrorService } from './ErrorService.js';
+import { ScheduledMessageRepository } from './Repositories/ScheduledMessageRepository';
+import { TelegramService } from './TelegramService';
+import { ErrorService } from './ErrorService';
 
 const ONE_SECOND_IN_MILLISECONDS = 1000;
 

@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
-import { TelegramService } from '../TelegramService.js';
-import { DiceTool } from './DiceTool.js';
+import { TelegramService } from '../TelegramService';
+import { DiceTool } from './DiceTool';
 
 @injectable()
 export class DiceToolFactory {

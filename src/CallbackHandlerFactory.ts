@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
-import { CallbackHandler } from './CallbackHandler.js';
-import { TelegramService } from './TelegramService.js';
+import { CallbackHandler } from './CallbackHandler';
+import { TelegramService } from './TelegramService';
 
 /** Creates a callback handler instance. */
 @injectable()

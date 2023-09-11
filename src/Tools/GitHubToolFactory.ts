@@ -1,9 +1,9 @@
 import { ChainTool } from 'langchain/tools';
 import { injectable } from 'inversify';
-import { GptModelsProvider } from '../GptModelsProvider.js';
+import { GptModelsProvider } from '../GptModelsProvider';
 import { VectorDBQAChain } from 'langchain/chains';
-import { Config } from '../Config.js';
-import { GitHubVectorStore } from '../VectorStores/GitHubVectorStore.js';
+import { Config } from '../Config';
+import { GitHubVectorStore } from '../VectorStores/GitHubVectorStore';
 
 @injectable()
 export class GitHubToolFactory {

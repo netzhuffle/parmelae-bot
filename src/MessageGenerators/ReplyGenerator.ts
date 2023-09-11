@@ -1,5 +1,5 @@
-import { MessageHistoryService } from '../MessageHistoryService.js';
-import { Config } from '../Config.js';
+import { MessageHistoryService } from '../MessageHistoryService';
+import { Config } from '../Config';
 import {
   AIFunctionCallMessagePromptTemplate,
   ChatGptService,
@@ -15,7 +15,7 @@ import {
 } from 'langchain/prompts';
 import { AIMessage, BaseMessage } from 'langchain/schema';
 import { injectable } from 'inversify';
-import { ChatGptAgentService } from '../ChatGptAgentService.js';
+import { ChatGptAgentService } from '../ChatGptAgentService';
 import { Message } from '@prisma/client';
 
 /** The prompt messages. */

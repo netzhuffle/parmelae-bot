@@ -16,7 +16,7 @@ import {
   InputValues,
 } from 'langchain/schema';
 import { injectable } from 'inversify';
-import { ChatGptModel, GptModelsProvider } from './GptModelsProvider.js';
+import { ChatGptModel, GptModelsProvider } from './GptModelsProvider';
 import {
   ChatGptMessage,
   ChatGptRoles,

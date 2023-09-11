@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 import assert from 'assert';
-import { PrivateChatReplyStrategy } from '../PrivateChatReplyStrategy.js';
-import { TelegramService } from '../TelegramService.js';
-import { TelegramMessage } from '../Repositories/Types.js';
+import { PrivateChatReplyStrategy } from '../PrivateChatReplyStrategy';
+import { TelegramService } from '../TelegramService';
+import { TelegramMessage } from '../Repositories/Types';
 
 /** Reply with a Sticker file_id when Sticker sent in private chat. */
 @injectable()

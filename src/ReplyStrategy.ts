@@ -1,4 +1,4 @@
-import { TelegramMessageWithRelations } from './Repositories/Types.js';
+import { TelegramMessageWithRelations } from './Repositories/Types';
 
 /** Handles an incoming message if it likes to. */
 export interface ReplyStrategy {

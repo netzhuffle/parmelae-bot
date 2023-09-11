@@ -1,9 +1,11 @@
+import '@abraham/reflection';
+import { test, expect } from 'bun:test';
 import { AIChatMessage } from 'langchain/schema';
-import { GptModelsProvider } from '../GptModelsProvider.js';
+import { GptModelsProvider } from '../GptModelsProvider';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { OldMessageReplyGenerator } from './OldMessageReplyGenerator.js';
-import { ChatGptService } from '../ChatGptService.js';
-import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+import { OldMessageReplyGenerator } from './OldMessageReplyGenerator';
+import { ChatGptService } from '../ChatGptService';
+import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 
 test('generate', async () => {

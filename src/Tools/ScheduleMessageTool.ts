@@ -1,7 +1,7 @@
-import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository.js';
+import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository';
 import { Tool } from 'langchain/tools';
-import { ScheduledMessageService } from '../ScheduledMessageService.js';
-import { ErrorService } from '../ErrorService.js';
+import { ScheduledMessageService } from '../ScheduledMessageService';
+import { ErrorService } from '../ErrorService';
 
 /** RegExp to check for numeric string. */
 const NUMERIC_REGEXP = /^\d+$/;

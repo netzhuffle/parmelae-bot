@@ -1,16 +1,16 @@
 import assert from 'assert';
 import { injectable } from 'inversify';
-import { Config } from './Config.js';
-import { MessageStorageService } from './MessageStorageService.js';
-import { GitHubService } from './GitHubService.js';
-import { OldMessageReplyService } from './OldMessageReplyService.js';
-import { TelegramMessageService } from './TelegramMessageService.js';
-import { ReplyStrategyFinder } from './ReplyStrategyFinder.js';
-import { ScheduledMessageService } from './ScheduledMessageService.js';
+import { Config } from './Config';
+import { MessageStorageService } from './MessageStorageService';
+import { GitHubService } from './GitHubService';
+import { OldMessageReplyService } from './OldMessageReplyService';
+import { TelegramMessageService } from './TelegramMessageService';
+import { ReplyStrategyFinder } from './ReplyStrategyFinder';
+import { ScheduledMessageService } from './ScheduledMessageService';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
-import * as Typegram from 'typegram';
-import { ErrorService } from './ErrorService.js';
+import * as Typegram from '@telegraf/types';
+import { ErrorService } from './ErrorService';
 
 /** The most helpful bot in the world. */
 @injectable()

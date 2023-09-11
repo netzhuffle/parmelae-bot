@@ -1,8 +1,8 @@
-import { ReplyStrategy } from '../ReplyStrategy.js';
+import { ReplyStrategy } from '../ReplyStrategy';
 import { injectable } from 'inversify';
-import { Sticker } from '../Sticker.js';
-import { TelegramService } from '../TelegramService.js';
-import { TelegramMessage } from '../Repositories/Types.js';
+import { Sticker } from '../Sticker';
+import { TelegramService } from '../TelegramService';
+import { TelegramMessage } from '../Repositories/Types';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.00035;

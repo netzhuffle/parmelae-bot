@@ -1,7 +1,7 @@
-import { ReplyStrategy } from '../ReplyStrategy.js';
+import { ReplyStrategy } from '../ReplyStrategy';
 import { injectable } from 'inversify';
-import { TelegramService } from '../TelegramService.js';
-import { Sticker } from '../Sticker.js';
+import { TelegramService } from '../TelegramService';
+import { Sticker } from '../Sticker';
 import { Message } from '@prisma/client';
 
 /** Repeats a message that two other users wrote. */

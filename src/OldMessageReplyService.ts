@@ -1,8 +1,8 @@
-import { Config } from './Config.js';
-import { TelegramService } from './TelegramService.js';
-import { MessageWithUser, TelegramMessage } from './Repositories/Types.js';
-import { OldMessageReplyGenerator } from './MessageGenerators/OldMessageReplyGenerator.js';
-import { ChatGptService } from './ChatGptService.js';
+import { Config } from './Config';
+import { TelegramService } from './TelegramService';
+import { MessageWithUser, TelegramMessage } from './Repositories/Types';
+import { OldMessageReplyGenerator } from './MessageGenerators/OldMessageReplyGenerator';
+import { ChatGptService } from './ChatGptService';
 import { injectable } from 'inversify';
 import { Message } from '@prisma/client';
 

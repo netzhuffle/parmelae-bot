@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
-import { MessageRepository } from './Repositories/MessageRepository.js';
-import { OldMessageReplyService } from './OldMessageReplyService.js';
+import { MessageRepository } from './Repositories/MessageRepository';
+import { OldMessageReplyService } from './OldMessageReplyService';
 import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,

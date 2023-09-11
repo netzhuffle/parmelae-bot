@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { MessageRepository } from './Repositories/MessageRepository.js';
+import { MessageRepository } from './Repositories/MessageRepository';
 import {
   MessageWithUser,
   MessageWithUserAndReplyTo,

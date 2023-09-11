@@ -1,9 +1,9 @@
 import { BaseCallbackHandler } from 'langchain/callbacks';
-import { TelegramService } from './TelegramService.js';
+import { TelegramService } from './TelegramService';
 import { AgentAction, ChainValues } from 'langchain/schema';
-import { IntermediateAnswerTool } from './Tools/IntermediateAnswerTool.js';
+import { IntermediateAnswerTool } from './Tools/IntermediateAnswerTool';
 import { assert } from 'console';
-import { ErrorService } from './ErrorService.js';
+import { ErrorService } from './ErrorService';
 
 /** Handles LangChain callbacks. */
 export class CallbackHandler extends BaseCallbackHandler {
