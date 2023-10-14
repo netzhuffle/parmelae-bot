@@ -1,4 +1,4 @@
-import { OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 import { injectable } from 'inversify';
 
 /**
@@ -14,7 +14,7 @@ const ONE_IMAGE = 1;
 /** DALL·E Service */
 @injectable()
 export class DallEService {
-  constructor(private readonly openAi: OpenAIApi) {}
+  constructor(private readonly openAi: OpenAI) {}
 
   /**
    * Generates an image.
@@ -23,12 +23,12 @@ export class DallEService {
    */
   async generateImage(prompt: string): Promise<string | null> {
     try {
-      const response = await this.openAi.createImage({
+      const response = await this.openAi.images.generate({
         prompt,
         n: ONE_IMAGE,
         size: SIZE,
       });
-      return response.data.data[0].url ?? null;
+      return response.data[0].url ?? null;
     } catch (e) {
       if (e instanceof Error && e.message.startsWith('connect ECONNREFUSED')) {
         return null;

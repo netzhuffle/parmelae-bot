@@ -4,7 +4,7 @@ import { GptModelsProvider } from './GptModelsProvider.js';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { Octokit } from 'octokit';
-import { Configuration, OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 import { PrismaClient } from '@prisma/client';
 import { Config } from './Config.js';
 import { Telegraf } from 'telegraf';
@@ -100,13 +100,11 @@ container.bind(Octokit).toDynamicValue(
       timeZone: 'Europe/Zurich',
     }),
 );
-container.bind(OpenAIApi).toDynamicValue(
+container.bind(OpenAI).toDynamicValue(
   (context) =>
-    new OpenAIApi(
-      new Configuration({
-        apiKey: context.container.get(Config).openAiKey,
-      }),
-    ),
+    new OpenAI({
+      apiKey: context.container.get(Config).openAiKey,
+    }),
 );
 container.bind(PrismaClient).toDynamicValue(() => new PrismaClient());
 container

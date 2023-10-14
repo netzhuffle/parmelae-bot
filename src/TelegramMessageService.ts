@@ -6,7 +6,7 @@ import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
 } from './Repositories/Types.js';
-import * as Typegram from 'typegram';
+import * as Typegram from '@telegraf/types';
 
 type SupportedMessage =
   | Typegram.Message.TextMessage

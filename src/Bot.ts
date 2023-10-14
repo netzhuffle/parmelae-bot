@@ -9,7 +9,7 @@ import { ReplyStrategyFinder } from './ReplyStrategyFinder.js';
 import { ScheduledMessageService } from './ScheduledMessageService.js';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
-import * as Typegram from 'typegram';
+import * as Typegram from '@telegraf/types';
 import { ErrorService } from './ErrorService.js';
 
 /** The most helpful bot in the world. */

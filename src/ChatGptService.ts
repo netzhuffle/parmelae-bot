@@ -21,7 +21,7 @@ import {
   ChatGptMessage,
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage.js';
-import { ChatCompletionRequestMessageFunctionCall } from 'openai';
+import { ChatCompletionMessage } from 'openai/resources/index.js';
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
@@ -71,13 +71,13 @@ export class AIFunctionCallMessagePromptTemplate extends AIMessagePromptTemplate
     prompt: BaseStringPromptTemplate<
       InputValues<Extract<keyof InputValues<string>, string>>
     >,
-    private readonly functionCall: ChatCompletionRequestMessageFunctionCall,
+    private readonly functionCall: ChatCompletionMessage.FunctionCall,
   ) {
     super(prompt);
   }
 
   static fromCallAndTemplate(
-    functionCall: ChatCompletionRequestMessageFunctionCall,
+    functionCall: ChatCompletionMessage.FunctionCall,
     template: string,
   ) {
     return new this(PromptTemplate.fromTemplate(template), functionCall);

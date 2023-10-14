@@ -3,7 +3,7 @@ import { Sticker } from './Sticker.js';
 import { TelegramMessageService } from './TelegramMessageService.js';
 import { assert } from 'console';
 import { Telegraf } from 'telegraf';
-import * as Typegram from 'typegram';
+import * as Typegram from '@telegraf/types';
 import { TelegramMessage } from './Repositories/Types.js';
 
 /** Service to interact with Telegram. */
