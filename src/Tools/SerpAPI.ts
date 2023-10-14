@@ -354,38 +354,61 @@ export class SerpAPI extends Tool {
 
     const res = await resp.json();
 
-    if (res.error) {
+    if (typeof res !== 'object' || res === null) {
+      return 'Request failed';
+    }
+
+    if ('error' in res) {
       throw new Error(`Got error from serpAPI: ${res.error}`);
     }
 
     let links = '';
-    if (res.organic_results) {
+    if ('organic_results' in res && Array.isArray(res.organic_results)) {
       links = res.organic_results
         .map((r: { title: string; link: string }) => `[${r.title}](${r.link})`)
         .join();
     }
 
-    if (res.answer_box?.answer) {
-      return `${res.answer_box.answer}\n${links}`;
+    if (
+      'answer_box' in res &&
+      typeof res.answer_box === 'object' &&
+      res.answer_box !== null
+    ) {
+      if ('answer' in res.answer_box) {
+        return `${res.answer_box.answer}\n${links}`;
+      }
+
+      if ('snippet' in res.answer_box) {
+        return `${res.answer_box.snippet}\n${links}`;
+      }
+
+      if (
+        'snippet_highlighted_words' in res.answer_box &&
+        Array.isArray(res.answer_box.snippet_highlighted_words)
+      ) {
+        return `${res.answer_box.snippet_highlighted_words[0]}\n${links}`;
+      }
     }
 
-    if (res.answer_box?.snippet) {
-      return `${res.answer_box.snippet}\n${links}`;
-    }
-
-    if (res.answer_box?.snippet_highlighted_words) {
-      return `${res.answer_box.snippet_highlighted_words[0]}\n${links}`;
-    }
-
-    if (res.sports_results?.game_spotlight) {
+    if (
+      'sports_results' in res &&
+      typeof res.sports_results === 'object' &&
+      res.sports_results !== null &&
+      'game_spotlight' in res.sports_results
+    ) {
       return `${res.sports_results.game_spotlight}\n${links}`;
     }
 
-    if (res.knowledge_graph?.description) {
+    if (
+      'knowledge_graph' in res &&
+      typeof res.knowledge_graph === 'object' &&
+      res.knowledge_graph !== null &&
+      'description' in res.knowledge_graph
+    ) {
       return `${res.knowledge_graph.description}\n${links}`;
     }
 
-    if (res.organic_results.length) {
+    if (links !== '') {
       return links;
     }
 
