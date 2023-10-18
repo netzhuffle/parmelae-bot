@@ -34,9 +34,9 @@ export class Bot {
     this.telegraf.catch(ErrorService.log);
     this.telegraf
       .launch()
-      .then(() => this.telegraf.telegram.getMe())
+      .then(() => this.telegraf.telegram.getMyName())
       .then((me) => {
-        assert(me.username === this.config.username);
+        assert(me.name === this.config.username);
       })
       .catch(ErrorService.log);
     this.messageStorage.startDailyDeletion(this.oldMessageReplyService);
