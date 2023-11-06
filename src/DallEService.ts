@@ -1,6 +1,9 @@
 import { OpenAI } from 'openai';
 import { injectable } from 'inversify';
 
+/** DALL-E model. */
+type Model = 'dall-e-2' | 'dall-e-3';
+
 /**
  * Image size string.
  *
@@ -21,9 +24,10 @@ export class DallEService {
    * @param prompt - The DALL·E prompt
    * @return The URL to the image
    */
-  async generateImage(prompt: string): Promise<string | null> {
+  async generateImage(model: Model, prompt: string): Promise<string | null> {
     try {
       const response = await this.openAi.images.generate({
+        model,
         prompt,
         n: ONE_IMAGE,
         size: SIZE,
