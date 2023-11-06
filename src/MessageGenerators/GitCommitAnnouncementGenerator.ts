@@ -5,7 +5,7 @@ import {
   SystemMessagePromptTemplate,
 } from 'langchain/prompts';
 import { ChatGptService } from '../ChatGptService.js';
-import { ChatGptModels } from '../GptModelsProvider.js';
+import { GptModels } from '../GptModelsProvider.js';
 import { injectable } from 'inversify';
 
 /** The prompt messages. */
@@ -59,7 +59,7 @@ export class GitCommitAnnouncementGenerator {
    * @return The announcement message.
    */
   async generate(commitMessage: string): Promise<string> {
-    const message = await this.chatGpt.generate(PROMPT, ChatGptModels.ChatGpt, {
+    const message = await this.chatGpt.generate(PROMPT, GptModels.Turbo, {
       message: commitMessage,
     });
     return message.content;

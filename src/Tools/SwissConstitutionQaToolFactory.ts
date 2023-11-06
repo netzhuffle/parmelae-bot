@@ -16,9 +16,7 @@ export class SwissConstitutionQaToolFactory {
   async create(): Promise<ChainTool> {
     const vectorStore = await this.vectorStore.get();
     const chain = VectorDBQAChain.fromLLM(
-      this.config.useGpt4
-        ? this.chatGptModelsProvider.gpt4Strict
-        : this.chatGptModelsProvider.chatGptStrict,
+      this.chatGptModelsProvider.getStrictModel(this.config.gptModel),
       vectorStore,
       {
         verbose: true,

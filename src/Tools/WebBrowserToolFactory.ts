@@ -12,9 +12,7 @@ export class WebBrowserToolFactory {
 
   create(): WebBrowser {
     const tool = new WebBrowser({
-      model: this.config.useGpt4
-        ? this.gptModelsProvider.gpt4Strict
-        : this.gptModelsProvider.chatGptStrict,
+      model: this.gptModelsProvider.getStrictModel(this.config.gptModel),
       embeddings: this.gptModelsProvider.embeddings,
       verbose: true,
     });

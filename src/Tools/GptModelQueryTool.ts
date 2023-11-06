@@ -7,13 +7,13 @@ export class GptModelQueryTool extends Tool {
   name = 'gpt-model-query';
 
   description =
-    'Use to find out if ChatGPT or if GPT-4 is used. Returns the name of the used model. Input should be an empty string.';
+    'Use to find out which GPT language model is used. Returns the name of the used model, by example GPT-3.5 Turbo or GPT 4. Input should be an empty string.';
 
   constructor(private readonly config: Config) {
     super();
   }
 
   protected _call(): Promise<string> {
-    return Promise.resolve(this.config.useGpt4 ? 'GPT-4' : 'ChatGPT');
+    return Promise.resolve(this.config.gptModel);
   }
 }

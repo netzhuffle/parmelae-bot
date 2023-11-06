@@ -1,6 +1,6 @@
 import { ChatGptService, UserMessagePromptTemplate } from './ChatGptService.js';
 import { ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
-import { ChatGptModels, GptModelsProvider } from './GptModelsProvider.js';
+import { GptModels, GptModelsProvider } from './GptModelsProvider.js';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import {
   AIChatMessage,
@@ -19,10 +19,12 @@ test('generate message', async () => {
   const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
   const sut = new ChatGptService(
     new GptModelsProvider({
-      chatGpt: chatOpenAiFake as unknown as ChatOpenAI,
-      chatGptStrict: undefined as unknown as ChatOpenAI,
+      turbo: chatOpenAiFake as unknown as ChatOpenAI,
+      turboStrict: undefined as unknown as ChatOpenAI,
       gpt4: undefined as unknown as ChatOpenAI,
       gpt4Strict: undefined as unknown as ChatOpenAI,
+      gpt4Turbo: undefined as unknown as ChatOpenAI,
+      gpt4TurboStrict: undefined as unknown as ChatOpenAI,
       embeddings: undefined as unknown as OpenAIEmbeddings,
     }),
   );
@@ -31,7 +33,7 @@ test('generate message', async () => {
     AIMessagePromptTemplate.fromTemplate('Assistant Message'),
     UserMessagePromptTemplate.fromNameAndTemplate('Username', '{text}'),
   ]);
-  const response = await sut.generate(prompt, ChatGptModels.ChatGpt, {
+  const response = await sut.generate(prompt, GptModels.Turbo, {
     text: 'User Message',
   });
 

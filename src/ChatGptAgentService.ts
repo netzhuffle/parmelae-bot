@@ -149,7 +149,7 @@ export class ChatGptAgentService {
     return AgentExecutor.fromAgentAndTools({
       tags: ['openai-functions'],
       agent: ChatGptAgent.fromLLMAndTools(
-        this.config.useGpt4 ? this.models.gpt4 : this.models.chatGpt,
+        this.models.getModel(this.config.gptModel),
         tools,
         { basePrompt },
       ),

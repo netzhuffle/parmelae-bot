@@ -1,30 +1,38 @@
 import { injectable } from 'inversify';
 import { Config } from '../Config.js';
 import { Tool } from 'langchain/tools';
+import { GptModels } from '../GptModelsProvider.js';
 
 @injectable()
 export class GptModelSetterTool extends Tool {
   name = 'gpt-model-set';
 
   description =
-    'Use set if ChatGPT or if GPT-4 should be used. Input should be either "ChatGPT" or "GPT-4".';
+    'Use set which GPT language model should be used. Input should be "GPT-3.5 Turbo", "GPT-4", or "GPT-4 Turbo".';
 
   constructor(private readonly config: Config) {
     super();
   }
 
   protected _call(arg: string): Promise<string> {
-    const model = arg.trim().toLowerCase();
-
-    if (model !== 'chatgpt' && model !== 'gpt-4') {
-      return Promise.resolve('Error: Unknown model name.');
+    switch (arg.trim()) {
+      case 'GPT-3.5 Turbo':
+        this.config.gptModel = GptModels.Turbo;
+        break;
+      case 'GPT-4':
+        this.config.gptModel = GptModels.Gpt4;
+        break;
+      case 'GPT-4 Turbo':
+        this.config.gptModel = GptModels.Gpt4Turbo;
+        break;
+      default:
+        return Promise.resolve(
+          'Error: Unknown model name. Use "GPT-3.5 Turbo", "GPT-4", or "GPT-4 Turbo".',
+        );
     }
 
-    this.config.useGpt4 = model === 'gpt-4';
     return Promise.resolve(
-      'Success: ' +
-        (this.config.useGpt4 ? 'GPT-4' : 'ChatGPT') +
-        ' will be used from now on.',
+      `Success: ${this.config.gptModel} will be used from now on.`,
     );
   }
 }

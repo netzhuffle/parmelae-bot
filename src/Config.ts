@@ -1,17 +1,13 @@
 import * as dotenv from 'dotenv';
 import assert from 'assert';
 import { injectable } from 'inversify';
+import { GptModel, GptModels } from './GptModelsProvider.js';
 
 /** The configuration options, taken from .env */
 @injectable()
 export class Config {
-  /**
-   * Whether to use GPT-4 or ChatGPT for LangChain agent and tools.
-   *
-   * true = GPT-4
-   * false = ChatGPT
-   */
-  public useGpt4 = false;
+  /** Which GPT language model to use for LangChain agent and tools. */
+  public gptModel: GptModel = GptModels.Turbo;
 
   /** The bot's Telegram username (without @). */
   public readonly username: string;

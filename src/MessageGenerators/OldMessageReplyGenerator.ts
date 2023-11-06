@@ -6,7 +6,7 @@ import {
   SystemMessagePromptTemplate,
 } from 'langchain/prompts';
 import { ChatGptService } from '../ChatGptService.js';
-import { ChatGptModels } from '../GptModelsProvider.js';
+import { GptModels } from '../GptModelsProvider.js';
 import { injectable } from 'inversify';
 
 /** The prompt messages. */
@@ -70,7 +70,7 @@ export class OldMessageReplyGenerator {
   async generate(text: string): Promise<string> {
     assert(text.length < ChatGptService.MAX_INPUT_TEXT_LENGTH);
 
-    const message = await this.chatGpt.generate(PROMPT, ChatGptModels.ChatGpt, {
+    const message = await this.chatGpt.generate(PROMPT, GptModels.Turbo, {
       text,
     });
     return message.content;

@@ -5,7 +5,7 @@ import {
   SystemMessagePromptTemplate,
 } from 'langchain/prompts';
 import { ChatGptService } from '../ChatGptService.js';
-import { ChatGptModels } from '../GptModelsProvider.js';
+import { GptModels } from '../GptModelsProvider.js';
 import { injectable } from 'inversify';
 
 /** The prompt messages. */
@@ -35,7 +35,7 @@ export class DallEPromptGenerator {
    * @return The prompt.
    */
   async generate(description: string): Promise<string> {
-    const message = await this.chatGpt.generate(PROMPT, ChatGptModels.ChatGpt, {
+    const message = await this.chatGpt.generate(PROMPT, GptModels.Turbo, {
       description,
     });
     return message.content;

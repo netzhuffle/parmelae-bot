@@ -16,7 +16,7 @@ import {
   InputValues,
 } from 'langchain/schema';
 import { injectable } from 'inversify';
-import { ChatGptModel, GptModelsProvider } from './GptModelsProvider.js';
+import { GptModel, GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
   ChatGptRoles,
@@ -129,7 +129,7 @@ export class ChatGptService {
    */
   async generate(
     prompt: BasePromptTemplate,
-    model: ChatGptModel,
+    model: GptModel,
     promptValues: ChainValues,
   ): Promise<ChatGptMessage> {
     const chain = new LLMChain({

@@ -18,7 +18,7 @@ const container = new Container({
 container.bind(GptModelsProvider).toDynamicValue(
   (context) =>
     new GptModelsProvider({
-      chatGpt: new ChatOpenAI({
+      turbo: new ChatOpenAI({
         modelName: 'gpt-3.5-turbo',
         configuration: {
           basePath: 'https://oai.hconeai.com/v1',
@@ -32,7 +32,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         },
         verbose: true,
       }),
-      chatGptStrict: new ChatOpenAI({
+      turboStrict: new ChatOpenAI({
         modelName: 'gpt-3.5-turbo',
         temperature: 0,
         configuration: {
@@ -63,6 +63,36 @@ container.bind(GptModelsProvider).toDynamicValue(
       }),
       gpt4Strict: new ChatOpenAI({
         modelName: 'gpt-4',
+        temperature: 0,
+        configuration: {
+          basePath: 'https://oai.hconeai.com/v1',
+          baseOptions: {
+            headers: {
+              'Helicone-Auth': `Bearer ${
+                context.container.get(Config).heliconeApiKey
+              }`,
+            },
+          },
+        },
+        verbose: true,
+      }),
+      gpt4Turbo: new ChatOpenAI({
+        modelName: 'gpt-4-1106-preview',
+        temperature: 0,
+        configuration: {
+          basePath: 'https://oai.hconeai.com/v1',
+          baseOptions: {
+            headers: {
+              'Helicone-Auth': `Bearer ${
+                context.container.get(Config).heliconeApiKey
+              }`,
+            },
+          },
+        },
+        verbose: true,
+      }),
+      gpt4TurboStrict: new ChatOpenAI({
+        modelName: 'gpt-4-1106-preview',
         temperature: 0,
         configuration: {
           basePath: 'https://oai.hconeai.com/v1',
