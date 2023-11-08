@@ -1,5 +1,3 @@
-import { MessageHistoryService } from '../MessageHistoryService.js';
-import { Config } from '../Config.js';
 import {
   AIFunctionCallMessagePromptTemplate,
   ChatGptService,
@@ -17,6 +15,7 @@ import { AIMessage, BaseMessage } from 'langchain/schema';
 import { injectable } from 'inversify';
 import { ChatGptAgentService } from '../ChatGptAgentService.js';
 import { Message } from '@prisma/client';
+import { ConversationService } from '../ConversationService.js';
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromPromptMessages([
@@ -320,8 +319,7 @@ Schi Permelä`),
 export class ReplyGenerator {
   constructor(
     private readonly chatGptAgent: ChatGptAgentService,
-    private readonly messageHistory: MessageHistoryService,
-    private readonly config: Config,
+    private readonly conversation: ConversationService,
   ) {}
 
   /**
@@ -341,7 +339,7 @@ export class ReplyGenerator {
       EXAMPLE_CONVERSATIONS[
         Math.floor(Math.random() * EXAMPLE_CONVERSATIONS.length)
       ];
-    const conversation = await this.getConversation(message.id);
+    const conversation = await this.conversation.getConversation(message.id);
     const completion = await this.chatGptAgent.generate(
       message,
       PROMPT,
@@ -349,26 +347,5 @@ export class ReplyGenerator {
       conversation,
     );
     return completion.content;
-  }
-
-  private async getConversation(messageId: number): Promise<BaseMessage[]> {
-    const historyMessages = await this.messageHistory.getHistory(messageId);
-    return historyMessages
-      .filter(
-        (message) =>
-          message.text &&
-          message.text.length < ChatGptService.MAX_INPUT_TEXT_LENGTH,
-      )
-      .map((message) => {
-        if (message.from.username === this.config.username) {
-          const text = message.text ?? 'Ich bin sprachlos.';
-          return new AIMessage(text);
-        } else {
-          return ChatGptService.createUserChatMessage(
-            message.from.username ?? message.from.firstName,
-            message.text,
-          );
-        }
-      });
   }
 }

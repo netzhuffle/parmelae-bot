@@ -14,6 +14,7 @@ import {
   FunctionMessage,
   HumanMessage,
   InputValues,
+  MessageContent,
 } from 'langchain/schema';
 import { injectable } from 'inversify';
 import { GptModel, GptModelsProvider } from './GptModelsProvider.js';
@@ -146,7 +147,10 @@ export class ChatGptService {
   }
 
   /** Returns a human chat message with a username. */
-  static createUserChatMessage(name: string, content: string): HumanMessage {
+  static createUserChatMessage(
+    name: string,
+    content: MessageContent,
+  ): HumanMessage {
     return new HumanMessage({
       name,
       content,

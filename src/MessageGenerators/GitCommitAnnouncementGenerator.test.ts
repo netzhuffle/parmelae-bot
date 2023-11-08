@@ -19,6 +19,7 @@ test('generate', async () => {
         gpt4Strict: undefined as unknown as ChatOpenAI,
         gpt4Turbo: undefined as unknown as ChatOpenAI,
         gpt4TurboStrict: undefined as unknown as ChatOpenAI,
+        gpt4Vision: undefined as unknown as ChatOpenAI,
         embeddings: undefined as unknown as OpenAIEmbeddings,
       }),
     ),

@@ -31,6 +31,7 @@ import { DateTimeTool } from './Tools/DateTimeTool.js';
 import { ErrorService } from './ErrorService.js';
 import { ChatGptAgent } from './ChatGptAgent.js';
 import { SudoTool } from './Tools/SudoTool.js';
+import { VisionToolFactory } from './Tools/VisionToolFactory.js';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -45,6 +46,7 @@ export class ChatGptAgentService {
     private readonly diceToolFactory: DiceToolFactory,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
+    private readonly visionToolFactory: VisionToolFactory,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     dateTimeTool: DateTimeTool,
@@ -141,6 +143,7 @@ export class ChatGptAgentService {
       ...this.tools,
       this.dallEToolFactory.create(chatId),
       this.diceToolFactory.create(chatId),
+      this.visionToolFactory.create(message.id),
       this.scheduleMessageToolFactory.create(chatId, message.fromId),
       this.intermediateAnswerToolFactory.create(chatId),
     ];

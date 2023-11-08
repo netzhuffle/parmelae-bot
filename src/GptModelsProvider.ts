@@ -24,6 +24,8 @@ export class GptModelsProvider {
   public readonly gpt4Turbo: ChatOpenAI;
   /** LangChain chat model of GPT-4 Turbo with temperature 0. */
   public readonly gpt4TurboStrict: ChatOpenAI;
+  /** LangChain chat model of GPT-4 Turbo with Vision. */
+  public readonly gpt4Vision: ChatOpenAI;
   /** LangChain embeddings model. */
   public readonly embeddings: OpenAIEmbeddings;
 
@@ -40,6 +42,8 @@ export class GptModelsProvider {
     gpt4Turbo: ChatOpenAI;
     /** LangChain chat model of GPT-4 Turbo with temperature 0. */
     gpt4TurboStrict: ChatOpenAI;
+    /** LangChain chat model of GPT-4 Turbo with Vision. */
+    gpt4Vision: ChatOpenAI;
     /** LangChain embeddings model. */
     embeddings: OpenAIEmbeddings;
   }) {
@@ -49,6 +53,7 @@ export class GptModelsProvider {
     this.gpt4Strict = models.gpt4Strict;
     this.gpt4Turbo = models.gpt4Turbo;
     this.gpt4TurboStrict = models.gpt4TurboStrict;
+    this.gpt4Vision = models.gpt4Vision;
     this.embeddings = models.embeddings;
   }
 

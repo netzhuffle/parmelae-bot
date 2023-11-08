@@ -129,4 +129,10 @@ export class TelegramService {
     );
     await this.messageService.store(sentMessage);
   }
+
+  /** Returns the URL for a Telegram file id. */
+  async getFileUrl(fileId: string): Promise<string> {
+    const link = await this.telegraf.telegram.getFileLink(fileId);
+    return link.href;
+  }
 }

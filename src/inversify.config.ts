@@ -106,6 +106,22 @@ container.bind(GptModelsProvider).toDynamicValue(
         },
         verbose: true,
       }),
+      gpt4Vision: new ChatOpenAI({
+        modelName: 'gpt-4-vision-preview',
+        temperature: 0,
+        maxTokens: 4096,
+        configuration: {
+          basePath: 'https://oai.hconeai.com/v1',
+          baseOptions: {
+            headers: {
+              'Helicone-Auth': `Bearer ${
+                context.container.get(Config).heliconeApiKey
+              }`,
+            },
+          },
+        },
+        verbose: true,
+      }),
       embeddings: new OpenAIEmbeddings(
         {},
         {
