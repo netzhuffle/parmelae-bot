@@ -45,6 +45,7 @@ model Message {
   replyToMessage    Message?                 @relation("ReplyToMessage", fields: [replyToMessageId], references: [id])
   replyToMessageId  Int?
   text              String
+  imageFileId       String?
   stickerFileId     String?
   newChatMembers    ChatEntryMessagesUsers[]
   replies           Message[]                @relation("ReplyToMessage")

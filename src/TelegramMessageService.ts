@@ -25,6 +25,10 @@ type SupportedMessage =
   | Typegram.Message.VoiceMessage
   | Typegram.Message.VenueMessage;
 
+type ImageAttachmentMessage =
+  | { photo: Typegram.PhotoSize[] }
+  | { sticker: { thumbnail: Typegram.PhotoSize } };
+
 /** Handles incoming and outgoing Telegram messages. */
 @injectable()
 export class TelegramMessageService {
@@ -139,6 +143,9 @@ export class TelegramMessageService {
           ? this.getMessage(replyToMessage)
           : null,
       text: this.getMessageText(telegramMessage),
+      imageFileId: this.hasImageAttachment(telegramMessage)
+        ? this.getImageFileId(telegramMessage)
+        : null,
       stickerFileId: this.isStickerMessage(telegramMessage)
         ? telegramMessage.sticker.file_id
         : null,
@@ -285,6 +292,40 @@ export class TelegramMessageService {
     }
 
     throw new UnknownTelegramMessageTypeError(message);
+  }
+
+  private hasImageAttachment(
+    message: SupportedMessage,
+  ): message is SupportedMessage & ImageAttachmentMessage {
+    if (
+      'photo' in message &&
+      Array.isArray(message.photo) &&
+      message.photo.length
+    ) {
+      return true;
+    }
+    if ('sticker' in message && 'thumbnail' in message.sticker) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private getImageFileId(message: ImageAttachmentMessage): string {
+    if ('sticker' in message) {
+      return message.sticker.thumbnail.file_id;
+    }
+
+    let largestPhotoSize = message.photo[0];
+    for (const photoSize of message.photo) {
+      if (
+        photoSize.width * photoSize.height >
+        largestPhotoSize.width * largestPhotoSize.height
+      ) {
+        largestPhotoSize = photoSize;
+      }
+    }
+    return largestPhotoSize.file_id;
   }
 }
 

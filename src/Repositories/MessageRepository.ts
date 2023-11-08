@@ -92,6 +92,7 @@ export class MessageRepository {
         sentAt: message.sentAt,
         editedAt: message.editedAt,
         text: message.text,
+        imageFileId: message.imageFileId,
         replyToMessage: replyToMessage,
         from: this.connectUser(message.from),
         newChatMembers: this.connectNewChatMembers(message),
