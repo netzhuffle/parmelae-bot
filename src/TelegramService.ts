@@ -95,14 +95,20 @@ export class TelegramService {
         message.chatId.toString(),
         reply.fileId,
         {
-          reply_to_message_id: message.telegramMessageId,
+          reply_parameters: {
+            message_id: message.telegramMessageId,
+          },
         },
       );
     } else {
       sentMessage = await this.telegraf.telegram.sendMessage(
         message.chatId.toString(),
         reply,
-        { reply_to_message_id: message.telegramMessageId },
+        {
+          reply_parameters: {
+            message_id: message.telegramMessageId,
+          },
+        },
       );
     }
     await this.messageService.store(sentMessage);
