@@ -1,18 +1,19 @@
 import { OpenAI } from 'openai';
 import { injectable } from 'inversify';
 
-/** DALL-E model. */
-type Model = 'dall-e-2' | 'dall-e-3';
-
 /**
  * Image size string.
  *
- * Must be an allowed value from {@link https://beta.openai.com/docs/api-reference/images/create#images/create-size}.
+ * Must be an allowed value from {@link https://platform.openai.com/docs/api-reference/images/create#images-create-size}.
  */
 const SIZE = '1024x1024';
 
-/** Integer to create just one image. */
-const ONE_IMAGE = 1;
+/**
+ * Image quality string.
+ *
+ * Must be an allowed value from {@link https://platform.openai.com/docs/api-reference/images/create#images-create-quality}.
+ */
+const QUALITY = 'hd';
 
 /** DALL·E Service */
 @injectable()
@@ -24,13 +25,13 @@ export class DallEService {
    * @param prompt - The DALL·E prompt
    * @return The URL to the image
    */
-  async generateImage(model: Model, prompt: string): Promise<string | null> {
+  async generateImage(prompt: string): Promise<string | null> {
     try {
       const response = await this.openAi.images.generate({
-        model,
+        model: 'dall-e-3',
         prompt,
-        n: ONE_IMAGE,
         size: SIZE,
+        quality: QUALITY,
       });
       return response.data[0].url ?? null;
     } catch (e) {

@@ -20,31 +20,12 @@ export class DallETool extends Tool {
 
   protected async _call(arg: string): Promise<string> {
     const dallEPrompt = await this.dallEPromptGenerator.generate(arg);
-    const dallE2ImageUrl = await this.dallE.generateImage(
-      'dall-e-2',
-      dallEPrompt,
-    );
-    const dallE3ImageUrl = await this.dallE.generateImage(
-      'dall-e-3',
-      dallEPrompt,
-    );
-    if (!dallE2ImageUrl && !dallE3ImageUrl) {
+    const imageUrl = await this.dallE.generateImage(dallEPrompt);
+    if (!imageUrl) {
       return 'You could not send the image due to technical difficulties.';
     }
-    if (dallE2ImageUrl) {
-      await this.telegram.replyWithImage(
-        dallE2ImageUrl,
-        dallEPrompt,
-        this.chatId,
-      );
-    }
-    if (dallE3ImageUrl) {
-      await this.telegram.replyWithImage(
-        dallE3ImageUrl,
-        `EXPERIMENTELL: DALL-E-3\n${dallEPrompt}`,
-        this.chatId,
-      );
-    }
+    await this.telegram.replyWithImage(imageUrl, dallEPrompt, this.chatId);
+
     return `Successfully sent the image to the Telegram chat: ${dallEPrompt}`;
   }
 }
