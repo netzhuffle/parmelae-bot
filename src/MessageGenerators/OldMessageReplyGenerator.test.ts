@@ -1,13 +1,13 @@
-import { AIChatMessage } from 'langchain/schema';
+import { AIMessage } from '@langchain/core/messages';
 import { GptModelsProvider } from '../GptModelsProvider.js';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { ChatOpenAI } from '@langchain/openai';
 import { OldMessageReplyGenerator } from './OldMessageReplyGenerator.js';
 import { ChatGptService } from '../ChatGptService.js';
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { OpenAIEmbeddings } from '@langchain/openai';
 
 test('generate', async () => {
-  const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('Reply'));
+  const chatOpenAiFake = new ChatOpenAiFake(new AIMessage('Reply'));
   const sut = new OldMessageReplyGenerator(
     new ChatGptService(
       new GptModelsProvider({

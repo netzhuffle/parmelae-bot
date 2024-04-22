@@ -1,8 +1,8 @@
 import '@abraham/reflection';
 import { Container } from 'inversify';
 import { GptModelsProvider } from './GptModelsProvider.js';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { ChatOpenAI } from '@langchain/openai';
+import { OpenAIEmbeddings } from '@langchain/openai';
 import { Octokit } from 'octokit';
 import { OpenAI } from 'openai';
 import { PrismaClient } from '@prisma/client';

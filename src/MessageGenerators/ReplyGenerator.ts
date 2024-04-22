@@ -10,8 +10,8 @@ import {
   MessagesPlaceholder,
   SystemMessagePromptTemplate,
   HumanMessagePromptTemplate,
-} from 'langchain/prompts';
-import { AIMessage, BaseMessage } from 'langchain/schema';
+} from '@langchain/core/prompts';
+import { AIMessage, BaseMessage } from '@langchain/core/messages';
 import { injectable } from 'inversify';
 import { ChatGptAgentService } from '../ChatGptAgentService.js';
 import { Message } from '@prisma/client';

@@ -6,16 +6,15 @@ import {
   BaseStringPromptTemplate,
   HumanMessagePromptTemplate,
   PromptTemplate,
-} from 'langchain/prompts';
+} from '@langchain/core/prompts';
 import {
   AIMessage,
   BaseMessage,
-  ChainValues,
   FunctionMessage,
   HumanMessage,
-  InputValues,
   MessageContent,
-} from 'langchain/schema';
+} from '@langchain/core/messages';
+import { ChainValues, InputValues } from '@langchain/core/utils/types';
 import { injectable } from 'inversify';
 import { GptModel, GptModelsProvider } from './GptModelsProvider.js';
 import {
@@ -29,13 +28,13 @@ export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
   InputValues<string>
 > {
   async format(values: InputValues<string>): Promise<BaseMessage> {
-    if (!this.name) {
+    if (!this.username) {
       return super.format(values);
     }
 
     const message = await super.format(values);
     assert(message instanceof HumanMessage);
-    message.name = this.name;
+    message.name = this.username;
     return message;
   }
 
@@ -43,13 +42,13 @@ export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
     prompt: BaseStringPromptTemplate<
       InputValues<Extract<keyof InputValues<string>, string>>
     >,
-    private readonly name?: string,
+    private readonly username?: string,
   ) {
     super(prompt);
   }
 
-  static fromNameAndTemplate(name: string, template: string) {
-    return new this(PromptTemplate.fromTemplate(template), name);
+  static fromNameAndTemplate(username: string, template: string) {
+    return new this(PromptTemplate.fromTemplate(template), username);
   }
 }
 
@@ -90,10 +89,11 @@ export class FunctionMessagePromptTemplate extends HumanMessagePromptTemplate<
   InputValues<string>
 > {
   async format(values: InputValues<string>): Promise<BaseMessage> {
+    assert(this.prompt instanceof BaseStringPromptTemplate);
     return new FunctionMessage(
       {
         content: await this.prompt.format(values),
-        name: this.name,
+        name: this.functionName,
       },
       '',
     );
@@ -107,13 +107,13 @@ export class FunctionMessagePromptTemplate extends HumanMessagePromptTemplate<
     prompt: BaseStringPromptTemplate<
       InputValues<Extract<keyof InputValues<string>, string>>
     >,
-    private readonly name?: string,
+    private readonly functionName?: string,
   ) {
     super(prompt);
   }
 
-  static fromNameAndTemplate(name: string, template: string) {
-    return new this(PromptTemplate.fromTemplate(template), name);
+  static fromNameAndTemplate(functionName: string, template: string) {
+    return new this(PromptTemplate.fromTemplate(template), functionName);
   }
 }
 

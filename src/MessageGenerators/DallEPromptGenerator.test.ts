@@ -1,14 +1,14 @@
-import { AIChatMessage } from 'langchain/schema';
+import { AIMessage } from '@langchain/core/messages';
 import { DallEPromptGenerator } from './DallEPromptGenerator.js';
 import { GptModelsProvider } from '../GptModelsProvider.js';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { ChatOpenAI } from '@langchain/openai';
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
 import { ChatGptService } from '../ChatGptService.js';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { OpenAIEmbeddings } from '@langchain/openai';
 
 test('generate', async () => {
   const chatOpenAiFake = new ChatOpenAiFake(
-    new AIChatMessage('DALL-E description'),
+    new AIMessage('DALL-E description'),
   );
   const sut = new DallEPromptGenerator(
     new ChatGptService(

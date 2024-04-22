@@ -1,22 +1,22 @@
 import { ChatGptService, UserMessagePromptTemplate } from './ChatGptService.js';
 import { ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
 import { GptModels, GptModelsProvider } from './GptModelsProvider.js';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { ChatOpenAI } from '@langchain/openai';
 import {
-  AIChatMessage,
-  HumanChatMessage,
-  SystemChatMessage,
-} from 'langchain/schema';
+  AIMessage,
+  HumanMessage,
+  SystemMessage,
+} from '@langchain/core/messages';
 import {
   AIMessagePromptTemplate,
   ChatPromptTemplate,
   SystemMessagePromptTemplate,
-} from 'langchain/prompts';
+} from '@langchain/core/prompts';
 import { ChatOpenAiFake } from './Fakes/ChatOpenAiFake.js';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { OpenAIEmbeddings } from '@langchain/openai';
 
 test('generate message', async () => {
-  const chatOpenAiFake = new ChatOpenAiFake(new AIChatMessage('completion'));
+  const chatOpenAiFake = new ChatOpenAiFake(new AIMessage('completion'));
   const sut = new ChatGptService(
     new GptModelsProvider({
       turbo: chatOpenAiFake as unknown as ChatOpenAI,
@@ -42,11 +42,11 @@ test('generate message', async () => {
     role: ChatGptRoles.Assistant,
     content: 'completion',
   });
-  const humanMessage = new HumanChatMessage('User Message');
+  const humanMessage = new HumanMessage('User Message');
   humanMessage.name = 'Username';
   expect(chatOpenAiFake.request).toEqual([
-    new SystemChatMessage('System Message'),
-    new AIChatMessage('Assistant Message'),
+    new SystemMessage('System Message'),
+    new AIMessage('Assistant Message'),
     humanMessage,
   ]);
 });

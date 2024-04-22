@@ -1,7 +1,7 @@
 import { Tool } from 'langchain/tools';
 import { ConversationService } from '../ConversationService';
 import { GptModelsProvider } from '../GptModelsProvider';
-import { SystemMessage } from 'langchain/schema';
+import { SystemMessage } from '@langchain/core/messages';
 
 export class VisionTool extends Tool {
   name = 'vision';

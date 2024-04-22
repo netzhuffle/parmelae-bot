@@ -1,6 +1,7 @@
-import { BaseCallbackHandler } from 'langchain/callbacks';
+import { BaseCallbackHandler } from '@langchain/core/callbacks/base';
 import { TelegramService } from './TelegramService.js';
-import { AgentAction, ChainValues } from 'langchain/schema';
+import { AgentAction } from '@langchain/core/agents';
+import { ChainValues } from '@langchain/core/utils/types';
 import { IntermediateAnswerTool } from './Tools/IntermediateAnswerTool.js';
 import { assert } from 'console';
 import { ErrorService } from './ErrorService.js';

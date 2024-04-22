@@ -1,5 +1,6 @@
 import { BaseChatModel } from 'langchain/chat_models/base';
-import { BaseMessage, ChatResult } from 'langchain/schema';
+import { BaseMessage } from '@langchain/core/messages';
+import { ChatResult } from '@langchain/core/outputs';
 
 export class ChatOpenAiFake extends BaseChatModel {
   request?: BaseMessage[];

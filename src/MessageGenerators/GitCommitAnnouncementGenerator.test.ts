@@ -1,14 +1,14 @@
-import { AIChatMessage } from 'langchain/schema';
+import { AIMessage } from '@langchain/core/messages';
 import { GptModelsProvider } from '../GptModelsProvider.js';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { ChatOpenAI } from '@langchain/openai';
 import { GitCommitAnnouncementGenerator } from './GitCommitAnnouncementGenerator.js';
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
 import { ChatGptService } from '../ChatGptService.js';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { OpenAIEmbeddings } from '@langchain/openai';
 
 test('generate', async () => {
   const chatOpenAiFake = new ChatOpenAiFake(
-    new AIChatMessage('Commit Description'),
+    new AIMessage('Commit Description'),
   );
   const sut = new GitCommitAnnouncementGenerator(
     new ChatGptService(

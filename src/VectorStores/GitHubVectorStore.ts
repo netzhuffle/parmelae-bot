@@ -2,7 +2,7 @@ import { VectorStore } from 'langchain/vectorstores/base';
 import { SingleVectorStore } from '../VectorStore.js';
 import { GithubRepoLoader } from 'langchain/document_loaders/web/github';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import { HNSWLib } from 'langchain/vectorstores/hnswlib';
+import { HNSWLib } from '@langchain/community/vectorstores/hnswlib';
 import { injectable } from 'inversify';
 import { GptModelsProvider } from '../GptModelsProvider.js';
 import { Config } from '../Config.js';

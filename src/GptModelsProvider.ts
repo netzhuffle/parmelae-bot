@@ -1,6 +1,6 @@
-import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { ChatOpenAI } from '@langchain/openai';
 import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { OpenAIEmbeddings } from '@langchain/openai';
 
 export const GptModels = {
   Turbo: 'GPT-3.5 Turbo',

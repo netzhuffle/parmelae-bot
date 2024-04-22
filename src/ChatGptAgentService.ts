@@ -1,8 +1,8 @@
 import assert from 'assert';
 import { AgentExecutor } from 'langchain/agents';
-import { BasePromptTemplate } from 'langchain/prompts';
-import { BaseMessage } from 'langchain/schema';
-import { Calculator } from 'langchain/tools/calculator';
+import { BasePromptTemplate } from '@langchain/core/prompts';
+import { BaseMessage } from '@langchain/core/messages';
+import { Calculator } from '@langchain/community/tools/calculator';
 import { injectable } from 'inversify';
 import { GptModelsProvider } from './GptModelsProvider.js';
 import {

@@ -1,7 +1,11 @@
 import { MessageHistoryService } from './MessageHistoryService.js';
 import { Config } from './Config.js';
 import { ChatGptService } from './ChatGptService.js';
-import { AIMessage, BaseMessage, MessageContent } from 'langchain/schema';
+import {
+  AIMessage,
+  BaseMessage,
+  MessageContent,
+} from '@langchain/core/messages';
 import { injectable } from 'inversify';
 import { TelegramService } from './TelegramService.js';
 

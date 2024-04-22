@@ -4,7 +4,7 @@ import {
   ChatPromptTemplate,
   HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
-} from 'langchain/prompts';
+} from '@langchain/core/prompts';
 import { ChatGptService } from '../ChatGptService.js';
 import { GptModels } from '../GptModelsProvider.js';
 import { injectable } from 'inversify';
