@@ -31,7 +31,7 @@ import { DateTimeTool } from './Tools/DateTimeTool.js';
 import { ErrorService } from './ErrorService.js';
 import { ChatGptAgent } from './ChatGptAgent.js';
 import { SudoTool } from './Tools/SudoTool.js';
-import { VisionToolFactory } from './Tools/VisionToolFactory.js';
+import { Conversation } from './Conversation.js';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -46,7 +46,6 @@ export class ChatGptAgentService {
     private readonly diceToolFactory: DiceToolFactory,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
-    private readonly visionToolFactory: VisionToolFactory,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     dateTimeTool: DateTimeTool,
@@ -100,15 +99,19 @@ export class ChatGptAgentService {
     message: Message,
     basePrompt: BasePromptTemplate,
     example: BaseMessage[],
-    conversation: BaseMessage[],
+    conversation: Conversation,
     retries = 0,
   ): Promise<ChatGptMessage> {
-    const executor = this.createAgentExecutor(message, basePrompt);
+    const executor = this.createAgentExecutor(
+      message,
+      basePrompt,
+      conversation.needsVision,
+    );
 
     try {
-      const response = await executor.call({
+      const response = await executor.invoke({
         example,
-        conversation,
+        conversation: conversation.messages,
       });
       assert(typeof response.output === 'string');
       return {
@@ -137,13 +140,13 @@ export class ChatGptAgentService {
   private createAgentExecutor(
     message: Message,
     basePrompt: BasePromptTemplate,
+    needsVision: boolean,
   ): AgentExecutor {
     const chatId = message.chatId;
     const tools = [
       ...this.tools,
       this.dallEToolFactory.create(chatId),
       this.diceToolFactory.create(chatId),
-      this.visionToolFactory.create(message.id),
       this.scheduleMessageToolFactory.create(chatId, message.fromId),
       this.intermediateAnswerToolFactory.create(chatId),
     ];
@@ -152,7 +155,7 @@ export class ChatGptAgentService {
     return AgentExecutor.fromAgentAndTools({
       tags: ['openai-functions'],
       agent: ChatGptAgent.fromLLMAndTools(
-        this.models.getModel(this.config.gptModel),
+        this.models.getModel(this.config.gptModel, needsVision),
         tools,
         { basePrompt },
       ),

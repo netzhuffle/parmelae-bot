@@ -247,7 +247,7 @@ export class TelegramMessageService {
     }
 
     if ('photo' in message) {
-      return message.caption ? `[📸: ${message.caption}]` : '[📸]';
+      return message.caption ?? '';
     }
 
     if ('poll' in message) {
@@ -263,6 +263,9 @@ export class TelegramMessageService {
     }
 
     if ('sticker' in message) {
+      if (this.hasImageAttachment(message)) {
+        return '';
+      }
       return message.sticker.emoji
         ? `[Sticker: ${message.sticker.emoji}]`
         : '[Sticker]';

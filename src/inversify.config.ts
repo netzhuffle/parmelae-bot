@@ -47,37 +47,8 @@ container.bind(GptModelsProvider).toDynamicValue(
         },
         verbose: true,
       }),
-      gpt4: new ChatOpenAI({
-        modelName: 'gpt-4',
-        configuration: {
-          basePath: 'https://oai.hconeai.com/v1',
-          baseOptions: {
-            headers: {
-              'Helicone-Auth': `Bearer ${
-                context.container.get(Config).heliconeApiKey
-              }`,
-            },
-          },
-        },
-        verbose: true,
-      }),
-      gpt4Strict: new ChatOpenAI({
-        modelName: 'gpt-4',
-        temperature: 0,
-        configuration: {
-          basePath: 'https://oai.hconeai.com/v1',
-          baseOptions: {
-            headers: {
-              'Helicone-Auth': `Bearer ${
-                context.container.get(Config).heliconeApiKey
-              }`,
-            },
-          },
-        },
-        verbose: true,
-      }),
       gpt4Turbo: new ChatOpenAI({
-        modelName: 'gpt-4-1106-preview',
+        modelName: 'gpt-4-turbo',
         temperature: 0,
         configuration: {
           basePath: 'https://oai.hconeai.com/v1',
@@ -92,24 +63,8 @@ container.bind(GptModelsProvider).toDynamicValue(
         verbose: true,
       }),
       gpt4TurboStrict: new ChatOpenAI({
-        modelName: 'gpt-4-1106-preview',
+        modelName: 'gpt-4-turbo',
         temperature: 0,
-        configuration: {
-          basePath: 'https://oai.hconeai.com/v1',
-          baseOptions: {
-            headers: {
-              'Helicone-Auth': `Bearer ${
-                context.container.get(Config).heliconeApiKey
-              }`,
-            },
-          },
-        },
-        verbose: true,
-      }),
-      gpt4Vision: new ChatOpenAI({
-        modelName: 'gpt-4-vision-preview',
-        temperature: 0,
-        maxTokens: 4096,
         configuration: {
           basePath: 'https://oai.hconeai.com/v1',
           baseOptions: {

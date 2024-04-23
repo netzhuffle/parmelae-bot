@@ -121,7 +121,7 @@ export class FunctionMessagePromptTemplate extends HumanMessagePromptTemplate<
 @injectable()
 export class ChatGptService {
   /** Maximum number of characters in input text to avoid high cost. */
-  static readonly MAX_INPUT_TEXT_LENGTH = 1200;
+  static readonly MAX_INPUT_TEXT_LENGTH = 2000;
 
   constructor(private readonly models: GptModelsProvider) {}
 

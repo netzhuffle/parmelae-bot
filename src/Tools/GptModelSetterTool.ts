@@ -8,7 +8,7 @@ export class GptModelSetterTool extends Tool {
   name = 'gpt-model-set';
 
   description =
-    'Use set which GPT language model should be used. Input should be "GPT-3.5 Turbo", "GPT-4", or "GPT-4 Vision".';
+    'Use set which GPT language model should be used. Input should be "GPT-3.5 Turbo" or "GPT-4 Turbo".';
 
   constructor(private readonly config: Config) {
     super();
@@ -19,15 +19,12 @@ export class GptModelSetterTool extends Tool {
       case 'GPT-3.5 Turbo':
         this.config.gptModel = GptModels.Turbo;
         break;
-      case 'GPT-4':
-        this.config.gptModel = GptModels.Gpt4;
-        break;
-      case 'GPT-4 Vision':
+      case 'GPT-4 Turbo':
         this.config.gptModel = GptModels.Gpt4Turbo;
         break;
       default:
         return Promise.resolve(
-          'Error: Unknown model name. Use "GPT-3.5 Turbo", "GPT-4", or "GPT-4 Vision".',
+          'Error: Unknown model name. Use "GPT-3.5 Turbo" or "GPT-4 Turbo".',
         );
     }
 
