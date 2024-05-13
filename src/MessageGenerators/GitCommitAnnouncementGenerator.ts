@@ -59,7 +59,7 @@ export class GitCommitAnnouncementGenerator {
    * @return The announcement message.
    */
   async generate(commitMessage: string): Promise<string> {
-    const message = await this.chatGpt.generate(PROMPT, GptModels.Turbo, {
+    const message = await this.chatGpt.generate(PROMPT, GptModels.Cheap, {
       message: commitMessage,
     });
     return message.content;

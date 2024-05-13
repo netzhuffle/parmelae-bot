@@ -70,7 +70,7 @@ export class OldMessageReplyGenerator {
   async generate(text: string): Promise<string> {
     assert(text.length < ChatGptService.MAX_INPUT_TEXT_LENGTH);
 
-    const message = await this.chatGpt.generate(PROMPT, GptModels.Turbo, {
+    const message = await this.chatGpt.generate(PROMPT, GptModels.Cheap, {
       text,
     });
     return message.content;

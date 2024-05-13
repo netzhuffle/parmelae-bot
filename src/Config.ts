@@ -7,7 +7,7 @@ import { GptModel, GptModels } from './GptModelsProvider.js';
 @injectable()
 export class Config {
   /** Which GPT language model to use for LangChain agent and tools. */
-  public gptModel: GptModel = GptModels.Turbo;
+  public gptModel: GptModel = GptModels.Cheap;
 
   /** The bot's Telegram username (without @). */
   public readonly username: string;

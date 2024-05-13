@@ -19,10 +19,10 @@ test('generate message', async () => {
   const chatOpenAiFake = new ChatOpenAiFake(new AIMessage('completion'));
   const sut = new ChatGptService(
     new GptModelsProvider({
-      turbo: chatOpenAiFake as unknown as ChatOpenAI,
-      turboStrict: undefined as unknown as ChatOpenAI,
-      gpt4Turbo: undefined as unknown as ChatOpenAI,
-      gpt4TurboStrict: undefined as unknown as ChatOpenAI,
+      cheap: chatOpenAiFake as unknown as ChatOpenAI,
+      cheapStrict: undefined as unknown as ChatOpenAI,
+      advanced: undefined as unknown as ChatOpenAI,
+      advancedStrict: undefined as unknown as ChatOpenAI,
       embeddings: undefined as unknown as OpenAIEmbeddings,
     }),
   );
@@ -31,7 +31,7 @@ test('generate message', async () => {
     AIMessagePromptTemplate.fromTemplate('Assistant Message'),
     UserMessagePromptTemplate.fromNameAndTemplate('Username', '{text}'),
   ]);
-  const response = await sut.generate(prompt, GptModels.Turbo, {
+  const response = await sut.generate(prompt, GptModels.Cheap, {
     text: 'User Message',
   });
 

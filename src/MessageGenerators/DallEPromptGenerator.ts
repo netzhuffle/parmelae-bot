@@ -35,7 +35,7 @@ export class DallEPromptGenerator {
    * @return The prompt.
    */
   async generate(description: string): Promise<string> {
-    const message = await this.chatGpt.generate(PROMPT, GptModels.Turbo, {
+    const message = await this.chatGpt.generate(PROMPT, GptModels.Cheap, {
       description,
     });
     return message.content;
