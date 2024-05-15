@@ -30,7 +30,6 @@ import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.j
 import { DateTimeTool } from './Tools/DateTimeTool.js';
 import { ErrorService } from './ErrorService.js';
 import { ChatGptAgent } from './ChatGptAgent.js';
-import { SudoTool } from './Tools/SudoTool.js';
 import { Conversation } from './Conversation.js';
 
 /** ChatGPT Agent Service */
@@ -55,7 +54,6 @@ export class ChatGptAgentService {
     minecraftStartTool: MinecraftStartTool,
     minecraftStopTool: MinecraftStopTool,
     minecraftBackupTool: MinecraftBackupTool,
-    sudoTool: SudoTool,
     swissConstitutionQaToolFactory: SwissConstitutionQaToolFactory,
     webBrowserToolFactory: WebBrowserToolFactory,
   ) {
@@ -70,7 +68,6 @@ export class ChatGptAgentService {
       minecraftStopTool,
       minecraftBackupTool,
       webBrowserToolFactory.create(),
-      sudoTool,
     ];
     const tools = this.tools;
     gitHubToolFactory
