@@ -49,7 +49,11 @@ export class ConversationService {
             });
           }
         }
-        if (message.from.username === this.config.username) {
+        if (
+          message.from.username === this.config.username &&
+          // OpenAI API does not allow image content in assistant messages.
+          message.imageFileId === null
+        ) {
           return new AIMessage({ content });
         } else {
           return ChatGptService.createUserChatMessage(
