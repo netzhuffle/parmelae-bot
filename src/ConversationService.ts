@@ -17,11 +17,15 @@ export class ConversationService {
     private readonly config: Config,
   ) {}
 
-  /**
-   * Return the conversation for the given message id, up to this message.
-   */
-  async getConversation(messageId: number): Promise<Conversation> {
-    const historyMessages = await this.messageHistory.getHistory(messageId);
+  /** Return the conversation for the given message id, up to this message. */
+  async getConversation(
+    messageId: number,
+    messageCount: number,
+  ): Promise<Conversation> {
+    const historyMessages = await this.messageHistory.getHistory(
+      messageId,
+      messageCount,
+    );
     let needsVision = false;
     const messagePromises = historyMessages
       .filter(

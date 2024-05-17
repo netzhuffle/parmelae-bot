@@ -2,12 +2,16 @@ import * as dotenv from 'dotenv';
 import assert from 'assert';
 import { injectable } from 'inversify';
 import { GptModel, GptModels } from './GptModelsProvider.js';
+import { Identity } from './MessageGenerators/Identities/Identity.js';
 
 /** The configuration options, taken from .env */
 @injectable()
 export class Config {
   /** Which GPT language model to use for LangChain agent and tools. */
   public gptModel: GptModel = GptModels.Cheap;
+
+  /** The identity to use to reply to messages for each chat. */
+  public identityByChatId = new Map<bigint, Identity>();
 
   /** The bot's Telegram username (without @). */
   public readonly username: string;

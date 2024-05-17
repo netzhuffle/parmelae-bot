@@ -11,23 +11,28 @@ export class MessageHistoryService {
   constructor(private readonly messageRepository: MessageRepository) {}
 
   /**
-   * Returns the message and 14 preceding messages.
+   * Returns the message and a specified number of preceding messages.
    *
    * Preceding message is the message replied to, or if it is not a reply, then the message last written before in the
    * same chat, if there is one.
    * @param toMessageId - The message id to find history to.
+   * @param messageCount - The number of messages to return.
    * @return History, from oldest to newest, including the message requested the history for.
    */
-  async getHistory(toMessageId: number): Promise<MessageWithUser[]> {
+  async getHistory(
+    toMessageId: number,
+    messageCount: number,
+  ): Promise<MessageWithUser[]> {
     const message = await this.messageRepository.get(toMessageId);
-    return this.getHistoryForMessages([message]);
+    return this.getHistoryForMessages([message], messageCount);
   }
 
-  /** Recursively fetches older messages until 15 messages are found or there are no more old messages. */
+  /** Recursively fetches older messages until enough messages are found or there are no more old messages. */
   private async getHistoryForMessages(
     messages: MessageWithUserAndReplyTo[],
+    totalCount: number,
   ): Promise<MessageWithUser[]> {
-    if (messages.length >= 15) {
+    if (messages.length >= totalCount) {
       return messages;
     }
 
@@ -38,7 +43,10 @@ export class MessageHistoryService {
       const messageRepliedTo = await this.messageRepository.get(
         oldestMessage.replyToMessage.id,
       );
-      return this.getHistoryForMessages([messageRepliedTo, ...messages]);
+      return this.getHistoryForMessages(
+        [messageRepliedTo, ...messages],
+        totalCount,
+      );
     }
 
     // Fallback to last message in chat if there is one.
@@ -47,7 +55,10 @@ export class MessageHistoryService {
       oldestMessage.id,
     );
     if (precedingMessage) {
-      return this.getHistoryForMessages([precedingMessage, ...messages]);
+      return this.getHistoryForMessages(
+        [precedingMessage, ...messages],
+        totalCount,
+      );
     }
 
     // No preceding message found
