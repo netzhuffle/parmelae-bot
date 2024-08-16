@@ -7,7 +7,7 @@ export class GptModelQueryTool extends Tool {
   name = 'gpt-model-query';
 
   description =
-    'Use to find out which GPT language model is used. Returns the name of the used model, by example GPT-3.5 Turbo or GPT-4o. Input should be an empty string.';
+    'Use to find out which GPT language model is used. Returns the name of the used model, by example gpt-4o-mini or GPT-4o. Input should be an empty string.';
 
   constructor(private readonly config: Config) {
     super();

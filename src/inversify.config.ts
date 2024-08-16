@@ -19,7 +19,7 @@ container.bind(GptModelsProvider).toDynamicValue(
   (context) =>
     new GptModelsProvider({
       cheap: new ChatOpenAI({
-        modelName: 'gpt-3.5-turbo',
+        modelName: 'gpt-4o-mini',
         configuration: {
           basePath: 'https://oai.hconeai.com/v1',
           baseOptions: {
@@ -33,7 +33,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         verbose: true,
       }),
       cheapStrict: new ChatOpenAI({
-        modelName: 'gpt-3.5-turbo',
+        modelName: 'gpt-4o-mini',
         temperature: 0,
         configuration: {
           basePath: 'https://oai.hconeai.com/v1',
