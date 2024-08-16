@@ -3,7 +3,7 @@ import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
 export const GptModels = {
-  Cheap: 'GPT-3.5 Turbo',
+  Cheap: 'gpt-4o-mini',
   Advanced: 'GPT-4o',
 } as const;
 
