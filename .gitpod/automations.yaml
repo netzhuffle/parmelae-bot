@@ -1,9 +1,24 @@
+services:
+  run:
+    name: Run
+    description: Runs the bot
+    triggeredBy:
+      - manual
+    commands:
+      start: npm run run-dev
+  prisma:
+    name: Prisma Studio
+    description: Runs Prisma Studio to inspect the database
+    triggeredBy:
+      - manual
+    commands:
+      start: npm run prisma-studio
 tasks:
   init:
     name: Initialize
     description: Initialize workspace and database
     triggeredBy:
-      - postEnvironmentStart
+      - postDevcontainerStart
     command: |
       npm install
       npm run build
@@ -11,10 +26,6 @@ tasks:
   check:
     name: Check
     description: Runs formatting, linters, and tests
-    command: |
-      npm run checks
-  run:
-    name: Run
-    description: Runs the bot
-    command: |
-      npm run run-dev
+    triggeredBy:
+      - manual
+    command: npm run checks
