@@ -7,6 +7,8 @@
 
 import { Message, Prisma } from '@prisma/client';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type HasTelegramMessageId = {
   telegramMessageId: NonNullable<Message['telegramMessageId']>;

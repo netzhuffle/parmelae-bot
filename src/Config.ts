@@ -94,7 +94,7 @@ export class Config {
     this.chatAllowlist = chatAllowlistStrings.map((n) => {
       try {
         return BigInt(n);
-      } catch (e) {
+      } catch {
         assert(false, 'CHAT_ALLOWLIST must contain only numbers');
       }
     });
@@ -109,7 +109,7 @@ export class Config {
       (chat) => {
         try {
           return BigInt(chat);
-        } catch (e) {
+        } catch {
           assert(
             false,
             'NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers',

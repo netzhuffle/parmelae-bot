@@ -18,7 +18,7 @@ export class IntermediateAnswerTool extends Tool {
   protected async _call(arg: string): Promise<string> {
     try {
       await this.telegram.send(arg, this.chatId);
-    } catch (e) {
+    } catch {
       return 'Error: Could not send text to telegram';
     }
     return 'Successfully sent the text to the telegram chat';

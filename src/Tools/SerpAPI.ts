@@ -16,7 +16,6 @@
 import { Tool } from 'langchain/tools';
 
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
@@ -317,8 +316,7 @@ export class SerpAPI extends Tool {
 
   constructor(
     apiKey: string | undefined = typeof process !== 'undefined'
-      ? // eslint-disable-next-line no-process-env
-        process.env.SERPAPI_API_KEY
+      ? process.env.SERPAPI_API_KEY
       : undefined,
     params: Partial<GoogleParameters> = {},
   ) {

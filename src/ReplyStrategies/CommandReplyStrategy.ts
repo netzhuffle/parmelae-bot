@@ -27,7 +27,7 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
   }
 
   async handle(message: TelegramMessageWithReplyTo): Promise<void> {
-    const commandMatches = message.text.match(COMMAND_NAME);
+    const commandMatches = COMMAND_NAME.exec(message.text);
     assert(commandMatches && commandMatches.length >= 2);
     const command = this.getCommand(commandMatches[1]);
 
