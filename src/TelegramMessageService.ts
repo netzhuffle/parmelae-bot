@@ -100,10 +100,10 @@ export class TelegramMessageService {
       type: telegramChat.type,
       title: 'title' in telegramChat ? telegramChat.title : null,
       username:
-        'username' in telegramChat ? telegramChat.username ?? null : null,
+        'username' in telegramChat ? (telegramChat.username ?? null) : null,
       firstName: 'first_name' in telegramChat ? telegramChat.first_name : null,
       lastName:
-        'last_name' in telegramChat ? telegramChat.last_name ?? null : null,
+        'last_name' in telegramChat ? (telegramChat.last_name ?? null) : null,
     };
   }
 

@@ -1,4 +1,4 @@
-import '@abraham/reflection';
+import 'reflect-metadata/lite';
 import { Container } from 'inversify';
 import { GptModelsProvider } from './GptModelsProvider.js';
 import { ChatOpenAI } from '@langchain/openai';
