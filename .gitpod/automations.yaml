@@ -1,0 +1,20 @@
+tasks:
+  init:
+    name: Initialize
+    description: Initialize workspace and database
+    triggeredBy:
+      - postEnvironmentStart
+    command: |
+      npm install
+      npm run build
+      npm run migrate
+  check:
+    name: Check
+    description: Runs formatting, linters, and tests
+    command: |
+      npm run checks
+  run:
+    name: Run
+    description: Runs the bot
+    command: |
+      npm run run-dev
