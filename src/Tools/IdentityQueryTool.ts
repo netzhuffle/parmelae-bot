@@ -1,4 +1,4 @@
-import { Tool } from 'langchain/tools';
+import { Tool } from '@langchain/core/tools';
 import { Config } from '../Config.js';
 import { SchiParmelaeIdentity } from '../MessageGenerators/Identities/SchiParmelaeIdentity.js';
 

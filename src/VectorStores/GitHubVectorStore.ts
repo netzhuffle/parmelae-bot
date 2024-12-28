@@ -1,7 +1,7 @@
 import { VectorStoreInterface } from '@langchain/core/vectorstores';
 import { SingleVectorStoreInterface } from '../VectorStoreInterface.js';
 import { GithubRepoLoader } from '@langchain/community/document_loaders/web/github';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { HNSWLib } from '@langchain/community/vectorstores/hnswlib';
 import { injectable } from 'inversify';
 import { GptModelsProvider } from '../GptModelsProvider.js';

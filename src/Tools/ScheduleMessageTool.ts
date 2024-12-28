@@ -1,5 +1,5 @@
 import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository.js';
-import { Tool } from 'langchain/tools';
+import { Tool } from '@langchain/core/tools';
 import { ScheduledMessageService } from '../ScheduledMessageService.js';
 import { ErrorService } from '../ErrorService.js';
 

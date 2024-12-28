@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { Config } from '../Config.js';
-import { Tool } from 'langchain/tools';
+import { Tool } from '@langchain/core/tools';
 import { GptModels } from '../GptModelsProvider.js';
 
 @injectable()

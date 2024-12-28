@@ -13,7 +13,7 @@
  * may not match your location, and will not be deterministic.
  */
 
-import { Tool } from 'langchain/tools';
+import { Tool } from '@langchain/core/tools';
 
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */

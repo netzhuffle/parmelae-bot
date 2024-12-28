@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Tool } from 'langchain/tools';
+import { Tool } from '@langchain/core/tools';
 
 @injectable()
 export class DateTimeTool extends Tool {

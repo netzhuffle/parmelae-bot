@@ -20,7 +20,7 @@ import { GitHubToolFactory } from './Tools/GitHubToolFactory.js';
 import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
 import { Config } from './Config.js';
-import { Tool } from 'langchain/tools';
+import { Tool } from '@langchain/core/tools';
 import { Message } from '@prisma/client';
 import { DiceToolFactory } from './Tools/DiceToolFactory.js';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';

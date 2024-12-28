@@ -1,5 +1,5 @@
 import { TelegramService } from '../TelegramService.js';
-import { Tool } from 'langchain/tools';
+import { Tool } from '@langchain/core/tools';
 
 export class IntermediateAnswerTool extends Tool {
   static readonly toolName = 'intermediate-answer';
