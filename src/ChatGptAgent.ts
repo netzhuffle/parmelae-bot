@@ -1,6 +1,6 @@
 import { BasePromptTemplate } from '@langchain/core/prompts';
 import { AgentArgs, OpenAIAgent } from 'langchain/agents';
-import { BaseLanguageModel } from 'langchain/base_language';
+import { BaseLanguageModelInterface } from '@langchain/core/language_models/base';
 import { StructuredTool } from 'langchain/tools';
 import { LLMChain } from 'langchain/chains';
 
@@ -10,7 +10,7 @@ export interface ChatGptAgentCreatePromptArgs {
 
 export class ChatGptAgent extends OpenAIAgent {
   static fromLLMAndTools(
-    llm: BaseLanguageModel,
+    llm: BaseLanguageModelInterface,
     tools: StructuredTool[],
     args: ChatGptAgentCreatePromptArgs & Pick<AgentArgs, 'callbacks'>,
   ) {

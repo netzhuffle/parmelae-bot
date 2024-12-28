@@ -1,6 +1,6 @@
-import { VectorStore } from 'langchain/vectorstores/base';
-import { SingleVectorStore } from '../VectorStore.js';
-import { GithubRepoLoader } from 'langchain/document_loaders/web/github';
+import { VectorStoreInterface } from '@langchain/core/vectorstores';
+import { SingleVectorStoreInterface } from '../VectorStoreInterface.js';
+import { GithubRepoLoader } from '@langchain/community/document_loaders/web/github';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { HNSWLib } from '@langchain/community/vectorstores/hnswlib';
 import { injectable } from 'inversify';
@@ -9,8 +9,8 @@ import { Config } from '../Config.js';
 
 /** GitHub vector store. */
 @injectable()
-export class GitHubVectorStore implements SingleVectorStore {
-  private vectorStore: VectorStore | undefined;
+export class GitHubVectorStore implements SingleVectorStoreInterface {
+  private vectorStore: VectorStoreInterface | undefined;
 
   constructor(
     private readonly chatGptModelsProvider: GptModelsProvider,
@@ -36,7 +36,7 @@ export class GitHubVectorStore implements SingleVectorStore {
     );
   }
 
-  async get(): Promise<VectorStore> {
+  async get(): Promise<VectorStoreInterface> {
     if (!this.vectorStore) {
       await this.prepare();
       if (!this.vectorStore) {

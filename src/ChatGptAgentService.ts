@@ -14,7 +14,6 @@ import { MinecraftBackupTool } from './Tools/MinecraftBackupTool.js';
 import { MinecraftStartTool } from './Tools/MinecraftStartTool.js';
 import { MinecraftStatusTool } from './Tools/MinecraftStatusTool.js';
 import { MinecraftStopTool } from './Tools/MinecraftStopTool.js';
-import { SwissConstitutionQaToolFactory } from './Tools/SwissConstitutionQaToolFactory.js';
 import { WebBrowserToolFactory } from './Tools/WebBrowserToolFactory.js';
 import { GoogleSearchToolFactory } from './Tools/GoogleSearchToolFactory.js';
 import { GitHubToolFactory } from './Tools/GitHubToolFactory.js';
@@ -58,7 +57,6 @@ export class ChatGptAgentService {
     minecraftStartTool: MinecraftStartTool,
     minecraftStopTool: MinecraftStopTool,
     minecraftBackupTool: MinecraftBackupTool,
-    swissConstitutionQaToolFactory: SwissConstitutionQaToolFactory,
     webBrowserToolFactory: WebBrowserToolFactory,
   ) {
     this.tools = [
@@ -79,15 +77,6 @@ export class ChatGptAgentService {
       .then((tool) => tools.push(tool))
       .catch((e) =>
         console.error('Could not create github-qa tool, continuing without', e),
-      );
-    swissConstitutionQaToolFactory
-      .create()
-      .then((tool) => tools.push(tool))
-      .catch((e) =>
-        console.error(
-          'Could not create swiss-constitution-qa tool, continuing without',
-          e,
-        ),
       );
   }
 
