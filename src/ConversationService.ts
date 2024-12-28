@@ -26,7 +26,6 @@ export class ConversationService {
       messageId,
       messageCount,
     );
-    let needsVision = false;
     const messagePromises = historyMessages
       .filter(
         (message) =>
@@ -37,7 +36,6 @@ export class ConversationService {
       .map(async (message) => {
         let content: MessageContent = message.text;
         if (message.imageFileId !== null) {
-          needsVision = true;
           content = [
             {
               type: 'image_url',
@@ -66,6 +64,6 @@ export class ConversationService {
           );
         }
       });
-    return new Conversation(await Promise.all(messagePromises), needsVision);
+    return new Conversation(await Promise.all(messagePromises));
   }
 }

@@ -11,25 +11,25 @@ export type GptModel = (typeof GptModels)[keyof typeof GptModels];
 
 /** Provider for LangChain LLM models for dependency injection. */
 export class GptModelsProvider {
-  /** LangChain chat model of a cheap, potentially text-only model. */
+  /** LangChain chat model of a cheap model. */
   public readonly cheap: ChatOpenAI;
-  /** LangChain chat model of a cheap, potentially text-only model with temperature 0. */
+  /** LangChain chat model of a cheap model with temperature 0. */
   public readonly cheapStrict: ChatOpenAI;
-  /** LangChain chat model of an advanced, more expensive model with vision. */
+  /** LangChain chat model of an advanced, more expensive model. */
   public readonly advanced: ChatOpenAI;
-  /** LangChain chat model of an advanced, more expensive model with vision with temperature 0. */
+  /** LangChain chat model of an advanced, more expensive model with temperature 0. */
   public readonly advancedStrict: ChatOpenAI;
   /** LangChain embeddings model. */
   public readonly embeddings: OpenAIEmbeddings;
 
   constructor(models: {
-    /** LangChain chat model of a cheap, potentially text-only model. */
+    /** LangChain chat model of a cheap model. */
     cheap: ChatOpenAI;
-    /** LangChain chat model of a cheap, potentially text-only model with temperature 0. */
+    /** LangChain chat model of a cheap model with temperature 0. */
     cheapStrict: ChatOpenAI;
-    /** LangChain chat model of an advanced, more expensive model with vision. */
+    /** LangChain chat model of an advanced, more expensive model. */
     advanced: ChatOpenAI;
-    /** LangChain chat model of an advanced, more expensive model with vision with temperature 0. */
+    /** LangChain chat model of an advanced, more expensive model with temperature 0. */
     advancedStrict: ChatOpenAI;
     /** LangChain embeddings model. */
     embeddings: OpenAIEmbeddings;
@@ -42,11 +42,7 @@ export class GptModelsProvider {
   }
 
   /** Returns a ChatGPT model. */
-  getModel(model: GptModel, needsVision = false): ChatOpenAI {
-    if (needsVision) {
-      return this.advanced;
-    }
-
+  getModel(model: GptModel): ChatOpenAI {
     switch (model) {
       case GptModels.Cheap:
         return this.cheap;

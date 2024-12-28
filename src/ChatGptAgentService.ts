@@ -92,11 +92,7 @@ export class ChatGptAgentService {
     conversation: Conversation,
     retries = 0,
   ): Promise<ChatGptMessage> {
-    const executor = this.createAgentExecutor(
-      message,
-      basePrompt,
-      conversation.needsVision,
-    );
+    const executor = this.createAgentExecutor(message, basePrompt);
 
     try {
       const response = await executor.invoke({
@@ -130,7 +126,6 @@ export class ChatGptAgentService {
   private createAgentExecutor(
     message: Message,
     basePrompt: BasePromptTemplate,
-    needsVision: boolean,
   ): AgentExecutor {
     const chatId = message.chatId;
     const tools = [
@@ -147,7 +142,7 @@ export class ChatGptAgentService {
     return AgentExecutor.fromAgentAndTools({
       tags: ['openai-functions'],
       agent: ChatGptAgent.fromLLMAndTools(
-        this.models.getModel(this.config.gptModel, needsVision),
+        this.models.getModel(this.config.gptModel),
         tools,
         { basePrompt },
       ),
