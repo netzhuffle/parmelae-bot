@@ -77,7 +77,9 @@ container.bind(GptModelsProvider).toDynamicValue(
         verbose: true,
       }),
       embeddings: new OpenAIEmbeddings(
-        {},
+        {
+          model: 'text-embedding-3-small',
+        },
         {
           basePath: 'https://oai.hconeai.com/v1',
           baseOptions: {
