@@ -20,9 +20,8 @@ import { GitHubToolFactory } from './Tools/GitHubToolFactory.js';
 import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
 import { Config } from './Config.js';
-import { Tool } from '@langchain/core/tools';
+import { StructuredTool } from '@langchain/core/tools';
 import { Message } from '@prisma/client';
-import { DiceToolFactory } from './Tools/DiceToolFactory.js';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
 import { CallbackHandlerFactory } from './CallbackHandlerFactory.js';
 import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
@@ -32,22 +31,25 @@ import { ChatGptAgent } from './ChatGptAgent.js';
 import { Conversation } from './Conversation.js';
 import { IdentityQueryToolFactory } from './Tools/IdentityQueryToolFactory.js';
 import { IdentitySetterToolFactory } from './Tools/IdentitySetterToolFactory.js';
+import { diceTool } from './Tools/diceTool.js';
+import { setContextVariable } from '@langchain/core/context';
+import { TelegramService } from './TelegramService.js';
 
 /** ChatGPT Agent Service */
 @injectable()
 export class ChatGptAgentService {
-  private readonly tools: Tool[] = [new Calculator()];
+  private readonly tools: StructuredTool[] = [new Calculator(), diceTool];
 
   constructor(
     private readonly models: GptModelsProvider,
     private readonly config: Config,
     private readonly callbackHandlerFactory: CallbackHandlerFactory,
     private readonly dallEToolFactory: DallEToolFactory,
-    private readonly diceToolFactory: DiceToolFactory,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
     private readonly identityQueryToolFactory: IdentityQueryToolFactory,
     private readonly identitySetterToolFactory: IdentitySetterToolFactory,
+    telegram: TelegramService,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     dateTimeTool: DateTimeTool,
@@ -59,6 +61,7 @@ export class ChatGptAgentService {
     minecraftBackupTool: MinecraftBackupTool,
     webBrowserToolFactory: WebBrowserToolFactory,
   ) {
+    setContextVariable('telegram', telegram);
     this.tools = [
       ...this.tools,
       googleSearchToolFactory.create(),
@@ -128,10 +131,10 @@ export class ChatGptAgentService {
     basePrompt: BasePromptTemplate,
   ): AgentExecutor {
     const chatId = message.chatId;
+    setContextVariable('chatId', chatId);
     const tools = [
       ...this.tools,
       this.dallEToolFactory.create(chatId),
-      this.diceToolFactory.create(chatId),
       this.identityQueryToolFactory.create(chatId),
       this.identitySetterToolFactory.create(chatId),
       this.scheduleMessageToolFactory.create(chatId, message.fromId),
