@@ -49,19 +49,19 @@ function handleSoccer(value: number): string {
 }
 
 export const diceTool = tool(
-  async ({ dieEmoji }): Promise<string> => {
+  async ({ type }): Promise<string> => {
     const telegram = getContextVariable<TelegramService>('telegram');
     assert(telegram instanceof TelegramService);
     const chatId = getContextVariable<string>('chatId');
     assert(typeof chatId === 'bigint');
 
-    const result = await telegram.sendDice(dieEmoji, chatId);
+    const result = await telegram.sendDice(type, chatId);
     const dice = result.dice;
     if (!dice) {
       return 'Error: Telegram could not determine a random result';
     }
 
-    switch (dieEmoji) {
+    switch (type) {
       case '🎲':
         return handleDie(dice.value);
       case '🎰':
@@ -75,7 +75,7 @@ export const diceTool = tool(
       case '⚽':
         return handleSoccer(dice.value);
       default:
-        throw new NotExhaustiveSwitchError(dieEmoji);
+        throw new NotExhaustiveSwitchError(type);
     }
   },
   {
@@ -83,7 +83,7 @@ export const diceTool = tool(
     description:
       'Throw a die in the telegram chat. Will be displayed as an emoji with a random value to users. This tools returns your random value.',
     schema: z.object({
-      dieEmoji: z
+      type: z
         .enum(['🎲', '🎯', '🏀', '⚽', '🎳', '🎰'])
         .describe(
           'The emoji on which the animation is based: "🎲" (default), "🎯", "🎳", "🏀", "⚽", or "🎰".',
