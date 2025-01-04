@@ -9,7 +9,6 @@ import {
   ChatGptMessage,
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage.js';
-import { DallEToolFactory } from './Tools/DallEToolFactory.js';
 import { MinecraftBackupTool } from './Tools/MinecraftBackupTool.js';
 import { MinecraftStartTool } from './Tools/MinecraftStartTool.js';
 import { MinecraftStatusTool } from './Tools/MinecraftStatusTool.js';
@@ -34,22 +33,30 @@ import { IdentitySetterToolFactory } from './Tools/IdentitySetterToolFactory.js'
 import { diceTool } from './Tools/diceTool.js';
 import { setContextVariable } from '@langchain/core/context';
 import { TelegramService } from './TelegramService.js';
+import { dallETool } from './Tools/dallETool.js';
+import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
+import { DallEService } from './DallEService.js';
 
 /** ChatGPT Agent Service */
 @injectable()
 export class ChatGptAgentService {
-  private readonly tools: StructuredTool[] = [new Calculator(), diceTool];
+  private readonly tools: StructuredTool[] = [
+    new Calculator(),
+    diceTool,
+    dallETool,
+  ];
 
   constructor(
     private readonly models: GptModelsProvider,
     private readonly config: Config,
     private readonly callbackHandlerFactory: CallbackHandlerFactory,
-    private readonly dallEToolFactory: DallEToolFactory,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
     private readonly identityQueryToolFactory: IdentityQueryToolFactory,
     private readonly identitySetterToolFactory: IdentitySetterToolFactory,
     telegram: TelegramService,
+    dallEPromptGenerator: DallEPromptGenerator,
+    dallEService: DallEService,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     dateTimeTool: DateTimeTool,
@@ -62,6 +69,8 @@ export class ChatGptAgentService {
     webBrowserToolFactory: WebBrowserToolFactory,
   ) {
     setContextVariable('telegram', telegram);
+    setContextVariable('dallEPromptGenerator', dallEPromptGenerator);
+    setContextVariable('dallE', dallEService);
     this.tools = [
       ...this.tools,
       googleSearchToolFactory.create(),
@@ -134,7 +143,6 @@ export class ChatGptAgentService {
     setContextVariable('chatId', chatId);
     const tools = [
       ...this.tools,
-      this.dallEToolFactory.create(chatId),
       this.identityQueryToolFactory.create(chatId),
       this.identitySetterToolFactory.create(chatId),
       this.scheduleMessageToolFactory.create(chatId, message.fromId),

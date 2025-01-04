@@ -5,8 +5,22 @@ import * as Typegram from '@telegraf/types';
 import { assert } from 'console';
 
 export class TelegramServiceFake extends TelegramService {
-  result?: { method: 'sendDice'; value: number };
-  request?: { method: 'sendDice'; emoji: string; chatId: string };
+  result?: {
+    method: 'sendDice';
+    value: number;
+  };
+  request?:
+    | {
+        method: 'sendDice';
+        emoji: string;
+        chatId: string;
+      }
+    | {
+        method: 'sendImage';
+        url: string;
+        caption: string;
+        chatId: string;
+      };
 
   constructor() {
     super(
@@ -20,12 +34,9 @@ export class TelegramServiceFake extends TelegramService {
     chatId: bigint,
   ): Promise<Typegram.Message.DiceMessage> {
     this.request = { method: 'sendDice', emoji, chatId: chatId.toString() };
+
     assert(
-      typeof this.result === 'object',
-      'Set result before calling TelegramServiceFake sendDice',
-    );
-    assert(
-      this.result!.method === 'sendDice',
+      this.result?.method === 'sendDice',
       'Set sendDice result before calling TelegramServiceFake sendDice',
     );
 
@@ -33,10 +44,21 @@ export class TelegramServiceFake extends TelegramService {
       message_id: 123,
       date: 1234567890,
       chat: { id: Number(chatId), type: 'group', title: 'Test Group' },
-      dice: {
-        emoji: emoji,
-        value: this.result!.value,
-      },
+      dice: { emoji, value: this.result!.value },
     });
+  }
+
+  async replyWithImage(
+    url: string,
+    caption: string,
+    chatId: bigint,
+  ): Promise<void> {
+    this.request = {
+      method: 'sendImage',
+      url,
+      caption,
+      chatId: chatId.toString(),
+    };
+    return Promise.resolve();
   }
 }
