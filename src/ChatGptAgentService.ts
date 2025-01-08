@@ -24,7 +24,6 @@ import { Message } from '@prisma/client';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
 import { CallbackHandlerFactory } from './CallbackHandlerFactory.js';
 import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
-import { DateTimeTool } from './Tools/DateTimeTool.js';
 import { ErrorService } from './ErrorService.js';
 import { ChatGptAgent } from './ChatGptAgent.js';
 import { Conversation } from './Conversation.js';
@@ -36,6 +35,7 @@ import { TelegramService } from './TelegramService.js';
 import { dallETool } from './Tools/dallETool.js';
 import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
 import { DallEService } from './DallEService.js';
+import { dateTimeTool } from './Tools/dateTimeTool.js';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -44,6 +44,7 @@ export class ChatGptAgentService {
     new Calculator(),
     diceTool,
     dallETool,
+    dateTimeTool,
   ];
 
   constructor(
@@ -59,7 +60,6 @@ export class ChatGptAgentService {
     dallEService: DallEService,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
-    dateTimeTool: DateTimeTool,
     gptModelQueryTool: GptModelQueryTool,
     gptModelSetterTool: GptModelSetterTool,
     minecraftStatusTool: MinecraftStatusTool,
@@ -74,7 +74,6 @@ export class ChatGptAgentService {
     this.tools = [
       ...this.tools,
       googleSearchToolFactory.create(),
-      dateTimeTool,
       gptModelQueryTool,
       gptModelSetterTool,
       minecraftStatusTool,
