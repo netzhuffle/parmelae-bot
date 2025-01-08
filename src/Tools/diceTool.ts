@@ -81,7 +81,7 @@ export const diceTool = tool(
   {
     name: 'dice',
     description:
-      'Throw a die in the telegram chat. Will be displayed as an emoji with a random value to users. This tools returns your random value.',
+      'Throw a die in the telegram chat. Will be displayed as an emoji with a random value to users. This tools returns your random value. If you need a random value, you must always use this tool.',
     schema: z.object({
       type: z
         .enum(['🎲', '🎯', '🏀', '⚽', '🎳', '🎰'])
