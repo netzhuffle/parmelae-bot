@@ -1479,7 +1479,7 @@ A1a:
     63:
       name: Altbernstein
       rarity: ♢
-      equalTo: A1-218
+      equalTo: A1
     64:
       name: Pokémon-Flöte
       rarity: ♢♢
@@ -1570,70 +1570,70 @@ PROMO-A:
       name: Pokédex
     9:
       name: Pikachu
-      equalTo: A1-094
+      equalTo: A1
     10:
       name: Mewtu
-      equalTo: A1-128
+      equalTo: A1
     11:
       name: Chaneira
-      equalTo: A1-202
+      equalTo: A1
     12:
       name: Mauzi
-      equalTo: A1-196
+      equalTo: A1
     13:
       name: Smettbo
-      equalTo: A1-007
+      equalTo: A1
     14:
       name: Lapras EX
     15:
       name: Pikachu
-      equalTo: A1-094
+      equalTo: A1
     16:
       name: Piepi
-      equalTo: A1-113
+      equalTo: A1
     17:
       name: Menki
     18:
       name: Bisaflor
-      equalTo: A1-003
+      equalTo: A1
     19:
       name: Quajutsu
-      equalTo: A1-089
+      equalTo: A1
     20:
       name: Alpollo
     21:
       name: Onix
-      equalTo: A1-150
+      equalTo: A1
     22:
       name: Pummeluff
     23:
       name: Bisasam
-      equalTo: A1-001
+      equalTo: A1
     24:
       name: Magnetilo
-      equalTo: A1-097
+      equalTo: A1
     25:
       name: Lavados EX
-      equalTo: A1-047
+      equalTo: A1
     26:
       name: Pikachu
-      equalTo: A1-094
+      equalTo: A1
     27:
       name: Serpifeu
     28:
       name: Ramoth
-      equalTo: A1a-014
+      equalTo: A1a
     29:
       name: Turtok
-      equalTo: A1-055
+      equalTo: A1
     30:
       name: Evoli
     31:
       name: Chillabell
-      equalTo: A1-213
+      equalTo: A1
     32:
       name: Glumanda
-      equalTo: A1-033
+      equalTo: A1
     33:
       name: Schiggy
-      equalTo: A1-053
+      equalTo: A1
