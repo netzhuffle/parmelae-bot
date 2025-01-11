@@ -1265,19 +1265,28 @@ A1:
     283:
       name: Mew
       rarity: ☆☆☆
-      boosters: "-"
+      boosters: ~
     284:
       name: Glurak EX
       rarity: ♛
-      boosters: ["Glurak", "Mewtu", "Pikachu"]
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
     285:
       name: Pikachu EX
       rarity: ♛
-      boosters: ["Glurak", "Mewtu", "Pikachu"]
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
     286:
       name: Mewtu EX
       rarity: ♛
-      boosters: ["Glurak", "Mewtu", "Pikachu"]
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
 A1a:
   name: Mysteriöse Insel
   cards:
