@@ -1,0 +1,1630 @@
+A1:
+  name: Unschlagbare Gene
+  boosters:
+    - Glurak
+    - Mewtu
+    - Pikachu
+  cards:
+    1:
+      name: Bisasam
+      rarity: ♢
+      boosters: Mewtu
+    2:
+      name: Bisaknosp
+      rarity: ♢♢
+      boosters: Mewtu
+    3:
+      name: Bisaflor
+      rarity: ♢♢♢
+      boosters: Mewtu
+    4:
+      name: Bisaflor EX
+      rarity: ♢♢♢♢
+      boosters: Mewtu
+    5:
+      name: Raupy
+      rarity: ♢
+      boosters: Pikachu
+    6:
+      name: Safcon
+      rarity: ♢
+      boosters: Pikachu
+    7:
+      name: Smettbo
+      rarity: ♢♢♢
+      boosters: Pikachu
+    8:
+      name: Hornliu
+      rarity: ♢
+      boosters: Mewtu
+    9:
+      name: Kokuna
+      rarity: ♢
+      boosters: Mewtu
+    10:
+      name: Bibor
+      rarity: ♢♢♢
+      boosters: Mewtu
+    11:
+      name: Myrapla
+      rarity: ♢
+      boosters: Glurak
+    12:
+      name: Duflor
+      rarity: ♢♢
+      boosters: Glurak
+    13:
+      name: Giflor
+      rarity: ♢♢♢
+      boosters: Glurak
+    14:
+      name: Paras
+      rarity: ♢
+      boosters: Pikachu
+    15:
+      name: Parasek
+      rarity: ♢♢
+      boosters: Pikachu
+    16:
+      name: Bluzuk
+      rarity: ♢
+      boosters: Mewtu
+    17:
+      name: Omot
+      rarity: ♢♢
+      boosters: Mewtu
+    18:
+      name: Knofensa
+      rarity: ♢
+      boosters: Glurak
+    19:
+      name: Ultrigaria
+      rarity: ♢♢
+      boosters: Glurak
+    20:
+      name: Sarzenia
+      rarity: ♢♢♢
+      boosters: Glurak
+    21:
+      name: Owei
+      rarity: ♢
+      boosters: Glurak
+    22:
+      name: Kokowei
+      rarity: ♢♢♢
+      boosters: Glurak
+    23:
+      name: Kokowei EX
+      rarity: ♢♢♢♢
+      boosters: Glurak
+    24:
+      name: Tangela
+      rarity: ♢
+      boosters: Glurak
+    25:
+      name: Sichlor
+      rarity: ♢
+      boosters: Mewtu
+    26:
+      name: Pinsir
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    27:
+      name: Waumboll
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    28:
+      name: Elfun
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    29:
+      name: Lilminip
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    30:
+      name: Dressella
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    31:
+      name: Mähikel
+      rarity: ♢
+      boosters: Glurak
+    32:
+      name: Chevrumm
+      rarity: ♢
+      boosters: Glurak
+    33:
+      name: Glumanda
+      rarity: ♢
+      boosters: Glurak
+    34:
+      name: Glutexo
+      rarity: ♢♢
+      boosters: Glurak
+    35:
+      name: Glurak
+      rarity: ♢♢♢
+      boosters: Glurak
+    36:
+      name: Glurak EX
+      rarity: ♢♢♢♢
+      boosters: Glurak
+    37:
+      name: Vulpix
+      rarity: ♢
+      boosters: Glurak
+    38:
+      name: Vulnona
+      rarity: ♢♢
+      boosters: Glurak
+    39:
+      name: Fukano
+      rarity: ♢
+      boosters: Pikachu
+    40:
+      name: Arkani
+      rarity: ♢♢♢
+      boosters: Pikachu
+    41:
+      name: Arkani EX
+      rarity: ♢♢♢♢
+      boosters: Pikachu
+    42:
+      name: Ponita
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    43:
+      name: Gallopa
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    44:
+      name: Magmar
+      rarity: ♢
+      boosters: Glurak
+    45:
+      name: Flamara
+      rarity: ♢♢♢
+      boosters: Glurak
+    46:
+      name: Lavados
+      rarity: ♢♢♢
+      boosters: Glurak
+    47:
+      name: Lavados EX
+      rarity: ♢♢♢♢
+      boosters: Glurak
+    48:
+      name: Furnifraß
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    49:
+      name: Molunk
+      rarity: ♢
+      boosters: Mewtu
+    50:
+      name: Amfira
+      rarity: ♢
+      boosters: Mewtu
+    51:
+      name: Thermopod
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    52:
+      name: Infernopod
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    53:
+      name: Schiggy
+      rarity: ♢
+      boosters: Pikachu
+    54:
+      name: Schillok
+      rarity: ♢♢
+      boosters: Pikachu
+    55:
+      name: Turtok
+      rarity: ♢♢♢
+      boosters: Pikachu
+    56:
+      name: Turtok EX
+      rarity: ♢♢♢♢
+      boosters: Pikachu
+    57:
+      name: Enton
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    58:
+      name: Entoron
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    59:
+      name: Quapsel
+      rarity: ♢
+      boosters: Glurak
+    60:
+      name: Quaputzi
+      rarity: ♢♢
+      boosters: Glurak
+    61:
+      name: Quappo
+      rarity: ♢♢♢
+      boosters: Glurak
+    62:
+      name: Tentacha
+      rarity: ♢
+      boosters: Mewtu
+    63:
+      name: Tentoxa
+      rarity: ♢♢
+      boosters: Mewtu
+    64:
+      name: Jurob
+      rarity: ♢
+      boosters: Pikachu
+    65:
+      name: Jugong
+      rarity: ♢♢
+      boosters: Pikachu
+    66:
+      name: Muschas
+      rarity: ♢
+      boosters: Mewtu
+    67:
+      name: Austos
+      rarity: ♢♢
+      boosters: Mewtu
+    68:
+      name: Krabby
+      rarity: ♢
+      boosters: Mewtu
+    69:
+      name: Kingler
+      rarity: ♢♢
+      boosters: Mewtu
+    70:
+      name: Seeper
+      rarity: ♢
+      boosters: Pikachu
+    71:
+      name: Seemon
+      rarity: ♢♢
+      boosters: Pikachu
+    72:
+      name: Goldini
+      rarity: ♢
+      boosters: Pikachu
+    73:
+      name: Golking
+      rarity: ♢
+      boosters: Pikachu
+    74:
+      name: Sterndu
+      rarity: ♢
+      boosters: Glurak
+    75:
+      name: Starmie
+      rarity: ♢♢
+      boosters: Glurak
+    76:
+      name: Starmie EX
+      rarity: ♢♢♢♢
+      boosters: Glurak
+    77:
+      name: Karpador
+      rarity: ♢
+      boosters: Pikachu
+    78:
+      name: Garados
+      rarity: ♢♢♢
+      boosters: Pikachu
+    79:
+      name: Lapras
+      rarity: ♢♢♢
+      boosters: Glurak
+    80:
+      name: Aquana
+      rarity: ♢♢♢
+      boosters: Mewtu
+    81:
+      name: Amonitas
+      rarity: ♢♢
+      boosters: Pikachu
+    82:
+      name: Amoroso
+      rarity: ♢♢♢
+      boosters: Pikachu
+    83:
+      name: Arktos
+      rarity: ♢♢♢
+      boosters: Mewtu
+    84:
+      name: Arktos EX
+      rarity: ♢♢♢♢
+      boosters: Mewtu
+    85:
+      name: Piccolente
+      rarity: ♢
+      boosters: Glurak
+    86:
+      name: Swaroness
+      rarity: ♢♢
+      boosters: Glurak
+    87:
+      name: Froxy
+      rarity: ♢
+      boosters: Glurak
+    88:
+      name: Amphizel
+      rarity: ♢♢
+      boosters: Glurak
+    89:
+      name: Quajutsu
+      rarity: ♢♢♢
+      boosters: Glurak
+    90:
+      name: Gufa
+      rarity: ♢
+      boosters: Glurak
+    91:
+      name: Knirfish
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    92:
+      name: Snomnom
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    93:
+      name: Mottineva
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    94:
+      name: Pikachu
+      rarity: ♢
+      boosters: Pikachu
+    95:
+      name: Raichu
+      rarity: ♢♢♢
+      boosters: Pikachu
+    96:
+      name: Pikachu EX
+      rarity: ♢♢♢♢
+      boosters: Pikachu
+    97:
+      name: Magnetilo
+      rarity: ♢
+      boosters: Pikachu
+    98:
+      name: Magneton
+      rarity: ♢♢♢
+      boosters: Pikachu
+    99:
+      name: Voltobal
+      rarity: ♢
+      boosters: Pikachu
+    100:
+      name: Lektrobal
+      rarity: ♢♢
+      boosters: Pikachu
+    101:
+      name: Elektek
+      rarity: ♢
+      boosters: Pikachu
+    102:
+      name: Blitza
+      rarity: ♢♢♢
+      boosters: Pikachu
+    103:
+      name: Zapdos
+      rarity: ♢♢♢
+      boosters: Pikachu
+    104:
+      name: Zapdos EX
+      rarity: ♢♢♢♢
+      boosters: Pikachu
+    105:
+      name: Elezba
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    106:
+      name: Zebritz
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    107:
+      name: Zapplardin
+      rarity: ♢
+      boosters: Mewtu
+    108:
+      name: Zapplalek
+      rarity: ♢♢
+      boosters: Mewtu
+    109:
+      name: Zapplarang
+      rarity: ♢♢♢
+      boosters: Mewtu
+    110:
+      name: Eguana
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    111:
+      name: Elezard
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    112:
+      name: Britzigel
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    113:
+      name: Piepi
+      rarity: ♢
+      boosters: Pikachu
+    114:
+      name: Pixi
+      rarity: ♢♢
+      boosters: Pikachu
+    115:
+      name: Abra
+      rarity: ♢
+      boosters: Glurak
+    116:
+      name: Kadabra
+      rarity: ♢♢
+      boosters: Glurak
+    117:
+      name: Simsala
+      rarity: ♢♢♢
+      boosters: Glurak
+    118:
+      name: Flegmon
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    119:
+      name: Lahmus
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    120:
+      name: Nebulak
+      rarity: ♢
+      boosters: Mewtu
+    121:
+      name: Alpollo
+      rarity: ♢♢
+      boosters: Mewtu
+    122:
+      name: Gengar
+      rarity: ♢♢♢
+      boosters: Mewtu
+    123:
+      name: Gengar EX
+      rarity: ♢♢♢♢
+      boosters: Mewtu
+    124:
+      name: Traumato
+      rarity: ♢
+      boosters: Pikachu
+    125:
+      name: Hypno
+      rarity: ♢♢♢
+      boosters: Pikachu
+    126:
+      name: Pantimos
+      rarity: ♢♢
+      boosters: Mewtu
+    127:
+      name: Rossana
+      rarity: ♢
+      boosters: Mewtu
+    128:
+      name: Mewtu
+      rarity: ♢♢♢
+      boosters: Mewtu
+    129:
+      name: Mewtu EX
+      rarity: ♢♢♢♢
+      boosters: Mewtu
+    130:
+      name: Trasla
+      rarity: ♢
+      boosters: Mewtu
+    131:
+      name: Kirlia
+      rarity: ♢♢
+      boosters: Mewtu
+    132:
+      name: Guardevoir
+      rarity: ♢♢♢
+      boosters: Mewtu
+    133:
+      name: Fleknoil
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    134:
+      name: Fletiamo
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    135:
+      name: Golbit
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    136:
+      name: Golgantes
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    137:
+      name: Sandan
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    138:
+      name: Sandamer
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    139:
+      name: Digda
+      rarity: ♢
+      boosters: Pikachu
+    140:
+      name: Digdri
+      rarity: ♢♢
+      boosters: Pikachu
+    141:
+      name: Menki
+      rarity: ♢
+      boosters: Glurak
+    142:
+      name: Rasaff
+      rarity: ♢♢
+      boosters: Glurak
+    143:
+      name: Machollo
+      rarity: ♢
+      boosters: Glurak
+    144:
+      name: Maschock
+      rarity: ♢♢
+      boosters: Glurak
+    145:
+      name: Machomei
+      rarity: ♢♢♢
+      boosters: Glurak
+    146:
+      name: Machomei EX
+      rarity: ♢♢♢♢
+      boosters: Glurak
+    147:
+      name: Kleinstein
+      rarity: ♢
+      boosters: Pikachu
+    148:
+      name: Georok
+      rarity: ♢♢
+      boosters: Pikachu
+    149:
+      name: Geowaz
+      rarity: ♢♢♢
+      boosters: Pikachu
+    150:
+      name: Onix
+      rarity: ♢♢
+      boosters: Pikachu
+    151:
+      name: Tragosso
+      rarity: ♢
+      boosters: Mewtu
+    152:
+      name: Knogga
+      rarity: ♢♢
+      boosters: Mewtu
+    153:
+      name: Knogga EX
+      rarity: ♢♢♢♢
+      boosters: Mewtu
+    154:
+      name: Kicklee
+      rarity: ♢
+      boosters: Mewtu
+    155:
+      name: Nockchan
+      rarity: ♢
+      boosters: Glurak
+    156:
+      name: Rihorn
+      rarity: ♢
+      boosters: Mewtu
+    157:
+      name: Rizeros
+      rarity: ♢♢
+      boosters: Mewtu
+    158:
+      name: Kabuto
+      rarity: ♢♢
+      boosters: Glurak
+    159:
+      name: Kabutops
+      rarity: ♢♢♢
+      boosters: Glurak
+    160:
+      name: Lin-Fu
+      rarity: ♢
+      boosters: Pikachu
+    161:
+      name: Wie-Shu
+      rarity: ♢♢
+      boosters: Pikachu
+    162:
+      name: Klopptopus
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    163:
+      name: Kaocto
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    164:
+      name: Rettan
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    165:
+      name: Arbok
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    166:
+      name: Nidoran♀
+      rarity: ♢
+      boosters: Pikachu
+    167:
+      name: Nidorina
+      rarity: ♢♢
+      boosters: Pikachu
+    168:
+      name: Nidoqueen
+      rarity: ♢♢♢
+      boosters: Pikachu
+    169:
+      name: Nidoran♂
+      rarity: ♢
+      boosters: Pikachu
+    170:
+      name: Nidorino
+      rarity: ♢♢
+      boosters: Pikachu
+    171:
+      name: Nidoking
+      rarity: ♢♢♢
+      boosters: Pikachu
+    172:
+      name: Zubat
+      rarity: ♢
+      boosters: Mewtu
+    173:
+      name: Golbat
+      rarity: ♢♢
+      boosters: Mewtu
+    174:
+      name: Sleima
+      rarity: ♢
+      boosters: Mewtu
+    175:
+      name: Sleimok
+      rarity: ♢♢♢
+      boosters: Mewtu
+    176:
+      name: Smogon
+      rarity: ♢
+      boosters: Mewtu
+    177:
+      name: Smogmog
+      rarity: ♢♢♢
+      boosters: Mewtu
+    178:
+      name: Flunkifer
+      rarity: ♢
+      boosters: Glurak
+    179:
+      name: Gladiantri
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    180:
+      name: Caesurio
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    181:
+      name: Meltan
+      rarity: ♢
+      boosters: Glurak
+    182:
+      name: Melmetal
+      rarity: ♢♢♢
+      boosters: Glurak
+    183:
+      name: Dratini
+      rarity: ♢
+      boosters: Mewtu
+    184:
+      name: Dragonir
+      rarity: ♢♢
+      boosters: Mewtu
+    185:
+      name: Dragoran
+      rarity: ♢♢♢
+      boosters: Mewtu
+    186:
+      name: Taubsi
+      rarity: ♢
+      boosters: Mewtu
+    187:
+      name: Tauboga
+      rarity: ♢
+      boosters: Mewtu
+    188:
+      name: Tauboss
+      rarity: ♢♢♢
+      boosters: Mewtu
+    189:
+      name: Rattfratz
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    190:
+      name: Rattikarl
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    191:
+      name: Habitak
+      rarity: ♢
+      boosters: Glurak
+    192:
+      name: Ibitak
+      rarity: ♢
+      boosters: Glurak
+    193:
+      name: Pummeluff
+      rarity: ♢
+      boosters: Pikachu
+    194:
+      name: Knuddeluff
+      rarity: ♢
+      boosters: Pikachu
+    195:
+      name: Knuddeluff EX
+      rarity: ♢♢♢♢
+      boosters: Pikachu
+    196:
+      name: Mauzi
+      rarity: ♢
+      boosters: Glurak
+    197:
+      name: Snobilikat
+      rarity: ♢♢
+      boosters: Glurak
+    198:
+      name: Porenta
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    199:
+      name: Dodu
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    200:
+      name: Dodri
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    201:
+      name: Schlurp
+      rarity: ♢♢
+      boosters: Mewtu
+    202:
+      name: Chaneira
+      rarity: ♢♢
+      boosters: Pikachu
+    203:
+      name: Kangama
+      rarity: ♢♢♢
+      boosters: Glurak
+    204:
+      name: Tauros
+      rarity: ♢♢
+      boosters: Glurak
+    205:
+      name: Ditto
+      rarity: ♢♢♢
+      boosters: Mewtu
+    206:
+      name: Evoli
+      rarity: ♢
+      boosters: Glurak
+    207:
+      name: Evoli
+      rarity: ♢
+      boosters: Mewtu
+    208:
+      name: Evoli
+      rarity: ♢
+      boosters: Pikachu
+    209:
+      name: Porygon
+      rarity: ♢♢
+      boosters: Mewtu
+    210:
+      name: Aerodactyl
+      rarity: ♢♢♢
+      boosters: Mewtu
+    211:
+      name: Relaxo
+      rarity: ♢♢♢
+      boosters: Pikachu
+    212:
+      name: Picochilla
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    213:
+      name: Chillabell
+      rarity: ♢♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    214:
+      name: Wolly
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    215:
+      name: Zwollock
+      rarity: ♢
+      boosters:
+        - Glurak
+        - Mewtu
+        - Pikachu
+    216:
+      name: Helixfossil
+      rarity: ♢
+      boosters: Pikachu
+    217:
+      name: Domfossil
+      rarity: ♢
+      boosters: Glurak
+    218:
+      name: Altbernstein
+      rarity: ♢
+      boosters: Mewtu
+    219:
+      name: Erika
+      rarity: ♢♢
+      boosters: Glurak
+    220:
+      name: Misty
+      rarity: ♢♢
+      boosters: Pikachu
+    221:
+      name: Pyro
+      rarity: ♢♢
+      boosters: Glurak
+    222:
+      name: Koga
+      rarity: ♢♢
+      boosters: Mewtu
+    223:
+      name: Giovanni
+      rarity: ♢♢
+      boosters: Mewtu
+    224:
+      name: Rocko
+      rarity: ♢♢
+      boosters: Pikachu
+    225:
+      name: Sabrina
+      rarity: ♢♢
+      boosters: Glurak
+    226:
+      name: Major Bob
+      rarity: ♢♢
+      boosters: Pikachu
+    227:
+      name: Bisasam
+      rarity: ☆
+      boosters: Mewtu
+    228:
+      name: Duflor
+      rarity: ☆
+      boosters: Glurak
+    229:
+      name: Pinsir
+      rarity: ☆
+      boosters: Glurak
+    230:
+      name: Glumanda
+      rarity: ☆
+      boosters: Glurak
+    231:
+      name: Gallopa
+      rarity: ☆
+      boosters: Glurak
+    232:
+      name: Shiggy
+      rarity: ☆
+      boosters: Pikachu
+    233:
+      name: Garados
+      rarity: ☆
+      boosters: Pikachu
+    234:
+      name: Lapras
+      rarity: ☆
+      boosters: Glurak
+    235:
+      name: Lektrobal
+      rarity: ☆
+      boosters: Pikachu
+    236:
+      name: Simsala
+      rarity: ☆
+      boosters: Glurak
+    237:
+      name: Flegmon
+      rarity: ☆
+      boosters: Glurak
+    238:
+      name: Digda
+      rarity: ☆
+      boosters: Pikachu
+    239:
+      name: Tragosso
+      rarity: ☆
+      boosters: Mewtu
+    240:
+      name: Nidoqueen
+      rarity: ☆
+      boosters: Pikachu
+    241:
+      name: Nidoking
+      rarity: ☆
+      boosters: Pikachu
+    242:
+      name: Golbat
+      rarity: ☆
+      boosters: Mewtu
+    243:
+      name: Smogmog
+      rarity: ☆
+      boosters: Mewtu
+    244:
+      name: Dragoran
+      rarity: ☆
+      boosters: Mewtu
+    245:
+      name: Tauboss
+      rarity: ☆
+      boosters: Mewtu
+    246:
+      name: Mauzi
+      rarity: ☆
+      boosters: Glurak
+    247:
+      name: Ditto
+      rarity: ☆
+      boosters: Mewtu
+    248:
+      name: Evoli
+      rarity: ☆
+      boosters: Pikachu
+    249:
+      name: Porygon
+      rarity: ☆
+      boosters: Mewtu
+    250:
+      name: Relaxo
+      rarity: ☆
+      boosters: Pikachu
+    251:
+      name: Bisaflor EX
+      rarity: ☆☆
+      boosters: Mewtu
+    252:
+      name: Kokowei EX
+      rarity: ☆☆
+      boosters: Glurak
+    253:
+      name: Glurak EX
+      rarity: ☆☆
+      boosters: Glurak
+    254:
+      name: Arkani EX
+      rarity: ☆☆
+      boosters: Pikachu
+    255:
+      name: Lavados EX
+      rarity: ☆☆
+      boosters: Glurak
+    256:
+      name: Turtok EX
+      rarity: ☆☆
+      boosters: Pikachu
+    257:
+      name: Starmie EX
+      rarity: ☆☆
+      boosters: Glurak
+    258:
+      name: Arktos EX
+      rarity: ☆☆
+      boosters: Mewtu
+    259:
+      name: Pikachu EX
+      rarity: ☆☆
+      boosters: Pikachu
+    260:
+      name: Zapdos EX
+      rarity: ☆☆
+      boosters: Pikachu
+    261:
+      name: Gengar EX
+      rarity: ☆☆
+      boosters: Mewtu
+    262:
+      name: Mewtu EX
+      rarity: ☆☆
+      boosters: Mewtu
+    263:
+      name: Machomei EX
+      rarity: ☆☆
+      boosters: Glurak
+    264:
+      name: Knogga EX
+      rarity: ☆☆
+      boosters: Mewtu
+    265:
+      name: Knuddeluff EX
+      rarity: ☆☆
+      boosters: Pikachu
+    266:
+      name: Erika
+      rarity: ☆☆
+      boosters: Glurak
+    267:
+      name: Misty
+      rarity: ☆☆
+      boosters: Pikachu
+    268:
+      name: Pyro
+      rarity: ☆☆
+      boosters: Glurak
+    269:
+      name: Koga
+      rarity: ☆☆
+      boosters: Mewtu
+    270:
+      name: Giovanni
+      rarity: ☆☆
+      boosters: Mewtu
+    271:
+      name: Rocko
+      rarity: ☆☆
+      boosters: Pikachu
+    272:
+      name: Sabrina
+      rarity: ☆☆
+      boosters: Glurak
+    273:
+      name: Major Bob
+      rarity: ☆☆
+      boosters: Pikachu
+    274:
+      name: Lavados EX
+      rarity: ☆☆
+      boosters: Glurak
+    275:
+      name: Arktos EX
+      rarity: ☆☆
+      boosters: Mewtu
+    276:
+      name: Zapdos EX
+      rarity: ☆☆
+      boosters: Pikachu
+    277:
+      name: Gengar EX
+      rarity: ☆☆
+      boosters: Mewtu
+    278:
+      name: Machomei EX
+      rarity: ☆☆
+      boosters: Glurak
+    279:
+      name: Knuddeluff EX
+      rarity: ☆☆
+      boosters: Pikachu
+    280:
+      name: Glurak EX
+      rarity: ☆☆☆
+      boosters: Glurak
+    281:
+      name: Pikachu EX
+      rarity: ☆☆☆
+      boosters: Pikachu
+    282:
+      name: Mewtu EX
+      rarity: ☆☆☆
+      boosters: Mewtu
+    283:
+      name: Mew
+      rarity: ☆☆☆
+      boosters: "-"
+    284:
+      name: Glurak EX
+      rarity: ♛
+      boosters: ["Glurak", "Mewtu", "Pikachu"]
+    285:
+      name: Pikachu EX
+      rarity: ♛
+      boosters: ["Glurak", "Mewtu", "Pikachu"]
+    286:
+      name: Mewtu EX
+      rarity: ♛
+      boosters: ["Glurak", "Mewtu", "Pikachu"]
+A1a:
+  name: Mysteriöse Insel
+  cards:
+    1:
+      name: Owei
+      rarity: ♢
+    2:
+      name: Kokowei
+      rarity: ♢♢
+    3:
+      name: Celebi EX
+      rarity: ♢♢♢♢
+    4:
+      name: Serpifeu
+      rarity: ♢
+    5:
+      name: Efoserp
+      rarity: ♢♢
+    6:
+      name: Serpiroyal
+      rarity: ♢♢♢
+    7:
+      name: Bubungus
+      rarity: ♢
+    8:
+      name: Lamellux
+      rarity: ♢♢
+    9:
+      name: Moruda
+      rarity: ♢♢
+    10:
+      name: Ponita
+      rarity: ♢
+    11:
+      name: Gallopa
+      rarity: ♢♢
+    12:
+      name: Magmar
+      rarity: ♢♢
+    13:
+      name: Ignivor
+      rarity: ♢
+    14:
+      name: Ramoth
+      rarity: ♢♢♢
+    15:
+      name: Molunk
+      rarity: ♢
+    16:
+      name: Amfira
+      rarity: ♢
+    17:
+      name: Karpador
+      rarity: ♢
+    18:
+      name: Garados EX
+      rarity: ♢♢♢♢
+    19:
+      name: Aquana
+      rarity: ♢♢♢
+    20:
+      name: Finneon
+      rarity: ♢
+    21:
+      name: Lumineon
+      rarity: ♢♢
+    22:
+      name: Kamehaps
+      rarity: ♢
+    23:
+      name: Kamalm
+      rarity: ♢♢
+    24:
+      name: Urgl
+      rarity: ♢
+    25:
+      name: Pikachu
+      rarity: ♢
+    26:
+      name: Raichu
+      rarity: ♢♢♢
+    27:
+      name: Elektek
+      rarity: ♢♢
+    28:
+      name: Wattzapf
+      rarity: ♢
+    29:
+      name: Voltula
+      rarity: ♢♢
+    30:
+      name: Dedenne
+      rarity: ♢
+    31:
+      name: Mew
+      rarity: ♢♢♢
+    32:
+      name: Mew EX
+      rarity: ♢♢♢♢
+    33:
+      name: Symvolara
+      rarity: ♢♢
+    34:
+      name: Pygraulon
+      rarity: ♢
+    35:
+      name: Megalon
+      rarity: ♢♢
+    36:
+      name: Flabébé
+      rarity: ♢
+    37:
+      name: Floette
+      rarity: ♢
+    38:
+      name: Florges
+      rarity: ♢♢
+    39:
+      name: Flauschling
+      rarity: ♢
+    40:
+      name: Sabbaione
+      rarity: ♢
+    41:
+      name: Menki
+      rarity: ♢
+    42:
+      name: Rasaff
+      rarity: ♢
+    43:
+      name: Kleinstein
+      rarity: ♢
+    44:
+      name: Georok
+      rarity: ♢♢
+    45:
+      name: Geowaz
+      rarity: ♢♢♢
+    46:
+      name: Aerodactyl EX
+      rarity: ♢♢♢♢
+    47:
+      name: Marshadow
+      rarity: ♢♢♢
+    48:
+      name: Humanolith
+      rarity: ♢♢
+    49:
+      name: Smogon
+      rarity: ♢
+    50:
+      name: Smogmog
+      rarity: ♢♢
+    51:
+      name: Felilou
+      rarity: ♢
+    52:
+      name: Kleoparda
+      rarity: ♢
+    53:
+      name: Toxiped
+      rarity: ♢
+    54:
+      name: Rollum
+      rarity: ♢
+    55:
+      name: Cerapendra
+      rarity: ♢♢
+    56:
+      name: Shardrago
+      rarity: ♢♢
+    57:
+      name: Taubsi
+      rarity: ♢
+    58:
+      name: Tauboga
+      rarity: ♢
+    59:
+      name: Tauboss EX
+      rarity: ♢♢♢♢
+    60:
+      name: Tauros
+      rarity: ♢♢♢
+    61:
+      name: Evoli
+      rarity: ♢
+    62:
+      name: Plaudagei
+      rarity: ♢
+    63:
+      name: Altbernstein
+      rarity: ♢
+      equalTo: A1-218
+    64:
+      name: Pokémon-Flöte
+      rarity: ♢♢
+    65:
+      name: Mythische Tafel
+      rarity: ♢♢
+    66:
+      name: Abenteurer-Neuling
+      rarity: ♢♢
+    67:
+      name: Blau
+      rarity: ♢♢
+    68:
+      name: Leaf
+      rarity: ♢♢
+    69:
+      name: Kokowei
+      rarity: ☆
+    70:
+      name: Serpiroyal
+      rarity: ☆
+    71:
+      name: Molunk
+      rarity: ☆
+    72:
+      name: Aquana
+      rarity: ☆
+    73:
+      name: Dedenne
+      rarity: ☆
+    74:
+      name: Marshadow
+      rarity: ☆
+    75:
+      name: Celebi EX
+      rarity: ☆☆
+    76:
+      name: Garados EX
+      rarity: ☆☆
+    77:
+      name: Mew EX
+      rarity: ☆☆
+    78:
+      name: Aerodactyl EX
+      rarity: ☆☆
+    79:
+      name: Tauboss EX
+      rarity: ☆☆
+    80:
+      name: Abenteurer-Neuling
+      rarity: ☆☆
+    81:
+      name: Blau
+      rarity: ☆☆
+    82:
+      name: Leaf
+      rarity: ☆☆
+    83:
+      name: Mew EX
+      rarity: ☆☆
+    84:
+      name: Aerodactyl EX
+      rarity: ☆☆
+    85:
+      name: Celebi EX
+      rarity: ☆☆☆
+    86:
+      name: Mew EX
+      rarity: ♛
+PROMO-A:
+  name: Promo-A
+  cards:
+    1:
+      name: Trank
+    2:
+      name: X-Initiative
+    3:
+      name: Handperiskop
+    4:
+      name: Pokédex
+    5:
+      name: Pokéball
+    6:
+      name: Rote Karte
+    7:
+      name: Forschung des Professors
+    8:
+      name: Pokédex
+    9:
+      name: Pikachu
+      equalTo: A1-094
+    10:
+      name: Mewtu
+      equalTo: A1-128
+    11:
+      name: Chaneira
+      equalTo: A1-202
+    12:
+      name: Mauzi
+      equalTo: A1-196
+    13:
+      name: Smettbo
+      equalTo: A1-007
+    14:
+      name: Lapras EX
+    15:
+      name: Pikachu
+      equalTo: A1-094
+    16:
+      name: Piepi
+      equalTo: A1-113
+    17:
+      name: Menki
+    18:
+      name: Bisaflor
+      equalTo: A1-003
+    19:
+      name: Quajutsu
+      equalTo: A1-089
+    20:
+      name: Alpollo
+    21:
+      name: Onix
+      equalTo: A1-150
+    22:
+      name: Pummeluff
+    23:
+      name: Bisasam
+      equalTo: A1-001
+    24:
+      name: Magnetilo
+      equalTo: A1-097
+    25:
+      name: Lavados EX
+      equalTo: A1-047
+    26:
+      name: Pikachu
+      equalTo: A1-094
+    27:
+      name: Serpifeu
+    28:
+      name: Ramoth
+      equalTo: A1a-014
+    29:
+      name: Turtok
+      equalTo: A1-055
+    30:
+      name: Evoli
+    31:
+      name: Chillabell
+      equalTo: A1-213
+    32:
+      name: Glumanda
+      equalTo: A1-033
+    33:
+      name: Schiggy
+      equalTo: A1-053

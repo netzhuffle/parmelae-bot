@@ -8,8 +8,9 @@
     "schema-format": "prisma format",
     "build": "tsc",
     "lint": "eslint src",
+    "validate-yaml": "yaml-validator resources/*.yml",
     "test": "jest",
-    "checks": "npm run format && npm run schema-format && npm run build && npm run lint && npm run test",
+    "checks": "npm run format && npm run schema-format && npm run build && npm run lint && npm run validate-yaml && npm run test",
     "migrate": "prisma migrate dev",
     "run-dev": "nodemon --exec node --loader ts-node/esm src/index.ts",
     "prisma-studio": "prisma studio",
@@ -54,6 +55,7 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.19.1"
+    "typescript-eslint": "^8.19.1",
+    "yaml-validator": "^5.1.0"
   }
 }
