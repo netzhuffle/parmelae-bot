@@ -24,7 +24,7 @@ test('generate', async () => {
 
   const response = await sut.generate('git commit message');
 
-  expect(response).toEqual('Commit Description');
+  expect(response).toBe('Commit Description');
   expect(chatOpenAiFake.request).toHaveLength(12);
   expect(chatOpenAiFake.request?.[11].text).toBe('git commit message');
 });

@@ -2,6 +2,7 @@
 
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import jest from 'eslint-plugin-jest';
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -15,4 +16,16 @@ export default tseslint.config(
       },
     },
   },
+  {
+    files: ['**/*.test.ts'],
+    ...jest.configs['flat/recommended'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+    }
+  },
+  {
+    files: ['**/*.test.ts'],
+    ...jest.configs['flat/style'],
+  }
 );
+

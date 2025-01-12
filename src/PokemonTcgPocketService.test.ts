@@ -83,7 +83,7 @@ TEST:
         expect(rarityMap.get('Three Stars')).toBe(Rarity.THREE_STARS);
         expect(rarityMap.get('Four Stars')).toBe(Rarity.FOUR_STARS);
         expect(rarityMap.get('Crown')).toBe(Rarity.CROWN);
-        expect(rarityMap.get('No Rarity')).toBe(null);
+        expect(rarityMap.get('No Rarity')).toBeNull();
       });
     });
 
@@ -420,6 +420,29 @@ TEST:
         cardWithoutBoosters.id,
       );
       expect(cardWithoutBoostersBoosters).toHaveLength(0);
+    });
+  });
+
+  describe('searchCards smoke test', () => {
+    // Smoke test for searchCards - full test suite is in pokemonCardSearchTool.test.ts
+    it('should pass search criteria to repository', async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createBooster('Test Booster', 'A1');
+      await repository.createCard('Pikachu', 'A1', 1, Rarity.ONE_DIAMOND, [
+        'Test Booster',
+      ]);
+      await repository.createCard('Raichu', 'A1', 2, Rarity.TWO_DIAMONDS, [
+        'Test Booster',
+      ]);
+      const service = new PokemonTcgPocketService(repository, '');
+      const searchCardsSpy = jest.spyOn(repository, 'searchCards');
+
+      const nameSearchCards = await service.searchCards({ cardName: 'chu' });
+
+      expect(searchCardsSpy).toHaveBeenCalledWith({ cardName: 'chu' });
+      expect(nameSearchCards).toHaveLength(2);
+      expect(nameSearchCards[0].name).toBe('Pikachu');
+      expect(nameSearchCards[1].name).toBe('Raichu');
     });
   });
 });

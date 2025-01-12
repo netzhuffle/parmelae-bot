@@ -190,6 +190,48 @@ export class PokemonTcgPocketRepository {
     }
   }
 
+  /** Search for cards using various filters */
+  async searchCards(filters: {
+    cardName?: string;
+    setName?: string;
+    setKey?: string;
+    booster?: string;
+    cardNumber?: number;
+    rarity?: Rarity;
+  }) {
+    try {
+      return this.prisma.pokemonCard.findMany({
+        where: {
+          name: filters.cardName ? { contains: filters.cardName } : undefined,
+          number: filters.cardNumber,
+          rarity: filters.rarity,
+          set: {
+            name: filters.setName,
+            key: filters.setKey,
+          },
+          boosters: filters.booster
+            ? {
+                some: {
+                  name: filters.booster,
+                },
+              }
+            : undefined,
+        },
+        include: {
+          set: true,
+          boosters: true,
+        },
+        orderBy: [{ set: { key: 'asc' } }, { number: 'asc' }],
+      });
+    } catch (error) {
+      throw new PokemonTcgPocketDatabaseError(
+        'search',
+        'cards',
+        this.formatError(error),
+      );
+    }
+  }
+
   private async resolveSetId(key: string): Promise<number | null> {
     const cachedId = this.cache.getSetId(key);
     if (cachedId !== null) {

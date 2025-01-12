@@ -36,6 +36,8 @@ import { dallETool } from './Tools/dallETool.js';
 import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
 import { DallEService } from './DallEService.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
+import { pokemonCardSearchTool } from './Tools/pokemonCardSearchTool.js';
+import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -45,6 +47,7 @@ export class ChatGptAgentService {
     diceTool,
     dallETool,
     dateTimeTool,
+    pokemonCardSearchTool,
   ];
 
   constructor(
@@ -58,6 +61,7 @@ export class ChatGptAgentService {
     telegram: TelegramService,
     dallEPromptGenerator: DallEPromptGenerator,
     dallEService: DallEService,
+    pokemonTcgPocketService: PokemonTcgPocketService,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     gptModelQueryTool: GptModelQueryTool,
@@ -71,6 +75,7 @@ export class ChatGptAgentService {
     setContextVariable('telegram', telegram);
     setContextVariable('dallEPromptGenerator', dallEPromptGenerator);
     setContextVariable('dallE', dallEService);
+    setContextVariable('pokemonTcgPocket', pokemonTcgPocketService);
     this.tools = [
       ...this.tools,
       googleSearchToolFactory.create(),

@@ -37,7 +37,7 @@ export interface SetData {
 export type Sets = Record<string, SetData>;
 
 /** Maps rarity symbols to database enum values */
-const RARITY_MAP: Record<string, Rarity> = {
+export const RARITY_MAP: Record<string, Rarity> = {
   '♢': Rarity.ONE_DIAMOND,
   '♢♢': Rarity.TWO_DIAMONDS,
   '♢♢♢': Rarity.THREE_DIAMONDS,
@@ -49,6 +49,19 @@ const RARITY_MAP: Record<string, Rarity> = {
   '♛': Rarity.CROWN,
 };
 
+/** Maps database enum values to rarity symbols */
+export const RARITY_REVERSE_MAP: Record<Rarity, string> = {
+  [Rarity.ONE_DIAMOND]: '♢',
+  [Rarity.TWO_DIAMONDS]: '♢♢',
+  [Rarity.THREE_DIAMONDS]: '♢♢♢',
+  [Rarity.FOUR_DIAMONDS]: '♢♢♢♢',
+  [Rarity.ONE_STAR]: '☆',
+  [Rarity.TWO_STARS]: '☆☆',
+  [Rarity.THREE_STARS]: '☆☆☆',
+  [Rarity.FOUR_STARS]: '☆☆☆☆',
+  [Rarity.CROWN]: '♛',
+};
+
 /** Service for managing Pokemon TCG Pocket data */
 @injectable()
 export class PokemonTcgPocketService {
@@ -56,6 +69,18 @@ export class PokemonTcgPocketService {
     private readonly repository: PokemonTcgPocketRepository,
     @inject(PokemonTcgPocketYamlSymbol) private readonly yamlContent: string,
   ) {}
+
+  /** Search for cards using various filters */
+  async searchCards(filters: {
+    cardName?: string;
+    setName?: string;
+    setKey?: string;
+    booster?: string;
+    cardNumber?: number;
+    rarity?: Rarity;
+  }) {
+    return this.repository.searchCards(filters);
+  }
 
   /** Synchronizes the database with the YAML source file. */
   async synchronizeCardDatabaseWithYmlSource(): Promise<void> {

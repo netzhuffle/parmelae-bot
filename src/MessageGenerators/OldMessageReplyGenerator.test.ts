@@ -22,7 +22,7 @@ test('generate', async () => {
 
   const response = await sut.generate('old message');
 
-  expect(response).toEqual('Reply');
+  expect(response).toBe('Reply');
   expect(chatOpenAiFake.request).toHaveLength(16);
   expect(chatOpenAiFake.request?.[15].text).toBe('old message');
 });

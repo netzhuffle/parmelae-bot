@@ -144,4 +144,27 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   getAllCards(): PokemonCard[] {
     return Array.from(this.cards.values());
   }
+
+  /** Search for cards using various filters */
+  async searchCards(): Promise<
+    (PokemonCard & {
+      set: { name: string; id: number; key: string };
+      boosters: PokemonBooster[];
+    })[]
+  > {
+    // Add a minimal delay to satisfy require-await
+    await Promise.resolve();
+
+    return Array.from(this.cards.values()).map((card) => {
+      const set = Array.from(this.sets.values()).find(
+        (s) => s.id === card.setId,
+      )!;
+      const boosters = this.getCardBoosters(card.id);
+      return {
+        ...card,
+        set,
+        boosters,
+      };
+    });
+  }
 }
