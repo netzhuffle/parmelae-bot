@@ -136,7 +136,6 @@ export class ChatGptService {
     const chain = new LLMChain({
       prompt,
       llm: this.models.getModel(model),
-      verbose: true,
     });
     const response = await chain.call(promptValues);
     assert(typeof response.text === 'string');

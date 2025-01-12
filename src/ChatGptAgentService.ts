@@ -157,7 +157,6 @@ export class ChatGptAgentService {
         { basePrompt },
       ),
       tools,
-      verbose: true,
       callbacks: [callbackHandler],
       returnIntermediateSteps: true,
     });

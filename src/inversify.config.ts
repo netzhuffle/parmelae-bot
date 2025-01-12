@@ -37,7 +37,6 @@ container.bind(GptModelsProvider).toDynamicValue(
             },
           },
         },
-        verbose: true,
       }),
       cheapStrict: new ChatOpenAI({
         model: 'gpt-4o-mini',
@@ -52,7 +51,6 @@ container.bind(GptModelsProvider).toDynamicValue(
             },
           },
         },
-        verbose: true,
       }),
       advanced: new ChatOpenAI({
         model: 'gpt-4o',
@@ -66,7 +64,6 @@ container.bind(GptModelsProvider).toDynamicValue(
             },
           },
         },
-        verbose: true,
       }),
       advancedStrict: new ChatOpenAI({
         model: 'gpt-4o',
@@ -81,7 +78,6 @@ container.bind(GptModelsProvider).toDynamicValue(
             },
           },
         },
-        verbose: true,
       }),
       embeddings: new OpenAIEmbeddings(
         {
