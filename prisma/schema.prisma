@@ -75,3 +75,45 @@ model User {
   chatEntryMessages ChatEntryMessagesUsers[]
   scheduledMessages ScheduledMessage[]
 }
+
+model PokemonSet {
+  id       Int              @id @default(autoincrement())
+  key      String           @unique
+  name     String
+  boosters PokemonBooster[]
+  cards    PokemonCard[]
+}
+
+model PokemonBooster {
+  id    Int           @id @default(autoincrement())
+  name  String
+  set   PokemonSet    @relation(fields: [setId], references: [id])
+  setId Int
+  cards PokemonCard[]
+
+  @@unique([setId, name])
+}
+
+model PokemonCard {
+  id       Int              @id @default(autoincrement())
+  name     String
+  set      PokemonSet       @relation(fields: [setId], references: [id])
+  setId    Int
+  number   Int
+  rarity   Rarity?
+  boosters PokemonBooster[]
+
+  @@unique([setId, number])
+}
+
+enum Rarity {
+  ONE_DIAMOND
+  TWO_DIAMONDS
+  THREE_DIAMONDS
+  FOUR_DIAMONDS
+  ONE_STAR
+  TWO_STARS
+  THREE_STARS
+  FOUR_STARS
+  CROWN
+}

@@ -28,6 +28,7 @@
     "hnswlib-node": "^3.0.0",
     "inversify": "^6.2.1",
     "inversify-inject-decorators": "^3.1.0",
+    "js-yaml": "^4.1.0",
     "langchain": "^0.3.11",
     "octokit": "^4.1.0",
     "openai": "^4.78.1",
@@ -42,6 +43,7 @@
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@types/jest": "^29.5.14",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.9.0",
     "@types/pdf-parse": "^1.1.4",
     "@types/sqlite3": "^3.1.11",

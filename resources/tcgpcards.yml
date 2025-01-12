@@ -18,7 +18,7 @@ A1:
       rarity: ♢♢♢
       boosters: Mewtu
     4:
-      name: Bisaflor EX
+      name: Bisaflor ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     5:
@@ -94,7 +94,7 @@ A1:
       rarity: ♢♢♢
       boosters: Glurak
     23:
-      name: Kokowei EX
+      name: Kokowei ex
       rarity: ♢♢♢♢
       boosters: Glurak
     24:
@@ -161,7 +161,7 @@ A1:
       rarity: ♢♢♢
       boosters: Glurak
     36:
-      name: Glurak EX
+      name: Glurak ex
       rarity: ♢♢♢♢
       boosters: Glurak
     37:
@@ -181,7 +181,7 @@ A1:
       rarity: ♢♢♢
       boosters: Pikachu
     41:
-      name: Arkani EX
+      name: Arkani ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     42:
@@ -211,7 +211,7 @@ A1:
       rarity: ♢♢♢
       boosters: Glurak
     47:
-      name: Lavados EX
+      name: Lavados ex
       rarity: ♢♢♢♢
       boosters: Glurak
     48:
@@ -256,7 +256,7 @@ A1:
       rarity: ♢♢♢
       boosters: Pikachu
     56:
-      name: Turtok EX
+      name: Turtok ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     57:
@@ -342,7 +342,7 @@ A1:
       rarity: ♢♢
       boosters: Glurak
     76:
-      name: Starmie EX
+      name: Starmie ex
       rarity: ♢♢♢♢
       boosters: Glurak
     77:
@@ -374,7 +374,7 @@ A1:
       rarity: ♢♢♢
       boosters: Mewtu
     84:
-      name: Arktos EX
+      name: Arktos ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     85:
@@ -431,7 +431,7 @@ A1:
       rarity: ♢♢♢
       boosters: Pikachu
     96:
-      name: Pikachu EX
+      name: Pikachu ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     97:
@@ -463,7 +463,7 @@ A1:
       rarity: ♢♢♢
       boosters: Pikachu
     104:
-      name: Zapdos EX
+      name: Zapdos ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     105:
@@ -560,7 +560,7 @@ A1:
       rarity: ♢♢♢
       boosters: Mewtu
     123:
-      name: Gengar EX
+      name: Gengar ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     124:
@@ -584,7 +584,7 @@ A1:
       rarity: ♢♢♢
       boosters: Mewtu
     129:
-      name: Mewtu EX
+      name: Mewtu ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     130:
@@ -670,7 +670,7 @@ A1:
       rarity: ♢♢♢
       boosters: Glurak
     146:
-      name: Machomei EX
+      name: Machomei ex
       rarity: ♢♢♢♢
       boosters: Glurak
     147:
@@ -698,7 +698,7 @@ A1:
       rarity: ♢♢
       boosters: Mewtu
     153:
-      name: Knogga EX
+      name: Knogga ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     154:
@@ -890,7 +890,7 @@ A1:
       rarity: ♢
       boosters: Pikachu
     195:
-      name: Knuddeluff EX
+      name: Knuddeluff ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     196:
@@ -1135,63 +1135,63 @@ A1:
       rarity: ☆
       boosters: Pikachu
     251:
-      name: Bisaflor EX
+      name: Bisaflor ex
       rarity: ☆☆
       boosters: Mewtu
     252:
-      name: Kokowei EX
+      name: Kokowei ex
       rarity: ☆☆
       boosters: Glurak
     253:
-      name: Glurak EX
+      name: Glurak ex
       rarity: ☆☆
       boosters: Glurak
     254:
-      name: Arkani EX
+      name: Arkani ex
       rarity: ☆☆
       boosters: Pikachu
     255:
-      name: Lavados EX
+      name: Lavados ex
       rarity: ☆☆
       boosters: Glurak
     256:
-      name: Turtok EX
+      name: Turtok ex
       rarity: ☆☆
       boosters: Pikachu
     257:
-      name: Starmie EX
+      name: Starmie ex
       rarity: ☆☆
       boosters: Glurak
     258:
-      name: Arktos EX
+      name: Arktos ex
       rarity: ☆☆
       boosters: Mewtu
     259:
-      name: Pikachu EX
+      name: Pikachu ex
       rarity: ☆☆
       boosters: Pikachu
     260:
-      name: Zapdos EX
+      name: Zapdos ex
       rarity: ☆☆
       boosters: Pikachu
     261:
-      name: Gengar EX
+      name: Gengar ex
       rarity: ☆☆
       boosters: Mewtu
     262:
-      name: Mewtu EX
+      name: Mewtu ex
       rarity: ☆☆
       boosters: Mewtu
     263:
-      name: Machomei EX
+      name: Machomei ex
       rarity: ☆☆
       boosters: Glurak
     264:
-      name: Knogga EX
+      name: Knogga ex
       rarity: ☆☆
       boosters: Mewtu
     265:
-      name: Knuddeluff EX
+      name: Knuddeluff ex
       rarity: ☆☆
       boosters: Pikachu
     266:
@@ -1227,39 +1227,39 @@ A1:
       rarity: ☆☆
       boosters: Pikachu
     274:
-      name: Lavados EX
+      name: Lavados ex
       rarity: ☆☆
       boosters: Glurak
     275:
-      name: Arktos EX
+      name: Arktos ex
       rarity: ☆☆
       boosters: Mewtu
     276:
-      name: Zapdos EX
+      name: Zapdos ex
       rarity: ☆☆
       boosters: Pikachu
     277:
-      name: Gengar EX
+      name: Gengar ex
       rarity: ☆☆
       boosters: Mewtu
     278:
-      name: Machomei EX
+      name: Machomei ex
       rarity: ☆☆
       boosters: Glurak
     279:
-      name: Knuddeluff EX
+      name: Knuddeluff ex
       rarity: ☆☆
       boosters: Pikachu
     280:
-      name: Glurak EX
+      name: Glurak ex
       rarity: ☆☆☆
       boosters: Glurak
     281:
-      name: Pikachu EX
+      name: Pikachu ex
       rarity: ☆☆☆
       boosters: Pikachu
     282:
-      name: Mewtu EX
+      name: Mewtu ex
       rarity: ☆☆☆
       boosters: Mewtu
     283:
@@ -1267,21 +1267,21 @@ A1:
       rarity: ☆☆☆
       boosters: ~
     284:
-      name: Glurak EX
+      name: Glurak ex
       rarity: ♛
       boosters:
         - Glurak
         - Mewtu
         - Pikachu
     285:
-      name: Pikachu EX
+      name: Pikachu ex
       rarity: ♛
       boosters:
         - Glurak
         - Mewtu
         - Pikachu
     286:
-      name: Mewtu EX
+      name: Mewtu ex
       rarity: ♛
       boosters:
         - Glurak
@@ -1297,7 +1297,7 @@ A1a:
       name: Kokowei
       rarity: ♢♢
     3:
-      name: Celebi EX
+      name: Celebi ex
       rarity: ♢♢♢♢
     4:
       name: Serpifeu
@@ -1342,7 +1342,7 @@ A1a:
       name: Karpador
       rarity: ♢
     18:
-      name: Garados EX
+      name: Garados ex
       rarity: ♢♢♢♢
     19:
       name: Aquana
@@ -1384,7 +1384,7 @@ A1a:
       name: Mew
       rarity: ♢♢♢
     32:
-      name: Mew EX
+      name: Mew ex
       rarity: ♢♢♢♢
     33:
       name: Symvolara
@@ -1426,7 +1426,7 @@ A1a:
       name: Geowaz
       rarity: ♢♢♢
     46:
-      name: Aerodactyl EX
+      name: Aerodactyl ex
       rarity: ♢♢♢♢
     47:
       name: Marshadow
@@ -1465,7 +1465,7 @@ A1a:
       name: Tauboga
       rarity: ♢
     59:
-      name: Tauboss EX
+      name: Tauboss ex
       rarity: ♢♢♢♢
     60:
       name: Tauros
@@ -1514,19 +1514,19 @@ A1a:
       name: Marshadow
       rarity: ☆
     75:
-      name: Celebi EX
+      name: Celebi ex
       rarity: ☆☆
     76:
-      name: Garados EX
+      name: Garados ex
       rarity: ☆☆
     77:
-      name: Mew EX
+      name: Mew ex
       rarity: ☆☆
     78:
-      name: Aerodactyl EX
+      name: Aerodactyl ex
       rarity: ☆☆
     79:
-      name: Tauboss EX
+      name: Tauboss ex
       rarity: ☆☆
     80:
       name: Abenteurer-Neuling
@@ -1538,19 +1538,20 @@ A1a:
       name: Leaf
       rarity: ☆☆
     83:
-      name: Mew EX
+      name: Mew ex
       rarity: ☆☆
     84:
-      name: Aerodactyl EX
+      name: Aerodactyl ex
       rarity: ☆☆
     85:
-      name: Celebi EX
+      name: Celebi ex
       rarity: ☆☆☆
     86:
-      name: Mew EX
+      name: Mew ex
       rarity: ♛
 PROMO-A:
   name: Promo-A
+  boosters: ~
   cards:
     1:
       name: Trank
@@ -1584,7 +1585,7 @@ PROMO-A:
       name: Smettbo
       equalTo: A1
     14:
-      name: Lapras EX
+      name: Lapras ex
     15:
       name: Pikachu
       equalTo: A1
@@ -1613,7 +1614,7 @@ PROMO-A:
       name: Magnetilo
       equalTo: A1
     25:
-      name: Lavados EX
+      name: Lavados ex
       equalTo: A1
     26:
       name: Pikachu

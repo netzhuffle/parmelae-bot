@@ -7,6 +7,7 @@ import { OldMessageReplyService } from './OldMessageReplyService.js';
 import { TelegramMessageService } from './TelegramMessageService.js';
 import { ReplyStrategyFinder } from './ReplyStrategyFinder.js';
 import { ScheduledMessageService } from './ScheduledMessageService.js';
+import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import * as Typegram from '@telegraf/types';
@@ -24,6 +25,7 @@ export class Bot {
     private readonly messageService: TelegramMessageService,
     private readonly replyStrategyFinder: ReplyStrategyFinder,
     private readonly scheduledMessageService: ScheduledMessageService,
+    private readonly pokemonTcgPocketService: PokemonTcgPocketService,
   ) {}
 
   /** Sets the handler to listen to messages. */
@@ -42,6 +44,9 @@ export class Bot {
     this.messageStorage.startDailyDeletion(this.oldMessageReplyService);
     this.gitHub.announceNewCommits().catch(ErrorService.log);
     this.scheduledMessageService.schedule().catch(ErrorService.log);
+    this.pokemonTcgPocketService
+      .synchronizeCardDatabaseWithYmlSource()
+      .catch(ErrorService.log);
   }
 
   /**
