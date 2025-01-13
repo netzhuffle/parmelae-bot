@@ -47,7 +47,7 @@ describe('pokemonCardSearch', () => {
     const result = (await pokemonCardSearchTool.invoke({})) as string;
 
     expect(result).toBe(
-      'ID,Name,Rarity,Set,Boosters,Owned\nA1-001,Test Card,♢,Test Set,Test Booster,No',
+      'ID,Name,Rarity,Set,Boosters,Owned by @test1\nA1-001,Test Card,♢,Test Set,Test Booster,No',
     );
     expect(repository.searchCards).toHaveBeenCalledWith({});
   });
@@ -82,9 +82,9 @@ describe('pokemonCardSearch', () => {
     const lines = result.split('\n');
     // Header + 20 cards + empty line + message
     expect(lines).toHaveLength(23);
-    expect(lines[0]).toBe('ID,Name,Rarity,Set,Boosters,Owned');
+    expect(lines[0]).toBe('ID,Name,Rarity,Set,Boosters,Owned by @test1');
     expect(lines[lines.length - 1]).toBe(
-      'There are more cards matching the search query, limited to first 20 cards.',
+      'Tell the user there are 5 more cards matching the search query, limited to first 20 cards.',
     );
     // Verify we got exactly 20 cards
     const cardLines = lines.slice(1, -2); // Remove header and message
@@ -245,6 +245,32 @@ describe('pokemonCardSearch', () => {
     });
 
     it('should pass ownership filter when set to owned', async () => {
+      await repository.createSet('A1', 'Test Set');
+      const card1 = await repository.createCard(
+        'Card 1',
+        'A1',
+        1,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      const card2 = await repository.createCard(
+        'Card 2',
+        'A1',
+        2,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      const card3 = await repository.createCard(
+        'Card 3',
+        'A1',
+        3,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      await repository.addCardToCollection(card1.id, BigInt(1));
+      await repository.addCardToCollection(card2.id, BigInt(1));
+      await repository.addCardToCollection(card3.id, BigInt(1));
+
       const result = (await pokemonCardSearchTool.invoke({
         ownershipFilter: OwnershipFilter.OWNED,
       })) as string;
@@ -309,6 +335,41 @@ describe('pokemonCardSearch', () => {
           ownershipFilter: OwnershipFilter.OWNED,
         }),
       ).rejects.toThrow(AssertionError);
+    });
+  });
+
+  describe('ownership display', () => {
+    beforeEach(async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+    });
+
+    it('should show ownership by username when available', async () => {
+      jest
+        .mocked(getContextVariable)
+        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
+          if (name === 'pokemonTcgPocket') return service as T;
+          if (name === 'userId') return BigInt(1) as T;
+          return undefined;
+        });
+
+      const result = (await pokemonCardSearchTool.invoke({})) as string;
+
+      expect(result).toContain('Owned by @test1');
+    });
+
+    it('should show ownership by first name when username not available', async () => {
+      jest
+        .mocked(getContextVariable)
+        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
+          if (name === 'pokemonTcgPocket') return service as T;
+          if (name === 'userId') return BigInt(2) as T;
+          return undefined;
+        });
+
+      const result = (await pokemonCardSearchTool.invoke({})) as string;
+
+      expect(result).toContain('Owned by Test2');
     });
   });
 });

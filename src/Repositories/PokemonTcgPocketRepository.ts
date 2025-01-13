@@ -247,6 +247,77 @@ export class PokemonTcgPocketRepository {
     }
   }
 
+  /** Adds a card to a user's collection */
+  async addCardToCollection(
+    cardId: number,
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations> {
+    try {
+      return this.prisma.pokemonCard.update({
+        where: { id: cardId },
+        data: {
+          owners: {
+            connect: { id: userId },
+          },
+        },
+        include: {
+          set: true,
+          boosters: true,
+          owners: true,
+        },
+      });
+    } catch (error) {
+      throw new PokemonTcgPocketDatabaseError(
+        'add',
+        `card ${cardId} to user ${userId}'s collection`,
+        this.formatError(error),
+      );
+    }
+  }
+
+  /** Returns a user’s names by their ID */
+  async retrieveUserNames(userId: bigint): Promise<{
+    username: string | null;
+    firstName: string;
+  }> {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: {
+        username: true,
+        firstName: true,
+      },
+    });
+    return user;
+  }
+
+  /** Removes a card from a user's collection */
+  async removeCardFromCollection(
+    cardId: number,
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations> {
+    try {
+      return this.prisma.pokemonCard.update({
+        where: { id: cardId },
+        data: {
+          owners: {
+            disconnect: { id: userId },
+          },
+        },
+        include: {
+          set: true,
+          boosters: true,
+          owners: true,
+        },
+      });
+    } catch (error) {
+      throw new PokemonTcgPocketDatabaseError(
+        'remove',
+        `card ${cardId} from user ${userId}'s collection`,
+        this.formatError(error),
+      );
+    }
+  }
+
   private async resolveSetId(key: string): Promise<number | null> {
     const cachedId = this.cache.getSetId(key);
     if (cachedId !== null) {

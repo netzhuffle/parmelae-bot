@@ -38,6 +38,7 @@ import { DallEService } from './DallEService.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
 import { pokemonCardSearchTool } from './Tools/pokemonCardSearchTool.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
+import { pokemonCardAddTool } from './Tools/pokemonCardAddTool.js';
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -48,6 +49,7 @@ export class ChatGptAgentService {
     dallETool,
     dateTimeTool,
     pokemonCardSearchTool,
+    pokemonCardAddTool,
   ];
 
   constructor(

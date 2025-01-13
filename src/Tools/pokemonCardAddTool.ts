@@ -6,15 +6,9 @@ import {
   RARITY_MAP,
 } from '../PokemonTcgPocketService.js';
 import assert from 'assert';
+import { OwnershipFilter } from './pokemonCardSearchTool.js';
 
-/** Filter for card ownership */
-export enum OwnershipFilter {
-  ALL = 'all',
-  OWNED = 'owned',
-  MISSING = 'missing',
-}
-
-export const pokemonCardSearchTool = tool(
+export const pokemonCardAddTool = tool(
   async ({
     cardName,
     setName,
@@ -23,7 +17,8 @@ export const pokemonCardSearchTool = tool(
     cardNumber,
     cardId,
     rarity,
-    ownershipFilter,
+    remove,
+    bulkOperation,
   }): Promise<string> => {
     const service =
       getContextVariable<PokemonTcgPocketService>('pokemonTcgPocket');
@@ -47,6 +42,7 @@ export const pokemonCardSearchTool = tool(
       idCardNumber = parseInt(match[2], 10);
     }
 
+    // Search for matching cards
     const cards = await service.searchCards({
       cardName,
       setName,
@@ -54,29 +50,62 @@ export const pokemonCardSearchTool = tool(
       booster,
       cardNumber: idCardNumber ?? cardNumber,
       rarity: rarityEnum,
-      userId: ownershipFilter !== undefined ? userId : undefined,
-      ownershipFilter,
+      userId,
+      ownershipFilter: remove ? OwnershipFilter.OWNED : OwnershipFilter.MISSING,
     });
 
     // Validate results
     if (cards.length === 0) {
-      return 'No cards found matching the search criteria.';
+      const displayName = await service.getDisplayName(userId);
+      if (remove) {
+        return `No matching cards found in ${displayName}'s collection.`;
+      } else {
+        return `No matching cards found that ${displayName} is missing.`;
+      }
     }
 
-    // Format results
-    const csv = await service.formatCardsAsCsv(cards.slice(0, 20), userId);
-    if (cards.length > 20) {
+    if (!bulkOperation && cards.length > 1) {
       return (
-        csv +
-        `\n\nTell the user there are ${cards.length - 20} more cards matching the search query, limited to first 20 cards.`
+        'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:\n' +
+        (await service.formatCardsAsCsv(cards, userId))
       );
     }
-    return csv;
+
+    // Add or remove cards
+    const displayName = await service.getDisplayName(userId);
+    const operation = remove ? 'removed' : 'added';
+    const preposition = remove ? 'from' : 'to';
+
+    if (cards.length > 1 && bulkOperation) {
+      // Process multiple cards
+      const updatedCards = await Promise.all(
+        cards.map((card) =>
+          remove
+            ? service.removeCardFromCollection(card.id, userId)
+            : service.addCardToCollection(card.id, userId),
+        ),
+      );
+
+      const header = `Successfully ${operation} ${cards.length} cards ${preposition} ${displayName}'s collection:`;
+      const csv = await service.formatCardsAsCsv(updatedCards, userId);
+      return `${header}\n${csv}`;
+    } else {
+      // Process single card
+      assert(cards.length === 1);
+      const card = cards[0];
+      const updatedCard = remove
+        ? await service.removeCardFromCollection(card.id, userId)
+        : await service.addCardToCollection(card.id, userId);
+
+      const header = `Successfully ${operation} card ${preposition} ${displayName}'s collection:`;
+      const csv = await service.formatCardsAsCsv([updatedCard], userId);
+      return `${header}\n${csv}`;
+    }
   },
   {
-    name: 'pokemonCardSearch',
+    name: 'pokemonCardAdd',
     description:
-      'Search for Pokémon TCG Pocket cards using various filters. Returns a CSV with all card infos.',
+      'Add or remove Pokémon TCG Pocket cards to/from the collection of the user who wrote the last message in the chat. Returns a CSV with the card info. If a user shares an image of a Pokémon card without context in this chat (especially if it shows "new"), they likely want you to add it to their collection.',
     schema: z.object({
       cardName: z
         .string()
@@ -111,11 +140,17 @@ export const pokemonCardSearchTool = tool(
         .describe(
           'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛',
         ),
-      ownershipFilter: z
-        .nativeEnum(OwnershipFilter)
+      remove: z
+        .boolean()
         .optional()
         .describe(
-          'Filter by card ownership of the user who wrote the last message: "all" (default) for all cards, "owned" for cards they own, "missing" for cards they do not own',
+          'If true, removes the card from the collection instead of adding it',
+        ),
+      bulkOperation: z
+        .boolean()
+        .optional()
+        .describe(
+          'If true, allows adding/removing multiple cards at once. Only pass true if the user specifically requested to add/remove multiple cards.',
         ),
     }),
   },

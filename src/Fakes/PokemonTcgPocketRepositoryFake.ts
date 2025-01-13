@@ -8,6 +8,7 @@ import {
 import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { OwnershipFilter } from '../Tools/pokemonCardSearchTool.js';
+import { PokemonCardWithRelations } from '../Repositories/Types.js';
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
 export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
@@ -15,6 +16,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   private boosters = new Map<string, PokemonBooster>();
   private cards = new Map<string, PokemonCard>();
   private cardBoosters = new Map<number, Set<number>>();
+  private cardOwners = new Map<number, Set<bigint>>();
   private nextId = 1;
 
   constructor() {
@@ -143,27 +145,38 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       }[];
     }[]
   > {
-    // Simply return all cards with their set and boosters
-    // The test should verify that the filters were passed correctly
+    let cards = Array.from(this.cards.values());
+
+    // Apply ownership filter if specified
+    if (filters.userId && filters.ownershipFilter) {
+      cards = cards.filter((card) => {
+        const owners = this.cardOwners.get(card.id) ?? new Set<bigint>();
+        if (filters.ownershipFilter === OwnershipFilter.OWNED) {
+          return owners.has(filters.userId!);
+        } else if (filters.ownershipFilter === OwnershipFilter.MISSING) {
+          return !owners.has(filters.userId!);
+        }
+        return true;
+      });
+    }
+
+    // Format results
     return Promise.resolve(
-      Array.from(this.cards.values()).map((card) => {
+      cards.map((card) => {
         const set = Array.from(this.sets.values()).find(
           (s) => s.id === card.setId,
         )!;
         const boosters = this.getCardBoosters(card.id);
-        const owners =
-          filters.ownershipFilter === OwnershipFilter.OWNED
-            ? [
-                {
-                  id: BigInt(1),
-                  isBot: false,
-                  firstName: 'Test',
-                  lastName: null,
-                  username: null,
-                  languageCode: null,
-                },
-              ]
-            : [];
+        const owners = Array.from(this.cardOwners.get(card.id) ?? []).map(
+          (userId) => ({
+            id: userId,
+            isBot: false,
+            firstName: 'Test' + userId,
+            lastName: null,
+            username: Number(userId) % 2 === 0 ? null : 'test' + userId,
+            languageCode: null,
+          }),
+        );
         return {
           ...card,
           set,
@@ -172,6 +185,80 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
         };
       }),
     );
+  }
+
+  /** Adds a card to a user's collection */
+  addCardToCollection(
+    cardId: number,
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations> {
+    const card = this.findCardById(cardId);
+    if (!card) {
+      throw new Error(`Card ${cardId} not found`);
+    }
+
+    let owners = this.cardOwners.get(cardId);
+    if (!owners) {
+      owners = new Set<bigint>();
+      this.cardOwners.set(cardId, owners);
+    }
+    owners.add(userId);
+
+    const set = Array.from(this.sets.values()).find(
+      (s) => s.id === card.setId,
+    )!;
+    const boosters = this.getCardBoosters(card.id);
+    const updatedOwners = Array.from(owners).map((ownerId) => ({
+      id: ownerId,
+      isBot: false,
+      firstName: 'Test' + ownerId,
+      lastName: null,
+      username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
+      languageCode: null,
+    }));
+
+    return Promise.resolve({
+      ...card,
+      set,
+      boosters,
+      owners: updatedOwners,
+    });
+  }
+
+  /** Removes a card from a user's collection */
+  removeCardFromCollection(
+    cardId: number,
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations> {
+    const card = this.findCardById(cardId);
+    if (!card) {
+      throw new Error(`Card ${cardId} not found`);
+    }
+
+    const owners = this.cardOwners.get(cardId);
+    if (owners) {
+      owners.delete(userId);
+    }
+
+    const set = Array.from(this.sets.values()).find(
+      (s) => s.id === card.setId,
+    )!;
+    const boosters = this.getCardBoosters(card.id);
+    const updatedOwners = Array.from(owners ?? []).map((ownerId) => ({
+      id: ownerId,
+      isBot: false,
+      firstName: 'Test' + ownerId,
+      lastName: null,
+      username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
+      languageCode: null,
+    }));
+
+    return Promise.resolve({
+      ...card,
+      set,
+      boosters,
+      owners: updatedOwners,
+    });
   }
 
   /** Gets boosters for a card */
@@ -197,12 +284,29 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     return Array.from(this.cards.values());
   }
 
+  /** Finds a card by its ID */
+  private findCardById(cardId: number): PokemonCard | undefined {
+    return Array.from(this.cards.values()).find((c) => c.id === cardId);
+  }
+
+  /** Returns a user's names by their ID */
+  retrieveUserNames(userId: bigint): Promise<{
+    username: string | null;
+    firstName: string;
+  }> {
+    return Promise.resolve({
+      username: Number(userId) % 2 === 0 ? null : 'test' + userId,
+      firstName: 'Test' + userId,
+    });
+  }
+
   /** Clears all stored data */
   clear(): void {
     this.sets.clear();
     this.boosters.clear();
     this.cards.clear();
     this.cardBoosters.clear();
+    this.cardOwners.clear();
     this.nextId = 1;
   }
 }

@@ -1,13 +1,13 @@
 import { injectable, inject } from 'inversify';
 import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
 import { load } from 'js-yaml';
-import { Rarity, PokemonSet, PokemonBooster } from '@prisma/client';
-import { PokemonCardWithRelations } from './Repositories/Types.js';
+import { Rarity, PokemonSet, PokemonBooster, User } from '@prisma/client';
 import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketInvalidBoosterError.js';
 import { PokemonTcgPocketInvalidRarityError } from './Errors/PokemonTcgPocketInvalidRarityError.js';
 import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPocketDuplicateCardNumberError.js';
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 import { OwnershipFilter } from './Tools/pokemonCardSearchTool.js';
+import { PokemonCardWithRelations } from './Repositories/Types.js';
 
 /** Symbol for injecting the Pokemon TCG Pocket YAML content */
 export const PokemonTcgPocketYamlSymbol = Symbol('PokemonTcgPocketYaml');
@@ -51,7 +51,7 @@ export const RARITY_MAP: Record<string, Rarity> = {
 };
 
 /** Maps database enum values to rarity symbols */
-export const RARITY_REVERSE_MAP: Record<Rarity, string> = {
+const RARITY_REVERSE_MAP: Record<Rarity, string> = {
   [Rarity.ONE_DIAMOND]: '♢',
   [Rarity.TWO_DIAMONDS]: '♢♢',
   [Rarity.THREE_DIAMONDS]: '♢♢♢',
@@ -85,6 +85,22 @@ export class PokemonTcgPocketService {
     return this.repository.searchCards(filters);
   }
 
+  /** Adds a card to a user's collection */
+  async addCardToCollection(
+    cardId: number,
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations> {
+    return this.repository.addCardToCollection(cardId, userId);
+  }
+
+  /** Removes a card from a user's collection */
+  async removeCardFromCollection(
+    cardId: number,
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations> {
+    return this.repository.removeCardFromCollection(cardId, userId);
+  }
+
   /** Synchronizes the database with the YAML source file. */
   async synchronizeCardDatabaseWithYmlSource(): Promise<void> {
     const sets = load(this.yamlContent) as Sets;
@@ -92,6 +108,40 @@ export class PokemonTcgPocketService {
     for (const [setKey, setData] of Object.entries(sets)) {
       await this.synchronizeSet(setKey, setData);
     }
+  }
+
+  /** Gets a user's display name (username with @ if available, otherwise first name) */
+  async getDisplayName(userId: bigint): Promise<string> {
+    const user = await this.repository.retrieveUserNames(userId);
+    return user.username ? `@${user.username}` : user.firstName;
+  }
+
+  /** Formats multiple cards as CSV strings */
+  async formatCardsAsCsv(
+    cards: PokemonCardWithRelations[],
+    userId?: bigint,
+  ): Promise<string> {
+    const displayName = userId ? await this.getDisplayName(userId) : 'Owned';
+    const header = `ID,Name,Rarity,Set,Boosters,Owned by ${displayName}`;
+    const csvLines = await Promise.all(
+      cards.map((card) => this.formatCardAsCsv(card, userId)),
+    );
+    return [header, ...csvLines].join('\n');
+  }
+
+  /** Formats a card as a CSV string */
+  private formatCardAsCsv(
+    card: PokemonCardWithRelations,
+    userId?: bigint,
+  ): string {
+    const boosterNames = card.boosters
+      .map((b: PokemonBooster) => b.name)
+      .join(',');
+    const isOwned = userId
+      ? card.owners.some((o: User) => o.id === userId)
+      : false;
+    const raritySymbol = card.rarity ? RARITY_REVERSE_MAP[card.rarity] : '';
+    return `${card.set.key}-${card.number.toString().padStart(3, '0')},${card.name},${raritySymbol},${card.set.name},${boosterNames},${isOwned ? 'Yes' : 'No'}`;
   }
 
   private async synchronizeSet(

@@ -17,6 +17,23 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*Fake.ts'],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "args": "all",
+          "argsIgnorePattern": "^_",
+          "caughtErrors": "all",
+          "caughtErrorsIgnorePattern": "^_",
+          "destructuredArrayIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "ignoreRestSiblings": true
+        }
+      ]
+    }
+  },
+  {
     files: ['**/*.test.ts'],
     ...jest.configs['flat/recommended'],
     rules: {
