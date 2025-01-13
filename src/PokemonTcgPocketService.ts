@@ -1,12 +1,13 @@
 import { injectable, inject } from 'inversify';
 import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
 import { load } from 'js-yaml';
-import { Rarity } from '@prisma/client';
+import { Rarity, PokemonSet, PokemonBooster } from '@prisma/client';
+import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketInvalidBoosterError.js';
 import { PokemonTcgPocketInvalidRarityError } from './Errors/PokemonTcgPocketInvalidRarityError.js';
 import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPocketDuplicateCardNumberError.js';
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
-import { PokemonSet, PokemonBooster } from '@prisma/client';
+import { OwnershipFilter } from './Tools/pokemonCardSearchTool.js';
 
 /** Symbol for injecting the Pokemon TCG Pocket YAML content */
 export const PokemonTcgPocketYamlSymbol = Symbol('PokemonTcgPocketYaml');
@@ -18,7 +19,7 @@ export interface Card {
   /** The rarity of the card: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛ */
   rarity?: string;
   /** The booster(s) this card belongs to. If undefined, belongs to all boosters in the set */
-  boosters?: string | string[];
+  boosters?: string | string[] | null;
   /** Reference to another set that has a card with the same name that this card is equal to */
   equalTo?: string;
 }
@@ -27,8 +28,8 @@ export interface Card {
 export interface SetData {
   /** The name of the set */
   name: string;
-  /** The boosters in this set. If undefined, creates a single booster with the set name */
-  boosters?: string[];
+  /** The boosters in this set. If undefined, creates a single booster with the set name. If null, creates no boosters */
+  boosters?: string[] | null;
   /** The cards in this set, keyed by their number */
   cards: Record<number, Card>;
 }
@@ -71,14 +72,16 @@ export class PokemonTcgPocketService {
   ) {}
 
   /** Search for cards using various filters */
-  async searchCards(filters: {
+  searchCards(filters: {
     cardName?: string;
     setName?: string;
     setKey?: string;
     booster?: string;
     cardNumber?: number;
     rarity?: Rarity;
-  }) {
+    userId?: bigint;
+    ownershipFilter?: OwnershipFilter;
+  }): Promise<PokemonCardWithRelations[]> {
     return this.repository.searchCards(filters);
   }
 
@@ -162,14 +165,19 @@ export class PokemonTcgPocketService {
     setData: SetData,
     boosters: PokemonBooster[],
   ): Promise<void> {
-    const validBoosterNames = new Set<string>(boosters.map((b) => b.name));
+    // Create a set of valid booster names for this set
+    const validBoosterNames = new Set(boosters.map((b) => b.name));
 
-    for (const [numberStr, cardData] of Object.entries(setData.cards)) {
-      const number = parseInt(numberStr, 10);
-      if (!Number.isInteger(number) || number.toString() !== numberStr) {
-        throw new PokemonTcgPocketInvalidCardNumberError(setKey, numberStr);
+    for (const [cardNumberString, card] of Object.entries(setData.cards)) {
+      const cardNumber = parseInt(cardNumberString, 10);
+      if (isNaN(cardNumber)) {
+        throw new PokemonTcgPocketInvalidCardNumberError(
+          setKey,
+          cardNumberString,
+        );
       }
-      await this.synchronizeCard(setKey, number, cardData, validBoosterNames);
+
+      await this.synchronizeCard(setKey, cardNumber, card, validBoosterNames);
     }
   }
 
@@ -190,6 +198,7 @@ export class PokemonTcgPocketService {
     const cardBoosterNames = this.convertToBoosterNameArray(
       cardData,
       validBoosterNames,
+      setKey,
     );
     const rarity = this.convertSymbolToRarity(cardData.rarity);
 
@@ -205,6 +214,7 @@ export class PokemonTcgPocketService {
   private convertToBoosterNameArray(
     cardData: Card,
     validBoosterNames: Set<string>,
+    setKey: string,
   ): string[] {
     // If boosters is explicitly null, return an empty array (no boosters)
     if (cardData.boosters === null) {
@@ -225,7 +235,7 @@ export class PokemonTcgPocketService {
       (name) => !validBoosterNames.has(name),
     );
     if (invalidBoosters.length > 0) {
-      throw new PokemonTcgPocketInvalidBoosterError(cardData.name);
+      throw new PokemonTcgPocketInvalidBoosterError(cardData.name, setKey);
     }
 
     return boosterNames;

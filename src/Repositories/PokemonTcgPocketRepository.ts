@@ -9,6 +9,8 @@ import { injectable } from 'inversify';
 import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 import { PokemonTcgPocketNotFoundError } from '../Errors/PokemonTcgPocketNotFoundError.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
+import { PokemonCardWithRelations } from './Types.js';
+import { OwnershipFilter } from '../Tools/pokemonCardSearchTool.js';
 
 /** Repository for Pokémon TCG Pocket data */
 @injectable()
@@ -198,8 +200,19 @@ export class PokemonTcgPocketRepository {
     booster?: string;
     cardNumber?: number;
     rarity?: Rarity;
-  }) {
+    userId?: bigint;
+    ownershipFilter?: OwnershipFilter;
+  }): Promise<PokemonCardWithRelations[]> {
     try {
+      const ownershipCondition =
+        filters.userId && filters.ownershipFilter
+          ? filters.ownershipFilter === OwnershipFilter.OWNED
+            ? { some: { id: filters.userId } }
+            : filters.ownershipFilter === OwnershipFilter.MISSING
+              ? { none: { id: filters.userId } }
+              : undefined
+          : undefined;
+
       return this.prisma.pokemonCard.findMany({
         where: {
           name: filters.cardName ? { contains: filters.cardName } : undefined,
@@ -216,10 +229,12 @@ export class PokemonTcgPocketRepository {
                 },
               }
             : undefined,
+          owners: ownershipCondition,
         },
         include: {
           set: true,
           boosters: true,
+          owners: true,
         },
         orderBy: [{ set: { key: 'asc' } }, { number: 'asc' }],
       });

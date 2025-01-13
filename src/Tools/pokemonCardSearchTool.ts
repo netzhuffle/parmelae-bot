@@ -6,7 +6,15 @@ import {
   RARITY_MAP,
   RARITY_REVERSE_MAP,
 } from '../PokemonTcgPocketService.js';
+import { PokemonBooster } from '@prisma/client';
 import assert from 'assert';
+
+/** Filter for card ownership */
+export enum OwnershipFilter {
+  ALL = 'all',
+  OWNED = 'owned',
+  MISSING = 'missing',
+}
 
 export const pokemonCardSearchTool = tool(
   async ({
@@ -17,10 +25,13 @@ export const pokemonCardSearchTool = tool(
     cardNumber,
     cardId,
     rarity,
+    ownershipFilter,
   }): Promise<string> => {
     const service =
       getContextVariable<PokemonTcgPocketService>('pokemonTcgPocket');
     assert(service instanceof PokemonTcgPocketService);
+    const userId = getContextVariable<bigint>('userId');
+    assert(typeof userId === 'bigint');
 
     // Convert rarity symbol to enum if provided
     const rarityEnum = rarity ? RARITY_MAP[rarity] : undefined;
@@ -45,6 +56,8 @@ export const pokemonCardSearchTool = tool(
       booster,
       cardNumber: idCardNumber ?? cardNumber,
       rarity: rarityEnum,
+      userId: ownershipFilter !== undefined ? userId : undefined,
+      ownershipFilter,
     });
 
     if (cards.length === 0) {
@@ -52,14 +65,17 @@ export const pokemonCardSearchTool = tool(
     }
 
     // Format results as CSV
-    const lines = ['ID,Name,Rarity,Set,Boosters'];
+    const lines = ['ID,Name,Rarity,Set,Boosters,Owned'];
     const formattedCards = cards.slice(0, 20).map((card) => {
-      const cardIdStr = `${card.set.key}-${card.number.toString().padStart(3, '0')}`;
-      const rarityStr = card.rarity ? RARITY_REVERSE_MAP[card.rarity] : '';
+      const cardIdString = `${card.set.key}-${card.number.toString().padStart(3, '0')}`;
+      const rarityString = card.rarity ? RARITY_REVERSE_MAP[card.rarity] : '';
       const boostersStr = card.boosters.length
-        ? card.boosters.map((b) => b.name).join('/')
+        ? card.boosters.map((b: PokemonBooster) => b.name).join('/')
         : '';
-      return `${cardIdStr},${card.name},${rarityStr},${card.set.name},${boostersStr}`;
+      const owned = card.owners?.some((owner) => owner.id === userId)
+        ? 'Yes'
+        : 'No';
+      return `${cardIdString},${card.name},${rarityString},${card.set.name},${boostersStr},${owned}`;
     });
     lines.push(...formattedCards);
 
@@ -83,15 +99,15 @@ export const pokemonCardSearchTool = tool(
       setName: z
         .string()
         .optional()
-        .describe('Exact set name to filter by (e.g. “Unschlagbare Gene”)'),
+        .describe('Exact set name to filter by (e.g. "Unschlagbare Gene")'),
       setKey: z
         .string()
         .optional()
-        .describe('Exact set key to filter by (e.g. “A1”)'),
+        .describe('Exact set key to filter by (e.g. "A1")'),
       booster: z
         .string()
         .optional()
-        .describe('Exact booster name to filter by (e.g. “Mewtu”)'),
+        .describe('Exact booster name to filter by (e.g. "Mewtu")'),
       cardNumber: z
         .number()
         .int()
@@ -108,6 +124,12 @@ export const pokemonCardSearchTool = tool(
         .optional()
         .describe(
           'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛',
+        ),
+      ownershipFilter: z
+        .nativeEnum(OwnershipFilter)
+        .optional()
+        .describe(
+          'Filter by card ownership: "all" (default) for all cards, "owned" for owned cards only, "missing" for missing cards only',
         ),
     }),
   },

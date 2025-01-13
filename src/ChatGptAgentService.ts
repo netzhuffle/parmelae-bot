@@ -145,6 +145,7 @@ export class ChatGptAgentService {
   ): AgentExecutor {
     const chatId = message.chatId;
     setContextVariable('chatId', chatId);
+    setContextVariable('userId', message.fromId);
     const tools = [
       ...this.tools,
       this.identityQueryToolFactory.create(chatId),

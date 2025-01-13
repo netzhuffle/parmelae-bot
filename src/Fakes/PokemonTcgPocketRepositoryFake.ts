@@ -7,6 +7,7 @@ import {
 } from '@prisma/client';
 import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
+import { OwnershipFilter } from '../Tools/pokemonCardSearchTool.js';
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
 export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
@@ -91,16 +92,6 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       throw new Error(`Set ${setKey} not found`);
     }
 
-    // Verify all boosters exist and collect their IDs
-    const boosterIds = new Set<number>();
-    for (const boosterName of boosterNames) {
-      const booster = this.boosters.get(`${set.id}_${boosterName}`);
-      if (!booster) {
-        throw new Error(`Booster ${boosterName} not found in set ${setKey}`);
-      }
-      boosterIds.add(booster.id);
-    }
-
     const card: PokemonCard = {
       id: this.nextId++,
       name,
@@ -109,8 +100,78 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       rarity,
     };
     this.cards.set(`${set.id}_${number}`, card);
+
+    // Store booster associations
+    const boosterIds = new Set<number>();
+    for (const boosterName of boosterNames) {
+      const booster = this.boosters.get(`${set.id}_${boosterName}`);
+      if (booster) {
+        boosterIds.add(booster.id);
+      }
+    }
     this.cardBoosters.set(card.id, boosterIds);
+
     return Promise.resolve(card);
+  }
+
+  /** Search for cards using various filters */
+  async searchCards(filters: {
+    cardName?: string;
+    setName?: string;
+    setKey?: string;
+    booster?: string;
+    cardNumber?: number;
+    rarity?: Rarity;
+    userId?: bigint;
+    ownershipFilter?: OwnershipFilter;
+  }): Promise<
+    {
+      id: number;
+      name: string;
+      setId: number;
+      number: number;
+      rarity: Rarity | null;
+      set: { name: string; id: number; key: string };
+      boosters: { name: string; id: number; setId: number }[];
+      owners: {
+        id: bigint;
+        isBot: boolean;
+        firstName: string;
+        lastName: string | null;
+        username: string | null;
+        languageCode: string | null;
+      }[];
+    }[]
+  > {
+    // Simply return all cards with their set and boosters
+    // The test should verify that the filters were passed correctly
+    return Promise.resolve(
+      Array.from(this.cards.values()).map((card) => {
+        const set = Array.from(this.sets.values()).find(
+          (s) => s.id === card.setId,
+        )!;
+        const boosters = this.getCardBoosters(card.id);
+        const owners =
+          filters.ownershipFilter === OwnershipFilter.OWNED
+            ? [
+                {
+                  id: BigInt(1),
+                  isBot: false,
+                  firstName: 'Test',
+                  lastName: null,
+                  username: null,
+                  languageCode: null,
+                },
+              ]
+            : [];
+        return {
+          ...card,
+          set,
+          boosters,
+          owners,
+        };
+      }),
+    );
   }
 
   /** Gets boosters for a card */
@@ -119,15 +180,6 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     return Array.from(this.boosters.values()).filter((b) =>
       boosterIds.has(b.id),
     );
-  }
-
-  /** Clears all stored data */
-  clear(): void {
-    this.sets.clear();
-    this.boosters.clear();
-    this.cards.clear();
-    this.cardBoosters.clear();
-    this.nextId = 1;
   }
 
   /** Gets all stored sets */
@@ -145,26 +197,12 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     return Array.from(this.cards.values());
   }
 
-  /** Search for cards using various filters */
-  async searchCards(): Promise<
-    (PokemonCard & {
-      set: { name: string; id: number; key: string };
-      boosters: PokemonBooster[];
-    })[]
-  > {
-    // Add a minimal delay to satisfy require-await
-    await Promise.resolve();
-
-    return Array.from(this.cards.values()).map((card) => {
-      const set = Array.from(this.sets.values()).find(
-        (s) => s.id === card.setId,
-      )!;
-      const boosters = this.getCardBoosters(card.id);
-      return {
-        ...card,
-        set,
-        boosters,
-      };
-    });
+  /** Clears all stored data */
+  clear(): void {
+    this.sets.clear();
+    this.boosters.clear();
+    this.cards.clear();
+    this.cardBoosters.clear();
+    this.nextId = 1;
   }
 }

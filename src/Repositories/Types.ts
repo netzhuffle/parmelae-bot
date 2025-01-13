@@ -97,3 +97,18 @@ const MESSAGE_WITH_USER_AND_REPLY_TO_RELATIONS =
 export type MessageWithUserAndReplyTo = Prisma.MessageGetPayload<
   typeof MESSAGE_WITH_USER_AND_REPLY_TO_RELATIONS
 >;
+
+/** Type value for a Pokemon card including set and boosters relations. */
+const POKEMON_CARD_WITH_RELATIONS =
+  Prisma.validator<Prisma.PokemonCardDefaultArgs>()({
+    include: {
+      set: true,
+      boosters: true,
+      owners: true,
+    },
+  });
+
+/** Pokemon card including set and boosters relations. */
+export type PokemonCardWithRelations = Prisma.PokemonCardGetPayload<
+  typeof POKEMON_CARD_WITH_RELATIONS
+>;
