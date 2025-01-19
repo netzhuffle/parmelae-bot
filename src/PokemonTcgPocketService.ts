@@ -1,7 +1,13 @@
 import { injectable, inject } from 'inversify';
 import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
 import { load } from 'js-yaml';
-import { Rarity, PokemonSet, PokemonBooster, User } from '@prisma/client';
+import {
+  Rarity,
+  PokemonSet,
+  PokemonBooster,
+  User,
+  PokemonCard,
+} from '@prisma/client';
 import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketInvalidBoosterError.js';
 import { PokemonTcgPocketInvalidRarityError } from './Errors/PokemonTcgPocketInvalidRarityError.js';
 import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPocketDuplicateCardNumberError.js';
@@ -62,6 +68,19 @@ const RARITY_REVERSE_MAP: Record<Rarity, string> = {
   [Rarity.FOUR_STARS]: '☆☆☆☆',
   [Rarity.CROWN]: '♛',
 };
+
+/** Card with ownership information */
+interface CardWithOwnership {
+  card: PokemonCard;
+  isOwned: boolean;
+}
+
+/** Group of cards with ownership statistics */
+interface CardGroup {
+  cards: CardWithOwnership[];
+  owned: number;
+  total: number;
+}
 
 /** Service for managing Pokemon TCG Pocket data */
 @injectable()
@@ -142,6 +161,119 @@ export class PokemonTcgPocketService {
       : false;
     const raritySymbol = card.rarity ? RARITY_REVERSE_MAP[card.rarity] : '';
     return `${card.set.key}-${card.number.toString().padStart(3, '0')},${card.name},${raritySymbol},${card.set.name},${boosterNames},${isOwned ? 'Yes' : 'No'}`;
+  }
+
+  /** Gets formatted collection statistics for a user */
+  async getCollectionStats(userId: bigint): Promise<{
+    displayName: string;
+    sets: {
+      name: string;
+      stats: string[];
+    }[];
+    boosters: {
+      name: string;
+      owned: number;
+      total: number;
+      newCardProbability: number;
+    }[];
+  }> {
+    const rawStats = await this.repository.retrieveCollectionStats(userId);
+    const displayName = await this.getDisplayName(userId);
+
+    return {
+      displayName,
+      sets: rawStats.sets.map(({ set, cards }) => ({
+        name: set.name,
+        stats: this.formatSetStats(this.calculateSetStats(cards)),
+      })),
+      boosters: rawStats.sets.flatMap(({ boosters }) =>
+        boosters.map(({ booster, cards }) => ({
+          name: booster.name,
+          owned: cards.filter(({ isOwned }) => isOwned).length,
+          total: cards.length,
+          // For now, use a dummy percentage between 5% and 7%
+          newCardProbability: 5 + Math.random() * 2,
+        })),
+      ),
+    };
+  }
+
+  /** Calculates statistics for a set */
+  private calculateSetStats(cards: CardWithOwnership[]): {
+    diamonds: CardGroup;
+    stars: CardGroup;
+    crowns: CardGroup;
+    promos: CardGroup;
+  } {
+    const isDiamondCard = (card: PokemonCard): boolean =>
+      card.rarity === Rarity.ONE_DIAMOND ||
+      card.rarity === Rarity.TWO_DIAMONDS ||
+      card.rarity === Rarity.THREE_DIAMONDS ||
+      card.rarity === Rarity.FOUR_DIAMONDS;
+
+    const isStarCard = (card: PokemonCard): boolean =>
+      card.rarity === Rarity.ONE_STAR ||
+      card.rarity === Rarity.TWO_STARS ||
+      card.rarity === Rarity.THREE_STARS ||
+      card.rarity === Rarity.FOUR_STARS;
+
+    const isCrownCard = (card: PokemonCard): boolean =>
+      card.rarity === Rarity.CROWN;
+
+    const isPromoCard = (card: PokemonCard): boolean => card.rarity === null;
+
+    return {
+      diamonds: this.calculateCardGroup(cards, isDiamondCard),
+      stars: this.calculateCardGroup(cards, isStarCard),
+      crowns: this.calculateCardGroup(cards, isCrownCard),
+      promos: this.calculateCardGroup(cards, isPromoCard),
+    };
+  }
+
+  /** Calculates statistics for a group of cards */
+  private calculateCardGroup(
+    cards: CardWithOwnership[],
+    filter: (card: PokemonCard) => boolean,
+  ): CardGroup {
+    const filteredCards = cards.filter(({ card }) => filter(card));
+    return {
+      cards: filteredCards,
+      owned: filteredCards.filter(({ isOwned }) => isOwned).length,
+      total: filteredCards.length,
+    };
+  }
+
+  /** Formats the statistics for a set */
+  private formatSetStats(stats: {
+    diamonds: CardGroup;
+    stars: CardGroup;
+    crowns: CardGroup;
+    promos: CardGroup;
+  }): string[] {
+    const parts: string[] = [];
+
+    // For sets with rarities
+    const hasRarities =
+      stats.diamonds.total > 0 ||
+      stats.stars.total > 0 ||
+      stats.crowns.total > 0;
+
+    if (hasRarities) {
+      if (stats.diamonds.total > 0) {
+        parts.push(`♦️ ${stats.diamonds.owned}/${stats.diamonds.total}`);
+      }
+      if (stats.stars.total > 0) {
+        parts.push(`⭐️ ${stats.stars.owned}`);
+      }
+      if (stats.crowns.total > 0) {
+        parts.push(`👑 ${stats.crowns.owned}`);
+      }
+    } else {
+      // For promo sets without rarities
+      parts.push(stats.promos.owned.toString());
+    }
+
+    return parts;
   }
 
   private async synchronizeSet(

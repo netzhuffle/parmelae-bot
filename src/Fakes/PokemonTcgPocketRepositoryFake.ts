@@ -309,4 +309,65 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     this.cardOwners.clear();
     this.nextId = 1;
   }
+
+  /** Returns collection statistics for a user */
+  retrieveCollectionStats(userId: bigint): Promise<{
+    sets: {
+      set: PokemonSet;
+      cards: {
+        card: PokemonCard;
+        isOwned: boolean;
+      }[];
+      boosters: {
+        booster: PokemonBooster;
+        cards: {
+          card: PokemonCard;
+          isOwned: boolean;
+        }[];
+      }[];
+    }[];
+  }> {
+    const sets = Array.from(this.sets.values());
+    const result = {
+      sets: sets.map((set) => {
+        const setCards = Array.from(this.cards.values()).filter(
+          (card) => card.setId === set.id,
+        );
+        const setBoosterIds = new Set<number>();
+        setCards.forEach((card) => {
+          const boosterIds = this.cardBoosters.get(card.id);
+          if (boosterIds) {
+            boosterIds.forEach((id) => setBoosterIds.add(id));
+          }
+        });
+        const setBoosters = Array.from(this.boosters.values()).filter(
+          (booster) => setBoosterIds.has(booster.id),
+        );
+
+        return {
+          set,
+          cards: setCards.map((card) => ({
+            card,
+            isOwned: (this.cardOwners.get(card.id) ?? new Set()).has(userId),
+          })),
+          boosters: setBoosters.map((booster) => ({
+            booster,
+            cards: setCards
+              .filter(
+                (card) =>
+                  this.cardBoosters.get(card.id)?.has(booster.id) ?? false,
+              )
+              .map((card) => ({
+                card,
+                isOwned: (this.cardOwners.get(card.id) ?? new Set()).has(
+                  userId,
+                ),
+              })),
+          })),
+        };
+      }),
+    };
+
+    return Promise.resolve(result);
+  }
 }

@@ -275,7 +275,7 @@ export class PokemonTcgPocketRepository {
     }
   }
 
-  /** Returns a user’s names by their ID */
+  /** Returns a user's names by their ID */
   async retrieveUserNames(userId: bigint): Promise<{
     username: string | null;
     firstName: string;
@@ -288,6 +288,72 @@ export class PokemonTcgPocketRepository {
       },
     });
     return user;
+  }
+
+  /** Returns collection statistics for a user */
+  async retrieveCollectionStats(userId: bigint): Promise<{
+    sets: {
+      set: PokemonSet;
+      cards: {
+        card: PokemonCard;
+        isOwned: boolean;
+      }[];
+      boosters: {
+        booster: PokemonBooster;
+        cards: {
+          card: PokemonCard;
+          isOwned: boolean;
+        }[];
+      }[];
+    }[];
+  }> {
+    try {
+      const sets = await this.prisma.pokemonSet.findMany({
+        include: {
+          cards: {
+            include: {
+              owners: {
+                where: { id: userId },
+              },
+            },
+          },
+          boosters: {
+            include: {
+              cards: {
+                include: {
+                  owners: {
+                    where: { id: userId },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return {
+        sets: sets.map((set) => ({
+          set,
+          cards: set.cards.map((card) => ({
+            card,
+            isOwned: card.owners.length > 0,
+          })),
+          boosters: set.boosters.map((booster) => ({
+            booster,
+            cards: booster.cards.map((card) => ({
+              card,
+              isOwned: card.owners.length > 0,
+            })),
+          })),
+        })),
+      };
+    } catch (error) {
+      throw new PokemonTcgPocketDatabaseError(
+        'retrieve',
+        `collection stats for user ${userId}`,
+        this.formatError(error),
+      );
+    }
   }
 
   /** Removes a card from a user's collection */
