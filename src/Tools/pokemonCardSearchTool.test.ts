@@ -84,7 +84,7 @@ describe('pokemonCardSearch', () => {
     expect(lines).toHaveLength(23);
     expect(lines[0]).toBe('ID,Name,Rarity,Set,Boosters,Owned by @test1');
     expect(lines[lines.length - 1]).toBe(
-      'Tell the user there are 5 more cards matching the search query, limited to first 20 cards.',
+      'Limited list above to first 20 cards to save token usage. Tell the user there are 5 additional cards matching the search query (25 total).',
     );
     // Verify we got exactly 20 cards
     const cardLines = lines.slice(1, -2); // Remove header and message

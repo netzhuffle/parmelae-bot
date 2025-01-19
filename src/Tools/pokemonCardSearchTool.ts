@@ -68,7 +68,7 @@ export const pokemonCardSearchTool = tool(
     if (cards.length > 20) {
       return (
         csv +
-        `\n\nTell the user there are ${cards.length - 20} more cards matching the search query, limited to first 20 cards.`
+        `\n\nLimited list above to first 20 cards to save token usage. Tell the user there are ${cards.length - 20} additional cards matching the search query (${cards.length} total).`
       );
     }
     return csv;
@@ -109,7 +109,7 @@ export const pokemonCardSearchTool = tool(
         .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
         .optional()
         .describe(
-          'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛',
+          'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑.',
         ),
       ownershipFilter: z
         .nativeEnum(OwnershipFilter)
