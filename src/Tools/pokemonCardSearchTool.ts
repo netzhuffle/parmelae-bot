@@ -76,7 +76,7 @@ export const pokemonCardSearchTool = tool(
   {
     name: 'pokemonCardSearch',
     description:
-      'Search for Pokémon TCG Pocket cards using various filters. Returns a CSV with all card infos.',
+      'Search for Pokémon TCG Pocket cards using various filters, can either search through all existing cards or through the collection of the user that last wrote a message, or through the missing cards of that user. Returns a CSV with all card infos like ID, name, set, booster, and ownership status.',
     schema: z.object({
       cardName: z
         .string()
