@@ -2,3 +2,4 @@
 /dist/
 /node_modules/
 /prisma/sqlite.db
+/prisma/sqlite.db-journal
