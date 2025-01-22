@@ -14,6 +14,7 @@ import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPoc
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 import { OwnershipFilter } from './Tools/pokemonCardSearchTool.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
+import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 
 /** Symbol for injecting the Pokemon TCG Pocket YAML content */
 export const PokemonTcgPocketYamlSymbol = Symbol('PokemonTcgPocketYaml');
@@ -85,6 +86,9 @@ interface CardGroup {
 /** Service for managing Pokemon TCG Pocket data */
 @injectable()
 export class PokemonTcgPocketService {
+  private readonly probabilityService =
+    new PokemonTcgPocketProbabilityService();
+
   constructor(
     private readonly repository: PokemonTcgPocketRepository,
     @inject(PokemonTcgPocketYamlSymbol) private readonly yamlContent: string,
@@ -187,13 +191,21 @@ export class PokemonTcgPocketService {
         stats: this.formatSetStats(this.calculateSetStats(cards)),
       })),
       boosters: rawStats.sets.flatMap(({ boosters }) =>
-        boosters.map(({ booster, cards }) => ({
-          name: booster.name,
-          owned: cards.filter(({ isOwned }) => isOwned).length,
-          total: cards.length,
-          // For now, use a dummy percentage between 5% and 7%
-          newCardProbability: 5 + Math.random() * 2,
-        })),
+        boosters.map(({ booster, cards }) => {
+          const missingCards = cards
+            .filter(({ isOwned }) => !isOwned)
+            .map(({ card }) => card);
+          return {
+            name: booster.name,
+            owned: cards.filter(({ isOwned }) => isOwned).length,
+            total: cards.length,
+            newCardProbability:
+              this.probabilityService.calculateNewCardProbability(
+                cards.map(({ card }) => card),
+                missingCards,
+              ) * 100,
+          };
+        }),
       ),
     };
   }
