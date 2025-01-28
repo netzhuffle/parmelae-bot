@@ -1,4 +1,5 @@
 import { tool } from '@langchain/core/tools';
+import { z } from 'zod';
 
 export const dateTimeTool = tool(
   async (): Promise<string> => {
@@ -10,5 +11,6 @@ export const dateTimeTool = tool(
   {
     name: 'date-time',
     description: 'Useful to get the current date and/or time.',
+    schema: z.object({}),
   },
 );
