@@ -61,7 +61,7 @@ describe('pokemonCardStats', () => {
       const result = (await pokemonCardStatsTool.invoke({})) as string;
       expect(result).toContain('@test1’s collection:');
       expect(result).toContain('Sets:');
-      expect(result).toContain('Unschlagbare Gene: ♦️ 2/5 / ⭐️ 3 / 👑 1');
+      expect(result).toContain('Unschlagbare Gene: ♦️ 2/5 ⋅ ⭐️ 3 ⋅ 👑 1');
     });
 
     it('should show correct format for promo sets without rarities', async () => {
@@ -76,7 +76,7 @@ describe('pokemonCardStats', () => {
 
       const result = (await pokemonCardStatsTool.invoke({})) as string;
       expect(result).toContain('Promo-A: 1');
-      expect(result).toContain("Promo sets don't have rarities");
+      expect(result).toContain('Promo sets don’t have rarities');
     });
 
     it('should show correct format for boosters', async () => {
@@ -107,8 +107,8 @@ describe('pokemonCardStats', () => {
 
       const result = (await pokemonCardStatsTool.invoke({})) as string;
       expect(result).toContain('Packs:');
-      expect(result).toMatch(/Glurak: 1\/2 \/ \d+\.\d+ %/);
-      expect(result).toMatch(/Mewtu: 1\/2 \/ \d+\.\d+ %/);
+      expect(result).toMatch(/Glurak: 1\/2 ⋅ \d+\.\d+ %/);
+      expect(result).toMatch(/Mewtu: 1\/2 ⋅ \d+\.\d+ %/);
     });
 
     it('should include explanation texts', async () => {
@@ -118,7 +118,7 @@ describe('pokemonCardStats', () => {
       expect(result).toContain('♦️ is');
       expect(result).toContain('rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢');
       expect(result).toContain('⭐️ is');
-      expect(result).toContain('rarities ☆, ☆☆, ☆☆☆, and ☆☆☆☆');
+      expect(result).toContain('rarities ☆, ☆☆, and ☆☆☆');
       expect(result).toContain('👑 is');
       expect(result).toContain('rarity ♛');
       expect(result).toContain('Promo sets');

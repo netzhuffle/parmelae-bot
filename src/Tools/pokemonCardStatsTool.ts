@@ -6,9 +6,10 @@ import assert from 'assert';
 /** Explanation texts */
 const SETS_EXPLANATION =
   '(♦️ is the number of different cards in the user’s collection with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢ as well as the total in the set, ' +
-  '⭐️ is the number of different cards in the user’s collection with rarities ☆, ☆☆, ☆☆☆, and ☆☆☆☆, ' +
+  '⭐️ is the number of different cards in the user’s collection with rarities ☆, ☆☆, and ☆☆☆, ' +
   'and 👑 is the number of different cards in the user’s collection with rarity ♛. ' +
-  "Promo sets don't have rarities, thus only the number of different cards in the user’s collection is shown.)";
+  'Promo sets don’t have rarities, thus only the number of different cards in the user’s collection is shown. ' +
+  'When describing these stats to users, omit each ⭐️ and 👑 stat that is 0 for better readability and to match the ingame format, unless specifically asked for.)';
 
 const BOOSTERS_EXPLANATION =
   '(First numbers are the collected and total number of different cards in the specific booster. ' +
@@ -34,7 +35,7 @@ export const pokemonCardStatsTool = tool(
     // Sets section
     lines.push('Sets:');
     for (const { name, stats: setStats } of stats.sets) {
-      lines.push(`${name}: ${setStats.join(' / ')}`);
+      lines.push(`${name}: ${setStats.join(' ⋅ ')}`);
     }
     lines.push('');
     lines.push(SETS_EXPLANATION);
@@ -44,7 +45,7 @@ export const pokemonCardStatsTool = tool(
     lines.push('Packs:');
     for (const { name, owned, total, newCardProbability } of stats.boosters) {
       lines.push(
-        `${name}: ${owned}/${total} / ${newCardProbability.toFixed(2)} %`,
+        `${name}: ${owned}/${total} ⋅ ${newCardProbability.toFixed(2)} %`,
       );
     }
     lines.push('');
@@ -55,6 +56,6 @@ export const pokemonCardStatsTool = tool(
   {
     name: 'pokemonCardStats',
     description:
-      'Shows statistics about the Pokémon TCG Pocket card collection of the user who wrote the last message in the chat. Shows number of owned cards per set and per booster, grouped by rarity category, and the probability of getting new cards from each booster.',
+      'Shows numerical statistics and summaries about the Pokémon TCG Pocket card collection of the user who wrote the last message in the chat. Only provides counts and percentages – no card names or lists. Shows total number of owned cards per set and per booster, grouped by rarity category, and the probability of getting new cards from each booster. To get actual lists of cards with their names, use the pokemonCardSearch tool instead.',
   },
 );
