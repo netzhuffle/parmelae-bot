@@ -178,6 +178,7 @@ export class PokemonTcgPocketService {
       name: string;
       owned: number;
       total: number;
+      newDiamondCardProbability: number;
       newCardProbability: number;
     }[];
   }> {
@@ -195,19 +196,30 @@ export class PokemonTcgPocketService {
           const missingCards = cards
             .filter(({ isOwned }) => !isOwned)
             .map(({ card }) => card);
+          const allCards = cards.map(({ card }) => card);
           return {
             name: booster.name,
             owned: cards.filter(({ isOwned }) => isOwned).length,
             total: cards.length,
+            newDiamondCardProbability:
+              this.probabilityService.calculateNewDiamondCardProbability(
+                allCards,
+                missingCards,
+              ) * 100,
             newCardProbability:
               this.probabilityService.calculateNewCardProbability(
-                cards.map(({ card }) => card),
+                allCards,
                 missingCards,
               ) * 100,
           };
         }),
       ),
     };
+  }
+
+  /** Utility function to check card rarity */
+  private isCardOfRarity(card: PokemonCard, rarities: Rarity[]): boolean {
+    return rarities.includes(card.rarity!);
   }
 
   /** Calculates statistics for a set */
@@ -217,28 +229,27 @@ export class PokemonTcgPocketService {
     crowns: CardGroup;
     promos: CardGroup;
   } {
-    const isDiamondCard = (card: PokemonCard): boolean =>
-      card.rarity === Rarity.ONE_DIAMOND ||
-      card.rarity === Rarity.TWO_DIAMONDS ||
-      card.rarity === Rarity.THREE_DIAMONDS ||
-      card.rarity === Rarity.FOUR_DIAMONDS;
-
-    const isStarCard = (card: PokemonCard): boolean =>
-      card.rarity === Rarity.ONE_STAR ||
-      card.rarity === Rarity.TWO_STARS ||
-      card.rarity === Rarity.THREE_STARS ||
-      card.rarity === Rarity.FOUR_STARS;
-
-    const isCrownCard = (card: PokemonCard): boolean =>
-      card.rarity === Rarity.CROWN;
-
-    const isPromoCard = (card: PokemonCard): boolean => card.rarity === null;
-
     return {
-      diamonds: this.calculateCardGroup(cards, isDiamondCard),
-      stars: this.calculateCardGroup(cards, isStarCard),
-      crowns: this.calculateCardGroup(cards, isCrownCard),
-      promos: this.calculateCardGroup(cards, isPromoCard),
+      diamonds: this.calculateCardGroup(cards, (card) =>
+        this.isCardOfRarity(card, [
+          Rarity.ONE_DIAMOND,
+          Rarity.TWO_DIAMONDS,
+          Rarity.THREE_DIAMONDS,
+          Rarity.FOUR_DIAMONDS,
+        ]),
+      ),
+      stars: this.calculateCardGroup(cards, (card) =>
+        this.isCardOfRarity(card, [
+          Rarity.ONE_STAR,
+          Rarity.TWO_STARS,
+          Rarity.THREE_STARS,
+          Rarity.FOUR_STARS,
+        ]),
+      ),
+      crowns: this.calculateCardGroup(cards, (card) =>
+        this.isCardOfRarity(card, [Rarity.CROWN]),
+      ),
+      promos: this.calculateCardGroup(cards, (card) => card.rarity === null),
     };
   }
 
@@ -264,23 +275,20 @@ export class PokemonTcgPocketService {
   }): string[] {
     const parts: string[] = [];
 
-    // For sets with rarities
-    const hasRarities =
-      stats.diamonds.total > 0 ||
-      stats.stars.total > 0 ||
-      stats.crowns.total > 0;
+    // Always show total for diamond cards
+    if (stats.diamonds.total > 0) {
+      parts.push(`♦️ ${stats.diamonds.owned}/${stats.diamonds.total}`);
+    }
 
-    if (hasRarities) {
-      if (stats.diamonds.total > 0) {
-        parts.push(`♦️ ${stats.diamonds.owned}/${stats.diamonds.total}`);
-      }
-      if (stats.stars.total > 0) {
-        parts.push(`⭐️ ${stats.stars.owned}`);
-      }
-      if (stats.crowns.total > 0) {
-        parts.push(`👑 ${stats.crowns.owned}`);
-      }
-    } else {
+    // Only show owned count for stars and crowns
+    if (stats.stars.total > 0) {
+      parts.push(`⭐️ ${stats.stars.owned}`);
+    }
+    if (stats.crowns.total > 0) {
+      parts.push(`👑 ${stats.crowns.owned}`);
+    }
+
+    if (parts.length === 0) {
       // For promo sets without rarities
       parts.push(stats.promos.owned.toString());
     }

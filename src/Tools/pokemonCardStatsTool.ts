@@ -14,9 +14,48 @@ const SETS_EXPLANATION =
 
 const BOOSTERS_EXPLANATION =
   '(First numbers are the collected and total number of different cards in the specific booster. ' +
-  "Percentage number is the probability of receiving a new card currently missing in the user's collection " +
-  'when opening the specific booster. This is the most interesting number for the user so they can decide ' +
-  'which booster to open next to maximise their chances.)';
+  'p♢ is the probability of receiving a new card with rarity ♢, ♢♢, ♢♢♢, or ♢♢♢♢ currently missing in the user’s collection, ' +
+  'and pN is the probability of receiving any new card currently missing in the user’s collection ' +
+  'when opening the specific booster. These probabilities help the user decide which booster to open next to maximise their chances.)';
+
+function formatSetsSection(
+  sets: { name: string; stats: string[] }[],
+): string[] {
+  const lines: string[] = ['Sets:'];
+  for (const { name, stats: setStats } of sets) {
+    lines.push(`${name}: ${setStats.join(' ⋅ ')}`);
+  }
+  lines.push('');
+  lines.push(SETS_EXPLANATION);
+  lines.push('');
+  return lines;
+}
+
+function formatBoostersSection(
+  boosters: {
+    name: string;
+    owned: number;
+    total: number;
+    newDiamondCardProbability: number;
+    newCardProbability: number;
+  }[],
+): string[] {
+  const lines: string[] = ['Packs:'];
+  for (const {
+    name,
+    owned,
+    total,
+    newDiamondCardProbability,
+    newCardProbability,
+  } of boosters) {
+    lines.push(
+      `${name}: ${owned}/${total} ⋅ p♢ ${newDiamondCardProbability.toFixed(2)} % ⋅ pN ${newCardProbability.toFixed(2)} %`,
+    );
+  }
+  lines.push('');
+  lines.push(BOOSTERS_EXPLANATION);
+  return lines;
+}
 
 export const pokemonCardStatsTool = tool(
   async (): Promise<string> => {
@@ -34,23 +73,10 @@ export const pokemonCardStatsTool = tool(
     lines.push('');
 
     // Sets section
-    lines.push('Sets:');
-    for (const { name, stats: setStats } of stats.sets) {
-      lines.push(`${name}: ${setStats.join(' ⋅ ')}`);
-    }
-    lines.push('');
-    lines.push(SETS_EXPLANATION);
-    lines.push('');
+    lines.push(...formatSetsSection(stats.sets));
 
     // Boosters section
-    lines.push('Packs:');
-    for (const { name, owned, total, newCardProbability } of stats.boosters) {
-      lines.push(
-        `${name}: ${owned}/${total} ⋅ ${newCardProbability.toFixed(2)} %`,
-      );
-    }
-    lines.push('');
-    lines.push(BOOSTERS_EXPLANATION);
+    lines.push(...formatBoostersSection(stats.boosters));
 
     return lines.join('\n');
   },

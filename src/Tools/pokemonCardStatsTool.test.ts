@@ -107,8 +107,10 @@ describe('pokemonCardStats', () => {
 
       const result = (await pokemonCardStatsTool.invoke({})) as string;
       expect(result).toContain('Packs:');
-      expect(result).toMatch(/Glurak: 1\/2 ⋅ \d+\.\d+ %/);
-      expect(result).toMatch(/Mewtu: 1\/2 ⋅ \d+\.\d+ %/);
+      expect(result).toMatch(/Glurak: 1\/2 ⋅ p♢ \d+\.\d+ % ⋅ pN \d+\.\d+ %/);
+      expect(result).toMatch(/Mewtu: 1\/2 ⋅ p♢ \d+\.\d+ % ⋅ pN \d+\.\d+ %/);
+      expect(result).toContain('p♢ is the probability');
+      expect(result).toContain('pN is the probability');
     });
 
     it('should include explanation texts', async () => {

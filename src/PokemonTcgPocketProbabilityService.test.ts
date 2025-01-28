@@ -84,6 +84,57 @@ describe('PokemonTcgPocketProbabilityService', () => {
       expect(probability).toBe(0);
     });
   });
+
+  describe('calculateNewDiamondCardProbability', () => {
+    it('should handle missing only diamond cards', () => {
+      const boosterCards = createTestCards();
+      const missingCards = boosterCards.filter(
+        (card) =>
+          card.rarity === Rarity.ONE_DIAMOND ||
+          card.rarity === Rarity.TWO_DIAMONDS ||
+          card.rarity === Rarity.THREE_DIAMONDS ||
+          card.rarity === Rarity.FOUR_DIAMONDS,
+      );
+
+      const probability = service.calculateNewDiamondCardProbability(
+        boosterCards,
+        missingCards,
+      );
+
+      // First 3 slots are ONE_DIAMOND, and slots 4 and 5 have high diamond probabilities
+      expect(probability).toBeGreaterThan(0.9);
+    });
+
+    it('should return 0 for diamond probability when no diamond cards are missing', () => {
+      const boosterCards = createTestCards();
+      const missingCards = boosterCards.filter(
+        (card) =>
+          card.rarity === Rarity.ONE_STAR ||
+          card.rarity === Rarity.TWO_STARS ||
+          card.rarity === Rarity.THREE_STARS ||
+          card.rarity === Rarity.CROWN,
+      );
+
+      const probability = service.calculateNewDiamondCardProbability(
+        boosterCards,
+        missingCards,
+      );
+
+      expect(probability).toBe(0);
+    });
+
+    it('should handle empty booster for diamond probability', () => {
+      const boosterCards: PokemonCard[] = [];
+      const missingCards: PokemonCard[] = [];
+
+      const probability = service.calculateNewDiamondCardProbability(
+        boosterCards,
+        missingCards,
+      );
+
+      expect(probability).toBe(0);
+    });
+  });
 });
 
 /** Creates a set of test cards with various rarities */

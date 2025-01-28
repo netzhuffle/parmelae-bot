@@ -67,6 +67,6 @@ Key Practices:
 
 5. Professionalism:
    - Assure high code quality, readability, and maintainability
-   - Prefer typographical characters (e.g. “”, ’) over ASCII characters (e.g. "", ') in comments and where outputted to the user
+   - Prefer typographical characters (e.g. “”, ‘’, don’t, user’s) over ASCII characters (e.g. "", '', don't, user's) in comments and text output
 
 Remember to maintain high code quality standards and think about maintainability in every change you make.

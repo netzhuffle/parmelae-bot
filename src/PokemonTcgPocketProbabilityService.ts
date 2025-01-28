@@ -53,6 +53,14 @@ const GOD_PACK_RARITIES = new Set<Rarity>([
 /** Service for calculating Pokemon TCG Pocket card probabilities */
 @injectable()
 export class PokemonTcgPocketProbabilityService {
+  /** Set of diamond rarities */
+  private readonly DIAMOND_RARITIES = new Set<Rarity>([
+    Rarity.ONE_DIAMOND,
+    Rarity.TWO_DIAMONDS,
+    Rarity.THREE_DIAMONDS,
+    Rarity.FOUR_DIAMONDS,
+  ]);
+
   /**
    * Calculates the probability of getting at least one new card from a booster pack.
    * This considers both normal packs (99.95%) and god packs (0.05%).
@@ -61,11 +69,55 @@ export class PokemonTcgPocketProbabilityService {
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
   ): number {
-    const normalPackChance = this.computeNormalPackChance(
+    return this.calculateNewCardProbabilityForRarities(
       boosterCards,
       missingCards,
+      () => true,
     );
-    const godPackChance = this.computeGodPackChance(boosterCards, missingCards);
+  }
+
+  /**
+   * Calculates the probability of getting at least one new diamond card from a booster pack.
+   * This considers only cards with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢.
+   */
+  calculateNewDiamondCardProbability(
+    boosterCards: PokemonCard[],
+    missingCards: PokemonCard[],
+  ): number {
+    return this.calculateNewCardProbabilityForRarities(
+      boosterCards,
+      missingCards,
+      (card) => card.rarity !== null && this.DIAMOND_RARITIES.has(card.rarity),
+    );
+  }
+
+  /**
+   * Calculates the probability of getting at least one new card from a booster pack
+   * that matches the given rarity filter.
+   */
+  private calculateNewCardProbabilityForRarities(
+    boosterCards: PokemonCard[],
+    missingCards: PokemonCard[],
+    rarityFilter: (card: PokemonCard) => boolean,
+  ): number {
+    const filteredBoosterCards = boosterCards.filter(rarityFilter);
+    const filteredMissingCards = missingCards.filter(rarityFilter);
+
+    if (
+      filteredBoosterCards.length === 0 ||
+      filteredMissingCards.length === 0
+    ) {
+      return 0.0;
+    }
+
+    const normalPackChance = this.computeNormalPackChance(
+      filteredBoosterCards,
+      filteredMissingCards,
+    );
+    const godPackChance = this.computeGodPackChance(
+      filteredBoosterCards,
+      filteredMissingCards,
+    );
 
     return this.combinePackProbabilities(normalPackChance, godPackChance);
   }
