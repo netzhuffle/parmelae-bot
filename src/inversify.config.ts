@@ -28,13 +28,11 @@ container.bind(GptModelsProvider).toDynamicValue(
       cheap: new ChatOpenAI({
         model: 'gpt-4o-mini',
         configuration: {
-          basePath: 'https://oai.hconeai.com/v1',
-          baseOptions: {
-            headers: {
-              'Helicone-Auth': `Bearer ${
-                context.container.get(Config).heliconeApiKey
-              }`,
-            },
+          baseURL: 'https://oai.hconeai.com/v1',
+          defaultHeaders: {
+            'Helicone-Auth': `Bearer ${
+              context.container.get(Config).heliconeApiKey
+            }`,
           },
         },
       }),
@@ -42,26 +40,22 @@ container.bind(GptModelsProvider).toDynamicValue(
         model: 'gpt-4o-mini',
         temperature: 0,
         configuration: {
-          basePath: 'https://oai.hconeai.com/v1',
-          baseOptions: {
-            headers: {
-              'Helicone-Auth': `Bearer ${
-                context.container.get(Config).heliconeApiKey
-              }`,
-            },
+          baseURL: 'https://oai.hconeai.com/v1',
+          defaultHeaders: {
+            'Helicone-Auth': `Bearer ${
+              context.container.get(Config).heliconeApiKey
+            }`,
           },
         },
       }),
       advanced: new ChatOpenAI({
         model: 'gpt-4o',
         configuration: {
-          basePath: 'https://oai.hconeai.com/v1',
-          baseOptions: {
-            headers: {
-              'Helicone-Auth': `Bearer ${
-                context.container.get(Config).heliconeApiKey
-              }`,
-            },
+          baseURL: 'https://oai.hconeai.com/v1',
+          defaultHeaders: {
+            'Helicone-Auth': `Bearer ${
+              context.container.get(Config).heliconeApiKey
+            }`,
           },
         },
       }),
@@ -69,32 +63,26 @@ container.bind(GptModelsProvider).toDynamicValue(
         model: 'gpt-4o',
         temperature: 0,
         configuration: {
-          basePath: 'https://oai.hconeai.com/v1',
-          baseOptions: {
-            headers: {
-              'Helicone-Auth': `Bearer ${
-                context.container.get(Config).heliconeApiKey
-              }`,
-            },
+          baseURL: 'https://oai.hconeai.com/v1',
+          defaultHeaders: {
+            'Helicone-Auth': `Bearer ${
+              context.container.get(Config).heliconeApiKey
+            }`,
           },
         },
       }),
-      embeddings: new OpenAIEmbeddings(
-        {
-          model: 'text-embedding-3-small',
-        },
-        {
-          basePath: 'https://oai.hconeai.com/v1',
-          baseOptions: {
-            headers: {
-              'Helicone-Auth': `Bearer ${
-                context.container.get(Config).heliconeApiKey
-              }`,
-              'Helicone-Cache-Enabled': 'true',
-            },
+      embeddings: new OpenAIEmbeddings({
+        model: 'text-embedding-3-small',
+        configuration: {
+          baseURL: 'https://oai.hconeai.com/v1',
+          defaultHeaders: {
+            'Helicone-Auth': `Bearer ${
+              context.container.get(Config).heliconeApiKey
+            }`,
+            'Helicone-Cache-Enabled': 'true',
           },
         },
-      ),
+      }),
     }),
 );
 container.bind(Octokit).toDynamicValue(
