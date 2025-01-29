@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@langchain/community": "^0.3.27",
-    "@langchain/core": "^0.3.36",
+    "@langchain/core": "^0.3.37",
     "@langchain/openai": "^0.4.2",
     "@prisma/client": "^6.3.0",
     "@sentry/node": "^8.52.0",
@@ -31,7 +31,7 @@
     "js-yaml": "^4.1.0",
     "langchain": "^0.3.14",
     "octokit": "^4.1.0",
-    "openai": "^4.80.1",
+    "openai": "^4.81.0",
     "pdf-parse": "^1.1.1",
     "puppeteer": "^19.7.2",
     "reflect-metadata": "^0.2.2",
