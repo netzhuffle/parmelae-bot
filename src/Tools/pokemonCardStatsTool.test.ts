@@ -127,6 +127,13 @@ describe('pokemonCardStats', () => {
       expect(result).toContain('collected and total');
       expect(result).toContain('probability');
     });
+
+    it('should include search tool name in explanation', async () => {
+      await repository.createSet('A1', 'Test Set');
+
+      const result = (await pokemonCardStatsTool.invoke({})) as string;
+      expect(result).toContain('run the pokemonCardSearch tool');
+    });
   });
 
   describe('user display', () => {

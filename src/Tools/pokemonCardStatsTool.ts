@@ -3,6 +3,7 @@ import { getContextVariable } from '@langchain/core/context';
 import { PokemonTcgPocketService } from '../PokemonTcgPocketService.js';
 import assert from 'assert';
 import { z } from 'zod';
+import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 
 /** Explanation texts */
 const SETS_EXPLANATION =
@@ -17,6 +18,10 @@ const BOOSTERS_EXPLANATION =
   'p♢ is the probability of receiving a new card with rarity ♢, ♢♢, ♢♢♢, or ♢♢♢♢ currently missing in the user’s collection, ' +
   'and pN is the probability of receiving any new card currently missing in the user’s collection ' +
   'when opening the specific booster. These probabilities help the user decide which booster to open next to maximise their chances.)';
+
+const SEARCH_TOOL_NAME = pokemonCardSearchTool.name;
+
+const SEARCH_EXPLANATION = `If the user asked to see a list of which specific cards they own or are missing from their collection, run the ${SEARCH_TOOL_NAME} tool now to get this information.`;
 
 function formatSetsSection(
   sets: { name: string; stats: string[] }[],
@@ -77,6 +82,10 @@ export const pokemonCardStatsTool = tool(
 
     // Boosters section
     lines.push(...formatBoostersSection(stats.boosters));
+
+    // Search explanation
+    lines.push('');
+    lines.push(SEARCH_EXPLANATION);
 
     return lines.join('\n');
   },
