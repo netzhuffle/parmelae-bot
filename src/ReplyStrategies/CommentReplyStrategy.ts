@@ -27,7 +27,9 @@ export class CommentReplyStrategy extends AllowlistedReplyStrategy {
   }
 
   willHandleAllowlisted(message: Message): boolean {
-    return this.onlyUsernameRegExp.test(message.text);
+    return (
+      message.imageFileId === null && this.onlyUsernameRegExp.test(message.text)
+    );
   }
 
   async handle(message: TelegramMessageWithReplyTo): Promise<void> {
