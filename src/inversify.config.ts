@@ -19,7 +19,7 @@ const container = new Container({
 
 // Bind Pokemon TCG Pocket YAML content
 container.bind(PokemonTcgPocketYamlSymbol).toDynamicValue(() => {
-  return readFileSync('resources/tcgpcards.yml', 'utf-8');
+  return readFileSync('resources/tcgpcards.yaml', 'utf-8');
 });
 
 container.bind(GptModelsProvider).toDynamicValue(

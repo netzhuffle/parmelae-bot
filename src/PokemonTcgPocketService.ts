@@ -125,7 +125,7 @@ export class PokemonTcgPocketService {
   }
 
   /** Synchronizes the database with the YAML source file. */
-  async synchronizeCardDatabaseWithYmlSource(): Promise<void> {
+  async synchronizeCardDatabaseWithYamlSource(): Promise<void> {
     const sets = load(this.yamlContent) as Sets;
 
     for (const [setKey, setData] of Object.entries(sets)) {

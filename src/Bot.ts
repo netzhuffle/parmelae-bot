@@ -45,7 +45,7 @@ export class Bot {
     this.gitHub.announceNewCommits().catch(ErrorService.log);
     this.scheduledMessageService.schedule().catch(ErrorService.log);
     this.pokemonTcgPocketService
-      .synchronizeCardDatabaseWithYmlSource()
+      .synchronizeCardDatabaseWithYamlSource()
       .catch(ErrorService.log);
   }
 

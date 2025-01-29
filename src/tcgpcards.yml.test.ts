@@ -15,12 +15,12 @@ const VALID_RARITY_SYMBOLS = new Set([
   '♛',
 ]);
 
-describe('tcgpcards.yml', () => {
+describe('tcgpcards.yaml', () => {
   let yamlContent: string;
   let sets: Sets;
 
   beforeAll(() => {
-    yamlContent = readFileSync('resources/tcgpcards.yml', 'utf-8');
+    yamlContent = readFileSync('resources/tcgpcards.yaml', 'utf-8');
     sets = load(yamlContent) as Sets;
   });
 

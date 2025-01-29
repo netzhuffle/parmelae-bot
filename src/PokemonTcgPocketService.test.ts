@@ -27,7 +27,7 @@ TEST:
         const service = new PokemonTcgPocketService(repository, yaml);
 
         await expect(
-          service.synchronizeCardDatabaseWithYmlSource(),
+          service.synchronizeCardDatabaseWithYamlSource(),
         ).rejects.toThrow('Invalid rarity');
       });
 
@@ -67,7 +67,7 @@ TEST:
       name: No Rarity
 `;
         const service = new PokemonTcgPocketService(repository, yaml);
-        await service.synchronizeCardDatabaseWithYmlSource();
+        await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify all cards were created with correct rarities
         const cards = repository.getAllCards();
@@ -104,7 +104,7 @@ TEST-SET:
         const service = new PokemonTcgPocketService(repository, yaml);
 
         await expect(
-          service.synchronizeCardDatabaseWithYmlSource(),
+          service.synchronizeCardDatabaseWithYamlSource(),
         ).rejects.toThrow('duplicated mapping key');
       });
 
@@ -120,7 +120,7 @@ TEST:
         const service = new PokemonTcgPocketService(repository, yaml);
 
         await expect(
-          service.synchronizeCardDatabaseWithYmlSource(),
+          service.synchronizeCardDatabaseWithYamlSource(),
         ).rejects.toThrow('Invalid card number');
       });
     });
@@ -140,7 +140,7 @@ TEST:
         const service = new PokemonTcgPocketService(repository, yaml);
 
         await expect(
-          service.synchronizeCardDatabaseWithYmlSource(),
+          service.synchronizeCardDatabaseWithYamlSource(),
         ).rejects.toThrow('Card Test Card references non-existent boosters');
       });
     });
@@ -158,7 +158,7 @@ TEST:
       rarity: ♢
 `;
         const service = new PokemonTcgPocketService(repository, yaml);
-        await service.synchronizeCardDatabaseWithYmlSource();
+        await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
         const sets = repository.getAllSets();
@@ -194,7 +194,7 @@ TEST:
       rarity: ♢♢
 `;
         const service = new PokemonTcgPocketService(repository, yaml);
-        await service.synchronizeCardDatabaseWithYmlSource();
+        await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
         const sets = repository.getAllSets();
@@ -233,7 +233,7 @@ TEST:
         - Booster2
 `;
         const service = new PokemonTcgPocketService(repository, yaml);
-        await service.synchronizeCardDatabaseWithYmlSource();
+        await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
         const sets = repository.getAllSets();
@@ -287,7 +287,7 @@ SET2:
       rarity: ♢♢
 `;
         const service = new PokemonTcgPocketService(repository, yaml);
-        await service.synchronizeCardDatabaseWithYmlSource();
+        await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify sets were created
         const sets = repository.getAllSets();
@@ -353,7 +353,7 @@ TEST:
       boosters: Booster1
 `;
       const service = new PokemonTcgPocketService(repository, yaml);
-      await service.synchronizeCardDatabaseWithYmlSource();
+      await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created
       const cards = repository.getAllCards();
@@ -396,7 +396,7 @@ TEST:
       boosters: ~
 `;
       const service = new PokemonTcgPocketService(repository, yaml);
-      await service.synchronizeCardDatabaseWithYmlSource();
+      await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created
       const cards = repository.getAllCards();
