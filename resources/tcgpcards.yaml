@@ -1549,6 +1549,926 @@ A1a:
     86:
       name: Mew ex
       rarity: ♛
+A2:
+  name: Kollision von Raum und Zeit
+  boosters:
+    - Dialga
+    - Palkia
+  cards:
+    1:
+      name: Myrapla
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    2:
+      name: Duflor
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    3:
+      name: Blubella
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    4:
+      name: Tangela
+      rarity: ♢
+      boosters: Dialga
+    5:
+      name: Tangeloss
+      rarity: ♢♢
+      boosters: Dialga
+    6:
+      name: Yanma
+      rarity: ♢
+      boosters: Dialga
+    7:
+      name: Yanmega ex
+      rarity: ♢♢♢♢
+      boosters: Dialga
+    8:
+      name: Roselia
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    9:
+      name: Roserade
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    10:
+      name: Chelast
+      rarity: ♢
+      boosters: Palkia
+    11:
+      name: Chelcarain
+      rarity: ♢♢
+      boosters: Palkia
+    12:
+      name: Chelterrar
+      rarity: ♢♢♢
+      boosters: Palkia
+    13:
+      name: Zirpurze
+      rarity: ♢
+      boosters: Palkia
+    14:
+      name: Zirpeise
+      rarity: ♢
+      boosters: Palkia
+    15:
+      name: Burmy
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    16:
+      name: Burmadame
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    17:
+      name: Wadribie
+      rarity: ♢
+      boosters: Dialga
+    18:
+      name: Honweisel
+      rarity: ♢♢
+      boosters: Dialga
+    19:
+      name: Venuflibis
+      rarity: ♢♢
+      boosters: Palkia
+    20:
+      name: Folipurba
+      rarity: ♢♢♢
+      boosters: Dialga
+    21:
+      name: Schneid-Rotom
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    22:
+      name: Shaymin
+      rarity: ♢♢♢
+      boosters: Dialga
+    23:
+      name: Magmar
+      rarity: ♢
+      boosters: Palkia
+    24:
+      name: Magbrant
+      rarity: ♢♢♢
+      boosters: Palkia
+    25:
+      name: Schneckmag
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    26:
+      name: Magcargo
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    27:
+      name: Panflam
+      rarity: ♢
+      boosters: Palkia
+    28:
+      name: Panpyro
+      rarity: ♢♢
+      boosters: Palkia
+    29:
+      name: Panferno ex
+      rarity: ♢♢♢♢
+      boosters: Palkia
+    30:
+      name: Hitze-Rotom
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    31:
+      name: Quiekel
+      rarity: ♢
+      boosters: Dialga
+    32:
+      name: Keifel
+      rarity: ♢♢
+      boosters: Dialga
+    33:
+      name: Mamutel
+      rarity: ♢♢♢
+      boosters: Dialga
+    34:
+      name: Regice
+      rarity: ♢♢
+      boosters: Palkia
+    35:
+      name: Plinfa
+      rarity: ♢
+      boosters: Palkia
+    36:
+      name: Pliprin
+      rarity: ♢♢
+      boosters: Palkia
+    37:
+      name: Impoleon
+      rarity: ♢♢♢
+      boosters: Palkia
+    38:
+      name: Bamelin
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    39:
+      name: Bojelin
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    40:
+      name: Schalellos
+      rarity: ♢
+      boosters: Palkia
+    41:
+      name: Gastrodon
+      rarity: ♢♢
+      boosters: Palkia
+    42:
+      name: Finneon
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    43:
+      name: Lumineon
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    44:
+      name: Shnebedeck
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    45:
+      name: Rexblisar
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    46:
+      name: Glaziola
+      rarity: ♢♢♢
+      boosters: Palkia
+    47:
+      name: Wasch-Rotom
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    48:
+      name: Frost-Rotom
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    49:
+      name: Palkia ex
+      rarity: ♢♢♢♢
+      boosters: Palkia
+    50:
+      name: Manaphy
+      rarity: ♢♢
+      boosters: Palkia
+    51:
+      name: Magnetilo
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    52:
+      name: Magneton
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    53:
+      name: Magnezone
+      rarity: ♢♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    54:
+      name: Voltobal
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    55:
+      name: Lektrobal
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    56:
+      name: Elektek
+      rarity: ♢
+      boosters: Dialga
+    57:
+      name: Elevoltek
+      rarity: ♢♢♢
+      boosters: Dialga
+    58:
+      name: Sheinux
+      rarity: ♢
+      boosters: Dialga
+    59:
+      name: Luxio
+      rarity: ♢♢
+      boosters: Dialga
+    60:
+      name: Luxtra
+      rarity: ♢♢♢
+      boosters: Dialga
+    61:
+      name: Pachirisu ex
+      rarity: ♢♢♢♢
+      boosters: Dialga
+    62:
+      name: Rotom
+      rarity: ♢
+      boosters: Palkia
+    63:
+      name: Togepi
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    64:
+      name: Togetic
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    65:
+      name: Togekiss
+      rarity: ♢♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    66:
+      name: Traunfugil
+      rarity: ♢
+      boosters: Palkia
+    67:
+      name: Traunmagil ex
+      rarity: ♢♢♢♢
+      boosters: Palkia
+    68:
+      name: Trasla
+      rarity: ♢
+      boosters: Dialga
+    69:
+      name: Kirlia
+      rarity: ♢
+      boosters: Dialga
+    70:
+      name: Zwirrlicht
+      rarity: ♢
+      boosters: Dialga
+    71:
+      name: Zwirrklop
+      rarity: ♢♢
+      boosters: Dialga
+    72:
+      name: Zwirrfinst
+      rarity: ♢♢♢
+      boosters: Dialga
+    73:
+      name: Driftlon
+      rarity: ♢
+      boosters: Dialga
+    74:
+      name: Drifzepeli
+      rarity: ♢♢
+      boosters: Dialga
+    75:
+      name: Selfe
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    76:
+      name: Vesprit
+      rarity: ♢♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    77:
+      name: Tobutz
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    78:
+      name: Giratina
+      rarity: ♢♢♢
+      boosters: Palkia
+    79:
+      name: Cresselia
+      rarity: ♢♢♢
+      boosters: Palkia
+    80:
+      name: Rihorn
+      rarity: ♢
+      boosters: Palkia
+    81:
+      name: Rizeros
+      rarity: ♢♢
+      boosters: Palkia
+    82:
+      name: Rihornior
+      rarity: ♢♢♢
+      boosters: Palkia
+    83:
+      name: Skorgla
+      rarity: ♢
+      boosters: Dialga
+    84:
+      name: Skorgro
+      rarity: ♢♢
+      boosters: Dialga
+    85:
+      name: Kapoera
+      rarity: ♢
+      boosters: Dialga
+    86:
+      name: Nasgnet
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    87:
+      name: Regirock
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    88:
+      name: Koknodon
+      rarity: ♢♢
+      boosters: Dialga
+    89:
+      name: Rameidon
+      rarity: ♢♢♢
+      boosters: Dialga
+    90:
+      name: Burmadame
+      rarity: ♢
+      boosters: Dialga
+    91:
+      name: Riolu
+      rarity: ♢
+      boosters: Dialga
+    92:
+      name: Lucario
+      rarity: ♢♢♢
+      boosters: Dialga
+    93:
+      name: Hippopotas
+      rarity: ♢
+      boosters: Palkia
+    94:
+      name: Hippoterus
+      rarity: ♢♢
+      boosters: Palkia
+    95:
+      name: Galagladi ex
+      rarity: ♢♢♢♢
+      boosters: Dialga
+    96:
+      name: Kramurx
+      rarity: ♢
+      boosters: Dialga
+    97:
+      name: Kramshef
+      rarity: ♢♢
+      boosters: Dialga
+    98:
+      name: Sniebel
+      rarity: ♢
+      boosters: Palkia
+    99:
+      name: Snibunna ex
+      rarity: ♢♢♢♢
+      boosters: Palkia
+    100:
+      name: Fiffyen
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    101:
+      name: Magnayen
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    102:
+      name: Skunkapuh
+      rarity: ♢
+      boosters: Dialga
+    103:
+      name: Skuntank
+      rarity: ♢♢
+      boosters: Dialga
+    104:
+      name: Kryppuk
+      rarity: ♢♢
+      boosters: Palkia
+    105:
+      name: Pionskora
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    106:
+      name: Piondragi
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    107:
+      name: Glibunkel
+      rarity: ♢
+      boosters: Dialga
+    108:
+      name: Toxiquak
+      rarity: ♢♢
+      boosters: Dialga
+    109:
+      name: Darkrai
+      rarity: ♢♢♢
+      boosters: Dialga
+    110:
+      name: Darkrai ex
+      rarity: ♢♢♢♢
+      boosters: Dialga
+    111:
+      name: Panzaeron
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    112:
+      name: Registeel
+      rarity: ♢♢
+      boosters: Dialga
+    113:
+      name: Schilterus
+      rarity: ♢♢
+      boosters: Palkia
+    114:
+      name: Bollterus
+      rarity: ♢♢♢
+      boosters: Palkia
+    115:
+      name: Burmadame
+      rarity: ♢
+      boosters: Palkia
+    116:
+      name: Bronzel
+      rarity: ♢
+      boosters: Dialga
+    117:
+      name: Bronzong
+      rarity: ♢♢
+      boosters: Dialga
+    118:
+      name: Voluminas
+      rarity: ♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    119:
+      name: Dialga ex
+      rarity: ♢♢♢♢
+      boosters: Dialga
+    120:
+      name: Heatran
+      rarity: ♢♢♢
+      boosters: Dialga
+    121:
+      name: Kaumalat
+      rarity: ♢
+      boosters: Palkia
+    122:
+      name: Knarksel
+      rarity: ♢♢
+      boosters: Palkia
+    123:
+      name: Knakrack
+      rarity: ♢♢♢
+      boosters: Palkia
+    124:
+      name: Schlurp
+      rarity: ♢
+      boosters: Palkia
+    125:
+      name: Schlurplek ex
+      rarity: ♢♢♢♢
+      boosters: Palkia
+    126:
+      name: Evoli
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    127:
+      name: Porygon
+      rarity: ♢
+      boosters: Palkia
+    128:
+      name: Porygon2
+      rarity: ♢♢
+      boosters: Palkia
+    129:
+      name: Porygon-Z
+      rarity: ♢♢♢
+      boosters: Palkia
+    130:
+      name: Griffel
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    131:
+      name: Ambidiffel
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    132:
+      name: Staralili
+      rarity: ♢
+      boosters: Palkia
+    133:
+      name: Staravia
+      rarity: ♢
+      boosters: Palkia
+    134:
+      name: Staraptor
+      rarity: ♢♢
+      boosters: Palkia
+    135:
+      name: Bidiza
+      rarity: ♢
+      boosters: Dialga
+    136:
+      name: Bidifas
+      rarity: ♢
+      boosters: Dialga
+    137:
+      name: Haspiror
+      rarity: ♢
+      boosters: Dialga
+    138:
+      name: Schlapor
+      rarity: ♢
+      boosters: Dialga
+    139:
+      name: Charmian
+      rarity: ♢
+      boosters: Palkia
+    140:
+      name: Shnurgarst
+      rarity: ♢♢
+      boosters: Palkia
+    141:
+      name: Plaudagei
+      rarity: ♢
+      boosters: Palkia
+    142:
+      name: Wirbel-Rotom
+      rarity: ♢
+      boosters:
+        - Dialga
+        - Palkia
+    143:
+      name: Regigigas
+      rarity: ♢♢♢
+      boosters:
+        - Dialga
+        - Palkia
+    144:
+      name: Kopffossil
+      rarity: ♢
+      boosters: Dialga
+    145:
+      name: Panzerfossil
+      rarity: ♢
+      boosters: Palkia
+    146:
+      name: Pokémon-Kommunikation
+      rarity: ♢♢
+      boosters: Dialga
+    147:
+      name: Riesige Robe
+      rarity: ♢♢
+      boosters: Dialga
+    148:
+      name: Beulenhelm
+      rarity: ♢♢
+      boosters: Palkia
+    149:
+      name: Prunusbeere
+      rarity: ♢♢
+      boosters: Palkia
+    150:
+      name: Zyrus
+      rarity: ♢♢
+      boosters: Palkia
+    151:
+      name: Rüpel von Team Galaktik
+      rarity: ♢♢
+      boosters: Dialga
+    152:
+      name: Cynthia
+      rarity: ♢♢
+      boosters: Palkia
+    153:
+      name: Volkner
+      rarity: ♢♢
+      boosters: Dialga
+    154:
+      name: Lucia
+      rarity: ♢♢
+      boosters: Dialga
+    155:
+      name: Mars
+      rarity: ♢♢
+      boosters: Palkia
+    156:
+      name: Tangeloss
+      rarity: ☆
+      boosters: Dialga
+    157:
+      name: Wadribie
+      rarity: ☆
+      boosters: Dialga
+    158:
+      name: Venuflibis
+      rarity: ☆
+      boosters: Palkia
+    159:
+      name: Shaymin
+      rarity: ☆
+      boosters: Dialga
+    160:
+      name: Mamutel
+      rarity: ☆
+      boosters: Dialga
+    161:
+      name: Gastrodon
+      rarity: ☆
+      boosters: Palkia
+    162:
+      name: Manaphy
+      rarity: ☆
+      boosters: Palkia
+    163:
+      name: Sheinux
+      rarity: ☆
+      boosters: Dialga
+    164:
+      name: Rotom
+      rarity: ☆
+      boosters: Palkia
+    165:
+      name: Driftlon
+      rarity: ☆
+      boosters: Dialga
+    166:
+      name: Vesprit
+      rarity: ☆
+      boosters: Dialga
+    167:
+      name: Giratina
+      rarity: ☆
+      boosters: Palkia
+    168:
+      name: Cresselia
+      rarity: ☆
+      boosters: Palkia
+    169:
+      name: Rihornior
+      rarity: ☆
+      boosters: Palkia
+    170:
+      name: Lucario
+      rarity: ☆
+      boosters: Dialga
+    171:
+      name: Hippopotas
+      rarity: ☆
+      boosters: Palkia
+    172:
+      name: Kryppuk
+      rarity: ☆
+      boosters: Palkia
+    173:
+      name: Glibunkel
+      rarity: ☆
+      boosters: Dialga
+    174:
+      name: Heatran
+      rarity: ☆
+      boosters: Dialga
+    175:
+      name: Knakrack
+      rarity: ☆
+      boosters: Palkia
+    176:
+      name: Staraptor
+      rarity: ☆
+      boosters: Palkia
+    177:
+      name: Bidiza
+      rarity: ☆
+      boosters: Dialga
+    178:
+      name: Charmian
+      rarity: ☆
+      boosters: Palkia
+    179:
+      name: Regigigas
+      rarity: ☆
+      boosters: Dialga
+    180:
+      name: Yanmega ex
+      rarity: ☆☆
+      boosters: Dialga
+    181:
+      name: Panferno ex
+      rarity: ☆☆
+      boosters: Palkia
+    182:
+      name: Palkia ex
+      rarity: ☆☆
+      boosters: Palkia
+    183:
+      name: Pachirisu ex
+      rarity: ☆☆
+      boosters: Dialga
+    184:
+      name: Traunmagil ex
+      rarity: ☆☆
+      boosters: Palkia
+    185:
+      name: Galagladi ex
+      rarity: ☆☆
+      boosters: Dialga
+    186:
+      name: Snibunna ex
+      rarity: ☆☆
+      boosters: Palkia
+    187:
+      name: Darkrai ex
+      rarity: ☆☆
+      boosters: Dialga
+    188:
+      name: Dialga ex
+      rarity: ☆☆
+      boosters: Dialga
+    189:
+      name: Schlurplek ex
+      rarity: ☆☆
+      boosters: Palkia
+    190:
+      name: Zyrus
+      rarity: ☆☆
+      boosters: Palkia
+    191:
+      name: Rüpel von Team Galaktik
+      rarity: ☆☆
+      boosters: Dialga
+    192:
+      name: Cynthia
+      rarity: ☆☆
+      boosters: Palkia
+    193:
+      name: Volkner
+      rarity: ☆☆
+      boosters: Dialga
+    194:
+      name: Lucia
+      rarity: ☆☆
+      boosters: Dialga
+    195:
+      name: Mars
+      rarity: ☆☆
+      boosters: Palkia
+    196:
+      name: Yanmega ex
+      rarity: ☆☆
+      boosters: Dialga
+    197:
+      name: Panferno ex
+      rarity: ☆☆
+      boosters: Palkia
+    198:
+      name: Pachirisu ex
+      rarity: ☆☆
+      boosters: Dialga
+    199:
+      name: Traunmagil ex
+      rarity: ☆☆
+      boosters: Palkia
+    200:
+      name: Galagladi ex
+      rarity: ☆☆
+      boosters: Dialga
+    201:
+      name: Snibunna ex
+      rarity: ☆☆
+      boosters: Palkia
+    202:
+      name: Darkrai ex
+      rarity: ☆☆
+      boosters: Dialga
+    203:
+      name: Schlurplek ex
+      rarity: ☆☆
+      boosters: Palkia
+    204:
+      name: Palkia ex
+      rarity: ☆☆☆
+      boosters: Palkia
+    205:
+      name: Dialga ex
+      rarity: ☆☆☆
+      boosters: Dialga
+    206:
+      name: Palkia ex
+      rarity: ♛
+      boosters: Palkia
+    207:
+      name: Dialga ex
+      rarity: ♛
+      boosters: Dialga
 PROMO-A:
   name: Promo-A
   boosters: ~
@@ -1640,17 +2560,23 @@ PROMO-A:
       equalTo: A1
     34:
       name: Plinfa
+      equalTo: A2
     35:
       name: Chelast
+      equalTo: A2
     36:
       name: Elevoltek
+      equalTo: A2
     37:
       name: Cresselia ex
     38:
       name: Traunfugil
     39:
       name: Panzaeron
+      equalTo: A2
     40:
       name: Panflam
+      equalTo: A2
     41:
       name: Togepi
+      equalTo: A2
