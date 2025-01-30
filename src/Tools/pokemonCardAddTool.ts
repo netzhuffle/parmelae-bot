@@ -57,10 +57,29 @@ export const pokemonCardAddTool = tool(
     // Validate results
     if (cards.length === 0) {
       const displayName = await service.getDisplayName(userId);
-      if (remove) {
-        return `No matching cards found in ${displayName}'s collection.`;
+
+      // If no cards found, check if they exist at all
+      const existingCards = await service.searchCards({
+        cardName,
+        setName,
+        setKey: idSetKey ?? setKey,
+        booster,
+        cardNumber: idCardNumber ?? cardNumber,
+        rarity: rarityEnum,
+      });
+
+      if (existingCards.length === 0) {
+        return (
+          'No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was ' +
+          (remove ? 'removed from' : 'added to') +
+          ' the user’s collection.'
+        );
       } else {
-        return `No matching cards found that ${displayName} is missing.`;
+        if (remove) {
+          return `No matching cards found in ${displayName}’s collection. The cards exist but ${displayName} doesn’t own them. Thus no card was removed from the user’s collection.`;
+        } else {
+          return `No matching cards found that ${displayName} is missing. The cards exist but ${displayName} already owns them. Thus no card was added to the user’s collection.`;
+        }
       }
     }
 
@@ -86,7 +105,7 @@ export const pokemonCardAddTool = tool(
         ),
       );
 
-      const header = `Successfully ${operation} ${cards.length} cards ${preposition} ${displayName}'s collection:`;
+      const header = `Successfully ${operation} ${cards.length} cards ${preposition} ${displayName}’s collection:`;
       const csv = await service.formatCardsAsCsv(updatedCards, userId);
       const stats = await service.getFormattedCollectionStats(userId);
       return `${header}\n${csv}\n\nUpdated statistics of ${stats}`;
@@ -98,7 +117,7 @@ export const pokemonCardAddTool = tool(
         ? await service.removeCardFromCollection(card.id, userId)
         : await service.addCardToCollection(card.id, userId);
 
-      const header = `Successfully ${operation} card ${preposition} ${displayName}'s collection:`;
+      const header = `Successfully ${operation} card ${preposition} ${displayName}’s collection:`;
       const csv = await service.formatCardsAsCsv([updatedCard], userId);
       const stats = await service.getFormattedCollectionStats(userId);
       return `${header}\n${csv}\n\nUpdated statistics of ${stats}`;

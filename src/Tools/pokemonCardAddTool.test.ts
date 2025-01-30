@@ -39,7 +39,7 @@ describe('pokemonCardAdd', () => {
       })) as string;
 
       expect(result).toContain(
-        "Successfully added card to @test1's collection:",
+        'Successfully added card to @test1’s collection:',
       );
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
       const cards = await repository.searchCards({
@@ -105,7 +105,7 @@ describe('pokemonCardAdd', () => {
       })) as string;
 
       expect(result).toContain(
-        "Successfully added 2 cards to @test1's collection:",
+        'Successfully added 2 cards to @test1’s collection:',
       );
       const cards = await repository.searchCards({
         userId: BigInt(1),
@@ -129,7 +129,9 @@ describe('pokemonCardAdd', () => {
         cardId: 'A1-001',
       })) as string;
 
-      expect(result).toBe('No matching cards found that @test1 is missing.');
+      expect(result).toBe(
+        'No matching cards found that @test1 is missing. The cards exist but @test1 already owns them. Thus no card was added to the user’s collection.',
+      );
     });
   });
 
@@ -151,7 +153,7 @@ describe('pokemonCardAdd', () => {
       })) as string;
 
       expect(result).toContain(
-        "Successfully removed card from @test1's collection:",
+        'Successfully removed card from @test1’s collection:',
       );
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
       const cards = await repository.searchCards({
@@ -222,7 +224,7 @@ describe('pokemonCardAdd', () => {
       })) as string;
 
       expect(result).toContain(
-        "Successfully removed 2 cards from @test1's collection:",
+        'Successfully removed 2 cards from @test1’s collection:',
       );
       const cards = await repository.searchCards({
         userId: BigInt(1),
@@ -240,7 +242,9 @@ describe('pokemonCardAdd', () => {
         remove: true,
       })) as string;
 
-      expect(result).toBe("No matching cards found in @test1's collection.");
+      expect(result).toBe(
+        'No matching cards found in @test1’s collection. The cards exist but @test1 doesn’t own them. Thus no card was removed from the user’s collection.',
+      );
     });
   });
 
@@ -264,6 +268,100 @@ describe('pokemonCardAdd', () => {
         }),
       ).rejects.toThrow(AssertionError);
     });
+
+    it('should indicate when no cards exist at all', async () => {
+      const result = (await pokemonCardAddTool.invoke({
+        cardName: 'NonexistentCard',
+      })) as string;
+
+      expect(result).toBe(
+        'No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was added to the user’s collection.',
+      );
+    });
+
+    it('should indicate when cards exist but user already owns them', async () => {
+      await repository.createSet('A1', 'Test Set');
+      const card = await repository.createCard(
+        'Test Card',
+        'A1',
+        1,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      await repository.addCardToCollection(card.id, BigInt(1));
+
+      const result = (await pokemonCardAddTool.invoke({
+        cardId: 'A1-001',
+      })) as string;
+
+      expect(result).toBe(
+        'No matching cards found that @test1 is missing. The cards exist but @test1 already owns them. Thus no card was added to the user’s collection.',
+      );
+    });
+
+    it('should indicate when cards exist but user does not own them when removing', async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+
+      const result = (await pokemonCardAddTool.invoke({
+        cardId: 'A1-001',
+        remove: true,
+      })) as string;
+
+      expect(result).toBe(
+        'No matching cards found in @test1’s collection. The cards exist but @test1 doesn’t own them. Thus no card was removed from the user’s collection.',
+      );
+    });
+
+    it('should show first name in error messages when username not available', async () => {
+      jest
+        .mocked(getContextVariable)
+        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
+          if (name === 'pokemonTcgPocket') return service as T;
+          if (name === 'userId') return BigInt(2) as T;
+          return undefined;
+        });
+
+      await repository.createSet('A1', 'Test Set');
+      const card = await repository.createCard(
+        'Test Card',
+        'A1',
+        1,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      await repository.addCardToCollection(card.id, BigInt(2));
+
+      const result = (await pokemonCardAddTool.invoke({
+        cardId: 'A1-001',
+      })) as string;
+
+      expect(result).toBe(
+        'No matching cards found that Test2 is missing. The cards exist but Test2 already owns them. Thus no card was added to the user’s collection.',
+      );
+    });
+
+    it('should show first name in remove error messages when username not available', async () => {
+      jest
+        .mocked(getContextVariable)
+        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
+          if (name === 'pokemonTcgPocket') return service as T;
+          if (name === 'userId') return BigInt(2) as T;
+          return undefined;
+        });
+
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+
+      const result = (await pokemonCardAddTool.invoke({
+        cardId: 'A1-001',
+        remove: true,
+      })) as string;
+
+      expect(result).toBe(
+        'No matching cards found in Test2’s collection. The cards exist but Test2 doesn’t own them. Thus no card was removed from the user’s collection.',
+      );
+    });
   });
 
   describe('user display', () => {
@@ -286,7 +384,7 @@ describe('pokemonCardAdd', () => {
       })) as string;
 
       expect(result).toContain(
-        "Successfully added card to @test1's collection:",
+        'Successfully added card to @test1’s collection:',
       );
       expect(result).toContain('Owned by @test1');
     });
@@ -305,34 +403,9 @@ describe('pokemonCardAdd', () => {
       })) as string;
 
       expect(result).toContain(
-        "Successfully added card to Test2's collection:",
+        'Successfully added card to Test2’s collection:',
       );
       expect(result).toContain('Owned by Test2');
-    });
-
-    it('should show first name in error messages when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
-
-      const card = await repository.createCard(
-        'Test Card',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      await repository.addCardToCollection(card.id, BigInt(2));
-
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-      })) as string;
-
-      expect(result).toBe('No matching cards found that Test2 is missing.');
     });
 
     it('should show first name in bulk operation messages when username not available', async () => {
@@ -365,7 +438,7 @@ describe('pokemonCardAdd', () => {
       })) as string;
 
       expect(result).toContain(
-        "Successfully added 2 cards to Test2's collection:",
+        'Successfully added 2 cards to Test2’s collection:',
       );
       expect(result).toContain('Owned by Test2');
     });
@@ -379,6 +452,7 @@ describe('pokemonCardAdd', () => {
           return undefined;
         });
 
+      await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
       const result = (await pokemonCardAddTool.invoke({
@@ -386,7 +460,9 @@ describe('pokemonCardAdd', () => {
         remove: true,
       })) as string;
 
-      expect(result).toBe("No matching cards found in Test2's collection.");
+      expect(result).toBe(
+        'No matching cards found in Test2’s collection. The cards exist but Test2 doesn’t own them. Thus no card was removed from the user’s collection.',
+      );
     });
 
     it('should show first name in bulk remove messages when username not available', async () => {
@@ -398,6 +474,7 @@ describe('pokemonCardAdd', () => {
           return undefined;
         });
 
+      await repository.createSet('A1', 'Test Set');
       const card1 = await repository.createCard(
         'Test Card 1',
         'A1',
@@ -422,7 +499,7 @@ describe('pokemonCardAdd', () => {
       })) as string;
 
       expect(result).toContain(
-        "Successfully removed 2 cards from Test2's collection:",
+        'Successfully removed 2 cards from Test2’s collection:',
       );
       expect(result).toContain('Owned by Test2');
     });
