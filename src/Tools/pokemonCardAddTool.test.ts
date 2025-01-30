@@ -427,4 +427,67 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain('Owned by Test2');
     });
   });
+
+  describe('output format', () => {
+    it('should include collection stats after adding a card', async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+
+      const result = (await pokemonCardAddTool.invoke({
+        cardId: 'A1-001',
+      })) as string;
+
+      expect(result).toContain('Successfully added card');
+      expect(result).toContain('Test Set: ♦️ 1/1');
+      expect(result).toContain('♦️ is the number of different cards');
+    });
+
+    it('should include collection stats after removing a card', async () => {
+      await repository.createSet('A1', 'Test Set');
+      const card = await repository.createCard(
+        'Test Card',
+        'A1',
+        1,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      await repository.addCardToCollection(card.id, BigInt(1));
+
+      const result = (await pokemonCardAddTool.invoke({
+        cardId: 'A1-001',
+        remove: true,
+      })) as string;
+
+      expect(result).toContain('Successfully removed card');
+      expect(result).toContain('Test Set: ♦️ 0/1');
+      expect(result).toContain('♦️ is the number of different cards');
+    });
+
+    it('should include collection stats after bulk operations', async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard(
+        'Test Card 1',
+        'A1',
+        1,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      await repository.createCard(
+        'Test Card 2',
+        'A1',
+        2,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+
+      const result = (await pokemonCardAddTool.invoke({
+        rarity: '♢',
+        bulkOperation: true,
+      })) as string;
+
+      expect(result).toContain('Successfully added 2 cards');
+      expect(result).toContain('Test Set: ♦️ 2/2');
+      expect(result).toContain('♦️ is the number of different cards');
+    });
+  });
 });

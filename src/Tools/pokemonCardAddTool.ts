@@ -88,7 +88,8 @@ export const pokemonCardAddTool = tool(
 
       const header = `Successfully ${operation} ${cards.length} cards ${preposition} ${displayName}'s collection:`;
       const csv = await service.formatCardsAsCsv(updatedCards, userId);
-      return `${header}\n${csv}`;
+      const stats = await service.getFormattedCollectionStats(userId);
+      return `${header}\n${csv}\n\n${stats}`;
     } else {
       // Process single card
       assert(cards.length === 1);
@@ -99,7 +100,8 @@ export const pokemonCardAddTool = tool(
 
       const header = `Successfully ${operation} card ${preposition} ${displayName}'s collection:`;
       const csv = await service.formatCardsAsCsv([updatedCard], userId);
-      return `${header}\n${csv}`;
+      const stats = await service.getFormattedCollectionStats(userId);
+      return `${header}\n${csv}\n\n${stats}`;
     }
   },
   {

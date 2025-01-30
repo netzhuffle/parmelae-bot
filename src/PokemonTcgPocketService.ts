@@ -89,6 +89,20 @@ export class PokemonTcgPocketService {
   private readonly probabilityService =
     new PokemonTcgPocketProbabilityService();
 
+  /** Explanation texts */
+  private readonly SETS_EXPLANATION =
+    '(♦️ is the number of different cards in the user’s collection with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢ as well as the total in the set, ' +
+    '⭐️ is the number of different cards in the user’s collection with rarities ☆, ☆☆, and ☆☆☆, ' +
+    'and 👑 is the number of different cards in the user’s collection with rarity ♛. ' +
+    'Promo sets don’t have rarities, thus only the number of different cards in the user’s collection is shown. ' +
+    'When describing these stats to users, omit each ⭐️ and 👑 stat that is 0 for better readability and to match the ingame format, unless specifically asked for.)';
+
+  private readonly BOOSTERS_EXPLANATION =
+    '(First numbers are the collected and total number of different cards in the specific booster. ' +
+    'p♢ is the probability of receiving a new card with rarity ♢, ♢♢, ♢♢♢, or ♢♢♢♢ currently missing in the user’s collection, ' +
+    'and pN is the probability of receiving any new card currently missing in the user’s collection ' +
+    'when opening the specific booster. These probabilities help the user decide which booster to open next to maximise their chances.)';
+
   constructor(
     private readonly repository: PokemonTcgPocketRepository,
     @inject(PokemonTcgPocketYamlSymbol) private readonly yamlContent: string,
@@ -165,6 +179,65 @@ export class PokemonTcgPocketService {
       : false;
     const raritySymbol = card.rarity ? RARITY_REVERSE_MAP[card.rarity] : '';
     return `${card.set.key}-${card.number.toString().padStart(3, '0')},${card.name},${raritySymbol},${card.set.name},${boosterNames},${isOwned ? 'Yes' : 'No'}`;
+  }
+
+  /** Gets formatted collection statistics for a user */
+  async getFormattedCollectionStats(userId: bigint): Promise<string> {
+    const stats = await this.getCollectionStats(userId);
+    const lines: string[] = [];
+
+    // Header
+    lines.push(`${stats.displayName}’s collection:`);
+    lines.push('');
+
+    // Sets section
+    lines.push(...this.formatSetsSection(stats.sets));
+
+    // Boosters section
+    lines.push(...this.formatBoostersSection(stats.boosters));
+
+    return lines.join('\n');
+  }
+
+  /** Formats the sets section of collection statistics */
+  private formatSetsSection(
+    sets: { name: string; stats: string[] }[],
+  ): string[] {
+    const lines: string[] = ['Sets:'];
+    for (const { name, stats: setStats } of sets) {
+      lines.push(`${name}: ${setStats.join(' ⋅ ')}`);
+    }
+    lines.push('');
+    lines.push(this.SETS_EXPLANATION);
+    lines.push('');
+    return lines;
+  }
+
+  /** Formats the boosters section of collection statistics */
+  private formatBoostersSection(
+    boosters: {
+      name: string;
+      owned: number;
+      total: number;
+      newDiamondCardProbability: number;
+      newCardProbability: number;
+    }[],
+  ): string[] {
+    const lines: string[] = ['Packs:'];
+    for (const {
+      name,
+      owned,
+      total,
+      newDiamondCardProbability,
+      newCardProbability,
+    } of boosters) {
+      lines.push(
+        `${name}: ${owned}/${total} ⋅ p♢ ${newDiamondCardProbability.toFixed(2)} % ⋅ pN ${newCardProbability.toFixed(2)} %`,
+      );
+    }
+    lines.push('');
+    lines.push(this.BOOSTERS_EXPLANATION);
+    return lines;
   }
 
   /** Gets formatted collection statistics for a user */
