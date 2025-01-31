@@ -32,6 +32,7 @@ Key Practices:
      - Code runs without errors
      - The correct methods are called with the correct arguments
      - The correct return values are returned or set
+   - Avoid testing for full, long strings – test for parts relevant to the test
    - When you are done with an implementation, test writing, and refactoring, run formatting, linters, and tests with the following succession of commands:
      - `npm run format && npm run schema-format`
      - `npm run build`
@@ -68,5 +69,6 @@ Key Practices:
 5. Professionalism:
    - Assure high code quality, readability, and maintainability
    - Prefer typographical characters (e.g. “”, ‘’, don’t, user’s) over ASCII characters (e.g. "", '', don't, user's) in comments and text output
+   - If you are claude-3.5-sonnet and any linting or tests fail only because of apostroph issues (’ / '), please tell me so I can fix this manually. Your tools sadly do not allow you to use the correct apostroph (’) so that’s why changed codes sometimes turns into “'” apostrophs.
 
 Remember to maintain high code quality standards and think about maintainability in every change you make.

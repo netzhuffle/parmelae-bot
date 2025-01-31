@@ -7,8 +7,8 @@ import {
 } from '@prisma/client';
 import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
-import { OwnershipFilter } from '../Tools/pokemonCardSearchTool.js';
 import { PokemonCardWithRelations } from '../Repositories/Types.js';
+import { OwnershipFilter } from '../Tools/pokemonCardSearchTool.js';
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
 export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
@@ -101,7 +101,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       number,
       rarity,
     };
-    this.cards.set(`${set.id}_${number}`, card);
+    this.cards.set(`${setKey}_${number}`, card);
 
     // Store booster associations
     const boosterIds = new Set<number>();
@@ -117,55 +117,70 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Search for cards using various filters */
-  async searchCards(filters: {
+  async searchCards(searchCriteria?: {
     cardName?: string;
     setName?: string;
-    setKey?: string;
     booster?: string;
-    cardNumber?: number;
     rarity?: Rarity;
+    setKey?: string;
+    cardNumber?: number;
     userId?: bigint;
     ownershipFilter?: OwnershipFilter;
-  }): Promise<
-    {
-      id: number;
-      name: string;
-      setId: number;
-      number: number;
-      rarity: Rarity | null;
-      set: { name: string; id: number; key: string };
-      boosters: { name: string; id: number; setId: number }[];
-      owners: {
-        id: bigint;
-        isBot: boolean;
-        firstName: string;
-        lastName: string | null;
-        username: string | null;
-        languageCode: string | null;
-      }[];
-    }[]
-  > {
+  }): Promise<PokemonCardWithRelations[]> {
+    // Return all cards with their relationships
+    // No actual filtering to minimize business logic in fakes/tests
+    // Just apply basic userId filtering if specified
     let cards = Array.from(this.cards.values());
 
-    // Apply ownership filter if specified
-    if (filters.userId && filters.ownershipFilter) {
-      cards = cards.filter((card) => {
-        const owners = this.cardOwners.get(card.id) ?? new Set<bigint>();
-        if (filters.ownershipFilter === OwnershipFilter.OWNED) {
-          return owners.has(filters.userId!);
-        } else if (filters.ownershipFilter === OwnershipFilter.MISSING) {
-          return !owners.has(filters.userId!);
-        }
-        return true;
-      });
+    // Only apply userId filtering as it's critical for ownership tests
+    if (searchCriteria?.userId !== undefined) {
+      const userId = searchCriteria.userId;
+      if (searchCriteria.ownershipFilter === OwnershipFilter.OWNED) {
+        cards = cards.filter((card) =>
+          (this.cardOwners.get(card.id) ?? new Set()).has(userId),
+        );
+      } else if (searchCriteria.ownershipFilter === OwnershipFilter.MISSING) {
+        cards = cards.filter(
+          (card) => !(this.cardOwners.get(card.id) ?? new Set()).has(userId),
+        );
+      }
     }
 
-    // Format results
     return Promise.resolve(
       cards.map((card) => {
+        // Find the set by looking up the card's setId in the sets map
         const set = Array.from(this.sets.values()).find(
           (s) => s.id === card.setId,
-        )!;
+        );
+        if (!set) {
+          // Find the set by key instead since that's what we use in tests
+          const cardKey = Array.from(this.cards.entries()).find(
+            ([_, c]) => c.id === card.id,
+          )?.[0];
+          if (!cardKey) {
+            throw new Error(`Card ${card.id} not found in lookup map`);
+          }
+          const setKey = cardKey.split('_')[0];
+          const setByKey = this.sets.get(setKey);
+          if (!setByKey) {
+            throw new Error(`Set with key ${setKey} not found`);
+          }
+          return {
+            ...card,
+            set: setByKey,
+            boosters: this.getCardBoosters(card.id),
+            owners: Array.from(this.cardOwners.get(card.id) ?? []).map(
+              (userId) => ({
+                id: userId,
+                isBot: false,
+                firstName: 'Test' + userId,
+                lastName: null,
+                username: Number(userId) % 2 === 0 ? null : 'test' + userId,
+                languageCode: null,
+              }),
+            ),
+          };
+        }
         const boosters = this.getCardBoosters(card.id);
         const owners = Array.from(this.cardOwners.get(card.id) ?? []).map(
           (userId) => ({
