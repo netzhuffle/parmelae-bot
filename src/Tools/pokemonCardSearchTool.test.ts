@@ -4,10 +4,7 @@ import { Rarity } from '@prisma/client';
 import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
 import { getContextVariable } from '@langchain/core/context';
 import { jest } from '@jest/globals';
-import {
-  pokemonCardSearchTool,
-  OwnershipFilter,
-} from './pokemonCardSearchTool.js';
+import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 import { AssertionError } from 'assert';
 
 jest.mock('@langchain/core/context');
@@ -39,15 +36,15 @@ describe('pokemonCardSearch', () => {
 
   it('should format results as CSV with all columns', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createBooster('Test Booster', 'A1');
+    await repository.createBooster('Glurak', 'A1');
     await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, [
-      'Test Booster',
+      'Glurak',
     ]);
 
     const result = (await pokemonCardSearchTool.invoke({})) as string;
 
     expect(result).toBe(
-      'ID,Name,Rarity,Set,Boosters,Owned by @test1\nA1-001,Test Card,♢,Test Set,Test Booster,No',
+      'ID,Name,Rarity,Set,Boosters,Owned by @test1\nA1-001,Test Card,♢,Test Set,Glurak,No',
     );
     expect(repository.searchCards).toHaveBeenCalledWith({});
   });
@@ -109,38 +106,38 @@ describe('pokemonCardSearch', () => {
     });
   });
 
-  it('should filter by set name', async () => {
+  it('should filter by set key', async () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
     const result = (await pokemonCardSearchTool.invoke({
-      setName: 'Test Set',
+      setKey: 'A1',
     })) as string;
 
     expect(result).toContain('Card 1');
     expect(result).toContain('Test Set');
     expect(result).toContain(',No'); // Verify ownership column
     expect(repository.searchCards).toHaveBeenCalledWith({
-      setName: 'Test Set',
+      setKey: 'A1',
     });
   });
 
   it('should filter by booster', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createBooster('Booster 1', 'A1');
+    await repository.createBooster('Glurak', 'A1');
     await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
-      'Booster 1',
+      'Glurak',
     ]);
 
     const result = (await pokemonCardSearchTool.invoke({
-      booster: 'Booster 1',
+      booster: 'Glurak',
     })) as string;
 
     expect(result).toContain('Card 1');
-    expect(result).toContain('Booster 1');
+    expect(result).toContain('Glurak');
     expect(result).toContain(',No'); // Verify ownership column
     expect(repository.searchCards).toHaveBeenCalledWith({
-      booster: 'Booster 1',
+      booster: 'Glurak',
     });
   });
 
@@ -272,7 +269,7 @@ describe('pokemonCardSearch', () => {
       await repository.addCardToCollection(card3.id, BigInt(1));
 
       const result = (await pokemonCardSearchTool.invoke({
-        ownershipFilter: OwnershipFilter.OWNED,
+        ownershipFilter: 'owned',
       })) as string;
 
       expect(result).toContain('Card 1');
@@ -285,13 +282,13 @@ describe('pokemonCardSearch', () => {
       });
       expect(repository.searchCards).toHaveBeenCalledWith({
         userId: BigInt(1),
-        ownershipFilter: OwnershipFilter.OWNED,
+        ownershipFilter: 'owned',
       });
     });
 
     it('should pass ownership filter when set to missing', async () => {
       const result = (await pokemonCardSearchTool.invoke({
-        ownershipFilter: OwnershipFilter.MISSING,
+        ownershipFilter: 'missing',
       })) as string;
 
       expect(result).toContain('Card 1');
@@ -304,13 +301,13 @@ describe('pokemonCardSearch', () => {
       });
       expect(repository.searchCards).toHaveBeenCalledWith({
         userId: BigInt(1),
-        ownershipFilter: OwnershipFilter.MISSING,
+        ownershipFilter: 'missing',
       });
     });
 
     it('should pass ownership filter when set to all', async () => {
       const result = (await pokemonCardSearchTool.invoke({
-        ownershipFilter: OwnershipFilter.ALL,
+        ownershipFilter: 'all',
       })) as string;
 
       expect(result).toContain('Card 1');
@@ -323,7 +320,7 @@ describe('pokemonCardSearch', () => {
       });
       expect(repository.searchCards).toHaveBeenCalledWith({
         userId: BigInt(1),
-        ownershipFilter: OwnershipFilter.ALL,
+        ownershipFilter: 'all',
       });
     });
 
@@ -332,7 +329,7 @@ describe('pokemonCardSearch', () => {
 
       await expect(
         pokemonCardSearchTool.invoke({
-          ownershipFilter: OwnershipFilter.OWNED,
+          ownershipFilter: 'owned',
         }),
       ).rejects.toThrow(AssertionError);
     });

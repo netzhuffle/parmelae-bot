@@ -4,27 +4,64 @@ import { z } from 'zod';
 import {
   PokemonTcgPocketService,
   RARITY_MAP,
+  SET_KEY_VALUES,
+  SET_KEY_NAMES,
+  BOOSTER_VALUES,
+  OWNERSHIP_FILTER_VALUES,
 } from '../PokemonTcgPocketService.js';
 import assert from 'assert';
 
-/** Filter for card ownership */
-export enum OwnershipFilter {
-  ALL = 'all',
-  OWNED = 'owned',
-  MISSING = 'missing',
-}
+/** Card ID regex pattern */
+const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
+
+const schema = z.object({
+  cardName: z
+    .string()
+    .optional()
+    .describe('Substring to search for in card names'),
+  setKey: z
+    .enum(SET_KEY_VALUES)
+    .optional()
+    .describe(
+      `Set key to filter by: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}`,
+    ),
+  booster: z.enum(BOOSTER_VALUES).optional().describe('Booster to filter by'),
+  cardNumber: z
+    .number()
+    .int()
+    .optional()
+    .describe('Exact card number in set to filter by'),
+  cardId: z
+    .string()
+    .regex(CARD_ID_PATTERN)
+    .optional()
+    .describe('Card ID in format {set-key}-{three digit number}, e.g. A1-003'),
+  rarity: z
+    .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
+    .optional()
+    .describe(
+      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑.',
+    ),
+  ownershipFilter: z
+    .enum(OWNERSHIP_FILTER_VALUES)
+    .optional()
+    .describe(
+      'Filter by card ownership of the user who wrote the last message: "all" (default) for all cards, "owned" for cards they own, "missing" for cards they do not own',
+    ),
+});
+
+type PokemonCardSearchInput = z.infer<typeof schema>;
 
 export const pokemonCardSearchTool = tool(
   async ({
     cardName,
-    setName,
     setKey,
     booster,
     cardNumber,
     cardId,
     rarity,
     ownershipFilter,
-  }): Promise<string> => {
+  }: PokemonCardSearchInput): Promise<string> => {
     const service =
       getContextVariable<PokemonTcgPocketService>('pokemonTcgPocket');
     assert(service instanceof PokemonTcgPocketService);
@@ -38,8 +75,7 @@ export const pokemonCardSearchTool = tool(
     let idSetKey: string | undefined;
     let idCardNumber: number | undefined;
     if (cardId) {
-      const regex = /^([A-Za-z0-9-]+)-(\d{3})$/;
-      const match = regex.exec(cardId);
+      const match = CARD_ID_PATTERN.exec(cardId);
       if (!match) {
         return 'Invalid card ID format. Expected format: {set-key}-{three digit number}, e.g. A1-003';
       }
@@ -49,7 +85,6 @@ export const pokemonCardSearchTool = tool(
 
     const cards = await service.searchCards({
       cardName,
-      setName,
       setKey: idSetKey ?? setKey,
       booster,
       cardNumber: idCardNumber ?? cardNumber,
@@ -77,46 +112,6 @@ export const pokemonCardSearchTool = tool(
     name: 'pokemonCardSearch',
     description:
       'Search for and get detailed lists of Pokémon TCG Pocket cards using various filters. Returns a CSV with full card information including ID, name, set, booster, and ownership status. Can search through all existing cards, through the collection of the user that last wrote a message, or through their missing cards. This is the tool to use when you need actual card names and details, not just statistics (use pokemonCardStats for numerical summaries).',
-    schema: z.object({
-      cardName: z
-        .string()
-        .optional()
-        .describe('Substring to search for in card names'),
-      setName: z
-        .string()
-        .optional()
-        .describe('Exact set name to filter by (e.g. "Unschlagbare Gene")'),
-      setKey: z
-        .string()
-        .optional()
-        .describe('Exact set key to filter by (e.g. "A1")'),
-      booster: z
-        .string()
-        .optional()
-        .describe('Exact booster name to filter by (e.g. "Mewtu")'),
-      cardNumber: z
-        .number()
-        .int()
-        .optional()
-        .describe('Exact card number in set to filter by'),
-      cardId: z
-        .string()
-        .optional()
-        .describe(
-          'Card ID in format {set-key}-{three digit number}, e.g. A1-003',
-        ),
-      rarity: z
-        .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
-        .optional()
-        .describe(
-          'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑.',
-        ),
-      ownershipFilter: z
-        .nativeEnum(OwnershipFilter)
-        .optional()
-        .describe(
-          'Filter by card ownership of the user who wrote the last message: "all" (default) for all cards, "owned" for cards they own, "missing" for cards they do not own',
-        ),
-    }),
+    schema,
   },
 );

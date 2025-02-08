@@ -10,7 +10,7 @@ import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabas
 import { PokemonTcgPocketNotFoundError } from '../Errors/PokemonTcgPocketNotFoundError.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { PokemonCardWithRelations } from './Types.js';
-import { OwnershipFilter } from '../Tools/pokemonCardSearchTool.js';
+import { OwnershipFilter } from '../PokemonTcgPocketService.js';
 
 /** Repository for Pokémon TCG Pocket data */
 @injectable()
@@ -206,9 +206,9 @@ export class PokemonTcgPocketRepository {
     try {
       const ownershipCondition =
         filters.userId && filters.ownershipFilter
-          ? filters.ownershipFilter === OwnershipFilter.OWNED
+          ? filters.ownershipFilter === 'owned'
             ? { some: { id: filters.userId } }
-            : filters.ownershipFilter === OwnershipFilter.MISSING
+            : filters.ownershipFilter === 'missing'
               ? { none: { id: filters.userId } }
               : undefined
           : undefined;

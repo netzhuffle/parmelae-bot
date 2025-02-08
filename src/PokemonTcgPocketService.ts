@@ -12,9 +12,41 @@ import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketIn
 import { PokemonTcgPocketInvalidRarityError } from './Errors/PokemonTcgPocketInvalidRarityError.js';
 import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPocketDuplicateCardNumberError.js';
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
-import { OwnershipFilter } from './Tools/pokemonCardSearchTool.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+
+/** Set key values */
+export const SET_KEY_VALUES = ['A1', 'A1a', 'A2', 'PROMO-A'] as const;
+
+/** Set key type */
+export type SetKey = (typeof SET_KEY_VALUES)[number];
+
+/** Maps set keys to their names */
+export const SET_KEY_NAMES: Record<SetKey, string> = {
+  A1: 'Unschlagbare Gene',
+  A1a: 'Mysteriöse Insel',
+  A2: 'Kollision von Raum und Zeit',
+  'PROMO-A': 'Promo-A',
+};
+
+/** Booster values */
+export const BOOSTER_VALUES = [
+  'Glurak',
+  'Mewtu',
+  'Pikachu',
+  'Mysteriöse Insel',
+  'Dialga',
+  'Palkia',
+] as const;
+
+/** Booster type */
+export type Booster = (typeof BOOSTER_VALUES)[number];
+
+/** Ownership filter values */
+export const OWNERSHIP_FILTER_VALUES = ['all', 'owned', 'missing'] as const;
+
+/** Ownership filter type */
+export type OwnershipFilter = (typeof OWNERSHIP_FILTER_VALUES)[number];
 
 /** Symbol for injecting the Pokemon TCG Pocket YAML content */
 export const PokemonTcgPocketYamlSymbol = Symbol('PokemonTcgPocketYaml');
@@ -223,7 +255,7 @@ export class PokemonTcgPocketService {
       newCardProbability: number;
     }[],
   ): string[] {
-    const lines: string[] = ['Packs:'];
+    const lines: string[] = ['Booster Packs:'];
     for (const {
       name,
       owned,
@@ -240,7 +272,7 @@ export class PokemonTcgPocketService {
     return lines;
   }
 
-  /** Gets formatted collection statistics for a user */
+  /** Gets collection statistics for a user */
   async getCollectionStats(userId: bigint): Promise<{
     displayName: string;
     sets: {
@@ -290,7 +322,7 @@ export class PokemonTcgPocketService {
     };
   }
 
-  /** Utility function to check card rarity */
+  /** Checks if a card has a specific rarity */
   private isCardOfRarity(card: PokemonCard, rarities: Rarity[]): boolean {
     return rarities.includes(card.rarity!);
   }
@@ -339,7 +371,7 @@ export class PokemonTcgPocketService {
     };
   }
 
-  /** Formats the statistics for a set */
+  /** Formats set statistics */
   private formatSetStats(stats: {
     diamonds: CardGroup;
     stars: CardGroup;

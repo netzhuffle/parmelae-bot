@@ -8,7 +8,7 @@ import {
 import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { PokemonCardWithRelations } from '../Repositories/Types.js';
-import { OwnershipFilter } from '../Tools/pokemonCardSearchTool.js';
+import { OwnershipFilter } from '../PokemonTcgPocketService.js';
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
 export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
@@ -135,11 +135,11 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     // Only apply userId filtering as it's critical for ownership tests
     if (searchCriteria?.userId !== undefined) {
       const userId = searchCriteria.userId;
-      if (searchCriteria.ownershipFilter === OwnershipFilter.OWNED) {
+      if (searchCriteria.ownershipFilter === 'owned') {
         cards = cards.filter((card) =>
           (this.cardOwners.get(card.id) ?? new Set()).has(userId),
         );
-      } else if (searchCriteria.ownershipFilter === OwnershipFilter.MISSING) {
+      } else if (searchCriteria.ownershipFilter === 'missing') {
         cards = cards.filter(
           (card) => !(this.cardOwners.get(card.id) ?? new Set()).has(userId),
         );
