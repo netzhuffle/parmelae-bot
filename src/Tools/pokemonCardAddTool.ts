@@ -81,10 +81,7 @@ export const pokemonCardAddTool = tool(
     let idSetKey: string | undefined;
     let idCardNumber: number | undefined;
     if (cardId) {
-      const match = CARD_ID_PATTERN.exec(cardId);
-      if (!match) {
-        return 'Invalid card ID format. Expected format: {set-key}-{three digit number}, e.g. A1-003';
-      }
+      const match = CARD_ID_PATTERN.exec(cardId)!;
       idSetKey = match[1];
       idCardNumber = parseInt(match[2], 10);
     }

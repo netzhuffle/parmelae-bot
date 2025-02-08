@@ -175,13 +175,12 @@ describe('pokemonCardSearch', () => {
   });
 
   it('should return error message for invalid card ID format', async () => {
-    const result = (await pokemonCardSearchTool.invoke({
-      cardId: 'invalid',
-    })) as string;
+    await expect(
+      pokemonCardSearchTool.invoke({
+        cardId: 'invalid',
+      }),
+    ).rejects.toThrow();
 
-    expect(result).toBe(
-      'Invalid card ID format. Expected format: {set-key}-{three digit number}, e.g. A1-003',
-    );
     expect(repository.searchCards).not.toHaveBeenCalled();
   });
 

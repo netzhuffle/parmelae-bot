@@ -224,13 +224,11 @@ describe('pokemonCardAdd', () => {
 
   describe('error handling', () => {
     it('should handle invalid card ID format', async () => {
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'invalid',
-      })) as string;
-
-      expect(result).toBe(
-        'Invalid card ID format. Expected format: {set-key}-{three digit number}, e.g. A1-003',
-      );
+      await expect(
+        pokemonCardAddTool.invoke({
+          cardId: 'invalid',
+        }),
+      ).rejects.toThrow();
     });
 
     it('should throw error when userId not available', async () => {
