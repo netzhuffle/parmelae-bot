@@ -1,23 +1,15 @@
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator.js';
-import { DallEService } from '../DallEService.js';
-import { TelegramService } from '../TelegramService.js';
-import { getContextVariable } from '@langchain/core/context';
-import assert from 'assert';
+import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import { getToolContext } from '../ChatGptAgentService.js';
 
 export const dallETool = tool(
-  async ({ prompt }): Promise<string> => {
-    const dallEPromptGenerator = getContextVariable<DallEPromptGenerator>(
-      'dallEPromptGenerator',
-    );
-    assert(dallEPromptGenerator instanceof DallEPromptGenerator);
-    const dallE = getContextVariable<DallEService>('dallE');
-    assert(dallE instanceof DallEService);
-    const telegram = getContextVariable<TelegramService>('telegram');
-    assert(telegram instanceof TelegramService);
-    const chatId = getContextVariable<string>('chatId');
-    assert(typeof chatId === 'bigint');
+  async ({ prompt }, config: LangGraphRunnableConfig): Promise<string> => {
+    const context = getToolContext(config);
+    const chatId = context.chatId;
+    const dallEPromptGenerator = context.dallEPromptGenerator;
+    const dallE = context.dallEService;
+    const telegram = context.telegramService;
 
     const dallEPrompt = await dallEPromptGenerator.generate(prompt);
     const imageUrl = await dallE.generateImage(dallEPrompt);

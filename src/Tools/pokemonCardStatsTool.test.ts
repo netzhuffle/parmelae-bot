@@ -1,31 +1,22 @@
 import { PokemonTcgPocketService } from '../PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity } from '@prisma/client';
-import { getContextVariable } from '@langchain/core/context';
-import { jest } from '@jest/globals';
 import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
-
-jest.mock('@langchain/core/context');
+import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 
 describe('pokemonCardStats', () => {
   let repository: PokemonTcgPocketRepositoryFake;
-  let service: PokemonTcgPocketService;
-
+  let config: { configurable: ToolContext };
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
-    service = new PokemonTcgPocketService(repository, '');
-    jest
-      .mocked(getContextVariable)
-      .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-        if (name === 'pokemonTcgPocket') return service as T;
-        if (name === 'userId') return BigInt(1) as T;
-        return undefined;
-      });
+    config = createTestToolConfig({
+      userId: BigInt(1),
+      pokemonTcgPocketService: new PokemonTcgPocketService(repository, ''),
+    });
   });
 
   afterEach(() => {
     repository.clear();
-    jest.clearAllMocks();
   });
 
   describe('output format', () => {
@@ -58,7 +49,7 @@ describe('pokemonCardStats', () => {
       // Add 1 crown card
       await repository.addCardToCollection(cards[8].id, BigInt(1));
 
-      const result = (await pokemonCardStatsTool.invoke({})) as string;
+      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
       expect(result).toContain('@test1’s collection:');
       expect(result).toContain('Sets:');
       expect(result).toContain('Unschlagbare Gene: ♦️ 2/5 ⋅ ⭐️ 3 ⋅ 👑 1');
@@ -74,7 +65,7 @@ describe('pokemonCardStats', () => {
       const cards = await repository.searchCards({ setKey: 'PA' });
       await repository.addCardToCollection(cards[0].id, BigInt(1));
 
-      const result = (await pokemonCardStatsTool.invoke({})) as string;
+      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
       expect(result).toContain('Promo-A: 1');
       expect(result).toContain('Promo sets don’t have rarities');
     });
@@ -105,7 +96,7 @@ describe('pokemonCardStats', () => {
       await repository.addCardToCollection(cards[0].id, BigInt(1));
       await repository.addCardToCollection(cards[2].id, BigInt(1));
 
-      const result = (await pokemonCardStatsTool.invoke({})) as string;
+      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
       expect(result).toContain('Packs:');
       expect(result).toMatch(/Glurak: 1\/2 ⋅ p♢ \d+\.\d+ % ⋅ pN \d+\.\d+ %/);
       expect(result).toMatch(/Mewtu: 1\/2 ⋅ p♢ \d+\.\d+ % ⋅ pN \d+\.\d+ %/);
@@ -116,7 +107,7 @@ describe('pokemonCardStats', () => {
     it('should include explanation texts', async () => {
       await repository.createSet('A1', 'Test Set');
 
-      const result = (await pokemonCardStatsTool.invoke({})) as string;
+      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
       expect(result).toContain('♦️ is');
       expect(result).toContain('rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢');
       expect(result).toContain('⭐️ is');
@@ -131,7 +122,7 @@ describe('pokemonCardStats', () => {
     it('should include search tool name in explanation', async () => {
       await repository.createSet('A1', 'Test Set');
 
-      const result = (await pokemonCardStatsTool.invoke({})) as string;
+      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
       expect(result).toContain('run the pokemonCardSearch tool');
     });
   });
@@ -142,28 +133,14 @@ describe('pokemonCardStats', () => {
     });
 
     it('should show username when available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(1) as T;
-          return undefined;
-        });
-
-      const result = (await pokemonCardStatsTool.invoke({})) as string;
+      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
       expect(result).toContain('@test1’s collection:');
     });
 
     it('should show first name when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
+      config.configurable.userId = BigInt(2);
 
-      const result = (await pokemonCardStatsTool.invoke({})) as string;
+      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
       expect(result).toContain('Test2’s collection:');
     });
   });

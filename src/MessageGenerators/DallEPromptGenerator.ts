@@ -9,7 +9,7 @@ import { GptModels } from '../GptModelsProvider.js';
 import { injectable } from 'inversify';
 
 /** The prompt messages. */
-const PROMPT = ChatPromptTemplate.fromPromptMessages([
+const PROMPT = ChatPromptTemplate.fromMessages([
   SystemMessagePromptTemplate.fromTemplate(
     'Generiere einen Dall-E-Prompt für wunderschöne Kunst oder Fotos basierend auf einer simplen Anfrage. Dall-E-Prompts sind englisch, übertrieben detailliert beschrieben, mit hohen Qualitätsforderungen, jedoch nah an der ursprünglichen Anfrage.',
   ),

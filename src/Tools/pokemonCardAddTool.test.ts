@@ -1,32 +1,26 @@
 import { PokemonTcgPocketService } from '../PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity } from '@prisma/client';
-import { getContextVariable } from '@langchain/core/context';
 import { jest } from '@jest/globals';
 import { pokemonCardAddTool } from './pokemonCardAddTool.js';
-import { AssertionError } from 'assert';
+import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 
 jest.mock('@langchain/core/context');
 
 describe('pokemonCardAdd', () => {
   let repository: PokemonTcgPocketRepositoryFake;
-  let service: PokemonTcgPocketService;
+  let config: { configurable: ToolContext };
 
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
-    service = new PokemonTcgPocketService(repository, '');
-    jest
-      .mocked(getContextVariable)
-      .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-        if (name === 'pokemonTcgPocket') return service as T;
-        if (name === 'userId') return BigInt(1) as T;
-        return undefined;
-      });
+    config = createTestToolConfig({
+      userId: BigInt(1),
+      pokemonTcgPocketService: new PokemonTcgPocketService(repository, ''),
+    });
   });
 
   afterEach(() => {
     repository.clear();
-    jest.clearAllMocks();
   });
 
   describe('adding cards', () => {
@@ -34,9 +28,12 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('added card to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -60,9 +57,12 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain(
         'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:',
@@ -88,10 +88,13 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-        bulkOperation: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+          bulkOperation: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('added 2 cards to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -110,9 +113,12 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('@test1 already owns them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
@@ -132,10 +138,13 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-        remove: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+          remove: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('removed card from @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -161,10 +170,13 @@ describe('pokemonCardAdd', () => {
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-        remove: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+          remove: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain(
         'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:',
@@ -197,11 +209,14 @@ describe('pokemonCardAdd', () => {
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-        remove: true,
-        bulkOperation: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+          remove: true,
+          bulkOperation: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('removed 2 cards from @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -211,10 +226,13 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-        remove: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+          remove: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('@test1 does not own them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
@@ -225,26 +243,22 @@ describe('pokemonCardAdd', () => {
   describe('error handling', () => {
     it('should handle invalid card ID format', async () => {
       await expect(
-        pokemonCardAddTool.invoke({
-          cardId: 'invalid',
-        }),
+        pokemonCardAddTool.invoke(
+          {
+            cardId: 'invalid',
+          },
+          config,
+        ),
       ).rejects.toThrow();
     });
 
-    it('should throw error when userId not available', async () => {
-      jest.mocked(getContextVariable).mockReturnValue(undefined);
-
-      await expect(
-        pokemonCardAddTool.invoke({
-          cardId: 'A1-001',
-        }),
-      ).rejects.toThrow(AssertionError);
-    });
-
     it('should indicate when no cards exist at all', async () => {
-      const result = (await pokemonCardAddTool.invoke({
-        cardName: 'NonexistentCard',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardName: 'NonexistentCard',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('No cards exist');
       expect(result).toContain('no card was added');
@@ -261,9 +275,12 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('@test1 already owns them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
@@ -274,10 +291,13 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-        remove: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+          remove: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('@test1 does not own them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
@@ -285,13 +305,7 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show first name in error messages when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
+      config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
       const card = await repository.createCard(
@@ -303,9 +317,12 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(2));
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('Test2 already owns them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
@@ -313,21 +330,18 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show first name in remove error messages when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
+      config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-        remove: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+          remove: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('Test2 does not own them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
@@ -342,17 +356,12 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show username when available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(1) as T;
-          return undefined;
-        });
-
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('added card to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -360,20 +369,17 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show first name when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
+      config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('added card to Test2');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
@@ -381,13 +387,7 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show first name in bulk operation messages when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
+      config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
       await repository.createCard(
@@ -405,10 +405,13 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-        bulkOperation: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+          bulkOperation: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('added 2 cards to Test2');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
@@ -417,21 +420,18 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show first name in remove error messages when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
+      config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-        remove: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+          remove: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('No matching cards found in Test2');
       expect(result).toContain('The cards exist');
@@ -440,13 +440,7 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show first name in bulk remove messages when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
+      config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
       const card1 = await repository.createCard(
@@ -466,11 +460,14 @@ describe('pokemonCardAdd', () => {
       await repository.addCardToCollection(card1.id, BigInt(2));
       await repository.addCardToCollection(card2.id, BigInt(2));
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-        remove: true,
-        bulkOperation: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+          remove: true,
+          bulkOperation: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('removed 2 cards from Test2');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
@@ -484,9 +481,12 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('Successfully added card');
       expect(result).toContain('Test Set: ♦️ 1/1');
@@ -504,10 +504,13 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke({
-        cardId: 'A1-001',
-        remove: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          cardId: 'A1-001',
+          remove: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('Successfully removed card');
       expect(result).toContain('Test Set: ♦️ 0/1');
@@ -531,10 +534,13 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-        bulkOperation: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+          bulkOperation: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('Successfully added 2 cards');
       expect(result).toContain('Test Set: ♦️ 2/2');
@@ -558,10 +564,13 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-        bulkOperation: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+          bulkOperation: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('added 2 cards to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -588,11 +597,14 @@ describe('pokemonCardAdd', () => {
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke({
-        rarity: '♢',
-        remove: true,
-        bulkOperation: true,
-      })) as string;
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          rarity: '♢',
+          remove: true,
+          bulkOperation: true,
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('removed 2 cards from @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');

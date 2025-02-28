@@ -1,15 +1,16 @@
 import { tool } from '@langchain/core/tools';
-import { getContextVariable } from '@langchain/core/context';
 import { z } from 'zod';
 import {
-  PokemonTcgPocketService,
   RARITY_MAP,
   SET_KEY_VALUES,
   SET_KEY_NAMES,
   BOOSTER_VALUES,
   OWNERSHIP_FILTER_VALUES,
 } from '../PokemonTcgPocketService.js';
-import assert from 'assert';
+import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import { getToolContext } from '../ChatGptAgentService.js';
+
+export const POKEMON_CARD_SEARCH_TOOL_NAME = 'pokemonCardSearch';
 
 /** Card ID regex pattern */
 const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
@@ -53,20 +54,21 @@ const schema = z.object({
 type PokemonCardSearchInput = z.infer<typeof schema>;
 
 export const pokemonCardSearchTool = tool(
-  async ({
-    cardName,
-    setKey,
-    booster,
-    cardNumber,
-    cardId,
-    rarity,
-    ownershipFilter,
-  }: PokemonCardSearchInput): Promise<string> => {
-    const service =
-      getContextVariable<PokemonTcgPocketService>('pokemonTcgPocket');
-    assert(service instanceof PokemonTcgPocketService);
-    const userId = getContextVariable<bigint>('userId');
-    assert(typeof userId === 'bigint');
+  async (
+    {
+      cardName,
+      setKey,
+      booster,
+      cardNumber,
+      cardId,
+      rarity,
+      ownershipFilter,
+    }: PokemonCardSearchInput,
+    config: LangGraphRunnableConfig,
+  ): Promise<string> => {
+    const context = getToolContext(config);
+    const userId = context.userId;
+    const service = context.pokemonTcgPocketService;
 
     // Convert rarity symbol to enum if provided
     const rarityEnum = rarity ? RARITY_MAP[rarity] : undefined;
@@ -106,7 +108,7 @@ export const pokemonCardSearchTool = tool(
     return csv;
   },
   {
-    name: 'pokemonCardSearch',
+    name: POKEMON_CARD_SEARCH_TOOL_NAME,
     description:
       'Search for and get detailed lists of Pokémon TCG Pocket cards using various filters. Returns a CSV with full card information including ID, name, set, booster, and ownership status. Can search through all existing cards, through the collection of the user that last wrote a message, or through their missing cards. This is the tool to use when you need actual card names and details, not just statistics (use pokemonCardStats for numerical summaries).',
     schema,

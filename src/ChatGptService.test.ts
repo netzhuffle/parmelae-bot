@@ -26,7 +26,7 @@ test('generate message', async () => {
       embeddings: undefined as unknown as OpenAIEmbeddings,
     }),
   );
-  const prompt = ChatPromptTemplate.fromPromptMessages([
+  const prompt = ChatPromptTemplate.fromMessages([
     SystemMessagePromptTemplate.fromTemplate('System Message'),
     AIMessagePromptTemplate.fromTemplate('Assistant Message'),
     UserMessagePromptTemplate.fromNameAndTemplate('Username', '{text}'),

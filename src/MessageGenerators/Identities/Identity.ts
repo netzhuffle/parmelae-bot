@@ -1,4 +1,4 @@
-import { BasePromptTemplate } from '@langchain/core/prompts';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { BaseMessage } from '@langchain/core/messages';
 
 /** A bot identity, used to generate replies. */
@@ -7,7 +7,7 @@ export interface Identity {
   readonly name: string;
 
   /** The GPT prompt. */
-  readonly prompt: BasePromptTemplate;
+  readonly prompt: ChatPromptTemplate;
 
   /** List of example messages to choose one. */
   readonly exampleConversations: BaseMessage[][];

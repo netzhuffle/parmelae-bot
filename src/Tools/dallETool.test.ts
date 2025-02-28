@@ -6,29 +6,23 @@ import { ChatGptService } from '../ChatGptService.js';
 import { GptModelsProvider } from '../GptModelsProvider.js';
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
 import { AIMessage } from '@langchain/core/messages';
-import { getContextVariable } from '@langchain/core/context';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { ChatOpenAI } from '@langchain/openai';
-
+import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 const TEST_CHAT_ID = '123456789';
-
-jest.mock('@langchain/core/context', () => ({
-  getContextVariable: jest.fn(),
-}));
 
 describe('dallETool', () => {
   let telegramFake: TelegramServiceFake;
   let dallEServiceFake: DallEServiceFake;
-  let chatOpenAiFake: ChatOpenAiFake;
-  let dallEPromptGenerator: DallEPromptGenerator;
+  let config: { configurable: ToolContext };
 
   beforeEach(() => {
     telegramFake = new TelegramServiceFake();
     dallEServiceFake = new DallEServiceFake();
-    chatOpenAiFake = new ChatOpenAiFake(
+    const chatOpenAiFake = new ChatOpenAiFake(
       new AIMessage('A professional photo of a hamster, ultra HD quality'),
     );
-    dallEPromptGenerator = new DallEPromptGenerator(
+    const dallEPromptGenerator = new DallEPromptGenerator(
       new ChatGptService(
         new GptModelsProvider({
           cheap: chatOpenAiFake as unknown as ChatOpenAI,
@@ -39,26 +33,23 @@ describe('dallETool', () => {
         }),
       ),
     );
-
-    (getContextVariable as jest.Mock).mockImplementation((key: string) => {
-      if (key === 'telegram') return telegramFake;
-      if (key === 'chatId') return BigInt(TEST_CHAT_ID);
-      if (key === 'dallE') return dallEServiceFake;
-      if (key === 'dallEPromptGenerator') return dallEPromptGenerator;
-      return undefined;
+    config = createTestToolConfig({
+      chatId: BigInt(TEST_CHAT_ID),
+      dallEPromptGenerator,
+      dallEService: dallEServiceFake,
+      telegramService: telegramFake,
     });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
   });
 
   it('should successfully generate and send an image', async () => {
     dallEServiceFake.result = { url: 'https://example.com/image.jpg' };
 
-    const result = (await dallETool.invoke({
-      prompt: 'Foto eines Hamsters',
-    })) as string;
+    const result = (await dallETool.invoke(
+      {
+        prompt: 'Foto eines Hamsters',
+      },
+      config,
+    )) as string;
 
     expect(result).toBe(
       'Successfully sent the image to the Telegram chat: A professional photo of a hamster, ultra HD quality',
@@ -77,9 +68,12 @@ describe('dallETool', () => {
   it('should handle failed image generation', async () => {
     dallEServiceFake.result = { url: null };
 
-    const result = (await dallETool.invoke({
-      prompt: 'Foto eines Hamsters',
-    })) as string;
+    const result = (await dallETool.invoke(
+      {
+        prompt: 'Foto eines Hamsters',
+      },
+      config,
+    )) as string;
 
     expect(result).toBe(
       'You could not send the image due to technical difficulties.',

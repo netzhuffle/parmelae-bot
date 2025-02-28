@@ -1,14 +1,14 @@
 import { tool } from '@langchain/core/tools';
-import { getContextVariable } from '@langchain/core/context';
 import { z } from 'zod';
 import {
-  PokemonTcgPocketService,
   RARITY_MAP,
   SET_KEY_VALUES,
   SET_KEY_NAMES,
   BOOSTER_VALUES,
 } from '../PokemonTcgPocketService.js';
 import assert from 'assert';
+import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import { getToolContext } from '../ChatGptAgentService.js';
 
 /** Card ID regex pattern */
 const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
@@ -58,21 +58,22 @@ const schema = z.object({
 type PokemonCardAddInput = z.infer<typeof schema>;
 
 export const pokemonCardAddTool = tool(
-  async ({
-    cardName,
-    setKey,
-    booster,
-    cardNumber,
-    cardId,
-    rarity,
-    remove,
-    bulkOperation,
-  }: PokemonCardAddInput): Promise<string> => {
-    const service =
-      getContextVariable<PokemonTcgPocketService>('pokemonTcgPocket');
-    assert(service instanceof PokemonTcgPocketService);
-    const userId = getContextVariable<bigint>('userId');
-    assert(typeof userId === 'bigint');
+  async (
+    {
+      cardName,
+      setKey,
+      booster,
+      cardNumber,
+      cardId,
+      rarity,
+      remove,
+      bulkOperation,
+    }: PokemonCardAddInput,
+    config: LangGraphRunnableConfig,
+  ): Promise<string> => {
+    const context = getToolContext(config);
+    const userId = context.userId;
+    const service = context.pokemonTcgPocketService;
 
     // Convert rarity symbol to enum if provided
     const rarityEnum = rarity ? RARITY_MAP[rarity] : undefined;

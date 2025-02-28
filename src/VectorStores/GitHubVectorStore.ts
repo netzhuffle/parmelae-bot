@@ -1,5 +1,7 @@
-import { VectorStoreInterface } from '@langchain/core/vectorstores';
-import { SingleVectorStoreInterface } from '../VectorStoreInterface.js';
+import {
+  VectorStoreInterface,
+  VectorStoreRetriever,
+} from '@langchain/core/vectorstores';
 import { GithubRepoLoader } from '@langchain/community/document_loaders/web/github';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { HNSWLib } from '@langchain/community/vectorstores/hnswlib';
@@ -9,7 +11,7 @@ import { Config } from '../Config.js';
 
 /** GitHub vector store. */
 @injectable()
-export class GitHubVectorStore implements SingleVectorStoreInterface {
+export class GitHubVectorStore {
   private vectorStore: VectorStoreInterface | undefined;
 
   constructor(
@@ -26,7 +28,7 @@ export class GitHubVectorStore implements SingleVectorStoreInterface {
     );
     const docs = await loader.load();
     const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 2000,
+      chunkSize: 1000,
       chunkOverlap: 200,
     });
     const splitDocs = await splitter.splitDocuments(docs);
@@ -36,7 +38,7 @@ export class GitHubVectorStore implements SingleVectorStoreInterface {
     );
   }
 
-  async get(): Promise<VectorStoreInterface> {
+  async getRetriever(): Promise<VectorStoreRetriever> {
     if (!this.vectorStore) {
       await this.prepare();
       if (!this.vectorStore) {
@@ -44,7 +46,7 @@ export class GitHubVectorStore implements SingleVectorStoreInterface {
       }
     }
 
-    return this.vectorStore;
+    return this.vectorStore.asRetriever();
   }
 }
 

@@ -1,18 +1,20 @@
-import assert from 'assert';
-import { LLMChain } from 'langchain/chains';
+import assert from 'node:assert/strict';
 import {
   AIMessagePromptTemplate,
-  BasePromptTemplate,
+  BaseChatPromptTemplate,
   BaseStringPromptTemplate,
   HumanMessagePromptTemplate,
   PromptTemplate,
 } from '@langchain/core/prompts';
 import {
   AIMessage,
+  AIMessageFields,
   BaseMessage,
-  FunctionMessage,
   HumanMessage,
   MessageContent,
+  MessageContentComplex,
+  MessageContentText,
+  ToolMessage,
 } from '@langchain/core/messages';
 import { ChainValues, InputValues } from '@langchain/core/utils/types';
 import { injectable } from 'inversify';
@@ -21,7 +23,8 @@ import {
   ChatGptMessage,
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage.js';
-import { ChatCompletionMessage } from 'openai/resources/index.js';
+
+type ToolCalls = NonNullable<AIMessageFields['tool_calls']>;
 
 /** Human message template with username. */
 export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
@@ -52,68 +55,78 @@ export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
   }
 }
 
-/** Human message template with username. */
-export class AIFunctionCallMessagePromptTemplate extends AIMessagePromptTemplate<
-  InputValues<string>
-> {
-  async format(values: InputValues<string>): Promise<BaseMessage> {
-    if (!this.functionCall) {
-      return super.format(values);
-    }
-
-    const message = await super.format(values);
-    assert(message instanceof AIMessage);
-    message.additional_kwargs.function_call = this.functionCall;
-    return message;
-  }
-
-  constructor(
-    prompt: BaseStringPromptTemplate<
-      InputValues<Extract<keyof InputValues<string>, string>>
-    >,
-    private readonly functionCall: ChatCompletionMessage.FunctionCall,
-  ) {
-    super(prompt);
-  }
-
-  static fromCallAndTemplate(
-    functionCall: ChatCompletionMessage.FunctionCall,
-    template: string,
-  ) {
-    return new this(PromptTemplate.fromTemplate(template), functionCall);
-  }
-}
-
-/** Function result message template. */
-export class FunctionMessagePromptTemplate extends HumanMessagePromptTemplate<
+/** AI message template with tool call(s). */
+export class AIToolCallsMessagePromptTemplate extends AIMessagePromptTemplate<
   InputValues<string>
 > {
   async format(values: InputValues<string>): Promise<BaseMessage> {
     assert(this.prompt instanceof BaseStringPromptTemplate);
-    return new FunctionMessage(
-      {
-        content: await this.prompt.format(values),
-        name: this.functionName,
-      },
-      '',
-    );
-  }
+    assert(this.toolCalls);
+    assert(this.toolCalls.every((toolCall) => typeof toolCall.id === 'string'));
 
-  static fromTemplate(template: string) {
-    return new this(PromptTemplate.fromTemplate(template));
+    return new AIMessage({
+      content: await this.prompt.format(values),
+      tool_calls: this.toolCalls,
+      additional_kwargs: {
+        tool_calls: this.toolCalls.map((toolCall) => ({
+          id: toolCall.id!,
+          type: 'function',
+          function: {
+            name: toolCall.name,
+            arguments: JSON.stringify(toolCall.args),
+          },
+        })),
+      },
+    });
   }
 
   constructor(
     prompt: BaseStringPromptTemplate<
       InputValues<Extract<keyof InputValues<string>, string>>
     >,
-    private readonly functionName?: string,
+    private readonly toolCalls: ToolCalls,
   ) {
     super(prompt);
   }
 
-  static fromNameAndTemplate(functionName: string, template: string) {
-    return new this(PromptTemplate.fromTemplate(template), functionName);
+  /** Use fromCallsAndTemplate instead. */
+  static fromTemplate(template: string) {
+    return new this(PromptTemplate.fromTemplate(template), []);
+  }
+
+  static fromTemplateAndCalls(template: string, toolCalls: ToolCalls) {
+    return new this(PromptTemplate.fromTemplate(template), toolCalls);
+  }
+}
+
+/** Tool result message template. */
+export class ToolMessagePromptTemplate extends HumanMessagePromptTemplate<
+  InputValues<string>
+> {
+  async format(values: InputValues<string>): Promise<BaseMessage> {
+    assert(this.prompt instanceof BaseStringPromptTemplate);
+    return new ToolMessage({
+      content: await this.prompt.format(values),
+      tool_call_id: this.toolCallId,
+    });
+  }
+
+  constructor(
+    prompt: BaseStringPromptTemplate<
+      InputValues<Extract<keyof InputValues<string>, string>>
+    >,
+    private readonly toolCallId: string,
+  ) {
+    super(prompt);
+  }
+
+  /** Use fromCallIdAndTemplate instead. */
+  static fromTemplate(template: string) {
+    return new this(PromptTemplate.fromTemplate(template), '');
+  }
+
+  static fromCallIdAndTemplate(toolCallId: string, template: string) {
+    return new this(PromptTemplate.fromTemplate(template), toolCallId);
   }
 }
 
@@ -129,19 +142,16 @@ export class ChatGptService {
    * Generates and returns a message using a prompt and model.
    */
   async generate(
-    prompt: BasePromptTemplate,
+    prompt: BaseChatPromptTemplate,
     model: GptModel,
     promptValues: ChainValues,
   ): Promise<ChatGptMessage> {
-    const chain = new LLMChain({
-      prompt,
-      llm: this.models.getModel(model),
-    });
-    const response = await chain.call(promptValues);
-    assert(typeof response.text === 'string');
+    const chain = prompt.pipe(this.models.getModel(model));
+    const response = await chain.invoke(promptValues);
+    const textContent = this.getTextContent(response.content);
     return {
       role: ChatGptRoles.Assistant,
-      content: response.text,
+      content: textContent.text,
     };
   }
 
@@ -154,5 +164,26 @@ export class ChatGptService {
       name,
       content,
     });
+  }
+
+  private getTextContent(content: MessageContent): MessageContentText {
+    if (typeof content === 'string') {
+      return {
+        type: 'text',
+        text: content,
+      };
+    }
+    for (const item of content) {
+      if (this.isTextContent(item)) {
+        return item;
+      }
+    }
+    throw new Error('No text content found in response');
+  }
+
+  private isTextContent(
+    content: MessageContentComplex,
+  ): content is MessageContentText {
+    return content.type === 'text';
   }
 }

@@ -15,10 +15,13 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    rules: {
+      "@typescript-eslint/no-deprecated": "warn"
+    }
   },
   {
     files: ['**/*Fake.ts'],
-    "rules": {
+    rules: {
       "@typescript-eslint/no-unused-vars": [
         "error",
         {

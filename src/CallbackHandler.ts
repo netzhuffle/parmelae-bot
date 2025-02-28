@@ -1,62 +1,41 @@
 import { BaseCallbackHandler } from '@langchain/core/callbacks/base';
 import { TelegramService } from './TelegramService.js';
-import { AgentAction } from '@langchain/core/agents';
-import { ChainValues } from '@langchain/core/utils/types';
 import { IntermediateAnswerTool } from './Tools/IntermediateAnswerTool.js';
-import { assert } from 'console';
 import { ErrorService } from './ErrorService.js';
+import { Serialized } from '@langchain/core/load/serializable';
 
 /** Handles LangChain callbacks. */
 export class CallbackHandler extends BaseCallbackHandler {
   name = 'CallbackHandler';
-  readonly fullTextPromise: Promise<string>;
-  private resolveFullText: (value: string) => void;
 
   constructor(
     private readonly telegram: TelegramService,
     private readonly chatId: bigint,
   ) {
     super();
-    this.resolveFullText = () => {
-      // Overridden below.
-    };
-    this.fullTextPromise = new Promise((resolve) => {
-      this.resolveFullText = resolve;
-    });
   }
 
-  async handleAgentAction(action: AgentAction): Promise<void> {
-    if (action.tool === IntermediateAnswerTool.toolName) {
+  async handleToolStart(
+    tool: Serialized,
+    input: string,
+    _runId: string,
+    _parentRunId?: string,
+    _tags?: string[],
+    _metadata?: Record<string, unknown>,
+    runName?: string,
+  ): Promise<void> {
+    const toolName = runName ?? tool.id[2];
+
+    if (toolName === IntermediateAnswerTool.name) {
       return;
     }
 
-    let input = action.toolInput as string | { input: string } | object;
-    if (typeof input === 'object') {
-      const properties = Object.keys(input);
-      if (
-        properties.length === 1 &&
-        'input' in input &&
-        typeof input.input === 'string'
-      ) {
-        input = input.input;
-      } else {
-        input = JSON.stringify(input);
-      }
-    }
-
     return this.telegram
-      .sendWithoutStoring(`[${action.tool}: ${input}]`, this.chatId)
+      .sendWithoutStoring(`[${toolName}: ${input}]`, this.chatId)
       .then();
   }
 
-  handleChainEnd(outputs: ChainValues): void {
-    if (outputs.text) {
-      assert(typeof outputs.text === 'string');
-      this.resolveFullText(outputs.text as string);
-    }
-  }
-
-  handleToolError(err: unknown): void {
+  handleLLMError(err: undefined): void {
     ErrorService.log(err);
   }
 
@@ -64,7 +43,11 @@ export class CallbackHandler extends BaseCallbackHandler {
     ErrorService.log(err);
   }
 
-  handleLLMError(err: undefined): void {
+  handleToolError(err: unknown): void {
+    ErrorService.log(err);
+  }
+
+  handleRetrieverError(err: unknown): void {
     ErrorService.log(err);
   }
 }

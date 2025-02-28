@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 import {
-  AIFunctionCallMessagePromptTemplate,
+  AIToolCallsMessagePromptTemplate,
   ChatGptService,
-  FunctionMessagePromptTemplate,
+  ToolMessagePromptTemplate,
   UserMessagePromptTemplate,
 } from '../../ChatGptService.js';
 import {
@@ -52,16 +52,22 @@ Datum/Zeit: ${dateTime} Europe/Zurich`,
     'Nurtak',
     'Wer soll laut Verfassung seine Schutz-, Nutz- und Wohlfahrtsfunktionen erfüllen können?',
   ),
-  AIFunctionCallMessagePromptTemplate.fromCallAndTemplate(
-    {
-      name: 'swiss-constitution-qa',
-      arguments:
-        '{"input": "Wer soll seine Schutz-, Nutz- und Wohlfahrtsfunktionen erfüllen können?"}',
-    },
+  AIToolCallsMessagePromptTemplate.fromTemplateAndCalls(
     'Das muss ich in der Verfassung nachschlagen, um nichts falsches zu erzählen.',
+    [
+      {
+        name: 'swiss-constitution-qa',
+        args: {
+          input:
+            'Wer soll seine Schutz-, Nutz- und Wohlfahrtsfunktionen erfüllen können?',
+        },
+        id: 'call_123abc',
+        type: 'tool_call',
+      },
+    ],
   ),
-  FunctionMessagePromptTemplate.fromNameAndTemplate(
-    'swiss-constitution-qa',
+  ToolMessagePromptTemplate.fromCallIdAndTemplate(
+    'call_123abc',
     'In Art. 77 Wald Abs. 1 steht: "Der Bund sorgt dafür, dass der Wald seine Schutz-, Nutz- und Wohlfahrtsfunktionen erfüllen kann."',
   ),
   AIMessagePromptTemplate.fromTemplate(
@@ -71,27 +77,32 @@ Datum/Zeit: ${dateTime} Europe/Zurich`,
     'bugybunny',
     'Bitte machen Sie ein Foto der Golden Gate Bridge',
   ),
-  AIFunctionCallMessagePromptTemplate.fromCallAndTemplate(
-    {
-      name: 'intermediate-answer',
-      arguments:
-        '{"input": "Mit grossem Vergnügen. Ich reise sofort mit dem Bundesratsjet und meiner Foto-Ausrüstung nach San Franscisco."}',
-    },
+  AIToolCallsMessagePromptTemplate.fromTemplateAndCalls(
     'Ich soll ein Foto machen. Das Foto-Tool ist aber langsam, ich sollte also zuerst eine Zwischenantwort geben. Danach mache ich das Foto.',
+    [
+      {
+        name: 'intermediate-answer',
+        args: {
+          input:
+            'Mit grossem Vergnügen. Ich reise sofort mit dem Bundesratsjet und meiner Foto-Ausrüstung nach San Franscisco.',
+        },
+        id: 'call_234bcd',
+        type: 'tool_call',
+      },
+      {
+        name: 'dall-e',
+        args: { input: 'Foto der Golden Gate Bridge' },
+        id: 'call_345cde',
+        type: 'tool_call',
+      },
+    ],
   ),
-  FunctionMessagePromptTemplate.fromNameAndTemplate(
-    'intermediate-answer',
+  ToolMessagePromptTemplate.fromCallIdAndTemplate(
+    'call_234bcd',
     'Successfully sent the text to the telegram chat',
   ),
-  AIFunctionCallMessagePromptTemplate.fromCallAndTemplate(
-    {
-      name: 'dall-e',
-      arguments: '{"input": "Foto der Golden Gate Bridge"}',
-    },
-    'Da ich den Nutzer informiert habe, dass das Foto-Machen ein wenig dauern kann, kann ich jetzt das Foto machen und senden.',
-  ),
-  FunctionMessagePromptTemplate.fromNameAndTemplate(
-    'dall-e',
+  ToolMessagePromptTemplate.fromCallIdAndTemplate(
+    'call_345cde',
     'Successfully sent the image to the Telegram chat: Photo of Golden Gate Bridge in high dynamic range, artistic perspective, taken at sunrise with 24mm lens, shot from unique angle to highlight bridge architecture, with cityscape in the background, ideal for framed prints or high-end publications.',
   ),
   AIMessagePromptTemplate.fromTemplate(
@@ -106,7 +117,6 @@ Datum/Zeit: ${dateTime} Europe/Zurich`,
     'Es folgt nun die eigentliche Konversation:',
   ),
   new MessagesPlaceholder('conversation'),
-  new MessagesPlaceholder('agent_scratchpad'),
 ]);
 
 /** Example conversations for using randomly in prompts. */

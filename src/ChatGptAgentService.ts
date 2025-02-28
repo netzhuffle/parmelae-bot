@@ -1,9 +1,9 @@
-import assert from 'assert';
-import { AgentExecutor } from 'langchain/agents';
-import { BasePromptTemplate } from '@langchain/core/prompts';
-import { BaseMessage } from '@langchain/core/messages';
-import { Calculator } from '@langchain/community/tools/calculator';
+import assert from 'node:assert/strict';
 import { injectable } from 'inversify';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { AIMessage, BaseMessage } from '@langchain/core/messages';
+import { Calculator } from '@langchain/community/tools/calculator';
+import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
@@ -25,21 +25,72 @@ import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFac
 import { CallbackHandlerFactory } from './CallbackHandlerFactory.js';
 import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
 import { ErrorService } from './ErrorService.js';
-import { ChatGptAgent } from './ChatGptAgent.js';
 import { Conversation } from './Conversation.js';
 import { IdentityQueryToolFactory } from './Tools/IdentityQueryToolFactory.js';
 import { IdentitySetterToolFactory } from './Tools/IdentitySetterToolFactory.js';
 import { diceTool } from './Tools/diceTool.js';
-import { setContextVariable } from '@langchain/core/context';
-import { TelegramService } from './TelegramService.js';
 import { dallETool } from './Tools/dallETool.js';
-import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
-import { DallEService } from './DallEService.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
 import { pokemonCardSearchTool } from './Tools/pokemonCardSearchTool.js';
-import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 import { pokemonCardAddTool } from './Tools/pokemonCardAddTool.js';
 import { pokemonCardStatsTool } from './Tools/pokemonCardStatsTool.js';
+import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
+import { TelegramService } from './TelegramService.js';
+import { DallEService } from './DallEService.js';
+import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
+
+/** The context for the tools. */
+export interface ToolContext {
+  chatId: bigint;
+  userId: bigint;
+  telegramService: TelegramService;
+  dallEService: DallEService;
+  dallEPromptGenerator: DallEPromptGenerator;
+  pokemonTcgPocketService: PokemonTcgPocketService;
+}
+
+function assertIsToolContext(value: unknown): asserts value is ToolContext {
+  assert(typeof value === 'object');
+  assert(value !== null);
+  assert('chatId' in value);
+  assert('userId' in value);
+  assert('telegramService' in value);
+  assert('dallEService' in value);
+  assert('dallEPromptGenerator' in value);
+  assert('pokemonTcgPocketService' in value);
+}
+
+/**
+ * Gets the tool context from the config.
+ * @param config - The LangGraph Runnable config to get the tool context from.
+ * @returns The tool context.
+ */
+export function getToolContext(config: LangGraphRunnableConfig): ToolContext {
+  assertIsToolContext(config.configurable);
+  return config.configurable;
+}
+
+/**
+ * TESTS ONLY – Creates a test tool config, defaults all context to undefined.
+ * @param context - The context to create the tool context from.
+ * @returns The tool context.
+ */
+export function createTestToolConfig(context: Partial<ToolContext>): {
+  configurable: ToolContext;
+} {
+  return {
+    configurable: {
+      chatId: undefined as unknown as bigint,
+      userId: undefined as unknown as bigint,
+      telegramService: undefined as unknown as TelegramService,
+      dallEService: undefined as unknown as DallEService,
+      dallEPromptGenerator: undefined as unknown as DallEPromptGenerator,
+      pokemonTcgPocketService: undefined as unknown as PokemonTcgPocketService,
+      ...context,
+    },
+  };
+}
 
 /** ChatGPT Agent Service */
 @injectable()
@@ -57,15 +108,15 @@ export class ChatGptAgentService {
   constructor(
     private readonly models: GptModelsProvider,
     private readonly config: Config,
+    private readonly telegramService: TelegramService,
+    private readonly dallEService: DallEService,
+    private readonly dallEPromptGenerator: DallEPromptGenerator,
     private readonly callbackHandlerFactory: CallbackHandlerFactory,
+    private readonly pokemonTcgPocketService: PokemonTcgPocketService,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
     private readonly identityQueryToolFactory: IdentityQueryToolFactory,
     private readonly identitySetterToolFactory: IdentitySetterToolFactory,
-    telegram: TelegramService,
-    dallEPromptGenerator: DallEPromptGenerator,
-    dallEService: DallEService,
-    pokemonTcgPocketService: PokemonTcgPocketService,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     gptModelQueryTool: GptModelQueryTool,
@@ -76,10 +127,6 @@ export class ChatGptAgentService {
     minecraftBackupTool: MinecraftBackupTool,
     webBrowserToolFactory: WebBrowserToolFactory,
   ) {
-    setContextVariable('telegram', telegram);
-    setContextVariable('dallEPromptGenerator', dallEPromptGenerator);
-    setContextVariable('dallE', dallEService);
-    setContextVariable('pokemonTcgPocket', pokemonTcgPocketService);
     this.tools = [
       ...this.tools,
       googleSearchToolFactory.create(),
@@ -103,32 +150,22 @@ export class ChatGptAgentService {
   /**
    * Generates and returns a message using an agent executor and tools.
    *
-   * @param basePrompt - Prompt Template with the following placeholders: {tools}, {tool_names}, MessagesPlaceholder('example'), MessagesPlaceholder('conversation'), MessagesPlaceholder('agent_scratchpad')
+   * @param basePrompt - Prompt Template with the following MessagesPlaceholders: example, conversation
    */
   async generate(
     message: Message,
-    basePrompt: BasePromptTemplate,
+    prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,
     retries = 0,
   ): Promise<ChatGptMessage> {
-    const executor = this.createAgentExecutor(message, basePrompt);
-
     try {
-      const response = await executor.invoke({
-        example,
-        conversation: conversation.messages,
-      });
-      assert(typeof response.output === 'string');
-      return {
-        role: ChatGptRoles.Assistant,
-        content: response.output,
-      };
+      return this.getReply(message, prompt, example, conversation);
     } catch (error) {
       if (retries < 2) {
         return this.generate(
           message,
-          basePrompt,
+          prompt,
           example,
           conversation,
           retries + 1,
@@ -143,32 +180,49 @@ export class ChatGptAgentService {
     }
   }
 
-  private createAgentExecutor(
+  private async getReply(
     message: Message,
-    basePrompt: BasePromptTemplate,
-  ): AgentExecutor {
-    const chatId = message.chatId;
-    setContextVariable('chatId', chatId);
-    setContextVariable('userId', message.fromId);
-    const tools = [
-      ...this.tools,
-      this.identityQueryToolFactory.create(chatId),
-      this.identitySetterToolFactory.create(chatId),
-      this.scheduleMessageToolFactory.create(chatId, message.fromId),
-      this.intermediateAnswerToolFactory.create(chatId),
-    ];
-    const callbackHandler = this.callbackHandlerFactory.create(chatId);
-
-    return AgentExecutor.fromAgentAndTools({
-      tags: ['openai-functions'],
-      agent: ChatGptAgent.fromLLMAndTools(
-        this.models.getModel(this.config.gptModel),
-        tools,
-        { basePrompt },
-      ),
-      tools,
-      callbacks: [callbackHandler],
-      returnIntermediateSteps: true,
+    prompt: ChatPromptTemplate,
+    example: BaseMessage[],
+    conversation: Conversation,
+  ): Promise<ChatGptMessage> {
+    const agent = createReactAgent({
+      llm: this.models.getModel(this.config.gptModel),
+      tools: [
+        ...this.tools,
+        this.identityQueryToolFactory.create(message.chatId),
+        this.identitySetterToolFactory.create(message.chatId),
+        this.scheduleMessageToolFactory.create(message.chatId, message.fromId),
+        this.intermediateAnswerToolFactory.create(message.chatId),
+      ],
     });
+
+    const agentOutput = await agent.invoke(
+      {
+        messages: await prompt.formatMessages({
+          example,
+          conversation: conversation.messages,
+          message,
+        }),
+      },
+      {
+        configurable: {
+          chatId: message.chatId,
+          userId: message.fromId,
+          telegramService: this.telegramService,
+          dallEService: this.dallEService,
+          dallEPromptGenerator: this.dallEPromptGenerator,
+          pokemonTcgPocketService: this.pokemonTcgPocketService,
+        } satisfies ToolContext,
+        callbacks: [this.callbackHandlerFactory.create(message.chatId)],
+      },
+    );
+    const lastMessage = agentOutput.messages[agentOutput.messages.length - 1];
+    assert(lastMessage instanceof AIMessage);
+    assert(typeof lastMessage.content === 'string');
+    return {
+      role: ChatGptRoles.Assistant,
+      content: lastMessage.content,
+    };
   }
 }

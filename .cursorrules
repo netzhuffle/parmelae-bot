@@ -4,7 +4,7 @@ Technical Stack:
 - TypeScript on Node.js
 - Jest for testing (.test.ts files)
 - Prisma for database operations
-- LangChain for AI/LLM integrations
+- LangChain with LangGraph for AI/LLM integrations
 - Telegraf for Telegram bot functionality
 - Inversify for dependency injection (IoC)
 
@@ -41,7 +41,7 @@ Key Practices:
    - If you needed to fix anything, make sure to rerun all commands from the beginning again to make sure no issue is left undetected, do not skip any steps
 
 2. Error Handling:
-   - Create specific Error classes instead of using base Error
+   - Use specific, descriptive Error types, provide context in error messages
    - Use strict assertions (node:assert/strict) for programmer errors
    - Assertions only for conditions that shouldn't occur in normal flow
    - Throw specific errors for technical issues that can happen in normal flow
@@ -57,9 +57,11 @@ Key Practices:
    - Prioritize code readability
    - Review and improve file readability after changes
    - Follow TypeScript best practices
-   - Use strong typing, avoid any
-   - Prefer immutability where possible without sacrificing readability
+   - Write self-documenting, intention-revealing code
+   - Use precise, descriptive types, avoid any
+   - Prefer immutability where possible without sacrificing readability, use readonly for unchanging data and as const for literal values
    - Prefer composition over inheritance
+   - Minimize function complexity, prefer early returns, extract complex logic to utility functions
    - Use clear variable names, avoid abbreviations in variable names
    - Document public methods and exported classes with JSDoc
      - Keep documentation concise

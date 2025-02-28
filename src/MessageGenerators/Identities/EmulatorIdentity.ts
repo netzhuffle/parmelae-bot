@@ -221,7 +221,6 @@ WICHTIG:
 - SEI KREATIV. Mach daraus eine grossartige, unterhaltsame Erfahrung.`,
   ),
   new MessagesPlaceholder('conversation'),
-  new MessagesPlaceholder('agent_scratchpad'),
 ]);
 
 /** A game emulator. */

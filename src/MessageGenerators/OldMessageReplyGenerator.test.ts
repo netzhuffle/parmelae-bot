@@ -24,5 +24,6 @@ test('generate', async () => {
 
   expect(response).toBe('Reply');
   expect(chatOpenAiFake.request).toHaveLength(16);
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   expect(chatOpenAiFake.request?.[15].text).toBe('old message');
 });

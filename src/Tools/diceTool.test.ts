@@ -1,6 +1,6 @@
 import { diceTool } from './diceTool.js';
 import { TelegramServiceFake } from '../Fakes/TelegramServiceFake.js';
-import { getContextVariable } from '@langchain/core/context';
+import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 
 const TEST_CHAT_ID = '123456789';
 const BASE_TELEGRAM_REQUEST = {
@@ -8,24 +8,16 @@ const BASE_TELEGRAM_REQUEST = {
   chatId: TEST_CHAT_ID,
 };
 
-jest.mock('@langchain/core/context', () => ({
-  getContextVariable: jest.fn(),
-}));
-
 describe('diceTool', () => {
   let telegramFake: TelegramServiceFake;
+  let config: { configurable: ToolContext };
 
   beforeEach(() => {
     telegramFake = new TelegramServiceFake();
-    (getContextVariable as jest.Mock).mockImplementation((key: string) => {
-      if (key === 'telegram') return telegramFake;
-      if (key === 'chatId') return BigInt(TEST_CHAT_ID);
-      return undefined;
+    config = createTestToolConfig({
+      chatId: BigInt(TEST_CHAT_ID),
+      telegramService: telegramFake,
     });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
   });
 
   describe('die (🎲)', () => {
@@ -33,14 +25,17 @@ describe('diceTool', () => {
       'should handle die value %i correctly',
       async (value) => {
         telegramFake.result = { method: 'sendDice', value };
-        const result = (await diceTool.invoke({ type: '🎲' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎲' },
+          config,
+        )) as string;
         expect(result).toBe(`Your six sided die rolled a ${value}.`);
       },
     );
 
     it('should send correct emoji to Telegram', async () => {
       telegramFake.result = { method: 'sendDice', value: 1 };
-      await diceTool.invoke({ type: '🎲' });
+      await diceTool.invoke({ type: '🎲' }, config);
       expect(telegramFake.request).toEqual({
         ...BASE_TELEGRAM_REQUEST,
         emoji: '🎲',
@@ -52,7 +47,10 @@ describe('diceTool', () => {
     describe('darts (🎯)', () => {
       it('returns score 2/5 for value 3', async () => {
         telegramFake.result = { method: 'sendDice', value: 3 };
-        const result = (await diceTool.invoke({ type: '🎯' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎯' },
+          config,
+        )) as string;
         expect(telegramFake.request).toEqual({
           ...BASE_TELEGRAM_REQUEST,
           emoji: '🎯',
@@ -62,7 +60,10 @@ describe('diceTool', () => {
 
       it('shows "Missed!" when scoring 0/5', async () => {
         telegramFake.result = { method: 'sendDice', value: 1 };
-        const result = (await diceTool.invoke({ type: '🎯' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎯' },
+          config,
+        )) as string;
         expect(result).toBe(
           'Game 🎯: You scored 0 out of max. 5 points. Missed!',
         );
@@ -70,7 +71,10 @@ describe('diceTool', () => {
 
       it('shows "Bullseye!" when scoring 5/5', async () => {
         telegramFake.result = { method: 'sendDice', value: 6 };
-        const result = (await diceTool.invoke({ type: '🎯' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎯' },
+          config,
+        )) as string;
         expect(result).toBe(
           'Game 🎯: You scored 5 out of max. 5 points. Bullseye!',
         );
@@ -93,14 +97,17 @@ describe('diceTool', () => {
         'should return correct message for value $value',
         async ({ value, expected }) => {
           telegramFake.result = { method: 'sendDice', value };
-          const result = (await diceTool.invoke({ type: '🏀' })) as string;
+          const result = (await diceTool.invoke(
+            { type: '🏀' },
+            config,
+          )) as string;
           expect(result).toBe(expected);
         },
       );
 
       it('should send correct emoji to Telegram', async () => {
         telegramFake.result = { method: 'sendDice', value: 1 };
-        await diceTool.invoke({ type: '🏀' });
+        await diceTool.invoke({ type: '🏀' }, config);
         expect(telegramFake.request).toEqual({
           ...BASE_TELEGRAM_REQUEST,
           emoji: '🏀',
@@ -127,14 +134,17 @@ describe('diceTool', () => {
         'should return correct message for value $value',
         async ({ value, expected }) => {
           telegramFake.result = { method: 'sendDice', value };
-          const result = (await diceTool.invoke({ type: '⚽' })) as string;
+          const result = (await diceTool.invoke(
+            { type: '⚽' },
+            config,
+          )) as string;
           expect(result).toBe(expected);
         },
       );
 
       it('should send correct emoji to Telegram', async () => {
         telegramFake.result = { method: 'sendDice', value: 1 };
-        await diceTool.invoke({ type: '⚽' });
+        await diceTool.invoke({ type: '⚽' }, config);
         expect(telegramFake.request).toEqual({
           ...BASE_TELEGRAM_REQUEST,
           emoji: '⚽',
@@ -146,7 +156,10 @@ describe('diceTool', () => {
       it('should return the correct result for a bowling game', async () => {
         telegramFake.result = { method: 'sendDice', value: 2 };
 
-        const result = (await diceTool.invoke({ type: '🎳' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎳' },
+          config,
+        )) as string;
 
         expect(telegramFake.request).toEqual({
           ...BASE_TELEGRAM_REQUEST,
@@ -157,13 +170,19 @@ describe('diceTool', () => {
 
       it('should handle a miss', async () => {
         telegramFake.result = { method: 'sendDice', value: 1 };
-        const result = (await diceTool.invoke({ type: '🎳' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎳' },
+          config,
+        )) as string;
         expect(result).toBe('Game 🎳: You knocked down 0 of the 6 pins.');
       });
 
       it('should handle a strike', async () => {
         telegramFake.result = { method: 'sendDice', value: 6 };
-        const result = (await diceTool.invoke({ type: '🎳' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎳' },
+          config,
+        )) as string;
         expect(result).toBe(
           'Game 🎳: You knocked down 6 of the 6 pins. Strike!',
         );
@@ -171,7 +190,10 @@ describe('diceTool', () => {
 
       it('should handle a regular hit', async () => {
         telegramFake.result = { method: 'sendDice', value: 3 };
-        const result = (await diceTool.invoke({ type: '🎳' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎳' },
+          config,
+        )) as string;
         expect(result).toBe('Game 🎳: You knocked down 3 of the 6 pins.');
       });
     });
@@ -180,7 +202,10 @@ describe('diceTool', () => {
       it('should return the correct result for a slot machine win', async () => {
         telegramFake.result = { method: 'sendDice', value: 64 };
 
-        const result = (await diceTool.invoke({ type: '🎰' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎰' },
+          config,
+        )) as string;
 
         expect(telegramFake.request).toEqual({
           ...BASE_TELEGRAM_REQUEST,
@@ -192,7 +217,10 @@ describe('diceTool', () => {
       it('should return the correct result for a slot machine loss', async () => {
         telegramFake.result = { method: 'sendDice', value: 32 };
 
-        const result = (await diceTool.invoke({ type: '🎰' })) as string;
+        const result = (await diceTool.invoke(
+          { type: '🎰' },
+          config,
+        )) as string;
 
         expect(telegramFake.request).toEqual({
           ...BASE_TELEGRAM_REQUEST,

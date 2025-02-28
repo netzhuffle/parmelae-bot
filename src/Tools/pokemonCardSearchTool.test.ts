@@ -2,30 +2,24 @@ import { PokemonTcgPocketService } from '../PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity } from '@prisma/client';
 import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
-import { getContextVariable } from '@langchain/core/context';
 import { jest } from '@jest/globals';
 import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
-import { AssertionError } from 'assert';
-
-jest.mock('@langchain/core/context');
+import { ToolContext } from '../ChatGptAgentService.js';
+import { createTestToolConfig } from '../ChatGptAgentService.js';
 
 describe('pokemonCardSearch', () => {
   let repository: PokemonTcgPocketRepositoryFake;
-  let service: PokemonTcgPocketService;
-
+  let config: { configurable: ToolContext };
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
-    service = new PokemonTcgPocketService(
+    const service = new PokemonTcgPocketService(
       repository as unknown as PokemonTcgPocketRepository,
       '',
     );
-    jest
-      .mocked(getContextVariable)
-      .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-        if (name === 'pokemonTcgPocket') return service as T;
-        if (name === 'userId') return BigInt(1) as T;
-        return undefined;
-      });
+    config = createTestToolConfig({
+      userId: BigInt(1),
+      pokemonTcgPocketService: service,
+    });
     jest.spyOn(repository, 'searchCards');
   });
 
@@ -41,7 +35,7 @@ describe('pokemonCardSearch', () => {
       'Glurak',
     ]);
 
-    const result = (await pokemonCardSearchTool.invoke({})) as string;
+    const result = (await pokemonCardSearchTool.invoke({}, config)) as string;
 
     expect(result).toBe(
       'ID,Name,Rarity,Set,Boosters,Owned by @test1\nA1-001,Test Card,♢,Test Set,Glurak,No',
@@ -50,16 +44,19 @@ describe('pokemonCardSearch', () => {
   });
 
   it('should handle empty results', async () => {
-    const result = (await pokemonCardSearchTool.invoke({})) as string;
+    const result = (await pokemonCardSearchTool.invoke({}, config)) as string;
 
     expect(result).toBe('No cards found matching the search criteria.');
     expect(repository.searchCards).toHaveBeenCalledWith({});
   });
 
   it('should return no cards found message when using filters', async () => {
-    const result = (await pokemonCardSearchTool.invoke({
-      cardName: 'NonexistentCard',
-    })) as string;
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        cardName: 'NonexistentCard',
+      },
+      config,
+    )) as string;
 
     expect(result).toBe('No cards found matching the search criteria.');
     expect(repository.searchCards).toHaveBeenCalledWith({
@@ -74,7 +71,7 @@ describe('pokemonCardSearch', () => {
       await repository.createCard(`Card ${i}`, 'A1', i, Rarity.ONE_DIAMOND, []);
     }
 
-    const result = (await pokemonCardSearchTool.invoke({})) as string;
+    const result = (await pokemonCardSearchTool.invoke({}, config)) as string;
 
     const lines = result.split('\n');
     // Header + 20 cards + empty line + message
@@ -95,9 +92,12 @@ describe('pokemonCardSearch', () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-    const result = (await pokemonCardSearchTool.invoke({
-      cardName: 'Card',
-    })) as string;
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        cardName: 'Card',
+      },
+      config,
+    )) as string;
 
     expect(result).toContain('Card 1');
     expect(result).toContain(',No'); // Verify ownership column
@@ -110,9 +110,12 @@ describe('pokemonCardSearch', () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-    const result = (await pokemonCardSearchTool.invoke({
-      setKey: 'A1',
-    })) as string;
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        setKey: 'A1',
+      },
+      config,
+    )) as string;
 
     expect(result).toContain('Card 1');
     expect(result).toContain('Test Set');
@@ -129,9 +132,12 @@ describe('pokemonCardSearch', () => {
       'Glurak',
     ]);
 
-    const result = (await pokemonCardSearchTool.invoke({
-      booster: 'Glurak',
-    })) as string;
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        booster: 'Glurak',
+      },
+      config,
+    )) as string;
 
     expect(result).toContain('Card 1');
     expect(result).toContain('Glurak');
@@ -145,9 +151,12 @@ describe('pokemonCardSearch', () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-    const result = (await pokemonCardSearchTool.invoke({
-      rarity: '♢',
-    })) as string;
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        rarity: '♢',
+      },
+      config,
+    )) as string;
 
     expect(result).toContain('Card 1');
     expect(result).toContain('♢');
@@ -161,9 +170,12 @@ describe('pokemonCardSearch', () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-    const result = (await pokemonCardSearchTool.invoke({
-      cardId: 'A1-001',
-    })) as string;
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        cardId: 'A1-001',
+      },
+      config,
+    )) as string;
 
     expect(result).toContain('Card 1');
     expect(result).toContain('A1-001');
@@ -176,9 +188,12 @@ describe('pokemonCardSearch', () => {
 
   it('should return error message for invalid card ID format', async () => {
     await expect(
-      pokemonCardSearchTool.invoke({
-        cardId: 'invalid',
-      }),
+      pokemonCardSearchTool.invoke(
+        {
+          cardId: 'invalid',
+        },
+        config,
+      ),
     ).rejects.toThrow();
 
     expect(repository.searchCards).not.toHaveBeenCalled();
@@ -188,7 +203,7 @@ describe('pokemonCardSearch', () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-    const result = (await pokemonCardSearchTool.invoke({})) as string;
+    const result = (await pokemonCardSearchTool.invoke({}, config)) as string;
 
     expect(result).toContain('Card 1');
     // Find the line with Card 1 and verify it doesn't contain any booster
@@ -205,7 +220,7 @@ describe('pokemonCardSearch', () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createCard('Card 1', 'A1', 1, null, []);
 
-    const result = (await pokemonCardSearchTool.invoke({})) as string;
+    const result = (await pokemonCardSearchTool.invoke({}, config)) as string;
 
     expect(result).toContain('Card 1');
     // Find the line with Card 1 and verify it has empty rarity
@@ -227,7 +242,7 @@ describe('pokemonCardSearch', () => {
     });
 
     it('should return all cards when ownership filter is not set', async () => {
-      const result = (await pokemonCardSearchTool.invoke({})) as string;
+      const result = (await pokemonCardSearchTool.invoke({}, config)) as string;
 
       expect(result).toContain('Card 1');
       expect(result).toContain('Card 2');
@@ -267,9 +282,12 @@ describe('pokemonCardSearch', () => {
       await repository.addCardToCollection(card2.id, BigInt(1));
       await repository.addCardToCollection(card3.id, BigInt(1));
 
-      const result = (await pokemonCardSearchTool.invoke({
-        ownershipFilter: 'owned',
-      })) as string;
+      const result = (await pokemonCardSearchTool.invoke(
+        {
+          ownershipFilter: 'owned',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('Card 1');
       expect(result).toContain('Card 2');
@@ -286,9 +304,12 @@ describe('pokemonCardSearch', () => {
     });
 
     it('should pass ownership filter when set to missing', async () => {
-      const result = (await pokemonCardSearchTool.invoke({
-        ownershipFilter: 'missing',
-      })) as string;
+      const result = (await pokemonCardSearchTool.invoke(
+        {
+          ownershipFilter: 'missing',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('Card 1');
       expect(result).toContain('Card 2');
@@ -305,9 +326,12 @@ describe('pokemonCardSearch', () => {
     });
 
     it('should pass ownership filter when set to all', async () => {
-      const result = (await pokemonCardSearchTool.invoke({
-        ownershipFilter: 'all',
-      })) as string;
+      const result = (await pokemonCardSearchTool.invoke(
+        {
+          ownershipFilter: 'all',
+        },
+        config,
+      )) as string;
 
       expect(result).toContain('Card 1');
       expect(result).toContain('Card 2');
@@ -322,16 +346,6 @@ describe('pokemonCardSearch', () => {
         ownershipFilter: 'all',
       });
     });
-
-    it('should throw error when userId not available', async () => {
-      jest.mocked(getContextVariable).mockReturnValue(undefined);
-
-      await expect(
-        pokemonCardSearchTool.invoke({
-          ownershipFilter: 'owned',
-        }),
-      ).rejects.toThrow(AssertionError);
-    });
   });
 
   describe('ownership display', () => {
@@ -341,29 +355,15 @@ describe('pokemonCardSearch', () => {
     });
 
     it('should show ownership by username when available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(1) as T;
-          return undefined;
-        });
-
-      const result = (await pokemonCardSearchTool.invoke({})) as string;
+      const result = (await pokemonCardSearchTool.invoke({}, config)) as string;
 
       expect(result).toContain('Owned by @test1');
     });
 
     it('should show ownership by first name when username not available', async () => {
-      jest
-        .mocked(getContextVariable)
-        .mockImplementation(<T>(name: PropertyKey): T | undefined => {
-          if (name === 'pokemonTcgPocket') return service as T;
-          if (name === 'userId') return BigInt(2) as T;
-          return undefined;
-        });
+      config.configurable.userId = BigInt(2);
 
-      const result = (await pokemonCardSearchTool.invoke({})) as string;
+      const result = (await pokemonCardSearchTool.invoke({}, config)) as string;
 
       expect(result).toContain('Owned by Test2');
     });
