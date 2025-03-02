@@ -195,7 +195,6 @@ export class PokemonTcgPocketRepository {
   /** Search for cards using various filters */
   async searchCards(filters: {
     cardName?: string;
-    setName?: string;
     setKey?: string;
     booster?: string;
     cardNumber?: number;
@@ -219,7 +218,6 @@ export class PokemonTcgPocketRepository {
           number: filters.cardNumber,
           rarity: filters.rarity,
           set: {
-            name: filters.setName,
             key: filters.setKey,
           },
           boosters: filters.booster

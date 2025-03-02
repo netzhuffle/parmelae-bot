@@ -5,10 +5,12 @@ import {
   SET_KEY_VALUES,
   SET_KEY_NAMES,
   BOOSTER_VALUES,
+  PokemonTcgPocketService,
 } from '../PokemonTcgPocketService.js';
-import assert from 'assert';
+import assert from 'node:assert/strict';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';
+import { PokemonCardWithRelations } from '../Repositories/Types.js';
 
 /** Card ID regex pattern */
 const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
@@ -16,46 +18,148 @@ const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
 const schema = z.object({
   cardName: z
     .string()
-    .optional()
-    .describe('Substring to search for in card names'),
+    .nullable()
+    .describe(
+      'Substring to search for in card names (do not pass an ID here), null to ignore this filter',
+    ),
   setKey: z
     .enum(SET_KEY_VALUES)
-    .optional()
+    .nullable()
     .describe(
-      `Set key to filter by: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}`,
+      `Set key to filter by: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}. Pass null unless the user specifically asks you to filter by a set`,
     ),
-  booster: z.enum(BOOSTER_VALUES).optional().describe('Booster to filter by'),
-  cardNumber: z
-    .number()
-    .int()
-    .optional()
-    .describe('Exact card number in set to filter by'),
+  booster: z.enum(BOOSTER_VALUES).nullable().describe('Booster to filter by'),
   cardId: z
     .string()
     .regex(CARD_ID_PATTERN)
-    .optional()
-    .describe('Card ID in format {set-key}-{three digit number}, e.g. A1-003'),
+    .nullable()
+    .describe(
+      'Card ID in format {set-key}-{three digit number}, e.g. A1-003. If the user wants to add a card by ID, you likely do want to set the other filters to null to not create conflicting information. Null to ignore this filter',
+    ),
   rarity: z
     .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
-    .optional()
+    .nullable()
     .describe(
-      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑.',
+      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑. Null to ignore this filter',
     ),
   remove: z
     .boolean()
-    .optional()
     .describe(
-      'Whether to remove the card from the collection instead of adding it (default: add card)',
+      'Whether to remove the card from the collection instead of adding it (false: add card)',
     ),
   bulkOperation: z
     .boolean()
-    .optional()
     .describe(
-      'Whether to add/remove multiple cards with one tool call. Only pass true if the user specifically requested to add/remove multiple cards with the same parameters. If not defined (or false), the call will only add one card and ask for clarification if multiple cards match the criteria.',
+      'Whether to add/remove multiple cards with the exact same parameters in one tool call. Only pass true if the user specifically requested to add/remove multiple cards with the exact same parameters. If false, the call will only add one card and ask for clarification if multiple cards match the criteria – this is usually what the user wants.',
     ),
 });
 
 type PokemonCardAddInput = z.infer<typeof schema>;
+
+interface CardIdInfo {
+  setKey: string;
+  cardNumber: number;
+}
+
+function parseCardId(cardId: string): CardIdInfo {
+  const match = CARD_ID_PATTERN.exec(cardId)!;
+  return {
+    setKey: match[1],
+    cardNumber: parseInt(match[2], 10),
+  };
+}
+
+function buildSearchParams(
+  cardName: string | null,
+  setKey: string | null,
+  booster: string | null,
+  rarity: string | null,
+  idInfo?: CardIdInfo,
+  userId?: bigint,
+  ownershipFilter?: string,
+): Record<string, unknown> {
+  const searchParams: Record<string, unknown> = {};
+
+  if (cardName) searchParams.cardName = cardName;
+  if (idInfo?.setKey ?? setKey) searchParams.setKey = idInfo?.setKey ?? setKey;
+  if (booster) searchParams.booster = booster;
+  if (idInfo?.cardNumber) searchParams.cardNumber = idInfo?.cardNumber;
+  if (rarity) searchParams.rarity = RARITY_MAP[rarity];
+  if (userId) searchParams.userId = userId;
+  if (ownershipFilter) searchParams.ownershipFilter = ownershipFilter;
+
+  return searchParams;
+}
+
+async function handleNoCardsFound(
+  service: PokemonTcgPocketService,
+  userId: bigint,
+  searchParams: Record<string, unknown>,
+  remove: boolean,
+): Promise<string> {
+  const displayName = await service.getDisplayName(userId);
+  const existingCards = await service.searchCards(searchParams);
+
+  if (existingCards.length === 0) {
+    return (
+      'No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was ' +
+      (remove ? 'removed from' : 'added to') +
+      ' the user’s collection.'
+    );
+  }
+
+  const cardDetails = await service.formatCardsAsCsv(existingCards, userId);
+  if (remove) {
+    return `No matching cards found in ${displayName}’s collection. The cards exist but ${displayName} does not own them. The following cards were found:\n${cardDetails}\nThus no card was removed from the user’s collection.`;
+  }
+  return `No matching cards found that ${displayName} is missing. The cards exist but ${displayName} already owns them. The following cards were found:\n${cardDetails}\nThus no card was added to the user’s collection.`;
+}
+
+async function processCards(
+  service: PokemonTcgPocketService,
+  userId: bigint,
+  cards: PokemonCardWithRelations[],
+  remove: boolean,
+  bulkOperation: boolean,
+): Promise<string> {
+  const displayName = await service.getDisplayName(userId);
+  const operation = remove ? 'removed' : 'added';
+  const preposition = remove ? 'from' : 'to';
+
+  if (!bulkOperation && cards.length > 1) {
+    return (
+      'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:\n' +
+      (await service.formatCardsAsCsv(cards, userId))
+    );
+  }
+
+  if (cards.length > 1 && bulkOperation) {
+    const updatedCards = await Promise.all(
+      cards.map((card) =>
+        remove
+          ? service.removeCardFromCollection(card.id, userId)
+          : service.addCardToCollection(card.id, userId),
+      ),
+    );
+
+    const header = `Successfully ${operation} ${cards.length} cards ${preposition} ${displayName}'s collection:`;
+    const csv = await service.formatCardsAsCsv(updatedCards, userId);
+    const stats = await service.getFormattedCollectionStats(userId);
+    return `${header}\n${csv}\n\nUpdated statistics of ${stats}`;
+  }
+
+  // Process single card
+  assert(cards.length === 1);
+  const card = cards[0];
+  const updatedCard = remove
+    ? await service.removeCardFromCollection(card.id, userId)
+    : await service.addCardToCollection(card.id, userId);
+
+  const header = `Successfully ${operation} card ${preposition} ${displayName}'s collection:`;
+  const csv = await service.formatCardsAsCsv([updatedCard], userId);
+  const stats = await service.getFormattedCollectionStats(userId);
+  return `${header}\n${csv}\n\nUpdated statistics of ${stats}`;
+}
 
 export const pokemonCardAddTool = tool(
   async (
@@ -63,7 +167,6 @@ export const pokemonCardAddTool = tool(
       cardName,
       setKey,
       booster,
-      cardNumber,
       cardId,
       rarity,
       remove,
@@ -75,105 +178,42 @@ export const pokemonCardAddTool = tool(
     const userId = context.userId;
     const service = context.pokemonTcgPocketService;
 
-    // Convert rarity symbol to enum if provided
-    const rarityEnum = rarity ? RARITY_MAP[rarity] : undefined;
+    // Parse card ID if provided
+    const idInfo = cardId ? parseCardId(cardId) : undefined;
 
-    // Parse card ID into set key and number if provided
-    let idSetKey: string | undefined;
-    let idCardNumber: number | undefined;
-    if (cardId) {
-      const match = CARD_ID_PATTERN.exec(cardId)!;
-      idSetKey = match[1];
-      idCardNumber = parseInt(match[2], 10);
-    }
+    // Build search parameters
+    const searchParams = buildSearchParams(
+      cardName,
+      setKey,
+      booster,
+      rarity,
+      idInfo,
+      userId,
+      remove ? 'owned' : 'missing',
+    );
 
     // Search for matching cards
-    const cards = await service.searchCards({
-      cardName,
-      setKey: idSetKey ?? setKey,
-      booster,
-      cardNumber: idCardNumber ?? cardNumber,
-      rarity: rarityEnum,
-      userId,
-      ownershipFilter: remove ? 'owned' : 'missing',
-    });
+    const cards = await service.searchCards(searchParams);
 
-    // Validate results
+    // Handle no cards found
     if (cards.length === 0) {
-      const displayName = await service.getDisplayName(userId);
-
-      // If no cards found, check if they exist at all
-      const existingCards = await service.searchCards({
+      const baseParams = buildSearchParams(
         cardName,
-        setKey: idSetKey ?? setKey,
+        setKey,
         booster,
-        cardNumber: idCardNumber ?? cardNumber,
-        rarity: rarityEnum,
-      });
-
-      if (existingCards.length === 0) {
-        return (
-          'No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was ' +
-          (remove ? 'removed from' : 'added to') +
-          ' the user’s collection.'
-        );
-      } else {
-        const cardDetails = await service.formatCardsAsCsv(
-          existingCards,
-          userId,
-        );
-        if (remove) {
-          return `No matching cards found in ${displayName}’s collection. The cards exist but ${displayName} does not own them. The following cards were found:\n${cardDetails}\nThus no card was removed from the user’s collection.`;
-        } else {
-          return `No matching cards found that ${displayName} is missing. The cards exist but ${displayName} already owns them. The following cards were found:\n${cardDetails}\nThus no card was added to the user’s collection.`;
-        }
-      }
-    }
-
-    if (!bulkOperation && cards.length > 1) {
-      return (
-        'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:\n' +
-        (await service.formatCardsAsCsv(cards, userId))
+        rarity,
+        idInfo,
       );
+      return handleNoCardsFound(service, userId, baseParams, remove);
     }
 
-    // Add or remove cards
-    const displayName = await service.getDisplayName(userId);
-    const operation = remove ? 'removed' : 'added';
-    const preposition = remove ? 'from' : 'to';
-
-    if (cards.length > 1 && bulkOperation) {
-      // Process multiple cards
-      const updatedCards = await Promise.all(
-        cards.map((card) =>
-          remove
-            ? service.removeCardFromCollection(card.id, userId)
-            : service.addCardToCollection(card.id, userId),
-        ),
-      );
-
-      const header = `Successfully ${operation} ${cards.length} cards ${preposition} ${displayName}’s collection:`;
-      const csv = await service.formatCardsAsCsv(updatedCards, userId);
-      const stats = await service.getFormattedCollectionStats(userId);
-      return `${header}\n${csv}\n\nUpdated statistics of ${stats}`;
-    } else {
-      // Process single card
-      assert(cards.length === 1);
-      const card = cards[0];
-      const updatedCard = remove
-        ? await service.removeCardFromCollection(card.id, userId)
-        : await service.addCardToCollection(card.id, userId);
-
-      const header = `Successfully ${operation} card ${preposition} ${displayName}’s collection:`;
-      const csv = await service.formatCardsAsCsv([updatedCard], userId);
-      const stats = await service.getFormattedCollectionStats(userId);
-      return `${header}\n${csv}\n\nUpdated statistics of ${stats}`;
-    }
+    // Process found cards
+    return processCards(service, userId, cards, remove, bulkOperation);
   },
   {
     name: 'pokemonCardAdd',
     description:
-      'Add or remove Pokémon TCG Pocket cards to/from the collection of the user who wrote the last message in the chat. Returns a CSV with the card info. If a user shares an image of a Pokémon card without context in this chat (especially if it shows “new”), they likely want you to add it to their collection.',
+      'Add or remove Pokémon TCG Pocket cards to/from the collection of the user who wrote the last message in the chat. Returns a CSV with the card info. If a user shares an image of a Pokémon card without context in this chat (especially if it shows “new”), they likely want you to add it to their collection. Generally pass null to filters the user did not tell you to filter by and make sure to only add/remove 1 card unless the user explictly asks you to add/remove multiple cards – there is no undo!',
     schema,
   },
 );

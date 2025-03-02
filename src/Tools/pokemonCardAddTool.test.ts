@@ -31,6 +31,12 @@ describe('pokemonCardAdd', () => {
       const result = (await pokemonCardAddTool.invoke(
         {
           cardId: 'A1-001',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -59,7 +65,13 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardId: null,
           rarity: '♢',
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -90,7 +102,12 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardId: null,
           rarity: '♢',
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
           bulkOperation: true,
         },
         config,
@@ -116,6 +133,12 @@ describe('pokemonCardAdd', () => {
       const result = (await pokemonCardAddTool.invoke(
         {
           cardId: 'A1-001',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -142,6 +165,11 @@ describe('pokemonCardAdd', () => {
         {
           cardId: 'A1-001',
           remove: true,
+          rarity: null,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -172,8 +200,13 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardId: null,
           rarity: '♢',
           remove: true,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -211,8 +244,12 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardId: null,
           rarity: '♢',
           remove: true,
+          setKey: null,
+          booster: null,
+          cardName: null,
           bulkOperation: true,
         },
         config,
@@ -230,6 +267,11 @@ describe('pokemonCardAdd', () => {
         {
           cardId: 'A1-001',
           remove: true,
+          rarity: null,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -246,6 +288,12 @@ describe('pokemonCardAdd', () => {
         pokemonCardAddTool.invoke(
           {
             cardId: 'invalid',
+            rarity: null,
+            remove: false,
+            setKey: null,
+            booster: null,
+            cardName: null,
+            bulkOperation: false,
           },
           config,
         ),
@@ -256,6 +304,12 @@ describe('pokemonCardAdd', () => {
       const result = (await pokemonCardAddTool.invoke(
         {
           cardName: 'NonexistentCard',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardId: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -278,6 +332,12 @@ describe('pokemonCardAdd', () => {
       const result = (await pokemonCardAddTool.invoke(
         {
           cardId: 'A1-001',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -295,6 +355,11 @@ describe('pokemonCardAdd', () => {
         {
           cardId: 'A1-001',
           remove: true,
+          rarity: null,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -320,6 +385,12 @@ describe('pokemonCardAdd', () => {
       const result = (await pokemonCardAddTool.invoke(
         {
           cardId: 'A1-001',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -339,6 +410,11 @@ describe('pokemonCardAdd', () => {
         {
           cardId: 'A1-001',
           remove: true,
+          rarity: null,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -359,6 +435,12 @@ describe('pokemonCardAdd', () => {
       const result = (await pokemonCardAddTool.invoke(
         {
           cardId: 'A1-001',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -377,6 +459,12 @@ describe('pokemonCardAdd', () => {
       const result = (await pokemonCardAddTool.invoke(
         {
           cardId: 'A1-001',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -407,7 +495,12 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardName: null,
+          setKey: null,
+          booster: null,
+          cardId: null,
           rarity: '♢',
+          remove: false,
           bulkOperation: true,
         },
         config,
@@ -429,6 +522,11 @@ describe('pokemonCardAdd', () => {
         {
           cardId: 'A1-001',
           remove: true,
+          rarity: null,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -462,6 +560,10 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardName: null,
+          setKey: null,
+          booster: null,
+          cardId: null,
           rarity: '♢',
           remove: true,
           bulkOperation: true,
@@ -484,6 +586,12 @@ describe('pokemonCardAdd', () => {
       const result = (await pokemonCardAddTool.invoke(
         {
           cardId: 'A1-001',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -508,6 +616,11 @@ describe('pokemonCardAdd', () => {
         {
           cardId: 'A1-001',
           remove: true,
+          rarity: null,
+          setKey: null,
+          booster: null,
+          cardName: null,
+          bulkOperation: false,
         },
         config,
       )) as string;
@@ -536,7 +649,12 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardName: null,
+          setKey: null,
+          booster: null,
+          cardId: null,
           rarity: '♢',
+          remove: false,
           bulkOperation: true,
         },
         config,
@@ -566,7 +684,12 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardName: null,
+          setKey: null,
+          booster: null,
+          cardId: null,
           rarity: '♢',
+          remove: false,
           bulkOperation: true,
         },
         config,
@@ -599,6 +722,10 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
+          cardName: null,
+          setKey: null,
+          booster: null,
+          cardId: null,
           rarity: '♢',
           remove: true,
           bulkOperation: true,

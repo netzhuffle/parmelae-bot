@@ -30,8 +30,29 @@ export class CallbackHandler extends BaseCallbackHandler {
       return;
     }
 
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(input) as Record<string, unknown>;
+    } catch {
+      // Input is a non-JSON string
+      return this.telegram
+        .sendWithoutStoring(`[${toolName}: ${input}]`, this.chatId)
+        .then();
+    }
+
+    const filtered = Object.fromEntries(
+      Object.entries(parsed).filter(
+        ([, value]) => value !== null && value !== false,
+      ),
+    );
+
+    const formattedJson = JSON.stringify(filtered).replace(
+      /"([^"]+)":/g,
+      '$1:',
+    );
+
     return this.telegram
-      .sendWithoutStoring(`[${toolName}: ${input}]`, this.chatId)
+      .sendWithoutStoring(`[${toolName}: ${formattedJson}]`, this.chatId)
       .then();
   }
 
