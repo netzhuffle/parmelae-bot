@@ -16,7 +16,7 @@ import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 
 /** Set key values */
-export const SET_KEY_VALUES = ['A1', 'A1a', 'A2', 'PROMO-A'] as const;
+export const SET_KEY_VALUES = ['A1', 'A1a', 'A2', 'A2a', 'PROMO-A'] as const;
 
 /** Set key type */
 export type SetKey = (typeof SET_KEY_VALUES)[number];
@@ -26,6 +26,7 @@ export const SET_KEY_NAMES: Record<SetKey, string> = {
   A1: 'Unschlagbare Gene',
   A1a: 'Mysteriöse Insel',
   A2: 'Kollision von Raum und Zeit',
+  A2a: 'Licht des Triumphs',
   'PROMO-A': 'Promo-A',
 };
 
@@ -37,6 +38,7 @@ export const BOOSTER_VALUES = [
   'Mysteriöse Insel',
   'Dialga',
   'Palkia',
+  'Licht des Triumphs',
 ] as const;
 
 /** Booster type */

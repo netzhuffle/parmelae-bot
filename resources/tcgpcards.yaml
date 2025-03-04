@@ -2469,6 +2469,297 @@ A2:
       name: Dialga ex
       rarity: ♛
       boosters: Dialga
+A2a:
+  name: Licht des Triumphs
+  cards:
+    1:
+      name: Skaraborn
+      rarity: ♢♢
+    2:
+      name: Burmy
+      rarity: ♢
+    3:
+      name: Moterpel
+      rarity: ♢♢
+    4:
+      name: Wadribie
+      rarity: ♢
+    5:
+      name: Honweisel
+      rarity: ♢♢
+    6:
+      name: Kikugi
+      rarity: ♢
+    7:
+      name: Kinoso
+      rarity: ♢♢
+    8:
+      name: Kinoso
+      rarity: ♢♢
+    9:
+      name: Venuflibis
+      rarity: ♢♢♢
+    10:
+      name: Folipurba ex
+      rarity: ♢♢♢♢
+    11:
+      name: Hunduster
+      rarity: ♢
+    12:
+      name: Hundemon
+      rarity: ♢♢
+    13:
+      name: Heatran
+      rarity: ♢♢♢
+    14:
+      name: Marill
+      rarity: ♢
+    15:
+      name: Azumarill
+      rarity: ♢
+    16:
+      name: Schmerbe
+      rarity: ♢
+    17:
+      name: Welsar
+      rarity: ♢♢
+    18:
+      name: Schneppke
+      rarity: ♢
+    19:
+      name: Frosdedje
+      rarity: ♢♢
+    20:
+      name: Shnebedeck
+      rarity: ♢
+    21:
+      name: Rexblisar
+      rarity: ♢♢♢
+    22:
+      name: Glaziola ex
+      rarity: ♢♢♢♢
+    23:
+      name: Ur-Palkia
+      rarity: ♢♢♢
+    24:
+      name: Phione
+      rarity: ♢♢
+    25:
+      name: Pikachu
+      rarity: ♢
+    26:
+      name: Raichu
+      rarity: ♢♢♢
+    27:
+      name: Frizelbliz
+      rarity: ♢
+    28:
+      name: Voltenso
+      rarity: ♢♢
+    29:
+      name: Piepi
+      rarity: ♢
+    30:
+      name: Pixi
+      rarity: ♢♢
+    31:
+      name: Nebulak
+      rarity: ♢
+    32:
+      name: Alpollo
+      rarity: ♢
+    33:
+      name: Gengar
+      rarity: ♢♢
+    34:
+      name: Icognito
+      rarity: ♢♢
+    35:
+      name: Rotom
+      rarity: ♢♢♢
+    36:
+      name: Mogelbaum
+      rarity: ♢♢
+    37:
+      name: Phanpy
+      rarity: ♢
+    38:
+      name: Donphan
+      rarity: ♢♢
+    39:
+      name: Larvitar
+      rarity: ♢
+    40:
+      name: Pipitar
+      rarity: ♢♢
+    41:
+      name: Despotar
+      rarity: ♢♢♢
+    42:
+      name: Nasgnet
+      rarity: ♢
+    43:
+      name: Meditie
+      rarity: ♢
+    44:
+      name: Meditalis
+      rarity: ♢♢
+    45:
+      name: Kaumalat
+      rarity: ♢
+    46:
+      name: Knarksel
+      rarity: ♢
+    47:
+      name: Knakrack ex
+      rarity: ♢♢♢♢
+    48:
+      name: Zubat
+      rarity: ♢
+    49:
+      name: Golbat
+      rarity: ♢
+    50:
+      name: Iksbat
+      rarity: ♢♢♢
+    51:
+      name: Glibunkel
+      rarity: ♢
+    52:
+      name: Toxiquak
+      rarity: ♢♢
+    53:
+      name: Magnetilo
+      rarity: ♢
+    54:
+      name: Magneton
+      rarity: ♢
+    55:
+      name: Magnezone
+      rarity: ♢♢♢
+    56:
+      name: Flunkifer
+      rarity: ♢
+    57:
+      name: Voluminas ex
+      rarity: ♢♢♢♢
+    58:
+      name: Bronzel
+      rarity: ♢
+    59:
+      name: Bronzong
+      rarity: ♢♢
+    60:
+      name: Ur-Dialga
+      rarity: ♢♢♢
+    61:
+      name: Giratina
+      rarity: ♢♢♢
+    62:
+      name: Evoli
+      rarity: ♢
+    63:
+      name: Relaxo
+      rarity: ♢♢
+    64:
+      name: Hoothoot
+      rarity: ♢
+    65:
+      name: Noctuh
+      rarity: ♢♢
+    66:
+      name: Staralili
+      rarity: ♢
+    67:
+      name: Staravia
+      rarity: ♢
+    68:
+      name: Staraptor
+      rarity: ♢♢
+    69:
+      name: Shaymin
+      rarity: ♢♢♢
+    70:
+      name: Arceus
+      rarity: ♢♢♢
+    71:
+      name: Arceus ex
+      rarity: ♢♢♢♢
+    72:
+      name: Perla
+      rarity: ♢♢
+    73:
+      name: Älteste von Elyses
+      rarity: ♢♢
+    74:
+      name: Barry
+      rarity: ♢♢
+    75:
+      name: Diam
+      rarity: ♢♢
+    76:
+      name: Hundemon
+      rarity: ☆
+    77:
+      name: Marill
+      rarity: ☆
+    78:
+      name: Icognito
+      rarity: ☆
+    79:
+      name: Mogelbaum
+      rarity: ☆
+    80:
+      name: Magnetilo
+      rarity: ☆
+    81:
+      name: Shaymin
+      rarity: ☆
+    82:
+      name: Folipurba ex
+      rarity: ☆☆
+    83:
+      name: Glaziola ex
+      rarity: ☆☆
+    84:
+      name: Knakrack ex
+      rarity: ☆☆
+    85:
+      name: Voluminas ex
+      rarity: ☆☆
+    86:
+      name: Arceus ex
+      rarity: ☆☆
+    87:
+      name: Perla
+      rarity: ☆☆
+    88:
+      name: Älteste von Elyses
+      rarity: ☆☆
+    89:
+      name: Barry
+      rarity: ☆☆
+    90:
+      name: Diam
+      rarity: ☆☆
+    91:
+      name: Folipurba ex
+      rarity: ☆☆
+    92:
+      name: Glaziola ex
+      rarity: ☆☆
+    93:
+      name: Knakrack ex
+      rarity: ☆☆
+    94:
+      name: Voluminas ex
+      rarity: ☆☆
+    95:
+      name: Arceus ex
+      rarity: ☆☆☆
+    96:
+      name: Arceus ex
+      rarity: ♛
 PROMO-A:
   name: Promo-A
   boosters: ~
@@ -2580,3 +2871,25 @@ PROMO-A:
     41:
       name: Togepi
       equalTo: A2
+    42:
+      name: Darkrai ex
+      equalTo: A2
+    43:
+      name: Kinoso
+      equalTo: A2a
+    44:
+      name: Raichu
+      equalTo: A2a
+    45:
+      name: Nasgnet
+    46:
+      name: Kaumalat
+      equalTo: A2a
+    47:
+      name: Staraptor
+    48:
+      name: Manaphy
+      equalTo: A2a
+    49:
+      name: Relaxo
+      equalTo: A2a
