@@ -18,27 +18,27 @@ const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
 const schema = z.object({
   cardName: z
     .string()
-    .nullable()
+    .nullish()
     .describe(
       'Substring to search for in card names (do not pass an ID here), null to ignore this filter. Must be null if cardId is not null',
     ),
   setKey: z
     .enum(SET_KEY_VALUES)
-    .nullable()
+    .nullish()
     .describe(
       `Set key to filter by: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}. Pass null unless the user specifically asks you to filter by a set`,
     ),
-  booster: z.enum(BOOSTER_VALUES).nullable().describe('Booster to filter by'),
+  booster: z.enum(BOOSTER_VALUES).nullish().describe('Booster to filter by'),
   cardId: z
     .string()
     .regex(CARD_ID_PATTERN)
-    .nullable()
+    .nullish()
     .describe(
       'Card ID in format {set-key}-{three digit number}, e.g. A1-003. If the user wants to add a card by ID, you likely do want to set the other filters to null to not create conflicting information. Null to ignore this filter',
     ),
   rarity: z
     .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
-    .nullable()
+    .nullish()
     .describe(
       'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑. Null to ignore this filter',
     ),
@@ -183,10 +183,10 @@ export const pokemonCardAddTool = tool(
 
     // Build search parameters
     const searchParams = buildSearchParams(
-      cardName,
-      setKey,
-      booster,
-      rarity,
+      cardName ?? null,
+      setKey ?? null,
+      booster ?? null,
+      rarity ?? null,
       idInfo,
       userId,
       remove ? 'owned' : 'missing',
@@ -198,10 +198,10 @@ export const pokemonCardAddTool = tool(
     // Handle no cards found
     if (cards.length === 0) {
       const baseParams = buildSearchParams(
-        cardName,
-        setKey,
-        booster,
-        rarity,
+        cardName ?? null,
+        setKey ?? null,
+        booster ?? null,
+        rarity ?? null,
         idInfo,
       );
       return handleNoCardsFound(service, userId, baseParams, remove);
