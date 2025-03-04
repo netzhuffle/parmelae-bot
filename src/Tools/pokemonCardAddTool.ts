@@ -20,7 +20,7 @@ const schema = z.object({
     .string()
     .nullable()
     .describe(
-      'Substring to search for in card names (do not pass an ID here), null to ignore this filter',
+      'Substring to search for in card names (do not pass an ID here), null to ignore this filter. Must be null if cardId is not null',
     ),
   setKey: z
     .enum(SET_KEY_VALUES)
