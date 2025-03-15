@@ -16,41 +16,39 @@ import { PokemonCardWithRelations } from '../Repositories/Types.js';
 const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
 
 const schema = z.object({
-  cardName: z
+  card: z
     .string()
     .nullish()
     .describe(
-      'Substring to search for in card names (do not pass an ID here), null to ignore this filter. Must be null if cardId is not null',
+      'Card name or ID in format {set-key}-{three digit number}, e.g. A1-003. If it matches the ID pattern, it will be treated as an ID; otherwise, as a name. Pass null if you know neither name nor ID.',
     ),
   setKey: z
     .enum(SET_KEY_VALUES)
     .nullish()
     .describe(
-      `Set key to filter by: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}. Pass null unless the user specifically asks you to filter by a set`,
+      `Set key to filter by: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}. Pass null unless the user specifically asks you to filter by a set.`,
     ),
-  booster: z.enum(BOOSTER_VALUES).nullish().describe('Booster to filter by'),
-  cardId: z
-    .string()
-    .regex(CARD_ID_PATTERN)
+  booster: z
+    .enum(BOOSTER_VALUES)
     .nullish()
     .describe(
-      'Card ID in format {set-key}-{three digit number}, e.g. A1-003. If the user wants to add a card by ID, you likely do want to set the other filters to null to not create conflicting information. Null to ignore this filter',
+      'Booster to filter by. Pass null unless you are very sure about the booster name.',
     ),
   rarity: z
     .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
     .nullish()
     .describe(
-      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑. Null to ignore this filter',
+      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑. Pass null unless you are very sure about the rarity.',
     ),
   remove: z
     .boolean()
     .describe(
-      'Whether to remove the card from the collection instead of adding it (false: add card)',
+      'Whether to remove the card from the collection instead of adding it (false: add card).',
     ),
   bulkOperation: z
     .boolean()
     .describe(
-      'Whether to add/remove multiple cards with the exact same parameters in one tool call. Only pass true if the user specifically requested to add/remove multiple cards with the exact same parameters. If false, the call will only add one card and ask for clarification if multiple cards match the criteria – this is usually what the user wants.',
+      'Whether to add/remove multiple cards with the exact same parameters in one tool call. Only pass true if the user specifically requested to add/remove multiple cards with the exact same parameters (including name and/or ID). If false, the call will only add one card and ask for clarification if multiple cards match the criteria – this is usually what the user wants.',
     ),
 });
 
@@ -164,10 +162,9 @@ async function processCards(
 export const pokemonCardAddTool = tool(
   async (
     {
-      cardName,
+      card,
       setKey,
       booster,
-      cardId,
       rarity,
       remove,
       bulkOperation,
@@ -178,8 +175,10 @@ export const pokemonCardAddTool = tool(
     const userId = context.userId;
     const service = context.pokemonTcgPocketService;
 
-    // Parse card ID if provided
-    const idInfo = cardId ? parseCardId(cardId) : undefined;
+    // Determine if card is an ID or name
+    const idInfo =
+      card && CARD_ID_PATTERN.test(card) ? parseCardId(card) : undefined;
+    const cardName = idInfo ? null : card;
 
     // Build search parameters
     const searchParams = buildSearchParams(

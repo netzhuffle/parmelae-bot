@@ -37,10 +37,9 @@ describe('pokemonCardSearch', () => {
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: null,
         setKey: null,
         booster: null,
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -56,10 +55,9 @@ describe('pokemonCardSearch', () => {
   it('should handle empty results', async () => {
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: null,
         setKey: null,
         booster: null,
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -73,10 +71,9 @@ describe('pokemonCardSearch', () => {
   it('should return no cards found message when using filters', async () => {
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: 'NonexistentCard',
+        card: 'NonexistentCard',
         setKey: null,
         booster: null,
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -98,10 +95,9 @@ describe('pokemonCardSearch', () => {
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: null,
         setKey: null,
         booster: null,
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -129,10 +125,9 @@ describe('pokemonCardSearch', () => {
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: 'Card',
+        card: 'Card',
         setKey: null,
         booster: null,
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -152,10 +147,9 @@ describe('pokemonCardSearch', () => {
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: null,
         setKey: 'A1',
         booster: null,
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -179,10 +173,9 @@ describe('pokemonCardSearch', () => {
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: null,
         setKey: null,
         booster: 'Glurak',
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -203,10 +196,9 @@ describe('pokemonCardSearch', () => {
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: null,
         setKey: null,
         booster: null,
-        cardId: null,
         rarity: '♢',
         ownershipFilter: null,
       },
@@ -227,10 +219,9 @@ describe('pokemonCardSearch', () => {
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: 'A1-001',
         setKey: null,
         booster: null,
-        cardId: 'A1-001',
         rarity: null,
         ownershipFilter: null,
       },
@@ -246,34 +237,15 @@ describe('pokemonCardSearch', () => {
     });
   });
 
-  it('should return error message for invalid card ID format', async () => {
-    await expect(
-      pokemonCardSearchTool.invoke(
-        {
-          cardName: null,
-          setKey: null,
-          booster: null,
-          cardId: 'invalid',
-          rarity: null,
-          ownershipFilter: null,
-        },
-        config,
-      ),
-    ).rejects.toThrow();
-
-    expect(repository.searchCards).not.toHaveBeenCalled();
-  });
-
   it('should handle cards without boosters', async () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: null,
         setKey: null,
         booster: null,
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -297,10 +269,9 @@ describe('pokemonCardSearch', () => {
 
     const result = (await pokemonCardSearchTool.invoke(
       {
-        cardName: null,
+        card: null,
         setKey: null,
         booster: null,
-        cardId: null,
         rarity: null,
         ownershipFilter: null,
       },
@@ -329,10 +300,9 @@ describe('pokemonCardSearch', () => {
     it('should return all cards when ownership filter is not set', async () => {
       const result = (await pokemonCardSearchTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: null,
           ownershipFilter: null,
         },
@@ -379,10 +349,9 @@ describe('pokemonCardSearch', () => {
 
       const result = (await pokemonCardSearchTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: null,
           ownershipFilter: 'owned',
         },
@@ -406,10 +375,9 @@ describe('pokemonCardSearch', () => {
     it('should pass ownership filter when set to missing', async () => {
       const result = (await pokemonCardSearchTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: null,
           ownershipFilter: 'missing',
         },
@@ -433,10 +401,9 @@ describe('pokemonCardSearch', () => {
     it('should pass ownership filter when set to all', async () => {
       const result = (await pokemonCardSearchTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: null,
           ownershipFilter: 'all',
         },
@@ -467,10 +434,9 @@ describe('pokemonCardSearch', () => {
     it('should show ownership by username when available', async () => {
       const result = (await pokemonCardSearchTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: null,
           ownershipFilter: null,
         },
@@ -485,10 +451,9 @@ describe('pokemonCardSearch', () => {
 
       const result = (await pokemonCardSearchTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: null,
           ownershipFilter: null,
         },
@@ -496,6 +461,27 @@ describe('pokemonCardSearch', () => {
       )) as string;
 
       expect(result).toContain('Owned by Test2');
+    });
+  });
+
+  it('should handle no matches', async () => {
+    await repository.createSet('A1', 'Test Set');
+    await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
+
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        card: 'NonexistentCard',
+        setKey: null,
+        booster: null,
+        rarity: null,
+        ownershipFilter: null,
+      },
+      config,
+    )) as string;
+
+    expect(result).toBe('No cards found matching the search criteria.');
+    expect(repository.searchCards).toHaveBeenCalledWith({
+      cardName: 'NonexistentCard',
     });
   });
 });

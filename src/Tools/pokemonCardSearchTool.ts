@@ -18,37 +18,35 @@ export const POKEMON_CARD_SEARCH_TOOL_NAME = 'pokemonCardSearch';
 const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
 
 const schema = z.object({
-  cardName: z
+  card: z
     .string()
     .nullish()
     .describe(
-      'Substring to search for in card names (do not pass an ID here), null to ignore this filter. Must be null if cardId is not null',
+      'Card name or ID in format {set-key}-{three digit number}, e.g. A1-003. If it matches the ID pattern, it will be treated as an ID; otherwise, as a name. Pass null if you know neither name nor ID.',
     ),
   setKey: z
     .enum(SET_KEY_VALUES)
     .nullish()
     .describe(
-      `Set key to filter by: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}. Pass null unless the user specifically asks you to filter by a set`,
+      `Set key to filter by: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}. Pass null unless the user specifically asks you to filter by a set.`,
     ),
-  booster: z.enum(BOOSTER_VALUES).nullish().describe('Booster to filter by'),
-  cardId: z
-    .string()
-    .regex(CARD_ID_PATTERN)
+  booster: z
+    .enum(BOOSTER_VALUES)
     .nullish()
     .describe(
-      'Card ID in format {set-key}-{three digit number}, e.g. A1-003. If the user wants to search a card by ID, you likely do want to set the other filters to null to not create conflicting information. Null to ignore this filter',
+      'Booster to filter by. Pass null unless the user specifically asks you to filter by a booster name.',
     ),
   rarity: z
     .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
     .nullish()
     .describe(
-      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑. Null to ignore this filter',
+      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑. Pass null unless the user specifically asks you to filter by rarity.',
     ),
   ownershipFilter: z
     .enum(OWNERSHIP_FILTER_VALUES)
     .nullish()
     .describe(
-      'Filter by card ownership of the user who wrote the last message: null for all cards, "owned" for cards they own, "missing" for cards they do not own',
+      'Filter by card ownership of the user who wrote the last message: null for all cards, "owned" for cards they own, "missing" for cards they do not own.',
     ),
 });
 
@@ -112,22 +110,17 @@ async function formatSearchResults(
 
 export const pokemonCardSearchTool = tool(
   async (
-    {
-      cardName,
-      setKey,
-      booster,
-      cardId,
-      rarity,
-      ownershipFilter,
-    }: PokemonCardSearchInput,
+    { card, setKey, booster, rarity, ownershipFilter }: PokemonCardSearchInput,
     config: LangGraphRunnableConfig,
   ): Promise<string> => {
     const context = getToolContext(config);
     const userId = context.userId;
     const service = context.pokemonTcgPocketService;
 
-    // Parse card ID if provided
-    const idInfo = cardId ? parseCardId(cardId) : undefined;
+    // Determine if card is an ID or name
+    const idInfo =
+      card && CARD_ID_PATTERN.test(card) ? parseCardId(card) : undefined;
+    const cardName = idInfo ? null : card;
 
     // Build search parameters
     const searchParams = buildSearchParams(

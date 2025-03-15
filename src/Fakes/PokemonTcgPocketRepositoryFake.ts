@@ -128,9 +128,16 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     ownershipFilter?: OwnershipFilter;
   }): Promise<PokemonCardWithRelations[]> {
     // Return all cards with their relationships
-    // No actual filtering to minimize business logic in fakes/tests
-    // Just apply basic userId filtering if specified
+    // Apply only basic filtering to minimize business logic in fakes/tests
     let cards = Array.from(this.cards.values());
+
+    // Apply basic name filtering
+    const searchName = searchCriteria?.cardName;
+    if (searchName) {
+      cards = cards.filter((card) =>
+        card.name.toLowerCase().includes(searchName.toLowerCase()),
+      );
+    }
 
     // Only apply userId filtering as it's critical for ownership tests
     if (searchCriteria?.userId !== undefined) {

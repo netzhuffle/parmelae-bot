@@ -24,18 +24,38 @@ describe('pokemonCardAdd', () => {
   });
 
   describe('adding cards', () => {
-    it('should add a single card to collection', async () => {
+    it('should add a single card to collection using card ID', async () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           rarity: null,
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
+          bulkOperation: false,
+        },
+        config,
+      )) as string;
+
+      expect(result).toContain('added card to @test1');
+      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
+    });
+
+    it('should add a single card to collection using card name', async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          card: 'Test Card',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
           bulkOperation: false,
         },
         config,
@@ -65,12 +85,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: null,
+          card: null,
           rarity: '♢',
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -102,12 +121,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: null,
+          card: null,
           rarity: '♢',
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: true,
         },
         config,
@@ -132,12 +150,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           rarity: null,
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -163,12 +180,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           remove: true,
           rarity: null,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -200,12 +216,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: null,
+          card: null,
           rarity: '♢',
           remove: true,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -244,12 +259,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: null,
+          card: null,
           rarity: '♢',
           remove: true,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: true,
         },
         config,
@@ -265,12 +279,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           remove: true,
           rarity: null,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -283,32 +296,14 @@ describe('pokemonCardAdd', () => {
   });
 
   describe('error handling', () => {
-    it('should handle invalid card ID format', async () => {
-      await expect(
-        pokemonCardAddTool.invoke(
-          {
-            cardId: 'invalid',
-            rarity: null,
-            remove: false,
-            setKey: null,
-            booster: null,
-            cardName: null,
-            bulkOperation: false,
-          },
-          config,
-        ),
-      ).rejects.toThrow();
-    });
-
     it('should indicate when no cards exist at all', async () => {
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardName: 'NonexistentCard',
+          card: 'NonexistentCard',
           rarity: null,
           remove: false,
           setKey: null,
           booster: null,
-          cardId: null,
           bulkOperation: false,
         },
         config,
@@ -331,12 +326,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           rarity: null,
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -353,12 +347,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           remove: true,
           rarity: null,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -384,12 +377,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           rarity: null,
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -408,12 +400,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           remove: true,
           rarity: null,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -434,12 +425,11 @@ describe('pokemonCardAdd', () => {
     it('should show username when available', async () => {
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           rarity: null,
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -458,12 +448,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           rarity: null,
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -495,10 +484,9 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: '♢',
           remove: false,
           bulkOperation: true,
@@ -520,12 +508,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           remove: true,
           rarity: null,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -560,11 +547,10 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
-          rarity: '♢',
+          rarity: null,
           remove: true,
           bulkOperation: true,
         },
@@ -585,12 +571,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           rarity: null,
           remove: false,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -614,12 +599,11 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardId: 'A1-001',
+          card: 'A1-001',
           remove: true,
           rarity: null,
           setKey: null,
           booster: null,
-          cardName: null,
           bulkOperation: false,
         },
         config,
@@ -649,10 +633,9 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: '♢',
           remove: false,
           bulkOperation: true,
@@ -684,10 +667,9 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: '♢',
           remove: false,
           bulkOperation: true,
@@ -722,10 +704,9 @@ describe('pokemonCardAdd', () => {
 
       const result = (await pokemonCardAddTool.invoke(
         {
-          cardName: null,
+          card: null,
           setKey: null,
           booster: null,
-          cardId: null,
           rarity: '♢',
           remove: true,
           bulkOperation: true,
