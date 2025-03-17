@@ -7,7 +7,7 @@ export class MinecraftStartTool extends Tool {
   name = 'minecraft-start';
 
   description =
-    'Starts the minecraft server. Gives back the output and the map URL. Input should be an empty string.';
+    'Starts the minecraft server. Gives back the console output. Input should be an empty string.';
 
   protected _call(): Promise<string> {
     return new Promise<string>((resolve) => {

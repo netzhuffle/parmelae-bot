@@ -9,7 +9,6 @@ import {
   ChatGptMessage,
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage.js';
-import { MinecraftBackupTool } from './Tools/MinecraftBackupTool.js';
 import { MinecraftStartTool } from './Tools/MinecraftStartTool.js';
 import { MinecraftStatusTool } from './Tools/MinecraftStatusTool.js';
 import { MinecraftStopTool } from './Tools/MinecraftStopTool.js';
@@ -124,7 +123,6 @@ export class ChatGptAgentService {
     minecraftStatusTool: MinecraftStatusTool,
     minecraftStartTool: MinecraftStartTool,
     minecraftStopTool: MinecraftStopTool,
-    minecraftBackupTool: MinecraftBackupTool,
     webBrowserToolFactory: WebBrowserToolFactory,
   ) {
     this.tools = [
@@ -135,7 +133,6 @@ export class ChatGptAgentService {
       minecraftStatusTool,
       minecraftStartTool,
       minecraftStopTool,
-      minecraftBackupTool,
       webBrowserToolFactory.create(),
     ];
     const tools = this.tools;

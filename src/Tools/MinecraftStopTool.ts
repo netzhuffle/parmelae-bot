@@ -7,7 +7,7 @@ export class MinecraftStopTool extends Tool {
   name = 'minecraft-stop';
 
   description =
-    'Stops the minecraft server, creates a backup, and updates the map. Gives back the output and the map URL. Input should be an empty string.';
+    'Stops the minecraft server. Gives back the console output. Input should be an empty string.';
 
   protected _call(): Promise<string> {
     return new Promise<string>((resolve) => {
