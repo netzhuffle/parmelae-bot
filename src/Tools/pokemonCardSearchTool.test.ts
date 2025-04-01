@@ -1,7 +1,7 @@
-import { PokemonTcgPocketService } from '../PokemonTcgPocketService.js';
-import { PokemonTcgPocketRepositoryFake } from '../Fakes/PokemonTcgPocketRepositoryFake.js';
+import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
+import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity } from '@prisma/client';
-import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
+import { PokemonTcgPocketRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketRepository.js';
 import { jest } from '@jest/globals';
 import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 import { ToolContext } from '../ChatGptAgentService.js';

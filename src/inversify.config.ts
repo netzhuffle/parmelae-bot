@@ -9,7 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import { Config } from './Config.js';
 import { Telegraf } from 'telegraf';
 import { readFileSync } from 'fs';
-import { PokemonTcgPocketYamlSymbol } from './PokemonTcgPocketService.js';
+import { PokemonTcgPocketYamlSymbol } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 
 const container = new Container({
   defaultScope: 'Singleton',

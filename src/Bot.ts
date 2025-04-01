@@ -7,7 +7,7 @@ import { OldMessageReplyService } from './OldMessageReplyService.js';
 import { TelegramMessageService } from './TelegramMessageService.js';
 import { ReplyStrategyFinder } from './ReplyStrategyFinder.js';
 import { ScheduledMessageService } from './ScheduledMessageService.js';
-import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
+import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import * as Typegram from '@telegraf/types';

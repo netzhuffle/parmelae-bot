@@ -1,5 +1,5 @@
-import { PokemonTcgPocketService } from '../PokemonTcgPocketService.js';
-import { PokemonTcgPocketRepositoryFake } from '../Fakes/PokemonTcgPocketRepositoryFake.js';
+import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
+import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity } from '@prisma/client';
 import { jest } from '@jest/globals';
 import { pokemonCardAddTool } from './pokemonCardAddTool.js';

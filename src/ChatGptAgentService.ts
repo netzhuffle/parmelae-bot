@@ -37,7 +37,7 @@ import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
 import { TelegramService } from './TelegramService.js';
 import { DallEService } from './DallEService.js';
-import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
+import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 
 /** The context for the tools. */
 export interface ToolContext {

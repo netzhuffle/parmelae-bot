@@ -6,11 +6,11 @@ import {
   SET_KEY_NAMES,
   BOOSTER_VALUES,
   PokemonTcgPocketService,
-} from '../PokemonTcgPocketService.js';
+} from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import assert from 'node:assert/strict';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';
-import { PokemonCardWithRelations } from '../Repositories/Types.js';
+import { PokemonCardWithRelations } from '../PokemonTcgPocket/Repositories/Types.js';
 
 /** Card ID regex pattern */
 const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;

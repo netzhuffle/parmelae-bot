@@ -7,10 +7,10 @@ import {
   BOOSTER_VALUES,
   OWNERSHIP_FILTER_VALUES,
   PokemonTcgPocketService,
-} from '../PokemonTcgPocketService.js';
+} from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';
-import { PokemonCardWithRelations } from '../Repositories/Types.js';
+import { PokemonCardWithRelations } from '../PokemonTcgPocket/Repositories/Types.js';
 
 export const POKEMON_CARD_SEARCH_TOOL_NAME = 'pokemonCardSearch';
 
