@@ -57,7 +57,7 @@ export const PokemonTcgPocketYamlSymbol = Symbol('PokemonTcgPocketYaml');
 export interface Card {
   /** The name of the card */
   name: string;
-  /** The rarity of the card: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛ */
+  /** The rarity of the card: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, ✸, ✸✸, or ♛ */
   rarity?: string;
   /** The booster(s) this card belongs to. If undefined, belongs to all boosters in the set */
   boosters?: string | string[] | null;
@@ -88,6 +88,8 @@ export const RARITY_MAP: Record<string, Rarity> = {
   '☆☆': Rarity.TWO_STARS,
   '☆☆☆': Rarity.THREE_STARS,
   '☆☆☆☆': Rarity.FOUR_STARS,
+  '✸': Rarity.ONE_SHINY,
+  '✸✸': Rarity.TWO_SHINY,
   '♛': Rarity.CROWN,
 };
 
@@ -101,6 +103,8 @@ const RARITY_REVERSE_MAP: Record<Rarity, string> = {
   [Rarity.TWO_STARS]: '☆☆',
   [Rarity.THREE_STARS]: '☆☆☆',
   [Rarity.FOUR_STARS]: '☆☆☆☆',
+  [Rarity.ONE_SHINY]: '✸',
+  [Rarity.TWO_SHINY]: '✸✸',
   [Rarity.CROWN]: '♛',
 };
 
@@ -125,11 +129,12 @@ export class PokemonTcgPocketService {
 
   /** Explanation texts */
   private readonly SETS_EXPLANATION =
-    '(♦️ is the number of different cards in the user’s collection with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢ as well as the total in the set, ' +
+    '(♦️ is the number of different cards in the user’s collection with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢ followed by the total of these rarities in the set, ' +
     '⭐️ is the number of different cards in the user’s collection with rarities ☆, ☆☆, and ☆☆☆, ' +
+    '✴️ is the number of different cards in the user’s collection with rarities ✸ and ✸✸, ' +
     'and 👑 is the number of different cards in the user’s collection with rarity ♛. ' +
     'Promo sets don’t have rarities, thus only the number of different cards in the user’s collection is shown. ' +
-    'When describing these stats to users, omit each ⭐️ and 👑 stat that is 0 for better readability and to match the ingame format, but always show them if not 0.' +
+    'When describing these stats to users, omit each ⭐️, ✴️, and 👑 stat that is 0 for better readability and to match the ingame format, but always show them if >=1.' +
     'If you called this tool multiple times, always show the exact numbers of the very last call, do not change any numbers as it contains the end state after all calls already.)';
 
   private readonly BOOSTERS_EXPLANATION =

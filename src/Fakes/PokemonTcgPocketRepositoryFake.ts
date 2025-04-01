@@ -76,6 +76,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       id: this.nextId++,
       name,
       setId: set.id,
+      hasShinyRarity: false,
     };
     this.boosters.set(`${set.id}_${name}`, booster);
     return Promise.resolve(booster);

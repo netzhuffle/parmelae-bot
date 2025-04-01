@@ -86,11 +86,12 @@ model PokemonSet {
 }
 
 model PokemonBooster {
-  id    Int           @id @default(autoincrement())
-  name  String
-  set   PokemonSet    @relation(fields: [setId], references: [id])
-  setId Int
-  cards PokemonCard[]
+  id             Int           @id @default(autoincrement())
+  name           String
+  set            PokemonSet    @relation(fields: [setId], references: [id])
+  setId          Int
+  hasShinyRarity Boolean       @default(false)
+  cards          PokemonCard[]
 
   @@unique([setId, name])
 }
@@ -117,5 +118,7 @@ enum Rarity {
   TWO_STARS
   THREE_STARS
   FOUR_STARS
+  ONE_SHINY
+  TWO_SHINY
   CROWN
 }
