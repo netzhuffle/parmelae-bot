@@ -89,27 +89,21 @@ describe('tcgpcards.yaml', () => {
     });
 
     it('should only use " ex" as a suffix for ex cards', () => {
-      Object.entries(sets).forEach(([setKey, setData]: [string, SetData]) => {
-        Object.entries(setData.cards).forEach(
-          ([cardNumber, card]: [string, Card]) => {
-            // Check if card name ends with ' ex' or '-ex' (case insensitive)
-            const exSuffixRegex = /[\s-](?:ex|EX)$/i;
-            const match = exSuffixRegex.exec(card.name);
+      Object.values(sets).forEach((setData: SetData) => {
+        Object.values(setData.cards).forEach((card: Card) => {
+          // Check if card name ends with ' ex' or '-ex' (case insensitive)
+          const exSuffixRegex = /[\s-](?:ex|EX)$/i;
+          const match = exSuffixRegex.exec(card.name);
 
-            // Skip if no ' ex' or '-ex' suffix found
-            if (!match) {
-              return;
-            }
+          // Skip if no ' ex' or '-ex' suffix found
+          if (!match) {
+            return;
+          }
 
-            // Fail if suffix is not exactly ' ex'
-            const suffix = match[0];
-            if (suffix !== ' ex') {
-              fail(
-                `Card "${card.name}" (${setKey}-${cardNumber}) has invalid ex suffix "${suffix}". Only " ex" is allowed.`,
-              );
-            }
-          },
-        );
+          // Fail if suffix is not exactly ' ex'
+          const suffix = match[0];
+          expect(suffix).toBe(' ex');
+        });
       });
     });
 
@@ -146,44 +140,32 @@ describe('tcgpcards.yaml', () => {
     it('should have valid equalTo references', () => {
       const setKeys = new Set(Object.keys(sets));
 
-      Object.entries(sets).forEach(([setKey, setData]: [string, SetData]) => {
-        Object.entries(setData.cards).forEach(
-          ([cardNumber, card]: [string, Card]) => {
-            if (card.equalTo) {
-              if (!setKeys.has(card.equalTo)) {
-                fail(
-                  `Invalid equalTo reference: ${card.equalTo} in set ${setKey}, card ${cardNumber}`,
-                );
-              }
-            }
-          },
-        );
+      Object.values(sets).forEach((setData: SetData) => {
+        Object.values(setData.cards).forEach((card: Card) => {
+          if (card.equalTo) {
+            expect(setKeys.has(card.equalTo)).toBe(true);
+          }
+        });
       });
     });
 
     it('should have consistent booster assignments', () => {
-      Object.entries(sets).forEach(([setKey, setData]: [string, SetData]) => {
+      Object.values(sets).forEach((setData: SetData) => {
         // Skip sets with null boosters
         if (setData.boosters === null) return;
 
-        Object.entries(setData.cards).forEach(
-          ([cardNumber, card]: [string, Card]) => {
-            if (card.boosters === undefined) return;
-            if (card.boosters === null) return;
+        Object.values(setData.cards).forEach((card: Card) => {
+          if (card.boosters === undefined) return;
+          if (card.boosters === null) return;
 
-            const boosterList = Array.isArray(card.boosters)
-              ? card.boosters
-              : [card.boosters];
+          const boosterList = Array.isArray(card.boosters)
+            ? card.boosters
+            : [card.boosters];
 
-            // Check for duplicate booster assignments
-            const uniqueBoosters = new Set(boosterList);
-            if (uniqueBoosters.size !== boosterList.length) {
-              fail(
-                `Duplicate booster assignment in set ${setKey}, card ${cardNumber}`,
-              );
-            }
-          },
-        );
+          // Check for duplicate booster assignments
+          const uniqueBoosters = new Set(boosterList);
+          expect(uniqueBoosters.size).toBe(boosterList.length);
+        });
       });
     });
   });
