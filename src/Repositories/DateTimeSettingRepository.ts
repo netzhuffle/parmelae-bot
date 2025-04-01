@@ -15,19 +15,18 @@ export class DateTimeSettingRepository {
    * @param startingValue The starting value if the setting does not exist yet
    */
   async get(setting: string, startingValue: Date): Promise<Date> {
-    let dateTimeSetting = await this.prisma.dateTimeSetting.findUnique({
-      where: {
-        setting,
-      },
-    });
-    if (!dateTimeSetting) {
-      dateTimeSetting = await this.prisma.dateTimeSetting.create({
+    const dateTimeSetting =
+      (await this.prisma.dateTimeSetting.findUnique({
+        where: {
+          setting,
+        },
+      })) ??
+      (await this.prisma.dateTimeSetting.create({
         data: {
           setting,
           dateTime: startingValue,
         },
-      });
-    }
+      }));
     return dateTimeSetting.dateTime;
   }
 

@@ -24,7 +24,6 @@ export class ChatOpenAiFake extends BaseChatModel {
       generations: this.response
         ? [
             {
-              // eslint-disable-next-line @typescript-eslint/no-deprecated
               text: this.response.text,
               message: this.response,
             },

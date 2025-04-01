@@ -26,6 +26,5 @@ test('generate', async () => {
 
   expect(response).toBe('Commit Description');
   expect(chatOpenAiFake.request).toHaveLength(12);
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
   expect(chatOpenAiFake.request?.[11].text).toBe('git commit message');
 });

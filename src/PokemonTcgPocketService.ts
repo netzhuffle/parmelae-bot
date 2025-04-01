@@ -436,10 +436,9 @@ export class PokemonTcgPocketService {
     setKey: string,
     setData: SetData,
   ): Promise<PokemonSet | null> {
-    let set = await this.repository.retrieveSetByKey(setKey);
-    if (!set) {
-      set = await this.repository.createSet(setKey, setData.name);
-    }
+    const set =
+      (await this.repository.retrieveSetByKey(setKey)) ??
+      (await this.repository.createSet(setKey, setData.name));
     return set;
   }
 
@@ -457,13 +456,11 @@ export class PokemonTcgPocketService {
 
     const boosters = await Promise.all(
       boosterNames.map(async (name) => {
-        let booster = await this.repository.retrieveBoosterByNameAndSetKey(
-          name,
-          setKey,
-        );
-        if (!booster) {
-          booster = await this.repository.createBooster(name, setKey);
-        }
+        const booster =
+          (await this.repository.retrieveBoosterByNameAndSetKey(
+            name,
+            setKey,
+          )) ?? (await this.repository.createBooster(name, setKey));
         return booster;
       }),
     );

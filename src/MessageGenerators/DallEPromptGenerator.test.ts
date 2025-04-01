@@ -26,6 +26,5 @@ test('generate', async () => {
 
   expect(response).toBe('DALL-E description');
   expect(chatOpenAiFake.request).toHaveLength(6);
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
   expect(chatOpenAiFake.request?.[5].text).toBe('image description');
 });
