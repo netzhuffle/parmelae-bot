@@ -72,6 +72,22 @@ describe('PokemonTcgPocketProbabilityService', () => {
       expect(probability).toBeLessThan(0.2);
     });
 
+    it('should handle missing shiny cards', () => {
+      const boosterCards = createTestCards();
+      const missingCards = boosterCards.filter(
+        (card) =>
+          card.rarity === Rarity.ONE_SHINY || card.rarity === Rarity.TWO_SHINY,
+      );
+
+      const probability = service.calculateNewCardProbability(
+        boosterCards,
+        missingCards,
+      );
+
+      // Probabilities aren’t set yet
+      expect(probability).toBe(0);
+    });
+
     it('should handle empty booster', () => {
       const boosterCards: PokemonCard[] = [];
       const missingCards: PokemonCard[] = [];
