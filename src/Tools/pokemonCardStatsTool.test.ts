@@ -3,6 +3,7 @@ import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/Pokemo
 import { Rarity } from '@prisma/client';
 import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
+import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 
 describe('pokemonCardStats', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -11,7 +12,11 @@ describe('pokemonCardStats', () => {
     repository = new PokemonTcgPocketRepositoryFake();
     config = createTestToolConfig({
       userId: BigInt(1),
-      pokemonTcgPocketService: new PokemonTcgPocketService(repository, ''),
+      pokemonTcgPocketService: new PokemonTcgPocketService(
+        new PokemonTcgPocketProbabilityService(),
+        repository,
+        '',
+      ),
     });
   });
 

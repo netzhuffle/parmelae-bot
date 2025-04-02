@@ -1,5 +1,6 @@
 import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
+import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 import { Rarity } from '@prisma/client';
 import { jest } from '@jest/globals';
 import { pokemonCardAddTool } from './pokemonCardAddTool.js';
@@ -9,13 +10,19 @@ jest.mock('@langchain/core/context');
 
 describe('pokemonCardAdd', () => {
   let repository: PokemonTcgPocketRepositoryFake;
+  let probabilityService: PokemonTcgPocketProbabilityService;
   let config: { configurable: ToolContext };
 
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
+    probabilityService = new PokemonTcgPocketProbabilityService();
     config = createTestToolConfig({
       userId: BigInt(1),
-      pokemonTcgPocketService: new PokemonTcgPocketService(repository, ''),
+      pokemonTcgPocketService: new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        '',
+      ),
     });
   });
 

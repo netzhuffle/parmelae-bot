@@ -20,7 +20,7 @@ const schema = z.object({
     .string()
     .nullish()
     .describe(
-      'Card name or ID in format {set-key}-{three digit number}, e.g. A1-003. If it matches the ID pattern, it will be treated as an ID; otherwise, as a name. Pass null if you know neither name nor ID.',
+      'Card name or ID in format {set-key}-{three digit number}, e.g. A1-003. If it matches the ID pattern, it will be treated as an ID; otherwise, as a card name. Pass null instead of a string if you know neither name nor ID.',
     ),
   setKey: z
     .enum(SET_KEY_VALUES)
@@ -35,10 +35,10 @@ const schema = z.object({
       'Booster to filter by. Pass null unless you are very sure about the booster name.',
     ),
   rarity: z
-    .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
+    .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '✸', '✸✸', '♛'])
     .nullish()
     .describe(
-      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑. Pass null unless you are very sure about the rarity.',
+      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, ✸, ✸✸, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ✸ instead of ✴️, and ♛ instead of 👑. Pass null unless you are very sure about the rarity.',
     ),
   remove: z
     .boolean()
@@ -143,7 +143,7 @@ async function processCards(
     const header = `Successfully ${operation} ${cards.length} cards ${preposition} ${displayName}'s collection:`;
     const csv = await service.formatCardsAsCsv(updatedCards, userId);
     const stats = await service.getFormattedCollectionStats(userId);
-    return `${header}\n${csv}\n\nUpdated statistics of ${stats}`;
+    return `${header}\n${csv}\nIf these aren’t the cards the user was asking for, you passed the wrong parameters. If so, please inform the user about your mistake and let them decide what to do.\n\nUpdated statistics of ${stats}`;
   }
 
   // Process single card

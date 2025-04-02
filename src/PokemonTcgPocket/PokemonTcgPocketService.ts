@@ -14,9 +14,17 @@ import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPoc
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+import { BOOSTERS_STATS_EXPLANATION, SETS_STATS_EXPLANATION } from './Texts.js';
 
 /** Set key values */
-export const SET_KEY_VALUES = ['A1', 'A1a', 'A2', 'A2a', 'PROMO-A'] as const;
+export const SET_KEY_VALUES = [
+  'A1',
+  'A1a',
+  'A2',
+  'A2a',
+  'A2b',
+  'PROMO-A',
+] as const;
 
 /** Set key type */
 export type SetKey = (typeof SET_KEY_VALUES)[number];
@@ -27,6 +35,7 @@ export const SET_KEY_NAMES: Record<SetKey, string> = {
   A1a: 'Mysteriöse Insel',
   A2: 'Kollision von Raum und Zeit',
   A2a: 'Licht des Triumphs',
+  A2b: 'Glänzendes Festival',
   'PROMO-A': 'Promo-A',
 };
 
@@ -39,6 +48,7 @@ export const BOOSTER_VALUES = [
   'Dialga',
   'Palkia',
   'Licht des Triumphs',
+  'Glänzendes Festival',
 ] as const;
 
 /** Booster type */
@@ -124,27 +134,8 @@ interface CardGroup {
 /** Service for managing Pokemon TCG Pocket data */
 @injectable()
 export class PokemonTcgPocketService {
-  private readonly probabilityService =
-    new PokemonTcgPocketProbabilityService();
-
-  /** Explanation texts */
-  private readonly SETS_EXPLANATION =
-    '(♦️ is the number of different cards in the user’s collection with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢ followed by the total of these rarities in the set, ' +
-    '⭐️ is the number of different cards in the user’s collection with rarities ☆, ☆☆, and ☆☆☆, ' +
-    '✴️ is the number of different cards in the user’s collection with rarities ✸ and ✸✸, ' +
-    'and 👑 is the number of different cards in the user’s collection with rarity ♛. ' +
-    'Promo sets don’t have rarities, thus only the number of different cards in the user’s collection is shown. ' +
-    'When describing these stats to users, omit each ⭐️, ✴️, and 👑 stat that is 0 for better readability and to match the ingame format, but always show them if >=1.' +
-    'If you called this tool multiple times, always show the exact numbers of the very last call, do not change any numbers as it contains the end state after all calls already.)';
-
-  private readonly BOOSTERS_EXPLANATION =
-    '(First numbers are the collected and total number of different cards in the specific booster. ' +
-    'p♢ is the probability of receiving a new card with rarity ♢, ♢♢, ♢♢♢, or ♢♢♢♢ currently missing in the user’s collection, ' +
-    'and pN is the probability of receiving any new card currently missing in the user’s collection ' +
-    'when opening the specific booster. These probabilities help the user decide which booster to open next to maximise their chances.' +
-    'If you called this tool multiple times, always show the exact numbers of the very last call, do not change any numbers as it contains the end state after all calls already.)';
-
   constructor(
+    private readonly probabilityService: PokemonTcgPocketProbabilityService,
     private readonly repository: PokemonTcgPocketRepository,
     @inject(PokemonTcgPocketYamlSymbol) private readonly yamlContent: string,
   ) {}
@@ -249,7 +240,7 @@ export class PokemonTcgPocketService {
       lines.push(`${name}: ${setStats.join(' ⋅ ')}`);
     }
     lines.push('');
-    lines.push(this.SETS_EXPLANATION);
+    lines.push(SETS_STATS_EXPLANATION);
     lines.push('');
     return lines;
   }
@@ -277,7 +268,7 @@ export class PokemonTcgPocketService {
       );
     }
     lines.push('');
-    lines.push(this.BOOSTERS_EXPLANATION);
+    lines.push(BOOSTERS_STATS_EXPLANATION);
     return lines;
   }
 
@@ -481,6 +472,41 @@ export class PokemonTcgPocketService {
     // Create a set of valid booster names for this set
     const validBoosterNames = new Set(boosters.map((b) => b.name));
 
+    // Track which boosters contain shiny cards
+    const boostersWithShinyCards = new Set<string>();
+
+    // First pass: Process all cards and track which boosters contain shiny cards
+    for (const [cardNumberString, card] of Object.entries(setData.cards)) {
+      const cardNumber = parseInt(cardNumberString, 10);
+      if (isNaN(cardNumber)) {
+        throw new PokemonTcgPocketInvalidCardNumberError(
+          setKey,
+          cardNumberString,
+        );
+      }
+
+      // If card has shiny rarity, mark its boosters
+      if (card.rarity === '✸' || card.rarity === '✸✸') {
+        const cardBoosterNames = this.convertToBoosterNameArray(
+          card,
+          validBoosterNames,
+          setKey,
+        );
+        cardBoosterNames.forEach((name) => boostersWithShinyCards.add(name));
+      }
+    }
+
+    // Update hasShinyRarity for boosters
+    await Promise.all(
+      boosters.map((booster) =>
+        this.repository.updateBoosterShinyRarity(
+          booster.id,
+          boostersWithShinyCards.has(booster.name),
+        ),
+      ),
+    );
+
+    // Second pass: Create all cards
     for (const [cardNumberString, card] of Object.entries(setData.cards)) {
       const cardNumber = parseInt(cardNumberString, 10);
       if (isNaN(cardNumber)) {

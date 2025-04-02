@@ -22,7 +22,7 @@ const schema = z.object({
     .string()
     .nullish()
     .describe(
-      'Card name or ID in format {set-key}-{three digit number}, e.g. A1-003. If it matches the ID pattern, it will be treated as an ID; otherwise, as a name. Pass null if you know neither name nor ID.',
+      'Card name or ID in format {set-key}-{three digit number}, e.g. A1-003. If it matches the ID pattern, it will be treated as an ID; otherwise, as a name. Pass null instead of a string if you know neither name nor ID.',
     ),
   setKey: z
     .enum(SET_KEY_VALUES)
@@ -37,10 +37,10 @@ const schema = z.object({
       'Booster to filter by. Pass null unless the user specifically asks you to filter by a booster name.',
     ),
   rarity: z
-    .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '♛'])
+    .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '☆☆☆☆', '✸', '✸✸', '♛'])
     .nullish()
     .describe(
-      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ♛ instead of 👑. Pass null unless the user specifically asks you to filter by rarity.',
+      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, ✸, ✸✸, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ✸ instead of ✴️, and ♛ instead of 👑. Pass null unless the user specifically asks you to filter by rarity.',
     ),
   ownershipFilter: z
     .enum(OWNERSHIP_FILTER_VALUES)

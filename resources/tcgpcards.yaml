@@ -2760,6 +2760,342 @@ A2a:
     96:
       name: Arceus ex
       rarity: ♛
+A2b:
+  name: Glänzendes Festival
+  cards:
+    1:
+      name: Hornliu
+      rarity: ♢
+    2:
+      name: Kokuna
+      rarity: ♢♢
+    3:
+      name: Bibor ex
+      rarity: ♢♢♢♢
+    4:
+      name: Pinsir
+      rarity: ♢
+    5:
+      name: Felori
+      rarity: ♢
+    6:
+      name: Feliospa
+      rarity: ♢♢
+    7:
+      name: Maskagato
+      rarity: ♢♢♢
+    8:
+      name: Glumanda
+      rarity: ♢
+    9:
+      name: Glutexo
+      rarity: ♢♢
+    10:
+      name: Glurak ex
+      rarity: ♢♢♢♢
+    11:
+      name: Magmar
+      rarity: ♢
+    12:
+      name: Magbrant
+      rarity: ♢♢♢
+    13:
+      name: Paldea-Tauros
+      rarity: ♢♢
+    14:
+      name: Tentacha
+      rarity: ♢
+    15:
+      name: Tentoxa
+      rarity: ♢♢
+    16:
+      name: Bamelin
+      rarity: ♢
+    17:
+      name: Bojelin
+      rarity: ♢♢
+    18:
+      name: Schligda
+      rarity: ♢
+    19:
+      name: Schligdri ex
+      rarity: ♢♢♢♢
+    20:
+      name: Heerashai
+      rarity: ♢♢♢
+    21:
+      name: Nigiragi
+      rarity: ♢♢
+    22:
+      name: Pikachu ex
+      rarity: ♢♢♢♢
+    23:
+      name: Voltobal
+      rarity: ♢
+    24:
+      name: Lektrobal
+      rarity: ♢♢
+    25:
+      name: Pachirisu
+      rarity: ♢♢
+    26:
+      name: Pamo
+      rarity: ♢
+    27:
+      name: Pamamo
+      rarity: ♢♢
+    28:
+      name: Pamomamo
+      rarity: ♢♢♢
+    29:
+      name: Abra
+      rarity: ♢
+    30:
+      name: Kadabra
+      rarity: ♢♢
+    31:
+      name: Simsala
+      rarity: ♢♢♢
+    32:
+      name: Pantimos
+      rarity: ♢
+    33:
+      name: Driftlon
+      rarity: ♢
+    34:
+      name: Drifzepeli
+      rarity: ♢♢
+    35:
+      name: Giratina ex
+      rarity: ♢♢♢♢
+    36:
+      name: Gierspenst
+      rarity: ♢
+    37:
+      name: Machollo
+      rarity: ♢
+    38:
+      name: Maschock
+      rarity: ♢
+    39:
+      name: Machomei
+      rarity: ♢♢♢
+    40:
+      name: Kicklee
+      rarity: ♢
+    41:
+      name: Nockchan
+      rarity: ♢
+    42:
+      name: Riolu
+      rarity: ♢
+    43:
+      name: Lucario ex
+      rarity: ♢♢♢♢
+    44:
+      name: Flaminkno
+      rarity: ♢♢
+    45:
+      name: Rettan
+      rarity: ♢
+    46:
+      name: Arbok
+      rarity: ♢♢
+    47:
+      name: Paldea-Felino
+      rarity: ♢
+    48:
+      name: Paldea-Suelord ex
+      rarity: ♢♢♢♢
+    49:
+      name: Kryppuk
+      rarity: ♢♢
+    50:
+      name: Sproxi
+      rarity: ♢
+    51:
+      name: Affiti
+      rarity: ♢♢♢
+    52:
+      name: Forgita
+      rarity: ♢
+    53:
+      name: Tafforgita
+      rarity: ♢♢
+    54:
+      name: Granforgita ex
+      rarity: ♢♢♢♢
+    55:
+      name: Knattox
+      rarity: ♢
+    56:
+      name: Knattatox
+      rarity: ♢♢
+    57:
+      name: Monetigo
+      rarity: ♢♢♢
+    58:
+      name: Rattfratz
+      rarity: ♢
+    59:
+      name: Rattikarl
+      rarity: ♢
+    60:
+      name: Pummeluff
+      rarity: ♢
+    61:
+      name: Knuddeluff
+      rarity: ♢♢♢
+    62:
+      name: Schlurp
+      rarity: ♢
+    63:
+      name: Schlurplek
+      rarity: ♢
+    64:
+      name: Bidiza
+      rarity: ♢
+    65:
+      name: Bidifas ex
+      rarity: ♢♢♢♢
+    66:
+      name: Haspiror
+      rarity: ♢
+    67:
+      name: Schlapor
+      rarity: ♢
+    68:
+      name: Mopex
+      rarity: ♢♢
+    69:
+      name: Enigmara
+      rarity: ♢♢
+    70:
+      name: Pokémon-Center-Dame
+      rarity: ♢♢
+    71:
+      name: Rot
+      rarity: ♢♢
+    72:
+      name: Rüpel von Team Rocket
+      rarity: ♢♢
+    73:
+      name: Maskagato
+      rarity: ☆
+    74:
+      name: Bamelin
+      rarity: ☆
+    75:
+      name: Nigiragi
+      rarity: ☆
+    76:
+      name: Affiti
+      rarity: ☆
+    77:
+      name: Monetigo
+      rarity: ☆
+    78:
+      name: Knuddeluff
+      rarity: ☆
+    79:
+      name: Bibor ex
+      rarity: ☆☆
+    80:
+      name: Glurak ex
+      rarity: ☆☆
+    81:
+      name: Schligdri ex
+      rarity: ☆☆
+    82:
+      name: Pikachu ex
+      rarity: ☆☆
+    83:
+      name: Giratina ex
+      rarity: ☆☆
+    84:
+      name: Lucario ex
+      rarity: ☆☆
+    85:
+      name: Paldea-Suelord ex
+      rarity: ☆☆
+    86:
+      name: Granforgita ex
+      rarity: ☆☆
+    87:
+      name: Bidifas ex
+      rarity: ☆☆
+    88:
+      name: Enigmara
+      rarity: ☆☆
+    89:
+      name: Pokémon-Center-Dame
+      rarity: ☆☆
+    90:
+      name: Rot
+      rarity: ☆☆
+    91:
+      name: Rüpel von Team Rocket
+      rarity: ☆☆
+    92:
+      name: Pikachu ex
+      rarity: ☆☆
+    93:
+      name: Paldea-Suelord ex
+      rarity: ☆☆
+    94:
+      name: Granforgita ex
+      rarity: ☆☆
+    95:
+      name: Bidifas ex
+      rarity: ☆☆
+    96:
+      name: Giratina ex
+      rarity: ☆☆☆
+    97:
+      name: Hornliu
+      rarity: ✸
+    98:
+      name: Kokuna
+      rarity: ✸
+    99:
+      name: Glumanda
+      rarity: ✸
+    100:
+      name: Glutexo
+      rarity: ✸
+    101:
+      name: Schligda
+      rarity: ✸
+    102:
+      name: Heerashai
+      rarity: ✸
+    103:
+      name: Pachirisu
+      rarity: ✸
+    104:
+      name: Riolu
+      rarity: ✸
+    105:
+      name: Knattox
+      rarity: ✸
+    106:
+      name: Knattatox
+      rarity: ✸
+    107:
+      name: Bibor ex
+      rarity: ✸✸
+    108:
+      name: Glurak ex
+      rarity: ✸✸
+    109:
+      name: Schligdri ex
+      rarity: ✸✸
+    110:
+      name: Lucario ex
+      rarity: ✸✸
+    111:
+      name: Pokéball
+      rarity: ♛
 PROMO-A:
   name: Promo-A
   boosters: ~
@@ -2898,19 +3234,26 @@ PROMO-A:
       equalTo: A1
     51:
       name: Mopex
+      equalTo: A2b
     52:
       name: Felori
+      equalTo: A2b
     53:
       name: Bojelin
     54:
       name: Pamomamo
+      equalTo: A2b
     55:
       name: Machomei
+      equalTo: A2b
     56:
       name: Rettan
     57:
       name: Bidiza
+      equalTo: A2b
     58:
       name: Pachirisu
+      equalTo: A2b
     59:
       name: Riolu
+      equalTo: A2b

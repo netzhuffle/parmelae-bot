@@ -1,6 +1,7 @@
 import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity } from '@prisma/client';
+import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 
 describe('PokemonTcgPocketService', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -24,7 +25,12 @@ TEST:
       name: Test Card
       rarity: INVALID
 `;
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
 
         await expect(
           service.synchronizeCardDatabaseWithYamlSource(),
@@ -72,7 +78,12 @@ TEST:
     12:
       name: No Rarity
 `;
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify all cards were created with correct rarities
@@ -108,8 +119,12 @@ TEST-SET:
       name: Another Card One
       rarity: ♢`;
 
-        const repository = new PokemonTcgPocketRepositoryFake();
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
 
         await expect(
           service.synchronizeCardDatabaseWithYamlSource(),
@@ -125,7 +140,12 @@ TEST:
       name: Invalid Number Card
       rarity: ♢
 `;
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
 
         await expect(
           service.synchronizeCardDatabaseWithYamlSource(),
@@ -145,7 +165,12 @@ TEST:
       name: Test Card
       boosters: NonExistentBooster
 `;
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
 
         await expect(
           service.synchronizeCardDatabaseWithYamlSource(),
@@ -165,7 +190,12 @@ TEST:
       name: Test Card
       rarity: ♢
 `;
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
@@ -201,7 +231,12 @@ TEST:
       name: Card Two
       rarity: ♢♢
 `;
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
@@ -240,7 +275,12 @@ TEST:
         - Booster1
         - Booster2
 `;
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
@@ -294,7 +334,12 @@ SET2:
       name: Second Set Card
       rarity: ♢♢
 `;
-        const service = new PokemonTcgPocketService(repository, yaml);
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          yaml,
+        );
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify sets were created
@@ -360,7 +405,12 @@ TEST:
       rarity: ♢
       boosters: Booster1
 `;
-      const service = new PokemonTcgPocketService(repository, yaml);
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        yaml,
+      );
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created
@@ -384,6 +434,12 @@ TEST:
       const cardInOneBoosters = repository.getCardBoosters(cardInOne.id);
       expect(cardInOneBoosters).toHaveLength(1);
       expect(cardInOneBoosters[0].name).toBe('Booster1');
+
+      // Verify all boosters have hasShinyRarity set to false since there are no shiny cards
+      const boosters = repository.getAllBoosters();
+      boosters.forEach((booster) => {
+        expect(booster.hasShinyRarity).toBe(false);
+      });
     });
 
     it('handles cards with null boosters in a set with boosters', async () => {
@@ -403,7 +459,12 @@ TEST:
       rarity: ♢
       boosters: ~
 `;
-      const service = new PokemonTcgPocketService(repository, yaml);
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        yaml,
+      );
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created
@@ -428,6 +489,112 @@ TEST:
         cardWithoutBoosters.id,
       );
       expect(cardWithoutBoostersBoosters).toHaveLength(0);
+
+      // Verify all boosters have hasShinyRarity set to false since there are no shiny cards
+      const boosters = repository.getAllBoosters();
+      boosters.forEach((booster) => {
+        expect(booster.hasShinyRarity).toBe(false);
+      });
+    });
+  });
+
+  describe('Booster shiny rarity', () => {
+    it('sets hasShinyRarity to true for boosters containing shiny cards', async () => {
+      const yaml = `
+TEST:
+  name: Test Set
+  boosters:
+    - Booster1
+    - Booster2
+  cards:
+    1:
+      name: Regular Card
+      rarity: ♢
+      boosters: Booster1
+    2:
+      name: Shiny Card
+      rarity: ✸
+      boosters: Booster2
+    3:
+      name: Double Shiny Card
+      rarity: ✸✸
+      boosters: Booster2
+`;
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        yaml,
+      );
+      await service.synchronizeCardDatabaseWithYamlSource();
+
+      // Verify cards were created
+      const cards = repository.getAllCards();
+      expect(cards).toHaveLength(3);
+
+      // Get boosters
+      const boosters = repository.getAllBoosters();
+      expect(boosters).toHaveLength(2);
+
+      // Verify Booster1 (no shiny cards) has hasShinyRarity false
+      const booster1 = boosters.find((b) => b.name === 'Booster1')!;
+      expect(booster1.hasShinyRarity).toBe(false);
+
+      // Verify Booster2 (with shiny cards) has hasShinyRarity true
+      const booster2 = boosters.find((b) => b.name === 'Booster2')!;
+      expect(booster2.hasShinyRarity).toBe(true);
+    });
+
+    it('sets hasShinyRarity to true for boosters containing shiny cards when cards are in multiple boosters', async () => {
+      const yaml = `
+TEST:
+  name: Test Set
+  boosters:
+    - Booster1
+    - Booster2
+    - Booster3
+  cards:
+    1:
+      name: Regular Card
+      rarity: ♢
+    2:
+      name: Shiny Card
+      rarity: ✸
+      boosters:
+        - Booster1
+        - Booster2
+    3:
+      name: Double Shiny Card
+      rarity: ✸✸
+      boosters: Booster2
+`;
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        yaml,
+      );
+      await service.synchronizeCardDatabaseWithYamlSource();
+
+      // Verify cards were created
+      const cards = repository.getAllCards();
+      expect(cards).toHaveLength(3);
+
+      // Get boosters
+      const boosters = repository.getAllBoosters();
+      expect(boosters).toHaveLength(3);
+
+      // Verify Booster1 (with one shiny card) has hasShinyRarity true
+      const booster1 = boosters.find((b) => b.name === 'Booster1')!;
+      expect(booster1.hasShinyRarity).toBe(true);
+
+      // Verify Booster2 (with two shiny cards) has hasShinyRarity true
+      const booster2 = boosters.find((b) => b.name === 'Booster2')!;
+      expect(booster2.hasShinyRarity).toBe(true);
+
+      // Verify Booster3 (no shiny cards) has hasShinyRarity false
+      const booster3 = boosters.find((b) => b.name === 'Booster3')!;
+      expect(booster3.hasShinyRarity).toBe(false);
     });
   });
 
@@ -442,7 +609,12 @@ TEST:
       await repository.createCard('Raichu', 'A1', 2, Rarity.TWO_DIAMONDS, [
         'Test Booster',
       ]);
-      const service = new PokemonTcgPocketService(repository, '');
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        '',
+      );
       const searchCardsSpy = jest.spyOn(repository, 'searchCards');
 
       const nameSearchCards = await service.searchCards({ cardName: 'chu' });

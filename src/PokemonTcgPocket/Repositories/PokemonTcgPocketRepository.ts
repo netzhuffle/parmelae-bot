@@ -382,6 +382,25 @@ export class PokemonTcgPocketRepository {
     }
   }
 
+  /** Updates the hasShinyRarity field of a booster */
+  async updateBoosterShinyRarity(
+    boosterId: number,
+    hasShinyRarity: boolean,
+  ): Promise<PokemonBooster> {
+    try {
+      return this.prisma.pokemonBooster.update({
+        where: { id: boosterId },
+        data: { hasShinyRarity },
+      });
+    } catch (error) {
+      throw new PokemonTcgPocketDatabaseError(
+        'update',
+        `booster ${boosterId} shiny rarity`,
+        this.formatError(error),
+      );
+    }
+  }
+
   private async resolveSetId(key: string): Promise<number | null> {
     const cachedId = this.cache.getSetId(key);
     if (cachedId !== null) {

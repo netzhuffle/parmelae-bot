@@ -6,13 +6,16 @@ import { jest } from '@jest/globals';
 import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 import { ToolContext } from '../ChatGptAgentService.js';
 import { createTestToolConfig } from '../ChatGptAgentService.js';
+import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 
 describe('pokemonCardSearch', () => {
   let repository: PokemonTcgPocketRepositoryFake;
   let config: { configurable: ToolContext };
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
+    const probabilityService = new PokemonTcgPocketProbabilityService();
     const service = new PokemonTcgPocketService(
+      probabilityService,
       repository as unknown as PokemonTcgPocketRepository,
       '',
     );

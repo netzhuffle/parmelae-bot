@@ -1,6 +1,14 @@
 import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
-import { Card, SetData, Sets } from './PokemonTcgPocketService.js';
+import {
+  Card,
+  SetData,
+  Sets,
+  SET_KEY_VALUES,
+  SET_KEY_NAMES,
+  BOOSTER_VALUES,
+  SetKey,
+} from './PokemonTcgPocketService.js';
 
 /** Maps rarity symbols to database enum values */
 const VALID_RARITY_SYMBOLS = new Set([
@@ -12,6 +20,8 @@ const VALID_RARITY_SYMBOLS = new Set([
   '☆☆',
   '☆☆☆',
   '☆☆☆☆',
+  '✸',
+  '✸✸',
   '♛',
 ]);
 
@@ -117,6 +127,33 @@ describe('tcgpcards.yaml', () => {
       });
     });
 
+    it('should have correct rarity for ex cards', () => {
+      const validExRarities = new Set(['♢♢♢♢', '☆☆', '☆☆☆', '✸✸', '♛']);
+
+      Object.values(sets).forEach((setData: SetData) => {
+        Object.values(setData.cards).forEach((card: Card) => {
+          if (card.name.endsWith(' ex')) {
+            // Allow undefined rarity or valid ex rarity
+            if (card.rarity) {
+              expect(validExRarities.has(card.rarity)).toBe(true);
+            }
+          }
+        });
+      });
+    });
+
+    it('should have ex suffix for specific rarities', () => {
+      const exRequiredRarities = new Set(['♢♢♢♢', '✸✸']);
+
+      Object.values(sets).forEach((setData: SetData) => {
+        Object.values(setData.cards).forEach((card: Card) => {
+          if (card.rarity && exRequiredRarities.has(card.rarity)) {
+            expect(card.name.endsWith(' ex')).toBe(true);
+          }
+        });
+      });
+    });
+
     it('should reference valid boosters', () => {
       Object.entries(sets).forEach(([, setData]: [string, SetData]) => {
         const validBoosters = new Set(setData.boosters ?? [setData.name]);
@@ -166,6 +203,71 @@ describe('tcgpcards.yaml', () => {
           const uniqueBoosters = new Set(boosterList);
           expect(uniqueBoosters.size).toBe(boosterList.length);
         });
+      });
+    });
+  });
+
+  describe('Service and YAML consistency', () => {
+    it('should have matching set keys, names, and booster names between service and YAML', () => {
+      // Get all set keys from YAML
+      const yamlSetKeys = new Set(Object.keys(sets));
+
+      // Get all set names from YAML
+      const yamlSetNames = new Set(Object.values(sets).map((set) => set.name));
+
+      // Get all booster names from YAML
+      const yamlBoosterNames = new Set(
+        Object.values(sets).flatMap((set) =>
+          set.boosters === null ? [] : (set.boosters ?? [set.name]),
+        ),
+      );
+
+      // Verify all YAML set keys exist in service
+      yamlSetKeys.forEach((key) => {
+        expect(SET_KEY_VALUES).toContain(key as SetKey);
+      });
+
+      // Verify all service set keys exist in YAML
+      SET_KEY_VALUES.forEach((key) => {
+        expect(yamlSetKeys.has(key)).toBe(true);
+      });
+
+      // Verify all YAML set names exist in service
+      yamlSetNames.forEach((name) => {
+        expect(Object.values(SET_KEY_NAMES)).toContain(name);
+      });
+
+      // Verify all service set names exist in YAML
+      Object.values(SET_KEY_NAMES).forEach((name) => {
+        expect(yamlSetNames.has(name)).toBe(true);
+      });
+
+      // Verify all YAML booster names exist in service
+      yamlBoosterNames.forEach((name) => {
+        expect(BOOSTER_VALUES).toContain(
+          name as (typeof BOOSTER_VALUES)[number],
+        );
+      });
+
+      // Verify all service booster names exist in YAML
+      BOOSTER_VALUES.forEach((name) => {
+        expect(yamlBoosterNames.has(name)).toBe(true);
+      });
+    });
+
+    it('should have matching set names for each set key between service and YAML', () => {
+      // For each set key in the YAML, verify its name matches the service
+      Object.entries(sets).forEach(([key, setData]) => {
+        const serviceName = SET_KEY_NAMES[key as SetKey];
+        expect(serviceName).toBe(setData.name);
+      });
+
+      // For each set key in the service, verify its name matches the YAML
+      SET_KEY_VALUES.forEach((key) => {
+        const yamlSetData = sets[key];
+        expect(yamlSetData).toBeDefined();
+        const yamlName = yamlSetData.name;
+        expect(SET_KEY_NAMES[key]).toBe(yamlName);
       });
     });
   });

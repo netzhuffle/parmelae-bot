@@ -9,6 +9,7 @@ import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepo
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { PokemonCardWithRelations } from '../Repositories/Types.js';
 import { OwnershipFilter } from '../PokemonTcgPocketService.js';
+import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
 export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
@@ -392,5 +393,24 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     };
 
     return Promise.resolve(result);
+  }
+
+  /** Updates the hasShinyRarity field of a booster */
+  async updateBoosterShinyRarity(
+    boosterId: number,
+    hasShinyRarity: boolean,
+  ): Promise<PokemonBooster> {
+    const booster = Array.from(this.boosters.values()).find(
+      (b) => b.id === boosterId,
+    );
+    if (!booster) {
+      throw new PokemonTcgPocketDatabaseError(
+        'update',
+        `booster ${boosterId} shiny rarity`,
+        'Booster not found',
+      );
+    }
+    booster.hasShinyRarity = hasShinyRarity;
+    return await Promise.resolve(booster);
   }
 }
