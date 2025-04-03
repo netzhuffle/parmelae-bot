@@ -15,6 +15,37 @@ import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocke
 import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { BOOSTERS_STATS_EXPLANATION, SETS_STATS_EXPLANATION } from './texts.js';
+import assert from 'node:assert/strict';
+import {
+  CARD_EXISTS_BUT_NO_MATCH_MESSAGE,
+  NO_CARDS_IN_DB_MESSAGE,
+  NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE,
+  NO_MATCHING_MISSING_CARDS_MESSAGE,
+  MULTIPLE_MATCHES_MESSAGE,
+  BULK_OPERATION_HEADER_MESSAGE,
+  BULK_OPERATION_WARNING_MESSAGE,
+  SINGLE_OPERATION_HEADER_MESSAGE,
+  UPDATED_STATS_MESSAGE,
+  OPERATION_RESULT_MESSAGE,
+  NO_CARDS_FOUND_MESSAGE,
+} from './texts.js';
+
+/** Card ID regex pattern */
+const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
+
+/** Information about a card ID */
+interface CardIdInfo {
+  setKey: string;
+  cardNumber: number;
+}
+
+/** Result of parsing a card identifier */
+interface CardIdentifier {
+  /** The parsed card ID info if the input was an ID, undefined otherwise */
+  idInfo?: CardIdInfo;
+  /** The card name if the input was a name, undefined otherwise */
+  cardName?: string;
+}
 
 /** Set key values */
 export const SET_KEY_VALUES = [
@@ -593,5 +624,215 @@ export class PokemonTcgPocketService {
     }
 
     return rarity;
+  }
+
+  /** Parses a card identifier string into either an ID or name */
+  parseCardIdentifier(card: string | null | undefined): CardIdentifier {
+    if (!card) {
+      return {};
+    }
+
+    const match = CARD_ID_PATTERN.exec(card);
+    if (match) {
+      return {
+        idInfo: {
+          setKey: match[1],
+          cardNumber: parseInt(match[2], 10),
+        },
+      };
+    }
+
+    return { cardName: card };
+  }
+
+  /** Builds search parameters for card queries */
+  buildSearchParams(
+    cardName: string | null,
+    setKey: string | null,
+    booster: string | null,
+    rarity: string | null,
+    idInfo?: CardIdInfo,
+    userId?: bigint,
+    ownershipFilter?: string,
+  ): Record<string, unknown> {
+    const searchParams: Record<string, unknown> = {};
+
+    if (cardName) searchParams.cardName = cardName;
+    if (idInfo?.setKey ?? setKey)
+      searchParams.setKey = idInfo?.setKey ?? setKey;
+    if (booster) searchParams.booster = booster;
+    if (idInfo?.cardNumber) searchParams.cardNumber = idInfo?.cardNumber;
+    if (rarity) searchParams.rarity = RARITY_MAP[rarity];
+    if (userId && ownershipFilter) {
+      searchParams.userId = userId;
+      searchParams.ownershipFilter = ownershipFilter;
+    }
+
+    return searchParams;
+  }
+
+  /** Searches for cards with fallback to ID-only search if no results */
+  async searchCardsWithFallback(
+    searchParams: Record<string, unknown>,
+    idInfo?: CardIdInfo,
+  ): Promise<{
+    cards: PokemonCardWithRelations[];
+    idOnlyCards?: PokemonCardWithRelations[];
+  }> {
+    const cards = await this.searchCards(searchParams);
+
+    // If we have no results and used an ownership filter, try without it
+    if (cards.length === 0 && searchParams.ownershipFilter) {
+      const paramsWithoutOwnership = { ...searchParams };
+      delete paramsWithoutOwnership.ownershipFilter;
+      delete paramsWithoutOwnership.userId;
+      const cardsWithoutOwnership = await this.searchCards(
+        paramsWithoutOwnership,
+      );
+      if (cardsWithoutOwnership.length > 0) {
+        return { cards: cardsWithoutOwnership };
+      }
+    }
+
+    // If we still have no results and have an ID, try ID-only search
+    if (cards.length === 0 && idInfo) {
+      const idOnlyCards = await this.searchCards({
+        setKey: idInfo.setKey,
+        cardNumber: idInfo.cardNumber,
+      });
+      return { cards, idOnlyCards };
+    }
+
+    return { cards };
+  }
+
+  /** Handles the case when no cards are found, with fallback search if needed */
+  async handleNoCardsFound(
+    searchParams: Record<string, unknown>,
+    userId: bigint,
+    idInfo?: CardIdInfo,
+  ): Promise<string> {
+    // Search if the cards would exist without the ownership filter
+    const existingCards = await this.searchCards(searchParams);
+
+    if (existingCards.length === 0) {
+      // If we have a card ID and still no results, try searching with just the ID
+      if (idInfo) {
+        const idOnlyCards = await this.searchCards({
+          setKey: idInfo.setKey,
+          cardNumber: idInfo.cardNumber,
+        });
+
+        if (idOnlyCards.length > 0) {
+          const cardDetails = await this.formatCardsAsCsv(idOnlyCards, userId);
+          return CARD_EXISTS_BUT_NO_MATCH_MESSAGE(
+            idInfo.setKey,
+            idInfo.cardNumber,
+            cardDetails,
+          );
+        }
+      }
+
+      return NO_CARDS_FOUND_MESSAGE;
+    }
+
+    const cardDetails = await this.formatCardsAsCsv(existingCards, userId);
+    return cardDetails;
+  }
+
+  /** Handles the case when no cards are found for add/remove operations */
+  async handleNoCardsFoundForAddRemove(
+    searchParams: Record<string, unknown>,
+    userId: bigint,
+    remove: boolean,
+    idInfo?: CardIdInfo,
+  ): Promise<string> {
+    const displayName = await this.getDisplayName(userId);
+
+    // Search if the cards would exist without the ownership filter
+    const existingCards = await this.searchCards(searchParams);
+
+    if (existingCards.length === 0) {
+      // If we have a card ID and still no results, try searching with just the ID
+      if (idInfo) {
+        const idOnlyCards = await this.searchCards({
+          setKey: idInfo.setKey,
+          cardNumber: idInfo.cardNumber,
+        });
+
+        if (idOnlyCards.length > 0) {
+          const cardDetails = await this.formatCardsAsCsv(idOnlyCards, userId);
+          return (
+            CARD_EXISTS_BUT_NO_MATCH_MESSAGE(
+              idInfo.setKey,
+              idInfo.cardNumber,
+              cardDetails,
+            ) + OPERATION_RESULT_MESSAGE(remove)
+          );
+        }
+      }
+
+      return NO_CARDS_IN_DB_MESSAGE(remove);
+    }
+
+    const cardDetails = await this.formatCardsAsCsv(existingCards, userId);
+    if (remove) {
+      return NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE(displayName, cardDetails);
+    }
+    return NO_MATCHING_MISSING_CARDS_MESSAGE(displayName, cardDetails);
+  }
+
+  /** Processes multiple cards for add/remove operations */
+  async processCards(
+    cards: PokemonCardWithRelations[],
+    userId: bigint,
+    remove: boolean,
+    bulkOperation: boolean,
+  ): Promise<string> {
+    const displayName = await this.getDisplayName(userId);
+    const operation = remove ? 'removed' : 'added';
+    const preposition = remove ? 'from' : 'to';
+
+    if (!bulkOperation && cards.length > 1) {
+      return MULTIPLE_MATCHES_MESSAGE(
+        await this.formatCardsAsCsv(cards, userId),
+      );
+    }
+
+    if (cards.length > 1 && bulkOperation) {
+      const updatedCards = await Promise.all(
+        cards.map((card) =>
+          remove
+            ? this.removeCardFromCollection(card.id, userId)
+            : this.addCardToCollection(card.id, userId),
+        ),
+      );
+
+      const header = BULK_OPERATION_HEADER_MESSAGE(
+        operation,
+        cards.length,
+        preposition,
+        displayName,
+      );
+      const csv = await this.formatCardsAsCsv(updatedCards, userId);
+      const stats = await this.getFormattedCollectionStats(userId);
+      return BULK_OPERATION_WARNING_MESSAGE(header, csv, stats);
+    }
+
+    // Process single card
+    assert(cards.length === 1);
+    const card = cards[0];
+    const updatedCard = remove
+      ? await this.removeCardFromCollection(card.id, userId)
+      : await this.addCardToCollection(card.id, userId);
+
+    const header = SINGLE_OPERATION_HEADER_MESSAGE(
+      operation,
+      preposition,
+      displayName,
+    );
+    const csv = await this.formatCardsAsCsv([updatedCard], userId);
+    const stats = await this.getFormattedCollectionStats(userId);
+    return `${header}\n${csv}${UPDATED_STATS_MESSAGE(stats)}`;
   }
 }
