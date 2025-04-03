@@ -11,6 +11,12 @@ import {
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';
 import { PokemonCardWithRelations } from '../PokemonTcgPocket/Repositories/Types.js';
+import {
+  CARD_ID_MISMATCH_MESSAGE,
+  NO_CARDS_FOUND_MESSAGE,
+  CARD_EXISTS_BUT_NO_MATCH_MESSAGE,
+  LIMITED_RESULTS_MESSAGE,
+} from '../PokemonTcgPocket/texts.js';
 
 export const POKEMON_CARD_SEARCH_TOOL_NAME = 'pokemonCardSearch';
 
@@ -105,18 +111,19 @@ async function formatSearchResults(
 
       if (idOnlyCards.length > 0) {
         const csv = await service.formatCardsAsCsv(idOnlyCards, userId);
-        return `Card with ID ${idInfo.setKey}-${idInfo.cardNumber.toString().padStart(3, '0')} exists but does not match the additional search criteria:\n${csv}`;
+        return CARD_EXISTS_BUT_NO_MATCH_MESSAGE(
+          idInfo.setKey,
+          idInfo.cardNumber,
+          csv,
+        );
       }
     }
-    return 'No cards found matching the search criteria.';
+    return NO_CARDS_FOUND_MESSAGE;
   }
 
   const csv = await service.formatCardsAsCsv(cards.slice(0, 20), userId);
   if (cards.length > 20) {
-    return (
-      csv +
-      `\n\nLimited list above to first 20 cards to save token usage. Tell the user there are ${cards.length - 20} additional cards matching the search query (${cards.length} total).`
-    );
+    return csv + LIMITED_RESULTS_MESSAGE(cards.length - 20, cards.length);
   }
   return csv;
 }
@@ -136,7 +143,7 @@ export const pokemonCardSearchTool = tool(
     const cardName = idInfo ? null : card;
 
     if (idInfo?.setKey && setKey && idInfo.setKey !== setKey) {
-      return 'Card ID and set key do not match. Please ask the user which one is incorrect.';
+      return CARD_ID_MISMATCH_MESSAGE;
     }
 
     // Build search parameters for normal search

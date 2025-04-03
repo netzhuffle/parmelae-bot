@@ -11,6 +11,20 @@ import assert from 'node:assert/strict';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';
 import { PokemonCardWithRelations } from '../PokemonTcgPocket/Repositories/Types.js';
+import {
+  CARD_ID_MISMATCH_MESSAGE,
+  CARD_EXISTS_BUT_NO_MATCH_MESSAGE,
+  NO_CARDS_IN_DB_MESSAGE,
+  NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE,
+  NO_MATCHING_MISSING_CARDS_MESSAGE,
+  BULK_OPERATION_WARNING_MESSAGE,
+  POKEMON_CARD_ADD_TOOL_DESCRIPTION,
+  MULTIPLE_MATCHES_MESSAGE,
+  BULK_OPERATION_HEADER_MESSAGE,
+  SINGLE_OPERATION_HEADER_MESSAGE,
+  UPDATED_STATS_MESSAGE,
+  OPERATION_RESULT_MESSAGE,
+} from '../PokemonTcgPocket/texts.js';
 
 /** Card ID regex pattern */
 const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
@@ -111,22 +125,24 @@ async function handleNoCardsFound(
 
       if (idOnlyCards.length > 0) {
         const cardDetails = await service.formatCardsAsCsv(idOnlyCards, userId);
-        return `Card with ID ${idInfo.setKey}-${idInfo.cardNumber.toString().padStart(3, '0')} exists but does not match the additional search criteria:\n${cardDetails}\n\nThus no card was ${remove ? 'removed from' : 'added to'} the user’s collection.`;
+        return (
+          CARD_EXISTS_BUT_NO_MATCH_MESSAGE(
+            idInfo.setKey,
+            idInfo.cardNumber,
+            cardDetails,
+          ) + OPERATION_RESULT_MESSAGE(remove)
+        );
       }
     }
 
-    return (
-      'No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was ' +
-      (remove ? 'removed from' : 'added to') +
-      ' the user’s collection.'
-    );
+    return NO_CARDS_IN_DB_MESSAGE(remove);
   }
 
   const cardDetails = await service.formatCardsAsCsv(existingCards, userId);
   if (remove) {
-    return `No matching cards found in ${displayName}’s collection. The cards exist but ${displayName} does not own them. The following cards were found:\n${cardDetails}\nThus no card was removed from the user’s collection.`;
+    return NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE(displayName, cardDetails);
   }
-  return `No matching cards found that ${displayName} is missing. The cards exist but ${displayName} already owns them. The following cards were found:\n${cardDetails}\nThus no card was added to the user’s collection.`;
+  return NO_MATCHING_MISSING_CARDS_MESSAGE(displayName, cardDetails);
 }
 
 async function processCards(
@@ -141,9 +157,8 @@ async function processCards(
   const preposition = remove ? 'from' : 'to';
 
   if (!bulkOperation && cards.length > 1) {
-    return (
-      'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:\n' +
-      (await service.formatCardsAsCsv(cards, userId))
+    return MULTIPLE_MATCHES_MESSAGE(
+      await service.formatCardsAsCsv(cards, userId),
     );
   }
 
@@ -156,10 +171,15 @@ async function processCards(
       ),
     );
 
-    const header = `Successfully ${operation} ${cards.length} cards ${preposition} ${displayName}'s collection:`;
+    const header = BULK_OPERATION_HEADER_MESSAGE(
+      operation,
+      cards.length,
+      preposition,
+      displayName,
+    );
     const csv = await service.formatCardsAsCsv(updatedCards, userId);
     const stats = await service.getFormattedCollectionStats(userId);
-    return `${header}\n${csv}\nIf these aren’t the cards the user was asking for, you passed the wrong parameters. If so, please inform the user about your mistake and let them decide what to do.\n\nUpdated statistics of ${stats}`;
+    return BULK_OPERATION_WARNING_MESSAGE(header, csv, stats);
   }
 
   // Process single card
@@ -169,10 +189,14 @@ async function processCards(
     ? await service.removeCardFromCollection(card.id, userId)
     : await service.addCardToCollection(card.id, userId);
 
-  const header = `Successfully ${operation} card ${preposition} ${displayName}'s collection:`;
+  const header = SINGLE_OPERATION_HEADER_MESSAGE(
+    operation,
+    preposition,
+    displayName,
+  );
   const csv = await service.formatCardsAsCsv([updatedCard], userId);
   const stats = await service.getFormattedCollectionStats(userId);
-  return `${header}\n${csv}\n\nUpdated statistics of ${stats}`;
+  return `${header}\n${csv}${UPDATED_STATS_MESSAGE(stats)}`;
 }
 
 export const pokemonCardAddTool = tool(
@@ -197,7 +221,7 @@ export const pokemonCardAddTool = tool(
     const cardName = idInfo ? null : card;
 
     if (idInfo?.setKey && setKey && idInfo.setKey !== setKey) {
-      return 'Card ID and set key do not match. Please ask the user which one is incorrect.';
+      return CARD_ID_MISMATCH_MESSAGE;
     }
 
     // Build search parameters
@@ -231,8 +255,7 @@ export const pokemonCardAddTool = tool(
   },
   {
     name: 'pokemonCardAdd',
-    description:
-      'Add or remove Pokémon TCG Pocket cards to/from the collection of the user who wrote the last message in the chat. Returns a CSV with the card info. If a user shares an image of a Pokémon card without context in this chat (especially if it shows “new”), they likely want you to add it to their collection. Generally pass null to filters the user did not tell you to filter by and make sure to only add/remove 1 card unless the user explictly asks you to add/remove multiple cards – there is no undo!',
+    description: POKEMON_CARD_ADD_TOOL_DESCRIPTION,
     schema,
   },
 );

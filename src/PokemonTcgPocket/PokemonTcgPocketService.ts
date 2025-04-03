@@ -14,7 +14,7 @@ import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPoc
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
-import { BOOSTERS_STATS_EXPLANATION, SETS_STATS_EXPLANATION } from './Texts.js';
+import { BOOSTERS_STATS_EXPLANATION, SETS_STATS_EXPLANATION } from './texts.js';
 
 /** Set key values */
 export const SET_KEY_VALUES = [
