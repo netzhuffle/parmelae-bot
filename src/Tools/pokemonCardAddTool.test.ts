@@ -727,4 +727,129 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No');
     });
   });
+
+  describe('card ID exists but additional criteria do not match', () => {
+    beforeEach(async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createIdOnlyCard(
+        'Test Card',
+        'A1',
+        1,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      jest.spyOn(repository, 'searchCards');
+    });
+
+    it('should show card details when adding with mismatched criteria', async () => {
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          card: 'A1-001',
+          setKey: null,
+          booster: null,
+          rarity: '✸',
+          remove: false,
+          bulkOperation: false,
+        },
+        config,
+      )) as string;
+
+      expect(result).toContain(
+        'Card with ID A1-001 exists but does not match the additional search criteria:',
+      );
+      expect(result).toContain('Test Card');
+      expect(result).toContain('no card was added');
+      expect(repository.searchCards).toHaveBeenCalledWith({
+        setKey: 'A1',
+        cardNumber: 1,
+        rarity: Rarity.ONE_SHINY,
+      });
+      expect(repository.searchCards).toHaveBeenCalledWith({
+        setKey: 'A1',
+        cardNumber: 1,
+      });
+    });
+
+    it('should show card details when removing with mismatched criteria', async () => {
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          card: 'A1-001',
+          setKey: null,
+          booster: null,
+          rarity: '☆', // Wrong rarity
+          remove: true,
+          bulkOperation: false,
+        },
+        config,
+      )) as string;
+
+      expect(result).toContain(
+        'Card with ID A1-001 exists but does not match the additional search criteria:',
+      );
+      expect(result).toContain('Test Card');
+      expect(result).toContain('no card was removed');
+      expect(repository.searchCards).toHaveBeenCalledWith({
+        setKey: 'A1',
+        cardNumber: 1,
+        rarity: Rarity.ONE_STAR,
+      });
+      expect(repository.searchCards).toHaveBeenCalledWith({
+        setKey: 'A1',
+        cardNumber: 1,
+      });
+    });
+
+    it('should show card details with multiple mismatched criteria', async () => {
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          card: 'A1-001',
+          setKey: null,
+          booster: 'Glurak', // Wrong booster
+          rarity: '♢♢', // Wrong rarity
+          remove: false,
+          bulkOperation: false,
+        },
+        config,
+      )) as string;
+
+      expect(result).toContain(
+        'Card with ID A1-001 exists but does not match the additional search criteria:',
+      );
+      expect(result).toContain('Test Card');
+      expect(result).toContain('no card was added');
+      expect(repository.searchCards).toHaveBeenCalledWith({
+        setKey: 'A1',
+        cardNumber: 1,
+        booster: 'Glurak',
+        rarity: Rarity.TWO_DIAMONDS,
+      });
+      expect(repository.searchCards).toHaveBeenCalledWith({
+        setKey: 'A1',
+        cardNumber: 1,
+      });
+    });
+
+    it('should not show card details when ID does not exist', async () => {
+      const result = (await pokemonCardAddTool.invoke(
+        {
+          card: 'A2-001', // Non-existent ID
+          setKey: null,
+          booster: null,
+          rarity: null,
+          remove: false,
+          bulkOperation: false,
+        },
+        config,
+      )) as string;
+
+      expect(result).toContain(
+        'No cards exist in the database matching these search criteria',
+      );
+      expect(result).toContain('no card was added');
+      expect(repository.searchCards).toHaveBeenCalledWith({
+        setKey: 'A2',
+        cardNumber: 1,
+      });
+    });
+  });
 });

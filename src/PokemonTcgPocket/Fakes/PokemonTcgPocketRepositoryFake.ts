@@ -19,6 +19,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   private cardBoosters = new Map<number, Set<number>>();
   private cardOwners = new Map<number, Set<bigint>>();
   private nextId = 1;
+  private idOnlyCards = new Set<number>();
 
   constructor() {
     // Pass empty objects as we won't use them
@@ -118,6 +119,25 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     return Promise.resolve(card);
   }
 
+  /** Creates a new card that will only match when searched by ID */
+  async createIdOnlyCard(
+    name: string,
+    setKey: string,
+    number: number,
+    rarity: Rarity | null,
+    boosterNames: string[],
+  ): Promise<PokemonCard> {
+    const card = await this.createCard(
+      name,
+      setKey,
+      number,
+      rarity,
+      boosterNames,
+    );
+    this.idOnlyCards.add(card.id);
+    return card;
+  }
+
   /** Search for cards using various filters */
   async searchCards(searchCriteria?: {
     cardName?: string;
@@ -132,6 +152,37 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     // Return all cards with their relationships
     // Apply only basic filtering to minimize business logic in fakes/tests
     let cards = Array.from(this.cards.values());
+
+    // If we have both cardNumber and setKey, we're searching by ID
+    const isIdSearch =
+      searchCriteria?.cardNumber !== undefined &&
+      searchCriteria?.setKey !== undefined;
+    const hasOtherCriteria =
+      searchCriteria?.cardName !== undefined ||
+      searchCriteria?.setName !== undefined ||
+      searchCriteria?.booster !== undefined ||
+      searchCriteria?.rarity !== undefined;
+
+    // Apply basic ID filtering
+    if (isIdSearch) {
+      const setKey = searchCriteria.setKey;
+      const cardNumber = searchCriteria.cardNumber;
+      cards = cards.filter((card) => {
+        const cardKey = Array.from(this.cards.entries()).find(
+          ([_, c]) => c.id === card.id,
+        )?.[0];
+        if (!cardKey) return false;
+        const [cardSetKey, cardNumberStr] = cardKey.split('_');
+        return (
+          cardSetKey === setKey && parseInt(cardNumberStr, 10) === cardNumber
+        );
+      });
+    }
+
+    // If we have other criteria, filter out ID-only cards
+    if (hasOtherCriteria) {
+      cards = cards.filter((card) => !this.idOnlyCards.has(card.id));
+    }
 
     // Apply basic name filtering
     const searchName = searchCriteria?.cardName;
@@ -331,6 +382,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     this.cards.clear();
     this.cardBoosters.clear();
     this.cardOwners.clear();
+    this.idOnlyCards.clear();
     this.nextId = 1;
   }
 

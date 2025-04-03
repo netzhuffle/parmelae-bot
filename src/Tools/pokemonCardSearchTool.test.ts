@@ -487,4 +487,108 @@ describe('pokemonCardSearch', () => {
       cardName: 'NonexistentCard',
     });
   });
+
+  it('should show card details when ID exists but additional criteria do not match', async () => {
+    await repository.createSet('A1', 'Test Set');
+    await repository.createIdOnlyCard(
+      'Test Card',
+      'A1',
+      1,
+      Rarity.ONE_DIAMOND,
+      [],
+    );
+    jest.spyOn(repository, 'searchCards');
+
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        card: 'A1-001',
+        setKey: null,
+        booster: null,
+        rarity: '♢♢', // Wrong rarity
+        ownershipFilter: null,
+      },
+      config,
+    )) as string;
+
+    expect(result).toContain(
+      'Card with ID A1-001 exists but does not match the additional search criteria:',
+    );
+    expect(result).toContain('Test Card');
+    expect(repository.searchCards).toHaveBeenCalledWith({
+      setKey: 'A1',
+      cardNumber: 1,
+      rarity: Rarity.TWO_DIAMONDS,
+    });
+    expect(repository.searchCards).toHaveBeenCalledWith({
+      setKey: 'A1',
+      cardNumber: 1,
+    });
+  });
+
+  it('should show card details when ID exists but multiple additional criteria do not match', async () => {
+    await repository.createSet('A1', 'Test Set');
+    await repository.createIdOnlyCard(
+      'Test Card',
+      'A1',
+      1,
+      Rarity.ONE_DIAMOND,
+      [],
+    );
+    jest.spyOn(repository, 'searchCards');
+
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        card: 'A1-001',
+        setKey: null,
+        booster: 'Glurak', // Wrong booster
+        rarity: '♢♢', // Wrong rarity
+        ownershipFilter: null,
+      },
+      config,
+    )) as string;
+
+    expect(result).toContain(
+      'Card with ID A1-001 exists but does not match the additional search criteria:',
+    );
+    expect(result).toContain('Test Card');
+    expect(repository.searchCards).toHaveBeenCalledWith({
+      setKey: 'A1',
+      cardNumber: 1,
+      booster: 'Glurak',
+      rarity: Rarity.TWO_DIAMONDS,
+    });
+    expect(repository.searchCards).toHaveBeenCalledWith({
+      setKey: 'A1',
+      cardNumber: 1,
+    });
+  });
+
+  it('should not show card details when ID does not exist', async () => {
+    await repository.createSet('A1', 'Test Set');
+    await repository.createIdOnlyCard(
+      'Test Card',
+      'A1',
+      1,
+      Rarity.ONE_DIAMOND,
+      [],
+    );
+    jest.spyOn(repository, 'searchCards');
+
+    const result = (await pokemonCardSearchTool.invoke(
+      {
+        card: 'A2-001', // Non-existent ID
+        setKey: null,
+        booster: null,
+        rarity: null,
+        ownershipFilter: null,
+      },
+      config,
+    )) as string;
+
+    expect(result).toBe('No cards found matching the search criteria.');
+    expect(repository.searchCards).toHaveBeenCalledWith({
+      setKey: 'A2',
+      cardNumber: 1,
+    });
+  });
 });

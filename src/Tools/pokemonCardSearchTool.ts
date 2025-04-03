@@ -93,8 +93,21 @@ async function formatSearchResults(
   service: PokemonTcgPocketService,
   cards: PokemonCardWithRelations[],
   userId: bigint,
+  idInfo?: CardIdInfo,
 ): Promise<string> {
   if (cards.length === 0) {
+    // If we have a card ID and no results, try searching with just the ID
+    if (idInfo) {
+      const idOnlyCards = await service.searchCards({
+        setKey: idInfo.setKey,
+        cardNumber: idInfo.cardNumber,
+      });
+
+      if (idOnlyCards.length > 0) {
+        const csv = await service.formatCardsAsCsv(idOnlyCards, userId);
+        return `Card with ID ${idInfo.setKey}-${idInfo.cardNumber.toString().padStart(3, '0')} exists but does not match the additional search criteria:\n${csv}`;
+      }
+    }
     return 'No cards found matching the search criteria.';
   }
 
@@ -122,7 +135,11 @@ export const pokemonCardSearchTool = tool(
       card && CARD_ID_PATTERN.test(card) ? parseCardId(card) : undefined;
     const cardName = idInfo ? null : card;
 
-    // Build search parameters
+    if (idInfo?.setKey && setKey && idInfo.setKey !== setKey) {
+      return 'Card ID and set key do not match. Please ask the user which one is incorrect.';
+    }
+
+    // Build search parameters for normal search
     const searchParams = buildSearchParams(
       cardName ?? null,
       setKey ?? null,
@@ -135,7 +152,8 @@ export const pokemonCardSearchTool = tool(
 
     // Search and format results
     const cards = await service.searchCards(searchParams);
-    return formatSearchResults(service, cards, userId);
+
+    return formatSearchResults(service, cards, userId, idInfo);
   },
   {
     name: POKEMON_CARD_SEARCH_TOOL_NAME,

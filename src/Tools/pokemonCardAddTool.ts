@@ -94,11 +94,27 @@ async function handleNoCardsFound(
   userId: bigint,
   searchParams: Record<string, unknown>,
   remove: boolean,
+  idInfo?: CardIdInfo,
 ): Promise<string> {
   const displayName = await service.getDisplayName(userId);
+
+  // Search if the cards would exist without the ownership filter
   const existingCards = await service.searchCards(searchParams);
 
   if (existingCards.length === 0) {
+    // If we have a card ID and still no results, try searching with just the ID
+    if (idInfo) {
+      const idOnlyCards = await service.searchCards({
+        setKey: idInfo.setKey,
+        cardNumber: idInfo.cardNumber,
+      });
+
+      if (idOnlyCards.length > 0) {
+        const cardDetails = await service.formatCardsAsCsv(idOnlyCards, userId);
+        return `Card with ID ${idInfo.setKey}-${idInfo.cardNumber.toString().padStart(3, '0')} exists but does not match the additional search criteria:\n${cardDetails}\n\nThus no card was ${remove ? 'removed from' : 'added to'} the user’s collection.`;
+      }
+    }
+
     return (
       'No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was ' +
       (remove ? 'removed from' : 'added to') +
@@ -180,6 +196,10 @@ export const pokemonCardAddTool = tool(
       card && CARD_ID_PATTERN.test(card) ? parseCardId(card) : undefined;
     const cardName = idInfo ? null : card;
 
+    if (idInfo?.setKey && setKey && idInfo.setKey !== setKey) {
+      return 'Card ID and set key do not match. Please ask the user which one is incorrect.';
+    }
+
     // Build search parameters
     const searchParams = buildSearchParams(
       cardName ?? null,
@@ -203,7 +223,7 @@ export const pokemonCardAddTool = tool(
         rarity ?? null,
         idInfo,
       );
-      return handleNoCardsFound(service, userId, baseParams, remove);
+      return handleNoCardsFound(service, userId, baseParams, remove, idInfo);
     }
 
     // Process found cards
