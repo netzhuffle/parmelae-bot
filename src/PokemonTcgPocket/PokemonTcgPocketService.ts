@@ -362,6 +362,7 @@ export class PokemonTcgPocketService {
   private calculateSetStats(cards: CardWithOwnership[]): {
     diamonds: CardGroup;
     stars: CardGroup;
+    shinies: CardGroup;
     crowns: CardGroup;
     promos: CardGroup;
   } {
@@ -381,6 +382,9 @@ export class PokemonTcgPocketService {
           Rarity.THREE_STARS,
           Rarity.FOUR_STARS,
         ]),
+      ),
+      shinies: this.calculateCardGroup(cards, (card) =>
+        this.isCardOfRarity(card, [Rarity.ONE_SHINY, Rarity.TWO_SHINY]),
       ),
       crowns: this.calculateCardGroup(cards, (card) =>
         this.isCardOfRarity(card, [Rarity.CROWN]),
@@ -406,6 +410,7 @@ export class PokemonTcgPocketService {
   private formatSetStats(stats: {
     diamonds: CardGroup;
     stars: CardGroup;
+    shinies: CardGroup;
     crowns: CardGroup;
     promos: CardGroup;
   }): string[] {
@@ -416,11 +421,14 @@ export class PokemonTcgPocketService {
       parts.push(`♦️ ${stats.diamonds.owned}/${stats.diamonds.total}`);
     }
 
-    // Only show owned count for stars and crowns
-    if (stats.stars.total > 0) {
+    // Only show owned count for stars, shinies, and crowns if the user owns at least one
+    if (stats.stars.owned > 0) {
       parts.push(`⭐️ ${stats.stars.owned}`);
     }
-    if (stats.crowns.total > 0) {
+    if (stats.shinies.owned > 0) {
+      parts.push(`✴️ ${stats.shinies.owned}`);
+    }
+    if (stats.crowns.owned > 0) {
       parts.push(`👑 ${stats.crowns.owned}`);
     }
 

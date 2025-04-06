@@ -5,12 +5,11 @@
  */
 
 export const SETS_STATS_EXPLANATION =
-  '(♦️ is the number of different cards in the user’s collection with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢ followed by the total of these rarities in the set, ' +
+  '(♦️ is the number of different cards in the user’s collection with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢ followed by the total of these rarities in the set after the slash, ' +
   '⭐️ is the number of different cards in the user’s collection with rarities ☆, ☆☆, and ☆☆☆, ' +
-  '✴️ is the number of different cards in the user’s collection with rarities ✸ and ✸✸, ' +
-  'and 👑 is the number of different cards in the user’s collection with rarity ♛. ' +
+  '✴️ for rarities ✸ and ✸✸, and 👑 for rarity ♛. ' +
+  'The numbers for ⭐️, ✴️, and 👑 are only shown if the user owns at least one card with the respective rarity (and not all sets have ✴️ cards). ' +
   'Promo sets don’t have rarities, thus only the number of different cards in the user’s collection is shown. ' +
-  'When describing these stats to users, omit each ⭐️, ✴️, and 👑 stat that is 0 for better readability and to match the ingame format, but always show them if >=1.' +
   'If you called this tool multiple times, always show the exact numbers of the very last call, do not change any numbers as it contains the end state after all calls already.)';
 
 export const BOOSTERS_STATS_EXPLANATION =

@@ -625,4 +625,69 @@ TEST:
       expect(nameSearchCards[1].name).toBe('Raichu');
     });
   });
+
+  describe('formatSetStats', () => {
+    it('should format set stats correctly', () => {
+      const service = new PokemonTcgPocketService(
+        new PokemonTcgPocketProbabilityService(),
+        repository,
+        '',
+      );
+
+      // Test with all rarity types
+      const stats = {
+        diamonds: { cards: [], owned: 2, total: 5 },
+        stars: { cards: [], owned: 3, total: 3 },
+        shinies: { cards: [], owned: 1, total: 2 },
+        crowns: { cards: [], owned: 1, total: 2 },
+        promos: { cards: [], owned: 0, total: 0 },
+      };
+
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      const formatted = service['formatSetStats'](stats);
+      expect(formatted).toEqual(['♦️ 2/5', '⭐️ 3', '✴️ 1', '👑 1']);
+    });
+
+    it('should not show stats for rarities with 0 owned cards', () => {
+      const service = new PokemonTcgPocketService(
+        new PokemonTcgPocketProbabilityService(),
+        repository,
+        '',
+      );
+
+      // Test with some rarities having 0 owned cards
+      const stats = {
+        diamonds: { cards: [], owned: 2, total: 5 },
+        stars: { cards: [], owned: 0, total: 3 },
+        shinies: { cards: [], owned: 1, total: 2 },
+        crowns: { cards: [], owned: 0, total: 2 },
+        promos: { cards: [], owned: 0, total: 0 },
+      };
+
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      const formatted = service['formatSetStats'](stats);
+      expect(formatted).toEqual(['♦️ 2/5', '✴️ 1']);
+    });
+
+    it('should show only promo count for sets without rarities', () => {
+      const service = new PokemonTcgPocketService(
+        new PokemonTcgPocketProbabilityService(),
+        repository,
+        '',
+      );
+
+      // Test with only promo cards
+      const stats = {
+        diamonds: { cards: [], owned: 0, total: 0 },
+        stars: { cards: [], owned: 0, total: 0 },
+        shinies: { cards: [], owned: 0, total: 0 },
+        crowns: { cards: [], owned: 0, total: 0 },
+        promos: { cards: [], owned: 3, total: 5 },
+      };
+
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      const formatted = service['formatSetStats'](stats);
+      expect(formatted).toEqual(['3']);
+    });
+  });
 });

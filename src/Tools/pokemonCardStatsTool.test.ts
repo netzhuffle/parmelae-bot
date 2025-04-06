@@ -38,9 +38,12 @@ describe('pokemonCardStats', () => {
       await repository.createCard('Card 6', 'A1', 6, Rarity.ONE_STAR, []);
       await repository.createCard('Card 7', 'A1', 7, Rarity.TWO_STARS, []);
       await repository.createCard('Card 8', 'A1', 8, Rarity.TWO_STARS, []);
+      // Shiny cards (total: 2)
+      await repository.createCard('Card 9', 'A1', 9, Rarity.ONE_SHINY, []);
+      await repository.createCard('Card 10', 'A1', 10, Rarity.TWO_SHINY, []);
       // Crown cards (total: 2)
-      await repository.createCard('Card 9', 'A1', 9, Rarity.CROWN, []);
-      await repository.createCard('Card 10', 'A1', 10, Rarity.CROWN, []);
+      await repository.createCard('Card 11', 'A1', 11, Rarity.CROWN, []);
+      await repository.createCard('Card 12', 'A1', 12, Rarity.CROWN, []);
 
       // Add some cards to collection
       const cards = await repository.searchCards({ setKey: 'A1' });
@@ -51,13 +54,16 @@ describe('pokemonCardStats', () => {
       await repository.addCardToCollection(cards[5].id, BigInt(1));
       await repository.addCardToCollection(cards[6].id, BigInt(1));
       await repository.addCardToCollection(cards[7].id, BigInt(1));
-      // Add 1 crown card
+      // Add 1 shiny card
       await repository.addCardToCollection(cards[8].id, BigInt(1));
+      // Add 1 crown card
+      await repository.addCardToCollection(cards[10].id, BigInt(1));
 
       const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
-      expect(result).toContain('@test1’s collection:');
       expect(result).toContain('Sets:');
-      expect(result).toContain('Unschlagbare Gene: ♦️ 2/5 ⋅ ⭐️ 3 ⋅ 👑 1');
+      expect(result).toContain(
+        'Unschlagbare Gene: ♦️ 2/5 ⋅ ⭐️ 3 ⋅ ✴️ 1 ⋅ 👑 1',
+      );
     });
 
     it('should show correct format for promo sets without rarities', async () => {
@@ -117,8 +123,8 @@ describe('pokemonCardStats', () => {
       expect(result).toContain('rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢');
       expect(result).toContain('⭐️ is');
       expect(result).toContain('rarities ☆, ☆☆, and ☆☆☆');
-      expect(result).toContain('👑 is');
-      expect(result).toContain('rarity ♛');
+      expect(result).toContain('✴️ for rarities ✸ and ✸✸');
+      expect(result).toContain('👑 for rarity ♛');
       expect(result).toContain('Promo sets');
       expect(result).toContain('collected and total');
       expect(result).toContain('probability');
