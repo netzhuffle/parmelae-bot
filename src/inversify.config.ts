@@ -1,6 +1,6 @@
 import 'reflect-metadata/lite';
 import { Container } from 'inversify';
-import { GptModelsProvider } from './GptModelsProvider.js';
+import { GptModels, GptModelsProvider } from './GptModelsProvider.js';
 import { ChatOpenAI } from '@langchain/openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { Octokit } from 'octokit';
@@ -26,7 +26,7 @@ container.bind(GptModelsProvider).toDynamicValue(
   (context) =>
     new GptModelsProvider({
       cheap: new ChatOpenAI({
-        model: 'gpt-4o-mini',
+        model: GptModels.Cheap,
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
@@ -37,7 +37,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         },
       }),
       cheapStrict: new ChatOpenAI({
-        model: 'gpt-4o-mini',
+        model: GptModels.Cheap,
         temperature: 0,
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
@@ -49,7 +49,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         },
       }),
       advanced: new ChatOpenAI({
-        model: 'gpt-4o',
+        model: GptModels.Advanced,
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
@@ -60,7 +60,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         },
       }),
       advancedStrict: new ChatOpenAI({
-        model: 'gpt-4o',
+        model: GptModels.Advanced,
         temperature: 0,
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',

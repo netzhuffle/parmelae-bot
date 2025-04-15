@@ -7,8 +7,7 @@ import { GptModels } from '../GptModelsProvider.js';
 export class GptModelSetterTool extends Tool {
   name = 'gpt-model-set';
 
-  description =
-    'Use set which GPT language model should be used. Input should be "gpt-4o-mini" or "GPT-4o".';
+  description = `Use set which GPT language model should be used. Input should be "${GptModels.Cheap}" or "${GptModels.Advanced}".`;
 
   constructor(private readonly config: Config) {
     super();
@@ -16,15 +15,15 @@ export class GptModelSetterTool extends Tool {
 
   protected _call(arg: string): Promise<string> {
     switch (arg.trim()) {
-      case 'gpt-4o-mini':
+      case GptModels.Cheap:
         this.config.gptModel = GptModels.Cheap;
         break;
-      case 'GPT-4o':
+      case GptModels.Advanced:
         this.config.gptModel = GptModels.Advanced;
         break;
       default:
         return Promise.resolve(
-          'Error: Unknown model name. Use "gpt-4o-mini" or "GPT-4o".',
+          `Error: Unknown model name. Use "${GptModels.Cheap}" or "${GptModels.Advanced}".`,
         );
     }
 

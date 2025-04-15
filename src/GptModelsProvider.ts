@@ -2,11 +2,15 @@ import { ChatOpenAI } from '@langchain/openai';
 import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
+/** Enum of GPT language models to use. */
 export const GptModels = {
-  Cheap: 'gpt-4o-mini',
-  Advanced: 'GPT-4o',
+  /** Cheap model to use in most cases. Needs text & image inputs, text outputs, function calling. */
+  Cheap: 'gpt-4.1-mini',
+  /** Advanced model to use when asked explicitly. Needs text & image inputs, text outputs, function calling. */
+  Advanced: 'gpt-4.1',
 } as const;
 
+/** Possible GPT language model names. */
 export type GptModel = (typeof GptModels)[keyof typeof GptModels];
 
 /** Provider for LangChain LLM models for dependency injection. */
