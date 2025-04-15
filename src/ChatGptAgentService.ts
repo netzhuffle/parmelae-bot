@@ -18,7 +18,7 @@ import { GitHubToolFactory } from './Tools/GitHubToolFactory.js';
 import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
 import { Config } from './Config.js';
-import { StructuredTool } from '@langchain/core/tools';
+import { StructuredTool, Tool } from '@langchain/core/tools';
 import { Message } from '@prisma/client';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
 import { CallbackHandlerFactory } from './CallbackHandlerFactory.js';
@@ -94,7 +94,7 @@ export function createTestToolConfig(context: Partial<ToolContext>): {
 /** ChatGPT Agent Service */
 @injectable()
 export class ChatGptAgentService {
-  private readonly tools: StructuredTool[] = [
+  private readonly tools: (StructuredTool | Tool)[] = [
     new Calculator(),
     diceTool,
     dallETool,
