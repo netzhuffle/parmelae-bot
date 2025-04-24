@@ -33,7 +33,7 @@ export class DallEService {
         size: SIZE,
         quality: QUALITY,
       });
-      return response.data[0].url ?? null;
+      return response.data?.[0]?.url ?? null;
     } catch (e) {
       if (e instanceof Error && e.message.startsWith('connect ECONNREFUSED')) {
         return null;

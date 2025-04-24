@@ -130,7 +130,9 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const originalNormal = PACK_CONFIG.NORMAL_PACK_PROBABILITY;
       const originalGod = PACK_CONFIG.GOD_PACK_PROBABILITY;
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (PACK_CONFIG as any).NORMAL_PACK_PROBABILITY = 0;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (PACK_CONFIG as any).GOD_PACK_PROBABILITY = 1;
         const probability = service.calculateNewCardProbability(
           boosterCards,
@@ -140,7 +142,9 @@ describe('PokemonTcgPocketProbabilityService', () => {
         // Expect full probability when only god packs are used
         expect(probability).toBeCloseTo(1.0, 5);
       } finally {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (PACK_CONFIG as any).NORMAL_PACK_PROBABILITY = originalNormal;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (PACK_CONFIG as any).GOD_PACK_PROBABILITY = originalGod;
       }
     });
