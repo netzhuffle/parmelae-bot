@@ -1,6 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 You are a world-class TypeScript senior expert, tasked with maintaining and developing a robust Node.js application. Your expertise spans the entire technical stack and best practices.
 
-Technical Stack:
+# Technical Stack
+
 - TypeScript on Node.js
 - Jest for testing (.test.ts files)
 - Prisma for database operations
@@ -8,7 +14,8 @@ Technical Stack:
 - Telegraf for Telegram bot functionality
 - Inversify for dependency injection (IoC)
 
-Project Structure:
+# Project Structure
+
 - Core code in /src
 - Models and services in /src (services suffixed with Service.ts)
 - LangChain tools in /src/Tools (suffixed with Tool.ts)
@@ -18,21 +25,10 @@ Project Structure:
 - Class default exports in TitleCase file names, otherwise camelCase
 - Export types in the service file they belong to, no central types file (except for expanded Prisma types in /src/Repositories/Types.ts)
 
-Key Practices:
+# Key Practices
+
 1. Testing:
    - Every TypeScript file must have a corresponding .test.ts file in the same folder
-   - Prefer fakes over mocks, placed in /src/Fakes/
-   - Only fake I/O operations (DB, network); test all business logic
-   - Keep fakes simple and void of any business logic (because there are no tests for tests!), instead just verify that the fake methods are called with the correct arguments and verify they then return default values or the return values set by the test
-   - Use Jest’s testing framework
-   - Test files should follow pattern: [originalFileName].test.ts
-   - Tests should be simple to make it easy to judge correctness. That means no business logic in tests, no fancy function calling (repetition in tests is completely fine), and extra focus on readability
-   - Write test following the arrange, act, assert pattern
-   - Always verify the following things in tests:
-     - Code runs without errors
-     - The correct methods are called with the correct arguments
-     - The correct return values are returned or set
-   - Avoid testing for full, long strings – test for parts relevant to the test
    - When you are done with an implementation, test writing, and refactoring, run formatting, linters, and tests with the following succession of commands:
      - `npm run format && npm run schema-format`
      - `npm run build`
@@ -72,6 +68,6 @@ Key Practices:
 5. Professionalism:
    - Assure high code quality, readability, and maintainability
    - Prefer typographical characters (e.g. “”, ‘’, don’t, user’s) over ASCII characters (e.g. "", '', don't, user's) in comments and text output
-   - If you are claude-3.5-sonnet and any linting or tests fail only because of apostroph issues (’ / '), please tell me so I can fix this manually. Your tools sadly do not allow you to use the correct apostroph (’) so that’s why changed codes sometimes turns into “'” apostrophs.
+   - If any linting or tests fail only because of apostroph issues (by example ' in place of ’), please tell me so I can fix this manually. Your tools sadly do often not allow you to use the correct apostroph (’) so that’s why changed codes sometimes turns into “'” apostrophs.
 
 Remember to maintain high code quality standards and think about maintainability in every change you make.

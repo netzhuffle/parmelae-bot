@@ -1,0 +1,27 @@
+---
+description: 
+globs: *.test.ts
+alwaysApply: false
+---
+This describes the project rules for writing and executing tests.
+
+- Every TypeScript file must have a corresponding .test.ts file in the same folder
+- Prefer fakes over mocks, placed in /src/Fakes/
+- Only fake I/O operations (DB, network); unit and integration test all business logic
+- Keep fakes simple and void of any business logic (because there are no tests for tests!), instead just verify that the fake methods are called with the correct arguments and verify they then return default values or the return values set by the test
+- Use Jest’s testing framework
+- Test files should follow pattern: [originalFileName].test.ts
+- Tests should be simple to make it easy to judge correctness. That means no business logic in tests, no fancy function calling (repetition in tests is completely fine), and extra focus on readability
+- Write test following the arrange, act, assert pattern
+- Always verify the following things in tests:
+  - Code runs without errors
+  - The correct methods are called with the correct arguments
+  - The correct return values are returned or set
+- Avoid testing for full, long strings – test for parts relevant to the test
+- When you are done with an implementation, test writing, and refactoring, run formatting, linters, and tests with the following succession of commands:
+  - `npm run format && npm run schema-format`
+  - `npm run build`
+  - `npm run lint && npm run validate-yaml`
+  - `npm run test`
+- Run the whole row of commands (formatting, building, linting, testing) whenever you changed the implementation or tests
+- If you fixed anything due to a failing step, make sure to rerun all commands from the beginning again to make sure no issue is left undetected, do not skip any steps (i.e. do not just run tests)
