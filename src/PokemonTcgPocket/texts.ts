@@ -13,10 +13,11 @@ export const SETS_STATS_EXPLANATION =
   'If you called this tool multiple times, always show the exact numbers of the very last call, do not change any numbers as it contains the end state after all calls already.)';
 
 export const BOOSTERS_STATS_EXPLANATION =
-  '(First numbers are the collected and total number of different cards in the specific booster. ' +
-  'p♢ is the probability of receiving a new card with rarity ♢, ♢♢, ♢♢♢, or ♢♢♢♢ currently missing in the user’s collection, ' +
-  'and pN is the probability of receiving any new card currently missing in the user’s collection ' +
-  'when opening the specific booster. These probabilities help the user decide which booster to open next to maximise their chances.' +
+  '(Numbers divided by “/” are the collected and total number of different cards in the specific booster. ' +
+  '♢–♢♢♢♢ shows progress and probability (p%) for diamond rarities (♢, ♢♢, ♢♢♢, ♢♢♢♢), ' +
+  '♢–☆ shows progress and probability for tradable cards (diamonds + one-star ☆), ' +
+  'and ♢–♛ shows overall progress and probability for all rarities. ' +
+  'These probabilities help the user decide which booster to open next to maximise their chances. ' +
   'If you called this tool multiple times, always show the exact numbers of the very last call, do not change any numbers as it contains the end state after all calls already.)';
 
 // Tool messages

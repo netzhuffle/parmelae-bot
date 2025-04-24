@@ -6,6 +6,7 @@
 - Scheduled messages via `ScheduledMessageService`.
 - GitHub commit announcements via `GitHubService`.
 - Pokemon TCG card database synchronization via `PokemonTcgPocketService`.
+- PokemonTcgPocket booster statistics enhanced with diamond, tradable, and all rarity columns including new probability calculations.
 - Dependency injection configured in `inversify.config.ts`.
 - Database operations via Prisma repositories.
 - Basic test coverage for `ChatGptService` and `PokemonTcgPocketService`.
@@ -17,12 +18,13 @@
 - Enhance error handling with specific error classes.
 - Configure CI pipeline to automate `npm run checks` on push.
 - Improve vector store usage and retrieval strategies.
-- Document public methods with JSDoc and update README accordingly.
+- Review memory bank and update with recent feature additions and ensure CI pipeline automation.
 
 ## Current Status
 - Core functionality implemented for messaging, AI integrations, scheduling, and data persistence.
 - Memory bank initialized and project documentation underway.
 - Partial test coverage exists; majority of modules untested.
+- Booster stats enhancement for PokemonTcgPocket implemented and tested.
 
 ## Known Issues
 - Incomplete test coverage across most modules.

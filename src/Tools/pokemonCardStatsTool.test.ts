@@ -93,12 +93,15 @@ describe('pokemonCardStats', () => {
       await repository.createCard('Card 2', 'A1', 2, Rarity.TWO_DIAMONDS, [
         'Glurak',
       ]);
+      await repository.createCard('Card 3', 'A1', 3, Rarity.ONE_STAR, [
+        'Glurak',
+      ]);
 
       // Create cards in Mewtu booster
-      await repository.createCard('Card 3', 'A1', 3, Rarity.ONE_STAR, [
+      await repository.createCard('Card 4', 'A1', 4, Rarity.ONE_STAR, [
         'Mewtu',
       ]);
-      await repository.createCard('Card 4', 'A1', 4, Rarity.TWO_STARS, [
+      await repository.createCard('Card 5', 'A1', 5, Rarity.TWO_STARS, [
         'Mewtu',
       ]);
 
@@ -106,13 +109,19 @@ describe('pokemonCardStats', () => {
       const cards = await repository.searchCards({ setKey: 'A1' });
       await repository.addCardToCollection(cards[0].id, BigInt(1));
       await repository.addCardToCollection(cards[2].id, BigInt(1));
+      await repository.addCardToCollection(cards[3].id, BigInt(1));
 
       const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
-      expect(result).toContain('Packs:');
-      expect(result).toMatch(/Glurak: 1\/2 ⋅ p♢ \d+\.\d+ % ⋅ pN \d+\.\d+ %/);
-      expect(result).toMatch(/Mewtu: 1\/2 ⋅ p♢ \d+\.\d+ % ⋅ pN \d+\.\d+ %/);
-      expect(result).toContain('p♢ is the probability');
-      expect(result).toContain('pN is the probability');
+      expect(result).toContain('Booster Packs:');
+      expect(result).toMatch(
+        /Glurak: ♢–♢♢♢♢ 1\/2 ⋅ p\d+\.\d+% \| ♢–☆ 2\/3 ⋅ p\d+\.\d+% \| ♢–♛ 2\/3 ⋅ p\d+\.\d+%/,
+      );
+      expect(result).toMatch(
+        /Mewtu: ♢–♢♢♢♢ 0\/0 ⋅ p\d+\.\d+% \| ♢–☆ 1\/1 ⋅ p\d+\.\d+% \| ♢–♛ 1\/2 ⋅ p\d+\.\d+%/,
+      );
+      expect(result).toContain('♢–♢♢♢♢ shows progress and probability');
+      expect(result).toContain('♢–☆ shows progress and probability');
+      expect(result).toContain('♢–♛ shows overall progress and probability');
     });
 
     it('should include explanation texts', async () => {

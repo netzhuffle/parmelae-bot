@@ -280,22 +280,34 @@ export class PokemonTcgPocketService {
   private formatBoostersSection(
     boosters: {
       name: string;
-      owned: number;
-      total: number;
+      diamondOwned: number;
+      diamondTotal: number;
       newDiamondCardProbability: number;
+      tradableOwned: number;
+      tradableTotal: number;
+      newTradableCardProbability: number;
+      allOwned: number;
+      allTotal: number;
       newCardProbability: number;
     }[],
   ): string[] {
     const lines: string[] = ['Booster Packs:'];
     for (const {
       name,
-      owned,
-      total,
+      diamondOwned,
+      diamondTotal,
       newDiamondCardProbability,
+      tradableOwned,
+      tradableTotal,
+      newTradableCardProbability,
+      allOwned,
+      allTotal,
       newCardProbability,
     } of boosters) {
       lines.push(
-        `${name}: ${owned}/${total} ⋅ p♢ ${newDiamondCardProbability.toFixed(2)} % ⋅ pN ${newCardProbability.toFixed(2)} %`,
+        `${name}: ♢–♢♢♢♢ ${diamondOwned}/${diamondTotal} ⋅ p${newDiamondCardProbability.toFixed(2)}%` +
+          ` | ♢–☆ ${tradableOwned}/${tradableTotal} ⋅ p${newTradableCardProbability.toFixed(2)}%` +
+          ` | ♢–♛ ${allOwned}/${allTotal} ⋅ p${newCardProbability.toFixed(2)}%`,
       );
     }
     lines.push('');
@@ -312,9 +324,14 @@ export class PokemonTcgPocketService {
     }[];
     boosters: {
       name: string;
-      owned: number;
-      total: number;
+      diamondOwned: number;
+      diamondTotal: number;
       newDiamondCardProbability: number;
+      tradableOwned: number;
+      tradableTotal: number;
+      newTradableCardProbability: number;
+      allOwned: number;
+      allTotal: number;
       newCardProbability: number;
     }[];
   }> {
@@ -333,15 +350,45 @@ export class PokemonTcgPocketService {
             .filter(({ isOwned }) => !isOwned)
             .map(({ card }) => card);
           const allCards = cards.map(({ card }) => card);
+
+          const diamondCards = cards.filter(({ card }) =>
+            this.isCardOfRarity(card, [
+              Rarity.ONE_DIAMOND,
+              Rarity.TWO_DIAMONDS,
+              Rarity.THREE_DIAMONDS,
+              Rarity.FOUR_DIAMONDS,
+            ]),
+          );
+
+          const tradableCards = cards.filter(({ card }) =>
+            this.isCardOfRarity(card, [
+              Rarity.ONE_DIAMOND,
+              Rarity.TWO_DIAMONDS,
+              Rarity.THREE_DIAMONDS,
+              Rarity.FOUR_DIAMONDS,
+              Rarity.ONE_STAR,
+            ]),
+          );
+
           return {
             name: booster.name,
-            owned: cards.filter(({ isOwned }) => isOwned).length,
-            total: cards.length,
+            diamondOwned: diamondCards.filter(({ isOwned }) => isOwned).length,
+            diamondTotal: diamondCards.length,
             newDiamondCardProbability:
               this.probabilityService.calculateNewDiamondCardProbability(
                 allCards,
                 missingCards,
               ) * 100,
+            tradableOwned: tradableCards.filter(({ isOwned }) => isOwned)
+              .length,
+            tradableTotal: tradableCards.length,
+            newTradableCardProbability:
+              this.probabilityService.calculateNewTradableCardProbability(
+                allCards,
+                missingCards,
+              ) * 100,
+            allOwned: cards.filter(({ isOwned }) => isOwned).length,
+            allTotal: cards.length,
             newCardProbability:
               this.probabilityService.calculateNewCardProbability(
                 allCards,

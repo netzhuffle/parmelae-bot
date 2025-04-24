@@ -13,7 +13,7 @@ interface PackConfiguration {
   readonly GUARANTEED_ONE_DIAMOND_CARDS: number;
 }
 
-const PACK_CONFIG: PackConfiguration = {
+export const PACK_CONFIG: PackConfiguration = {
   NORMAL_PACK_PROBABILITY: 0.9995,
   GOD_PACK_PROBABILITY: 0.0005,
   CARDS_PER_PACK: 5,
@@ -61,6 +61,14 @@ export class PokemonTcgPocketProbabilityService {
     Rarity.FOUR_DIAMONDS,
   ]);
 
+  private readonly TRADABLE_RARITIES = new Set<Rarity>([
+    Rarity.ONE_DIAMOND,
+    Rarity.TWO_DIAMONDS,
+    Rarity.THREE_DIAMONDS,
+    Rarity.FOUR_DIAMONDS,
+    Rarity.ONE_STAR,
+  ]);
+
   /**
    * Calculates the probability of getting at least one new card from a booster pack.
    * This considers both normal packs (99.95%) and god packs (0.05%).
@@ -88,6 +96,21 @@ export class PokemonTcgPocketProbabilityService {
       boosterCards,
       missingCards,
       (card) => card.rarity !== null && this.DIAMOND_RARITIES.has(card.rarity),
+    );
+  }
+
+  /**
+   * Calculates the probability of getting at least one new tradable card from a booster pack.
+   * This considers only cards with rarities ♢, ♢♢, ♢♢♢, ♢♢♢♢, and ☆.
+   */
+  calculateNewTradableCardProbability(
+    boosterCards: PokemonCard[],
+    missingCards: PokemonCard[],
+  ): number {
+    return this.calculateNewCardProbabilityForRarities(
+      boosterCards,
+      missingCards,
+      (card) => card.rarity !== null && this.TRADABLE_RARITIES.has(card.rarity),
     );
   }
 

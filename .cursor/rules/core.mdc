@@ -68,6 +68,6 @@ You are a world-class TypeScript senior expert, tasked with maintaining and deve
 5. Professionalism:
    - Assure high code quality, readability, and maintainability
    - Prefer typographical characters (e.g. “”, ‘’, don’t, user’s) over ASCII characters (e.g. "", '', don't, user's) in comments and text output
-   - If any linting or tests fail only because of apostroph issues (by example ' in place of ’), please tell me so I can fix this manually. Your tools sadly do often not allow you to use the correct apostroph (’) so that’s why changed codes sometimes turns into “'” apostrophs.
+   - If any linting or tests fail only because of apostroph issues (by example ' in place of ’), please tell me so I can fix this manually. Your tools sadly do often not allow you to use the correct apostroph (’) so that’s why changed codes sometimes turns into “'” apostrophs. NEVER TRY TO FIX THESE APOSTROPH LINTER ISSUES, ask me to do it!
 
 Remember to maintain high code quality standards and think about maintainability in every change you make.

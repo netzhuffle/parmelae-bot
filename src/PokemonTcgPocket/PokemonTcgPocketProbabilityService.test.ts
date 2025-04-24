@@ -1,5 +1,6 @@
 import { PokemonCard, Rarity } from '@prisma/client';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+import { PACK_CONFIG } from './PokemonTcgPocketProbabilityService.js';
 
 /** Set of rarities that can appear in god packs */
 const GOD_PACK_RARITIES = new Set<Rarity>([
@@ -84,7 +85,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         missingCards,
       );
 
-      // Probabilities aren’t set yet
+      // Probabilities aren't set yet
       expect(probability).toBe(0);
     });
 
@@ -149,6 +150,185 @@ describe('PokemonTcgPocketProbabilityService', () => {
       );
 
       expect(probability).toBe(0);
+    });
+  });
+
+  describe('calculateNewTradableCardProbability', () => {
+    it('should return 0 when no cards are missing', () => {
+      const boosterCards = [
+        {
+          id: 1,
+          name: 'Test Card ONE_DIAMOND',
+          setId: 1,
+          number: 1,
+          rarity: Rarity.ONE_DIAMOND,
+        },
+        {
+          id: 2,
+          name: 'Test Card ONE_STAR',
+          setId: 1,
+          number: 2,
+          rarity: Rarity.ONE_STAR,
+        },
+      ];
+      const missingCards: PokemonCard[] = [];
+
+      const probability = service.calculateNewTradableCardProbability(
+        boosterCards,
+        missingCards,
+      );
+
+      expect(probability).toBe(0.0);
+    });
+
+    it('should return 0 when no tradable cards are missing', () => {
+      const boosterCards = [
+        {
+          id: 1,
+          name: 'Test Card ONE_DIAMOND',
+          setId: 1,
+          number: 1,
+          rarity: Rarity.ONE_DIAMOND,
+        },
+        {
+          id: 2,
+          name: 'Test Card ONE_STAR',
+          setId: 1,
+          number: 2,
+          rarity: Rarity.ONE_STAR,
+        },
+      ];
+      const missingCards = [
+        {
+          id: 3,
+          name: 'Test Card TWO_STARS',
+          setId: 1,
+          number: 3,
+          rarity: Rarity.TWO_STARS,
+        },
+        {
+          id: 4,
+          name: 'Test Card THREE_STARS',
+          setId: 1,
+          number: 4,
+          rarity: Rarity.THREE_STARS,
+        },
+      ];
+
+      const probability = service.calculateNewTradableCardProbability(
+        boosterCards,
+        missingCards,
+      );
+
+      expect(probability).toBe(0.0);
+    });
+
+    it('should calculate probability for missing tradable cards', () => {
+      const boosterCards = [
+        {
+          id: 1,
+          name: 'Test Card ONE_DIAMOND',
+          setId: 1,
+          number: 1,
+          rarity: Rarity.ONE_DIAMOND,
+        },
+        {
+          id: 2,
+          name: 'Test Card TWO_DIAMONDS',
+          setId: 1,
+          number: 2,
+          rarity: Rarity.TWO_DIAMONDS,
+        },
+        {
+          id: 3,
+          name: 'Test Card ONE_STAR',
+          setId: 1,
+          number: 3,
+          rarity: Rarity.ONE_STAR,
+        },
+        {
+          id: 4,
+          name: 'Test Card TWO_STARS',
+          setId: 1,
+          number: 4,
+          rarity: Rarity.TWO_STARS,
+        },
+        {
+          id: 5,
+          name: 'Test Card ONE_DIAMOND',
+          setId: 1,
+          number: 5,
+          rarity: Rarity.ONE_DIAMOND,
+        },
+      ];
+      const missingCards = [
+        {
+          id: 6,
+          name: 'Test Card ONE_DIAMOND',
+          setId: 1,
+          number: 6,
+          rarity: Rarity.ONE_DIAMOND,
+        },
+        {
+          id: 7,
+          name: 'Test Card ONE_STAR',
+          setId: 1,
+          number: 7,
+          rarity: Rarity.ONE_STAR,
+        },
+      ];
+
+      const probability = service.calculateNewTradableCardProbability(
+        boosterCards,
+        missingCards,
+      );
+
+      expect(probability).toBeGreaterThan(0.0);
+      expect(probability).toBeLessThan(1.0);
+    });
+
+    it('should consider both normal and god packs', () => {
+      const boosterCards = [
+        {
+          id: 1,
+          name: 'Test Card ONE_DIAMOND',
+          setId: 1,
+          number: 1,
+          rarity: Rarity.ONE_DIAMOND,
+        },
+        {
+          id: 2,
+          name: 'Test Card ONE_STAR',
+          setId: 1,
+          number: 2,
+          rarity: Rarity.ONE_STAR,
+        },
+      ];
+      const missingCards = [
+        {
+          id: 3,
+          name: 'Test Card ONE_DIAMOND',
+          setId: 1,
+          number: 3,
+          rarity: Rarity.ONE_DIAMOND,
+        },
+        {
+          id: 4,
+          name: 'Test Card ONE_STAR',
+          setId: 1,
+          number: 4,
+          rarity: Rarity.ONE_STAR,
+        },
+      ];
+
+      const probability = service.calculateNewTradableCardProbability(
+        boosterCards,
+        missingCards,
+      );
+
+      // Should be higher than just normal pack probability
+      const normalPackProbability = PACK_CONFIG.NORMAL_PACK_PROBABILITY;
+      expect(probability).toBeGreaterThan(normalPackProbability);
     });
   });
 });
