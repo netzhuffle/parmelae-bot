@@ -1,5 +1,9 @@
 import { PokemonCard, Rarity } from '@prisma/client';
 import { injectable } from 'inversify';
+import {
+  NormalPackProbabilityStrategy,
+  ShinyPackProbabilityStrategy,
+} from './PackProbabilityStrategy.js';
 
 /** Constants for pack probabilities and configurations */
 interface PackConfiguration {
@@ -20,33 +24,13 @@ export const PACK_CONFIG: PackConfiguration = {
   GUARANTEED_ONE_DIAMOND_CARDS: 3,
 } as const;
 
-/** Rarity distribution for the fourth card in a normal pack */
-const CARD4_RARITY_DISTRIBUTION = new Map<Rarity, number>([
-  [Rarity.TWO_DIAMONDS, 0.9],
-  [Rarity.THREE_DIAMONDS, 0.05],
-  [Rarity.FOUR_DIAMONDS, 0.01666],
-  [Rarity.ONE_STAR, 0.02572],
-  [Rarity.TWO_STARS, 0.005],
-  [Rarity.THREE_STARS, 0.00222],
-  [Rarity.CROWN, 0.0004],
-]);
-
-/** Rarity distribution for the fifth card in a normal pack */
-const CARD5_RARITY_DISTRIBUTION = new Map<Rarity, number>([
-  [Rarity.TWO_DIAMONDS, 0.6],
-  [Rarity.THREE_DIAMONDS, 0.2],
-  [Rarity.FOUR_DIAMONDS, 0.06664],
-  [Rarity.ONE_STAR, 0.10288],
-  [Rarity.TWO_STARS, 0.02],
-  [Rarity.THREE_STARS, 0.00888],
-  [Rarity.CROWN, 0.0016],
-]);
-
 /** Set of rarities that can appear in god packs */
 const GOD_PACK_RARITIES = new Set<Rarity>([
   Rarity.ONE_STAR,
   Rarity.TWO_STARS,
   Rarity.THREE_STARS,
+  Rarity.ONE_SHINY,
+  Rarity.TWO_SHINY,
   Rarity.CROWN,
 ]);
 
@@ -69,6 +53,9 @@ export class PokemonTcgPocketProbabilityService {
     Rarity.ONE_STAR,
   ]);
 
+  private readonly normalStrategy = new NormalPackProbabilityStrategy();
+  private readonly shinyStrategy = new ShinyPackProbabilityStrategy();
+
   /**
    * Calculates the probability of getting at least one new card from a booster pack.
    * This considers both normal packs (99.95%) and god packs (0.05%).
@@ -76,11 +63,13 @@ export class PokemonTcgPocketProbabilityService {
   calculateNewCardProbability(
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
+    hasShinyRarity: boolean,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
       boosterCards,
       missingCards,
       () => true,
+      hasShinyRarity,
     );
   }
 
@@ -91,11 +80,13 @@ export class PokemonTcgPocketProbabilityService {
   calculateNewDiamondCardProbability(
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
+    hasShinyRarity: boolean,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
       boosterCards,
       missingCards,
       (card) => card.rarity !== null && this.DIAMOND_RARITIES.has(card.rarity),
+      hasShinyRarity,
     );
   }
 
@@ -106,11 +97,13 @@ export class PokemonTcgPocketProbabilityService {
   calculateNewTradableCardProbability(
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
+    hasShinyRarity: boolean,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
       boosterCards,
       missingCards,
       (card) => card.rarity !== null && this.TRADABLE_RARITIES.has(card.rarity),
+      hasShinyRarity,
     );
   }
 
@@ -122,6 +115,7 @@ export class PokemonTcgPocketProbabilityService {
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
     rarityFilter: (card: PokemonCard) => boolean,
+    hasShinyRarity: boolean,
   ): number {
     const filteredBoosterCards = boosterCards.filter(rarityFilter);
     const filteredMissingCards = missingCards.filter(rarityFilter);
@@ -136,6 +130,7 @@ export class PokemonTcgPocketProbabilityService {
     const normalPackChance = this.computeNormalPackChance(
       filteredBoosterCards,
       filteredMissingCards,
+      hasShinyRarity,
     );
     const godPackChance = this.computeGodPackChance(
       filteredBoosterCards,
@@ -168,10 +163,12 @@ export class PokemonTcgPocketProbabilityService {
   private computeNormalPackChance(
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
+    hasShinyRarity: boolean,
   ): number {
     const probabilityNoNewCard = this.computeProbabilityNoNewCardInNormalPack(
       boosterCards,
       missingCards,
+      hasShinyRarity,
     );
     return 1.0 - probabilityNoNewCard;
   }
@@ -182,6 +179,7 @@ export class PokemonTcgPocketProbabilityService {
   private computeProbabilityNoNewCardInNormalPack(
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
+    hasShinyRarity: boolean,
   ): number {
     let probabilityNoNewCard = 1.0;
 
@@ -191,11 +189,13 @@ export class PokemonTcgPocketProbabilityService {
       missingCards,
     );
 
+    const strategy = hasShinyRarity ? this.shinyStrategy : this.normalStrategy;
+
     // Fourth slot uses CARD4_RARITY_DISTRIBUTION
     const pNoNewSlot4 =
       1.0 -
       this.computeNewCardProbabilityForDistribution(
-        CARD4_RARITY_DISTRIBUTION,
+        strategy.getCard4Distribution(),
         boosterCards,
         missingCards,
       );
@@ -205,7 +205,7 @@ export class PokemonTcgPocketProbabilityService {
     const pNoNewSlot5 =
       1.0 -
       this.computeNewCardProbabilityForDistribution(
-        CARD5_RARITY_DISTRIBUTION,
+        strategy.getCard5Distribution(),
         boosterCards,
         missingCards,
       );
@@ -237,7 +237,7 @@ export class PokemonTcgPocketProbabilityService {
   /**
    * Calculates the probability of getting at least one new card in a god pack.
    * In a god pack:
-   * - All 5 cards are from {⭐️, ⭐️⭐️, ⭐️⭐️⭐️, 👑}
+   * - All 5 cards are from {⭐️, ⭐️⭐️, ⭐️⭐️⭐️, ✴️, ✴️✴️, 👑}
    * - Each eligible card has equal probability
    */
   private computeGodPackChance(

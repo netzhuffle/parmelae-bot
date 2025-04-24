@@ -7,7 +7,8 @@
 ## Recent Changes
 - Initialized .ai-memory with core memory bank files.
 - Completed initial project analysis: README, package.json, and src directory structure.
-- Extended PokemonTcgPocketProbabilityService with TRADABLE_RARITIES and calculateNewTradableCardProbability; updated PokemonTcgPocketService to output booster stats with separate diamond, tradable, and all columns; added corresponding tests and ran full CI suite.
+- Extended PokemonTcgPocketProbabilityService with TRADABLE_RARITIES and calculateNewTradableCardProbability; updated PokemonTcgPocketService to output booster stats with separate diamond, tradable, and all columns including new probability calculations.
+- Refined and optimized Jest test suite for PokemonTcgPocketProbabilityService: updated and clarified test cases for normal, diamond, shiny, and god-pack probabilities, added config-based isolation of god-pack branch, and improved test maintainability.
 
 ## Next Steps
 - Populate activeContext.md and progress.md with project details.

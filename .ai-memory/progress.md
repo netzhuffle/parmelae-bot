@@ -10,6 +10,7 @@
 - Dependency injection configured in `inversify.config.ts`.
 - Database operations via Prisma repositories.
 - Basic test coverage for `ChatGptService` and `PokemonTcgPocketService`.
+- Jest test suite for `PokemonTcgPocketProbabilityService` now fully implemented and passing, covering normal, diamond, shiny, and god-pack scenarios.
 
 ## What's Left to Build
 - Add Jest test suites for all services (`DallEService`, `ScheduledMessageService`, `TelegramMessageService`, etc.).

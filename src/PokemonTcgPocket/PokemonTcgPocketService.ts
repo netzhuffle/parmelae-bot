@@ -378,6 +378,7 @@ export class PokemonTcgPocketService {
               this.probabilityService.calculateNewDiamondCardProbability(
                 allCards,
                 missingCards,
+                booster.hasShinyRarity,
               ) * 100,
             tradableOwned: tradableCards.filter(({ isOwned }) => isOwned)
               .length,
@@ -386,6 +387,7 @@ export class PokemonTcgPocketService {
               this.probabilityService.calculateNewTradableCardProbability(
                 allCards,
                 missingCards,
+                booster.hasShinyRarity,
               ) * 100,
             allOwned: cards.filter(({ isOwned }) => isOwned).length,
             allTotal: cards.length,
@@ -393,6 +395,7 @@ export class PokemonTcgPocketService {
               this.probabilityService.calculateNewCardProbability(
                 allCards,
                 missingCards,
+                booster.hasShinyRarity,
               ) * 100,
           };
         }),
