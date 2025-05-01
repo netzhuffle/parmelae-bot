@@ -3096,6 +3096,1050 @@ A2b:
     111:
       name: Pokéball
       rarity: ♛
+A3:
+  name: Hüter des Firmaments
+  boosters:
+    - Solgaleo
+    - Lunala
+  cards:
+    1:
+      name: Owei
+      rarity: ♢
+      boosters: Lunala
+    2:
+      name: Alola-Kokowei
+      rarity: ♢♢♢
+      boosters: Lunala
+    3:
+      name: Gehweiher
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    4:
+      name: Maskeregen
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    5:
+      name: Maracamba
+      rarity: ♢
+      boosters: Lunala
+    6:
+      name: Laukaps
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    7:
+      name: Paragoni
+      rarity: ♢
+      boosters: Solgaleo
+    8:
+      name: Trombork
+      rarity: ♢♢
+      boosters: Solgaleo
+    9:
+      name: Bauz
+      rarity: ♢
+      boosters: Solgaleo
+    10:
+      name: Bauz
+      rarity: ♢
+      boosters: Lunala
+    11:
+      name: Arboretoss
+      rarity: ♢♢
+      boosters: Lunala
+    12:
+      name: Silvarro ex
+      rarity: ♢♢♢♢
+      boosters: Lunala
+    13:
+      name: Mabula
+      rarity: ♢
+      boosters: Lunala
+    14:
+      name: Imantis
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    15:
+      name: Mantidea
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    16:
+      name: Bubungus
+      rarity: ♢
+      boosters: Lunala
+    17:
+      name: Lamellux
+      rarity: ♢♢
+      boosters: Lunala
+    18:
+      name: Frubberl
+      rarity: ♢
+      boosters: Solgaleo
+    19:
+      name: Frubaila
+      rarity: ♢♢
+      boosters: Solgaleo
+    20:
+      name: Fruyal
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    21:
+      name: Reißlaus
+      rarity: ♢
+      boosters: Solgaleo
+    22:
+      name: Tectass
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    23:
+      name: Moruda ex
+      rarity: ♢♢♢♢
+      boosters: Solgaleo
+    24:
+      name: Kapu-Toro
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    25:
+      name: Fukano
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    26:
+      name: Arkani
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    27:
+      name: Alola-Knogga
+      rarity: ♢♢
+      boosters: Lunala
+    28:
+      name: Dartignis
+      rarity: ♢
+      boosters: Solgaleo
+    29:
+      name: Fiaro
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    30:
+      name: Flamiau
+      rarity: ♢
+      boosters: Solgaleo
+    31:
+      name: Flamiau
+      rarity: ♢
+      boosters: Lunala
+    32:
+      name: Miezunder
+      rarity: ♢♢
+      boosters: Solgaleo
+    33:
+      name: Fuegro ex
+      rarity: ♢♢♢♢
+      boosters: Solgaleo
+    34:
+      name: Choreogel
+      rarity: ♢♢
+      boosters: Lunala
+    35:
+      name: Molunk
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    36:
+      name: Amfira
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    37:
+      name: Tortunator
+      rarity: ♢♢♢
+      boosters: Lunala
+    38:
+      name: Alola-Sandan
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    39:
+      name: Alola-Sandamer
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    40:
+      name: Alola-Vulpix
+      rarity: ♢
+      boosters: Lunala
+    41:
+      name: Alola-Vulnona
+      rarity: ♢♢♢
+      boosters: Lunala
+    42:
+      name: Muschas
+      rarity: ♢
+      boosters: Solgaleo
+    43:
+      name: Austos
+      rarity: ♢♢
+      boosters: Solgaleo
+    44:
+      name: Lapras
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    45:
+      name: Robball
+      rarity: ♢
+      boosters: Lunala
+    46:
+      name: Robball
+      rarity: ♢
+      boosters: Solgaleo
+    47:
+      name: Marikeck
+      rarity: ♢♢
+      boosters: Lunala
+    48:
+      name: Primarene
+      rarity: ♢♢♢
+      boosters: Lunala
+    49:
+      name: Krawell ex
+      rarity: ♢♢♢♢
+      boosters: Solgaleo
+    50:
+      name: Lusardin
+      rarity: ♢
+      boosters: Lunala
+    51:
+      name: Lusardin ex
+      rarity: ♢♢♢♢
+      boosters: Lunala
+    52:
+      name: Araqna
+      rarity: ♢
+      boosters: Solgaleo
+    53:
+      name: Aranestro
+      rarity: ♢♢
+      boosters: Solgaleo
+    54:
+      name: Gufa
+      rarity: ♢
+      boosters: Lunala
+    55:
+      name: Knirfish
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    56:
+      name: Kapu-Kime
+      rarity: ♢♢♢
+      boosters: Lunala
+    57:
+      name: Pikachu
+      rarity: ♢
+      boosters: Solgaleo
+    58:
+      name: Alola-Raichu ex
+      rarity: ♢♢♢♢
+      boosters: Solgaleo
+    59:
+      name: Alola-Kleinstein
+      rarity: ♢
+      boosters: Solgaleo
+    60:
+      name: Alola-Georok
+      rarity: ♢♢
+      boosters: Solgaleo
+    61:
+      name: Alola-Geowaz
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    62:
+      name: Eguana
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    63:
+      name: Elezard
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    64:
+      name: Akkup
+      rarity: ♢♢
+      boosters: Lunala
+    65:
+      name: Donarion
+      rarity: ♢♢♢
+      boosters: Lunala
+    66:
+      name: Choreogel
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    67:
+      name: Togedemaru
+      rarity: ♢
+      boosters: Lunala
+    68:
+      name: Kapu-Riki
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    69:
+      name: Pantimos
+      rarity: ♢♢
+      boosters: Solgaleo
+    70:
+      name: Zobiris
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    71:
+      name: Spoink
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    72:
+      name: Groink
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    73:
+      name: Lunastein
+      rarity: ♢
+      boosters: Lunala
+    74:
+      name: Shuppet
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    75:
+      name: Banette
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    76:
+      name: Choreogel
+      rarity: ♢♢
+      boosters: Solgaleo
+    77:
+      name: Choreogel
+      rarity: ♢♢
+      boosters: Lunala
+    78:
+      name: Wommel
+      rarity: ♢
+      boosters: Solgaleo
+    79:
+      name: Bandelby
+      rarity: ♢
+      boosters: Solgaleo
+    80:
+      name: Curelei
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    81:
+      name: Sankabuh
+      rarity: ♢
+      boosters: Solgaleo
+    82:
+      name: Colossand
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    83:
+      name: Mimigma
+      rarity: ♢
+      boosters: Lunala
+    84:
+      name: Kapu-Fala
+      rarity: ♢♢♢
+      boosters: Lunala
+    85:
+      name: Cosmog
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    86:
+      name: Cosmovum
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    87:
+      name: Lunala ex
+      rarity: ♢♢♢♢
+      boosters: Lunala
+    88:
+      name: Necrozma
+      rarity: ♢♢♢
+      boosters: Lunala
+    89:
+      name: Tragosso
+      rarity: ♢
+      boosters: Lunala
+    90:
+      name: Makuhita
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    91:
+      name: Hariyama
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    92:
+      name: Sonnfel
+      rarity: ♢
+      boosters: Solgaleo
+    93:
+      name: Rotomurf
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    94:
+      name: Praktibalk
+      rarity: ♢
+      boosters: Lunala
+    95:
+      name: Strepoli
+      rarity: ♢♢
+      boosters: Lunala
+    96:
+      name: Meistagrif
+      rarity: ♢♢♢
+      boosters: Lunala
+    97:
+      name: Krabbox
+      rarity: ♢
+      boosters: Solgaleo
+    98:
+      name: Wuffels
+      rarity: ♢
+      boosters: Lunala
+    99:
+      name: Wuffels
+      rarity: ♢
+      boosters: Solgaleo
+    100:
+      name: Wolwerock
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    101:
+      name: Wolwerock
+      rarity: ♢♢♢
+      boosters: Lunala
+    102:
+      name: Pampuli
+      rarity: ♢
+      boosters: Solgaleo
+    103:
+      name: Pampross
+      rarity: ♢♢
+      boosters: Solgaleo
+    104:
+      name: Quartermak ex
+      rarity: ♢♢♢♢
+      boosters: Lunala
+    105:
+      name: Meteno
+      rarity: ♢♢
+      boosters: Lunala
+    106:
+      name: Alola-Rattfratz
+      rarity: ♢
+      boosters: Lunala
+    107:
+      name: Alola-Rattikarl
+      rarity: ♢♢
+      boosters: Lunala
+    108:
+      name: Alola-Mauzi
+      rarity: ♢
+      boosters: Solgaleo
+    109:
+      name: Alola-Snobilikat
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    110:
+      name: Alola-Sleima
+      rarity: ♢
+      boosters: Lunala
+    111:
+      name: Alola-Sleimok ex
+      rarity: ♢♢♢♢
+      boosters: Lunala
+    112:
+      name: Absol
+      rarity: ♢♢♢
+      boosters: Lunala
+    113:
+      name: Unratütox
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    114:
+      name: Deponitox
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    115:
+      name: Gastella
+      rarity: ♢
+      boosters: Lunala
+    116:
+      name: Aggrostella
+      rarity: ♢
+      boosters: Lunala
+    117:
+      name: Alola-Digda
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    118:
+      name: Alola-Digdri
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    119:
+      name: Stalabor
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    120:
+      name: Cavalanzas
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    121:
+      name: Clavion
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    122:
+      name: Solgaleo ex
+      rarity: ♢♢♢♢
+      boosters: Solgaleo
+    123:
+      name: Magearna
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    124:
+      name: Sen-Long
+      rarity: ♢♢♢
+      boosters: Solgaleo
+    125:
+      name: Miniras
+      rarity: ♢
+      boosters: Lunala
+    126:
+      name: Mediras
+      rarity: ♢♢
+      boosters: Lunala
+    127:
+      name: Grandiras
+      rarity: ♢♢♢
+      boosters: Lunala
+    128:
+      name: Tauros
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    129:
+      name: Eneco
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    130:
+      name: Enekoro
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    131:
+      name: Dartiri
+      rarity: ♢
+      boosters: Solgaleo
+    132:
+      name: Resladero
+      rarity: ♢♢
+      boosters: Solgaleo
+    133:
+      name: Peppeck
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    134:
+      name: Trompeck
+      rarity: ♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    135:
+      name: Tukanon
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    136:
+      name: Mangunior
+      rarity: ♢
+      boosters: Solgaleo
+    137:
+      name: Manguspektor
+      rarity: ♢
+      boosters: Solgaleo
+    138:
+      name: Velursi
+      rarity: ♢
+      boosters: Lunala
+    139:
+      name: Kosturso
+      rarity: ♢♢♢
+      boosters: Lunala
+    140:
+      name: Kommandutan
+      rarity: ♢♢♢
+      boosters: Lunala
+    141:
+      name: Koalelu
+      rarity: ♢♢
+      boosters: Solgaleo
+    142:
+      name: Maxi-Malasada
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    143:
+      name: Fischernetz
+      rarity: ♢♢
+      boosters: Lunala
+    144:
+      name: Sonderbonbon
+      rarity: ♢♢
+      boosters:
+        - Solgaleo
+        - Lunala
+    145:
+      name: Rotom-Pokédex
+      rarity: ♢♢
+      boosters: Solgaleo
+    146:
+      name: Giftstich
+      rarity: ♢♢
+      boosters: Lunala
+    147:
+      name: Blätterumhang
+      rarity: ♢♢
+      boosters: Solgaleo
+    148:
+      name: Lola
+      rarity: ♢♢
+      boosters: Lunala
+    149:
+      name: Elima
+      rarity: ♢♢
+      boosters: Lunala
+    150:
+      name: Kiawe
+      rarity: ♢♢
+      boosters: Lunala
+    151:
+      name: Bromley
+      rarity: ♢♢
+      boosters: Lunala
+    152:
+      name: Tracy
+      rarity: ♢♢
+      boosters: Solgaleo
+    153:
+      name: Chrys
+      rarity: ♢♢
+      boosters: Solgaleo
+    154:
+      name: Maho
+      rarity: ♢♢
+      boosters: Solgaleo
+    155:
+      name: Lilly
+      rarity: ♢♢
+      boosters: Solgaleo
+    156:
+      name: Alola-Kokowei
+      rarity: ☆
+      boosters: Lunala
+    157:
+      name: Bubungus
+      rarity: ☆
+      boosters: Lunala
+    158:
+      name: Fruyal
+      rarity: ☆
+      boosters: Solgaleo
+    159:
+      name: Kapu-Toro
+      rarity: ☆
+      boosters: Solgaleo
+    160:
+      name: Alola-Knogga
+      rarity: ☆
+      boosters: Lunala
+    161:
+      name: Tortunator
+      rarity: ☆
+      boosters: Lunala
+    162:
+      name: Alola-Vulpix
+      rarity: ☆
+      boosters: Lunala
+    163:
+      name: Gufa
+      rarity: ☆
+      boosters: Lunala
+    164:
+      name: Kapu-Kime
+      rarity: ☆
+      boosters: Lunala
+    165:
+      name: Choreogel
+      rarity: ☆
+      boosters: Solgaleo
+    166:
+      name: Kapu-Riki
+      rarity: ☆
+      boosters: Solgaleo
+    167:
+      name: Wommel
+      rarity: ☆
+      boosters: Solgaleo
+    168:
+      name: Curelei
+      rarity: ☆
+      boosters: Solgaleo
+    169:
+      name: Sankabuh
+      rarity: ☆
+      boosters: Solgaleo
+    170:
+      name: Kapu-Fala
+      rarity: ☆
+      boosters: Lunala
+    171:
+      name: Cosmog
+      rarity: ☆
+      boosters: Lunala
+    172:
+      name: Wuffels
+      rarity: ☆
+      boosters: Solgaleo
+    173:
+      name: Pampross
+      rarity: ☆
+      boosters: Solgaleo
+    174:
+      name: Meteno
+      rarity: ☆
+      boosters: Lunala
+    175:
+      name: Magearna
+      rarity: ☆
+      boosters: Solgaleo
+    176:
+      name: Sen-Long
+      rarity: ☆
+      boosters: Solgaleo
+    177:
+      name: Peppeck
+      rarity: ☆
+      boosters: Lunala
+    178:
+      name: Kosturso
+      rarity: ☆
+      boosters: Lunala
+    179:
+      name: Koalelu
+      rarity: ☆
+      boosters: Solgaleo
+    180:
+      name: Silvarro ex
+      rarity: ☆☆
+      boosters: Lunala
+    181:
+      name: Moruda ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    182:
+      name: Fuegro ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    183:
+      name: Krawell ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    184:
+      name: Lusardin ex
+      rarity: ☆☆
+      boosters: Lunala
+    185:
+      name: Alola-Raichu ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    186:
+      name: Lunala ex
+      rarity: ☆☆
+      boosters: Lunala
+    187:
+      name: Quartermak ex
+      rarity: ☆☆
+      boosters: Lunala
+    188:
+      name: Alola-Sleimok ex
+      rarity: ☆☆
+      boosters: Lunala
+    189:
+      name: Solgaleo ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    190:
+      name: Lola
+      rarity: ☆☆
+      boosters: Lunala
+    191:
+      name: Elima
+      rarity: ☆☆
+      boosters: Lunala
+    192:
+      name: Kiawe
+      rarity: ☆☆
+      boosters: Lunala
+    193:
+      name: Bromley
+      rarity: ☆☆
+      boosters: Lunala
+    194:
+      name: Tracy
+      rarity: ☆☆
+      boosters: Solgaleo
+    195:
+      name: Chrys
+      rarity: ☆☆
+      boosters: Solgaleo
+    196:
+      name: Maho
+      rarity: ☆☆
+      boosters: Solgaleo
+    197:
+      name: Lilly
+      rarity: ☆☆
+      boosters: Solgaleo
+    198:
+      name: Silvarro ex
+      rarity: ☆☆
+      boosters: Lunala
+    199:
+      name: Moruda ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    200:
+      name: Fuegro ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    201:
+      name: Krawell ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    202:
+      name: Lusardin ex
+      rarity: ☆☆
+      boosters: Lunala
+    203:
+      name: Alola-Raichu ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    204:
+      name: Lunala ex
+      rarity: ☆☆
+      boosters: Lunala
+    205:
+      name: Quartermak ex
+      rarity: ☆☆
+      boosters: Lunala
+    206:
+      name: Alola-Sleimok ex
+      rarity: ☆☆
+      boosters: Lunala
+    207:
+      name: Solgaleo ex
+      rarity: ☆☆
+      boosters: Solgaleo
+    208:
+      name: Bromley
+      rarity: ☆☆☆
+      boosters: Lunala
+    209:
+      name: Lilly
+      rarity: ☆☆☆
+      boosters: Solgaleo
+    210:
+      name: Bisasam
+      rarity: ✸
+      boosters: Solgaleo
+    211:
+      name: Bisaknosp
+      rarity: ✸
+      boosters: Solgaleo
+    212:
+      name: Bisaflor
+      rarity: ✸
+      boosters: Solgaleo
+    213:
+      name: Owei
+      rarity: ✸
+      boosters: Lunala
+    214:
+      name: Kokowei
+      rarity: ✸
+      boosters: Lunala
+    215:
+      name: Schiggy
+      rarity: ✸
+      boosters: Lunala
+    216:
+      name: Schillok
+      rarity: ✸
+      boosters: Lunala
+    217:
+      name: Turtok
+      rarity: ✸
+      boosters: Lunala
+    218:
+      name: Sterndu
+      rarity: ✸
+      boosters: Solgaleo
+    219:
+      name: Starmie
+      rarity: ✸
+      boosters: Solgaleo
+    220:
+      name: Nebulak
+      rarity: ✸
+      boosters: Lunala
+    221:
+      name: Alpollo
+      rarity: ✸
+      boosters: Lunala
+    222:
+      name: Gengar
+      rarity: ✸
+      boosters: Lunala
+    223:
+      name: Machollo
+      rarity: ✸
+      boosters: Solgaleo
+    224:
+      name: Maschock
+      rarity: ✸
+      boosters: Solgaleo
+    225:
+      name: Machomei
+      rarity: ✸
+      boosters: Solgaleo
+    226:
+      name: Tragosso
+      rarity: ✸
+      boosters: Lunala
+    227:
+      name: Knogga
+      rarity: ✸
+      boosters: Lunala
+    228:
+      name: Pummeluff
+      rarity: ✸
+      boosters: Solgaleo
+    229:
+      name: Knuddeluff
+      rarity: ✸
+      boosters: Solgaleo
+    230:
+      name: Bisaflor ex
+      rarity: ✸✸
+      boosters: Solgaleo
+    231:
+      name: Kokowei ex
+      rarity: ✸✸
+      boosters: Lunala
+    232:
+      name: Turtok ex
+      rarity: ✸✸
+      boosters: Lunala
+    233:
+      name: Starmie ex
+      rarity: ✸✸
+      boosters: Solgaleo
+    234:
+      name: Gengar ex
+      rarity: ✸✸
+      boosters: Lunala
+    235:
+      name: Machomei ex
+      rarity: ✸✸
+      boosters: Solgaleo
+    236:
+      name: Knogga ex
+      rarity: ✸✸
+      boosters: Lunala
+    237:
+      name: Knuddeluff ex
+      rarity: ✸✸
+      boosters: Solgaleo
+    238:
+      name: Lunala ex
+      rarity: ♛
+      boosters:
+        - Lunala
+        - Solgaleo
+    239:
+      name: Solgaleo ex
+      rarity: ♛
+      boosters:
+        - Lunala
+        - Solgaleo
 PROMO-A:
   name: Promo-A
   boosters: ~
@@ -3257,3 +4301,31 @@ PROMO-A:
     59:
       name: Riolu
       equalTo: A2b
+    60:
+      name: Owei
+    61:
+      name: Froxy
+    62:
+      name: Porenta
+    63:
+      name: Rayquaza
+    64:
+      name: Rayquaza ex
+    65:
+      name: Rayquaza ex
+    66:
+      name: Mimigma
+    67:
+      name: Cosmog
+    68:
+      name: Wolwerock
+    69:
+      name: Alola-Kokowei
+    70:
+      name: Alola-Vulnona
+    71:
+      name: Krabbox
+    72:
+      name: Alola-Sleima
+    73:
+      name: Turkanon
