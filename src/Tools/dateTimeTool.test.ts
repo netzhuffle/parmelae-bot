@@ -22,7 +22,7 @@ describe('dateTimeTool', () => {
   });
 
   it('should return current date and time in Swiss timezone', async () => {
-    const result = (await dateTimeTool.invoke({})) as string;
+    const result = await dateTimeTool.invoke({});
 
     expect(result).toBe(
       'It is 1/15/2024, 3:30:00 PM local time in Switzerland.',

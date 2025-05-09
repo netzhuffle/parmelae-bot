@@ -44,12 +44,12 @@ describe('dallETool', () => {
   it('should successfully generate and send an image', async () => {
     dallEServiceFake.result = { url: 'https://example.com/image.jpg' };
 
-    const result = (await dallETool.invoke(
+    const result = await dallETool.invoke(
       {
         prompt: 'Foto eines Hamsters',
       },
       config,
-    )) as string;
+    );
 
     expect(result).toBe(
       'Successfully sent the image to the Telegram chat: A professional photo of a hamster, ultra HD quality',
@@ -68,12 +68,12 @@ describe('dallETool', () => {
   it('should handle failed image generation', async () => {
     dallEServiceFake.result = { url: null };
 
-    const result = (await dallETool.invoke(
+    const result = await dallETool.invoke(
       {
         prompt: 'Foto eines Hamsters',
       },
       config,
-    )) as string;
+    );
 
     expect(result).toBe(
       'You could not send the image due to technical difficulties.',

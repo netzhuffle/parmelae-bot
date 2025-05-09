@@ -35,7 +35,7 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           rarity: null,
@@ -45,7 +45,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('added card to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -56,7 +56,7 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'Test Card',
           rarity: null,
@@ -66,7 +66,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('added card to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -90,7 +90,7 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           rarity: '♢',
@@ -100,7 +100,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain(
         'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:',
@@ -126,7 +126,7 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           rarity: '♢',
@@ -136,7 +136,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: true,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('added 2 cards to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -155,7 +155,7 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           rarity: null,
@@ -165,7 +165,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('@test1 already owns them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
@@ -185,7 +185,7 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           remove: true,
@@ -195,7 +195,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('removed card from @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -221,7 +221,7 @@ describe('pokemonCardAdd', () => {
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           rarity: '♢',
@@ -231,7 +231,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain(
         'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:',
@@ -264,7 +264,7 @@ describe('pokemonCardAdd', () => {
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           rarity: '♢',
@@ -274,7 +274,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: true,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('removed 2 cards from @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -284,7 +284,7 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           remove: true,
@@ -294,7 +294,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('@test1 does not own them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
@@ -304,7 +304,7 @@ describe('pokemonCardAdd', () => {
 
   describe('error handling', () => {
     it('should indicate when no cards exist at all', async () => {
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'NonexistentCard',
           rarity: null,
@@ -314,7 +314,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('No cards exist');
       expect(result).toContain('no card was added');
@@ -331,7 +331,7 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           rarity: null,
@@ -341,7 +341,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('@test1 already owns them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
@@ -352,7 +352,7 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           remove: true,
@@ -362,7 +362,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('@test1 does not own them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
@@ -382,7 +382,7 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(2));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           rarity: null,
@@ -392,7 +392,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('Test2 already owns them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
@@ -405,7 +405,7 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           remove: true,
@@ -415,7 +415,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('Test2 does not own them');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
@@ -430,7 +430,7 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show username when available', async () => {
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           rarity: null,
@@ -440,7 +440,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('added card to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -453,7 +453,7 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           rarity: null,
@@ -463,7 +463,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('added card to Test2');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
@@ -489,7 +489,7 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           setKey: null,
@@ -499,7 +499,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: true,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('added 2 cards to Test2');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
@@ -513,7 +513,7 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           remove: true,
@@ -523,7 +523,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('No matching cards found in Test2');
       expect(result).toContain('The cards exist');
@@ -552,7 +552,7 @@ describe('pokemonCardAdd', () => {
       await repository.addCardToCollection(card1.id, BigInt(2));
       await repository.addCardToCollection(card2.id, BigInt(2));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           setKey: null,
@@ -562,7 +562,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: true,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('removed 2 cards from Test2');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
@@ -576,7 +576,7 @@ describe('pokemonCardAdd', () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           rarity: null,
@@ -586,7 +586,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('Successfully added card');
       expect(result).toContain('Test Set: ♦️ 1/1');
@@ -604,7 +604,7 @@ describe('pokemonCardAdd', () => {
       );
       await repository.addCardToCollection(card.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           remove: true,
@@ -614,7 +614,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('Successfully removed card');
       expect(result).toContain('Test Set: ♦️ 0/1');
@@ -638,7 +638,7 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           setKey: null,
@@ -648,7 +648,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: true,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('Successfully added 2 cards');
       expect(result).toContain('Test Set: ♦️ 2/2');
@@ -672,7 +672,7 @@ describe('pokemonCardAdd', () => {
         [],
       );
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           setKey: null,
@@ -682,7 +682,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: true,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('added 2 cards to @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -709,7 +709,7 @@ describe('pokemonCardAdd', () => {
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: null,
           setKey: null,
@@ -719,7 +719,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: true,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain('removed 2 cards from @test1');
       expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
@@ -742,7 +742,7 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show card details when adding with mismatched criteria', async () => {
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           setKey: null,
@@ -752,7 +752,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain(
         'Card with ID A1-001 exists but does not match the additional search criteria:',
@@ -771,7 +771,7 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show card details when removing with mismatched criteria', async () => {
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           setKey: null,
@@ -781,7 +781,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain(
         'Card with ID A1-001 exists but does not match the additional search criteria:',
@@ -800,7 +800,7 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should show card details with multiple mismatched criteria', async () => {
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
           setKey: null,
@@ -810,7 +810,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain(
         'Card with ID A1-001 exists but does not match the additional search criteria:',
@@ -830,7 +830,7 @@ describe('pokemonCardAdd', () => {
     });
 
     it('should not show card details when ID does not exist', async () => {
-      const result = (await pokemonCardAddTool.invoke(
+      const result = await pokemonCardAddTool.invoke(
         {
           card: 'A2-001', // Non-existent ID
           setKey: null,
@@ -840,7 +840,7 @@ describe('pokemonCardAdd', () => {
           bulkOperation: false,
         },
         config,
-      )) as string;
+      );
 
       expect(result).toContain(
         'No cards exist in the database matching these search criteria',

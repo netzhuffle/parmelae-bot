@@ -59,7 +59,7 @@ describe('pokemonCardStats', () => {
       // Add 1 crown card
       await repository.addCardToCollection(cards[10].id, BigInt(1));
 
-      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
+      const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('Sets:');
       expect(result).toContain(
         'Unschlagbare Gene: ♦️ 2/5 ⋅ ⭐️ 3 ⋅ ✴️ 1 ⋅ 👑 1',
@@ -76,7 +76,7 @@ describe('pokemonCardStats', () => {
       const cards = await repository.searchCards({ setKey: 'PA' });
       await repository.addCardToCollection(cards[0].id, BigInt(1));
 
-      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
+      const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('Promo-A: 1');
       expect(result).toContain('Promo sets don’t have rarities');
     });
@@ -111,7 +111,7 @@ describe('pokemonCardStats', () => {
       await repository.addCardToCollection(cards[2].id, BigInt(1));
       await repository.addCardToCollection(cards[3].id, BigInt(1));
 
-      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
+      const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('Booster Packs:');
       expect(result).toMatch(
         /Glurak: ♢–♢♢♢♢ 1\/2 ⋅ p\d+\.\d+% \| ♢–☆ 2\/3 ⋅ p\d+\.\d+% \| ♢–♛ 2\/3 ⋅ p\d+\.\d+%/,
@@ -127,7 +127,7 @@ describe('pokemonCardStats', () => {
     it('should include explanation texts', async () => {
       await repository.createSet('A1', 'Test Set');
 
-      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
+      const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('♦️ is');
       expect(result).toContain('rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢');
       expect(result).toContain('⭐️ is');
@@ -142,7 +142,7 @@ describe('pokemonCardStats', () => {
     it('should include search tool name in explanation', async () => {
       await repository.createSet('A1', 'Test Set');
 
-      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
+      const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('run the pokemonCardSearch tool');
     });
   });
@@ -153,14 +153,14 @@ describe('pokemonCardStats', () => {
     });
 
     it('should show username when available', async () => {
-      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
+      const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('@test1’s collection:');
     });
 
     it('should show first name when username not available', async () => {
       config.configurable.userId = BigInt(2);
 
-      const result = (await pokemonCardStatsTool.invoke({}, config)) as string;
+      const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('Test2’s collection:');
     });
   });
