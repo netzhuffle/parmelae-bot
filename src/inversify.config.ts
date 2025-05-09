@@ -9,16 +9,15 @@ import { PrismaClient } from '@prisma/client';
 import { Config } from './Config.js';
 import { Telegraf } from 'telegraf';
 import { readFileSync } from 'fs';
-import { PokemonTcgPocketYamlSymbol } from './PokemonTcgPocket/PokemonTcgPocketService.js';
+import { POKEMON_TCGP_YAML_SYMBOL } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 
 const container = new Container({
   defaultScope: 'Singleton',
-  autoBindInjectable: true,
-  skipBaseClassChecks: true,
+  autobind: true,
 });
 
 // Bind Pokemon TCG Pocket YAML content
-container.bind(PokemonTcgPocketYamlSymbol).toDynamicValue(() => {
+container.bind(POKEMON_TCGP_YAML_SYMBOL).toDynamicValue(() => {
   return readFileSync('resources/tcgpcards.yaml', 'utf-8');
 });
 
@@ -30,9 +29,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
-            'Helicone-Auth': `Bearer ${
-              context.container.get(Config).heliconeApiKey
-            }`,
+            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
           },
         },
       }),
@@ -42,9 +39,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
-            'Helicone-Auth': `Bearer ${
-              context.container.get(Config).heliconeApiKey
-            }`,
+            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
           },
         },
       }),
@@ -53,9 +48,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
-            'Helicone-Auth': `Bearer ${
-              context.container.get(Config).heliconeApiKey
-            }`,
+            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
           },
         },
       }),
@@ -65,9 +58,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
-            'Helicone-Auth': `Bearer ${
-              context.container.get(Config).heliconeApiKey
-            }`,
+            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
           },
         },
       }),
@@ -76,9 +67,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
-            'Helicone-Auth': `Bearer ${
-              context.container.get(Config).heliconeApiKey
-            }`,
+            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
             'Helicone-Cache-Enabled': 'true',
           },
         },
@@ -88,7 +77,7 @@ container.bind(GptModelsProvider).toDynamicValue(
 container.bind(Octokit).toDynamicValue(
   (context) =>
     new Octokit({
-      auth: context.container.get(Config).gitHubPersonalAccessToken,
+      auth: context.get(Config).gitHubPersonalAccessToken,
       userAgent: 'parmelae-bot',
       timeZone: 'Europe/Zurich',
     }),
@@ -96,14 +85,12 @@ container.bind(Octokit).toDynamicValue(
 container.bind(OpenAI).toDynamicValue(
   (context) =>
     new OpenAI({
-      apiKey: context.container.get(Config).openAiKey,
+      apiKey: context.get(Config).openAiKey,
     }),
 );
 container.bind(PrismaClient).toDynamicValue(() => new PrismaClient());
 container
   .bind(Telegraf)
-  .toDynamicValue(
-    (context) => new Telegraf(context.container.get(Config).telegramToken),
-  );
+  .toDynamicValue((context) => new Telegraf(context.get(Config).telegramToken));
 
 export default container;

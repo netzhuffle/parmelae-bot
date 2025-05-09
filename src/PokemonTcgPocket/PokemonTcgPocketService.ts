@@ -96,7 +96,7 @@ export const OWNERSHIP_FILTER_VALUES = ['all', 'owned', 'missing'] as const;
 export type OwnershipFilter = (typeof OWNERSHIP_FILTER_VALUES)[number];
 
 /** Symbol for injecting the Pokemon TCG Pocket YAML content */
-export const PokemonTcgPocketYamlSymbol = Symbol('PokemonTcgPocketYaml');
+export const POKEMON_TCGP_YAML_SYMBOL = Symbol('PokemonTcgPocketYaml');
 
 /** Card data from the YAML file */
 export interface Card {
@@ -172,7 +172,7 @@ export class PokemonTcgPocketService {
   constructor(
     private readonly probabilityService: PokemonTcgPocketProbabilityService,
     private readonly repository: PokemonTcgPocketRepository,
-    @inject(PokemonTcgPocketYamlSymbol) private readonly yamlContent: string,
+    @inject(POKEMON_TCGP_YAML_SYMBOL) private readonly yamlContent: string,
   ) {}
 
   /** Search for cards using various filters */
