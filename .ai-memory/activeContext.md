@@ -9,10 +9,13 @@
 - Completed initial project analysis: README, package.json, and src directory structure.
 - Extended PokemonTcgPocketProbabilityService with TRADABLE_RARITIES and calculateNewTradableCardProbability; updated PokemonTcgPocketService to output booster stats with separate diamond, tradable, and all columns including new probability calculations.
 - Refined and optimized Jest test suite for PokemonTcgPocketProbabilityService: updated and clarified test cases for normal, diamond, shiny, and god-pack probabilities, added config-based isolation of god-pack branch, and improved test maintainability.
+- Added AgentStateGraphFactory for constructing LangGraph state graphs for agent workflows.
+- Added minimal, contract-based black-box Jest test for AgentStateGraphFactory; all checks and tests pass.
 
 ## Next Steps
 - Populate activeContext.md and progress.md with project details.
 - Identify modules lacking test coverage and plan test implementations.
+- Generate and maintain minimal, contract-based Jest tests for new factories/classes (e.g., AgentStateGraphFactory).
 - Refactor code to adhere to best practices and patterns.
 - Configure CI pipeline to automate npm run checks.
 - Continue enhancing test coverage across modules and review additional feature enhancements.

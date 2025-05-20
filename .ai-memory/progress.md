@@ -11,9 +11,10 @@
 - Database operations via Prisma repositories.
 - Basic test coverage for `ChatGptService` and `PokemonTcgPocketService`.
 - Jest test suite for `PokemonTcgPocketProbabilityService` now fully implemented and passing, covering normal, diamond, shiny, and god-pack scenarios.
+- AgentStateGraphFactory implemented for LangGraph agent workflows and covered by a minimal, contract-based black-box test (all checks pass).
 
 ## What's Left to Build
-- Add Jest test suites for all services (`DallEService`, `ScheduledMessageService`, `TelegramMessageService`, etc.).
+- Add Jest test suites for all services (`DallEService`, `ScheduledMessageService`, `TelegramMessageService`, etc.) and new classes (e.g., `AgentStateGraphFactory`).
 - Implement tests for repositories and fakes under `/src/Repositories` and `/src/Fakes`.
 - Validate environment variables at startup with descriptive errors.
 - Enhance error handling with specific error classes.

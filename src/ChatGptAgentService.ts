@@ -3,7 +3,6 @@ import { injectable } from 'inversify';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { AIMessage, BaseMessage } from '@langchain/core/messages';
 import { Calculator } from '@langchain/community/tools/calculator';
-import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
@@ -38,6 +37,7 @@ import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.j
 import { TelegramService } from './TelegramService.js';
 import { DallEService } from './DallEService.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
+import { AgentStateGraphFactory } from './AgentStateGraphFactory.js';
 
 /** The context for the tools. */
 export interface ToolContext {
@@ -105,6 +105,7 @@ export class ChatGptAgentService {
   ];
 
   constructor(
+    private readonly agentStateGraphFactory: AgentStateGraphFactory,
     private readonly models: GptModelsProvider,
     private readonly config: Config,
     private readonly telegramService: TelegramService,
@@ -183,8 +184,7 @@ export class ChatGptAgentService {
     example: BaseMessage[],
     conversation: Conversation,
   ): Promise<ChatGptMessage> {
-    const agent = createReactAgent({
-      llm: this.models.getModel(this.config.gptModel),
+    const agent = this.agentStateGraphFactory.create({
       tools: [
         ...this.tools,
         this.identityQueryToolFactory.create(message.chatId),
@@ -192,6 +192,7 @@ export class ChatGptAgentService {
         this.scheduleMessageToolFactory.create(message.chatId, message.fromId),
         this.intermediateAnswerToolFactory.create(message.chatId),
       ],
+      llm: this.models.getModel(this.config.gptModel),
     });
 
     const agentOutput = await agent.invoke(
