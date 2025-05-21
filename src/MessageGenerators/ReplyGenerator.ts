@@ -23,9 +23,13 @@ export class ReplyGenerator {
    * Executes commands within the reply.
    *
    * @param message - The message to reply to
+   * @param announceToolCall - A callback to announce tool calls
    * @return The reply text
    */
-  async generate(message: Message): Promise<string> {
+  async generate(
+    message: Message,
+    announceToolCall: (text: string) => Promise<void>,
+  ): Promise<string> {
     const identity =
       this.config.identityByChatId.get(message.chatId) ??
       this.schiParmelaeIdentity;
@@ -42,6 +46,7 @@ export class ReplyGenerator {
       identity.prompt,
       example,
       conversation,
+      announceToolCall,
     );
     return completion.content;
   }

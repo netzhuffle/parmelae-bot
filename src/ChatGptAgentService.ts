@@ -20,7 +20,7 @@ import { Config } from './Config.js';
 import { StructuredTool, Tool } from '@langchain/core/tools';
 import { Message } from '@prisma/client';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
-import { CallbackHandlerFactory } from './CallbackHandlerFactory.js';
+import { CallbackHandler } from './CallbackHandler.js';
 import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
 import { ErrorService } from './ErrorService.js';
 import { Conversation } from './Conversation.js';
@@ -111,7 +111,7 @@ export class ChatGptAgentService {
     private readonly telegramService: TelegramService,
     private readonly dallEService: DallEService,
     private readonly dallEPromptGenerator: DallEPromptGenerator,
-    private readonly callbackHandlerFactory: CallbackHandlerFactory,
+    private readonly callbackHandler: CallbackHandler,
     private readonly pokemonTcgPocketService: PokemonTcgPocketService,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
@@ -149,16 +149,24 @@ export class ChatGptAgentService {
    * Generates and returns a message using an agent executor and tools.
    *
    * @param basePrompt - Prompt Template with the following MessagesPlaceholders: example, conversation
+   * @param announceToolCall - Callback to announce tool calls (e.g., send to Telegram)
    */
   async generate(
     message: Message,
     prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,
+    announceToolCall: (text: string) => Promise<void>,
     retries = 0,
   ): Promise<ChatGptMessage> {
     try {
-      return this.getReply(message, prompt, example, conversation);
+      return this.getReply(
+        message,
+        prompt,
+        example,
+        conversation,
+        announceToolCall,
+      );
     } catch (error) {
       if (retries < 2) {
         return this.generate(
@@ -166,6 +174,7 @@ export class ChatGptAgentService {
           prompt,
           example,
           conversation,
+          announceToolCall,
           retries + 1,
         );
       }
@@ -183,6 +192,7 @@ export class ChatGptAgentService {
     prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,
+    announceToolCall: (text: string) => Promise<void>,
   ): Promise<ChatGptMessage> {
     const agent = this.agentStateGraphFactory.create({
       tools: [
@@ -193,6 +203,7 @@ export class ChatGptAgentService {
         this.intermediateAnswerToolFactory.create(message.chatId),
       ],
       llm: this.models.getModel(this.config.gptModel),
+      announceToolCall,
     });
 
     const agentOutput = await agent.invoke(
@@ -212,7 +223,7 @@ export class ChatGptAgentService {
           dallEPromptGenerator: this.dallEPromptGenerator,
           pokemonTcgPocketService: this.pokemonTcgPocketService,
         } satisfies ToolContext,
-        callbacks: [this.callbackHandlerFactory.create(message.chatId)],
+        callbacks: [this.callbackHandler],
       },
     );
     const lastMessage = agentOutput.messages[agentOutput.messages.length - 1];

@@ -12,6 +12,9 @@
 - Basic test coverage for `ChatGptService` and `PokemonTcgPocketService`.
 - Jest test suite for `PokemonTcgPocketProbabilityService` now fully implemented and passing, covering normal, diamond, shiny, and god-pack scenarios.
 - AgentStateGraphFactory, AgentNodeFactory, and ToolsNodeFactory now have robust, idiomatic Jest test coverage with strict type safety and no use of `any` or unsafe assignments. All checks (format, lint, build, test) pass and codebase is fully compliant for these modules.
+- Tool call announcements are now handled by ToolCallAnnouncementNodeFactory, combining all tool calls for a message into one announcement (newline-separated), with AIMessage content as the first line if present. CallbackHandlerFactory was removed; CallbackHandler is now injected directly. Tests for ToolCallAnnouncementNodeFactory are comprehensive and up to date. All code, linter, and tests are clean and passing.
+- **Fallback for empty tool names and all related tests have been removed. Tool names are now always assumed to be non-empty, and the code/tests reflect this guarantee.**
+- **Tool name constant pattern (e.g., INTERMEDIATE_ANSWER_TOOL_NAME) is now used for all tool name checks, ensuring robust and future-proof comparisons.**
 
 ## What's Left to Build
 - Add Jest test suites for all services (`DallEService`, `ScheduledMessageService`, `TelegramMessageService`, etc.) and new classes (e.g., `AgentStateGraphFactory`).
@@ -21,6 +24,7 @@
 - Configure CI pipeline to automate `npm run checks` on push.
 - Improve vector store usage and retrieval strategies.
 - Review memory bank and update with recent feature additions and ensure CI pipeline automation.
+- **Future task:** Remove CommandReplyStrategy and CommandService, as /xyz commands are no longer useful.
 
 ## Current Status
 - Core functionality implemented for messaging, AI integrations, scheduling, and data persistence.
@@ -28,6 +32,9 @@
 - Partial test coverage exists; majority of modules untested.
 - Booster stats enhancement for PokemonTcgPocket implemented and tested.
 - AgentStateGraph and node factories now fully tested and compliant.
+- Tool call announcement logic is robust, unified, and content-aware, with comprehensive tests.
+- **Tool names are always non-empty; code and tests do not handle empty tool names.**
+- **Tool name constants are used for all tool name checks.**
 
 ## Known Issues
 - Incomplete test coverage across most modules.

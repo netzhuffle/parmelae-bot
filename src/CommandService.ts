@@ -29,8 +29,15 @@ export class CommandService {
       if (!message.replyToMessage) {
         return 'Ich würde Ihnen gerne einen Kommentar dazu abgeben, aber dazu müssen Sie mich in einer Antwort auf einen Text fragen, s’il vous plait.';
       }
-
-      return this.replyGenerator.generate(message.replyToMessage);
+      const toolCalls: string[] = [];
+      const reply = await this.replyGenerator.generate(
+        message.replyToMessage,
+        (text) => {
+          toolCalls.push(text);
+          return Promise.resolve();
+        },
+      );
+      return (toolCalls.length ? toolCalls.join('\n') + '\n' : '') + reply;
     }
 
     throw new NotExhaustiveSwitchError(command);

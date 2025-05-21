@@ -25,7 +25,10 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
 
   async handle(message: TelegramMessage): Promise<void> {
     void this.telegram.sendTyping(message.chatId);
-    const reply = await this.replyGenerator.generate(message);
+    const announceToolCall = async (text: string) => {
+      await this.telegram.sendWithoutStoring(text, message.chatId);
+    };
+    const reply = await this.replyGenerator.generate(message, announceToolCall);
     return this.telegram.reply(reply, message);
   }
 }
