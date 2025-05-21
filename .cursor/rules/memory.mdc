@@ -121,4 +121,4 @@ flowchart TD
 
 Note: When triggered by **update memory bank**, you MUST review every memory bank file, even if some don’t require updates. Focus particularly on activeContext.md and progress.md as they track current state.
 
-REMEMBER: After every memory reset, you begin completely fresh. The Memory Bank is your only link to previous work. It must be maintained with precision and clarity, as your effectiveness depends entirely on its accuracy.
+REMEMBER: After every memory reset, you begin completely fresh. The Memory Bank is your only link to previous work. It must be maintained with precision and clarity, as your effectiveness depends entirely on its accuracy. Future tasks must thus be recorded with all available information that allow you to execute them without loss of knowledge after a memory reset.

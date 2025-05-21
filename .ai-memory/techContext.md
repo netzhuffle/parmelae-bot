@@ -18,6 +18,7 @@
 - Strict TypeScript settings in tsconfig.json (noImplicitAny, strictNullChecks)
 - Required environment variables loaded via dotenv and validated at startup
 - CI checks enforce formatting, linting, schema formatting, and tests
+- Use of Prisma JSON field (toolCalls) and ToolMessage table for tool call and response persistence.
 
 ## Dependencies
 - AI/LLM: @langchain/core, @langchain/community, @langchain/langgraph, openai

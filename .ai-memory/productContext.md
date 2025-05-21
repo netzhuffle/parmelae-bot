@@ -11,4 +11,5 @@ This project exists to provide a robust Telegram bot powered by Node.js and Type
 - Enable conversational commands for AI interactions seamlessly within chats.
 - Provide clear, friendly feedback and error handling.
 - Allow users to schedule messages and generate images with minimal setup.
-- Offer reliable and responsive performance within Telegram. 
+- Offer reliable and responsive performance within Telegram.
+- **LLM context and reliability improved by persisting tool calls and tool responses in the database.** 

@@ -7,6 +7,7 @@
 - Prisma connects to a local SQLite database for persistence
 - Sentry provides optional error tracking when DSN is present
 - Tool call announcements are now handled by ToolCallAnnouncementNodeFactory, combining all tool calls for a message into one announcement (newline-separated), with AIMessage content as the first line if present.
+- Tool calls and tool responses will be persisted in the database (toolCalls JSON field in Message, ToolMessage table) and included in message histories for LLM workflows.
 
 ## Key Technical Decisions
 - Use Inversify for dependency injection to decouple components and improve testability
@@ -15,6 +16,7 @@
 - Integrate LangChain and OpenAI for AI-driven conversational responses
 - Apply Strategy pattern for dynamic reply behaviors and Factory pattern for node factory creation (not for callback handler instantiation)
 - Utilize `hnswlib-node` for vector store management in embeddings
+- Persist tool calls and tool responses in the database for complete message history and LLM context.
 
 ## Design Patterns
 - Dependency Injection (Inversify) for component wiring
@@ -22,14 +24,18 @@
 - Service Layer Pattern for business logic implementation
 - Strategy Pattern to select different reply strategies at runtime
 - Factory Pattern in node factories (e.g., ToolCallAnnouncementNodeFactory) for handler creation; CallbackHandler is now injected directly
+- Tool call and response persistence pattern (ToolMessage table, toolCalls JSON field).
 
 ## Component Relationships
 - `Bot` depends on `CommandService`, `CallbackHandler`, and `ReplyStrategyFinder`
 - Services (e.g., `ChatGptService`, `ScheduledMessageService`) depend on their corresponding Repositories for data access
 - Tools under `/src/Tools` used by Services for AI/LLM integrations
 - DI container configured in `inversify.config.ts` wires up all classes and constants
+- MessageHistoryService will include tool calls and tool responses when fetching message history.
+- ToolCallAnnouncementNodeFactory and related nodes will interact with the database to persist tool calls and responses.
 
 ## Critical Implementation Paths
 - Incoming Telegram message → `Bot` → `CallbackHandler` → `ReplyStrategyFinder` → Selected `ReplyStrategy` → Specific Service (e.g., `ChatGptService`) → Response → `Bot` sends reply
 - Scheduled messages loaded by `ScheduledMessageService` from DB via `ScheduledMessageRepository`, then sent by `Bot` at the scheduled time
-- Image generation via `DallEService` calls OpenAI API, then `Bot` sends the generated image 
+- Image generation via `DallEService` calls OpenAI API, then `Bot` sends the generated image
+- Tool call and response persistence: ToolCallAnnouncementNodeFactory → Database (Message.toolCalls, ToolMessage) → MessageHistoryService → LLM context. 

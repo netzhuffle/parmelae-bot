@@ -25,6 +25,7 @@
 - Improve vector store usage and retrieval strategies.
 - Review memory bank and update with recent feature additions and ensure CI pipeline automation.
 - **Future task:** Remove CommandReplyStrategy and CommandService, as /xyz commands are no longer useful.
+- Persist tool calls and tool responses in the database and include them in message histories for LLM workflows.
 
 ## Current Status
 - Core functionality implemented for messaging, AI integrations, scheduling, and data persistence.
@@ -35,16 +36,19 @@
 - Tool call announcement logic is robust, unified, and content-aware, with comprehensive tests.
 - **Tool names are always non-empty; code and tests do not handle empty tool names.**
 - **Tool name constants are used for all tool name checks.**
+- **Work initiated to persist tool calls and tool responses in the database and include them in message histories.**
 
 ## Known Issues
 - Incomplete test coverage across most modules.
 - Missing environment variable validation leads to runtime errors.
 - Potential formatting/linting issues due to apostroph characters.
 - No CI/CD pipeline configured.
+- Tool calls and tool responses are not yet persisted or included in message histories, leading to incomplete LLM context.
 
 ## Evolution of Project Decisions
 - Started as a personal fun project exploring AI and Telegram bots.
 - Adopted Inversify for DI and Prisma for ORM to improve maintainability.
 - Introduced Strategy and Factory patterns for extensible reply logic.
 - Integrated LangChain, LangGraph, and hnswlib-node for advanced LLM workflows.
-- Structured code into services, repositories, tools, and fakes to enforce separation of concerns. 
+- Structured code into services, repositories, tools, and fakes to enforce separation of concerns.
+- **Decision to persist tool calls and tool responses for improved LLM context and reliability.** 
