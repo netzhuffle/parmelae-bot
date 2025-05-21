@@ -3,6 +3,7 @@
 ## Current Work Focus
 - Populating memory bank and documenting project structure.
 - Reviewing codebase to ensure memory bank accuracy.
+- Refactoring and testing AgentStateGraph-related modules for robust, type-safe coverage.
 
 ## Recent Changes
 - Initialized .ai-memory with core memory bank files.
@@ -11,6 +12,7 @@
 - Refined and optimized Jest test suite for PokemonTcgPocketProbabilityService: updated and clarified test cases for normal, diamond, shiny, and god-pack probabilities, added config-based isolation of god-pack branch, and improved test maintainability.
 - Added AgentStateGraphFactory for constructing LangGraph state graphs for agent workflows.
 - Added minimal, contract-based black-box Jest test for AgentStateGraphFactory; all checks and tests pass.
+- Refactored AgentStateGraphFactory, AgentNodeFactory, and ToolsNodeFactory to have strict, idiomatic Jest test coverage using real LangChain messages and robust type assertions. Removed all use of `any` and unsafe assignments. All checks (format, lint, build, test) now pass.
 
 ## Next Steps
 - Populate activeContext.md and progress.md with project details.

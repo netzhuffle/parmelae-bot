@@ -11,7 +11,7 @@
 - Database operations via Prisma repositories.
 - Basic test coverage for `ChatGptService` and `PokemonTcgPocketService`.
 - Jest test suite for `PokemonTcgPocketProbabilityService` now fully implemented and passing, covering normal, diamond, shiny, and god-pack scenarios.
-- AgentStateGraphFactory implemented for LangGraph agent workflows and covered by a minimal, contract-based black-box test (all checks pass).
+- AgentStateGraphFactory, AgentNodeFactory, and ToolsNodeFactory now have robust, idiomatic Jest test coverage with strict type safety and no use of `any` or unsafe assignments. All checks (format, lint, build, test) pass and codebase is fully compliant for these modules.
 
 ## What's Left to Build
 - Add Jest test suites for all services (`DallEService`, `ScheduledMessageService`, `TelegramMessageService`, etc.) and new classes (e.g., `AgentStateGraphFactory`).
@@ -27,6 +27,7 @@
 - Memory bank initialized and project documentation underway.
 - Partial test coverage exists; majority of modules untested.
 - Booster stats enhancement for PokemonTcgPocket implemented and tested.
+- AgentStateGraph and node factories now fully tested and compliant.
 
 ## Known Issues
 - Incomplete test coverage across most modules.

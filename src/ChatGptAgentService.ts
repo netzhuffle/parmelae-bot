@@ -37,7 +37,7 @@ import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.j
 import { TelegramService } from './TelegramService.js';
 import { DallEService } from './DallEService.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
-import { AgentStateGraphFactory } from './AgentStateGraphFactory.js';
+import { AgentStateGraphFactory } from './AgentStateGraph/AgentStateGraphFactory.js';
 
 /** The context for the tools. */
 export interface ToolContext {
