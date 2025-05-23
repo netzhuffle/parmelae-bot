@@ -34,7 +34,7 @@ export class CommandService {
         message.replyToMessage,
         (text) => {
           toolCalls.push(text);
-          return Promise.resolve();
+          return Promise.resolve(null);
         },
       );
       return (toolCalls.length ? toolCalls.join('\n') + '\n' : '') + reply;

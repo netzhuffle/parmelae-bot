@@ -35,7 +35,7 @@ export class AgentStateGraphFactory {
   }: {
     tools: (StructuredTool | Tool)[];
     llm: ChatOpenAI;
-    announceToolCall: (text: string) => Promise<void>;
+    announceToolCall: (text: string) => Promise<number | null>;
   }) {
     const model = llm.bindTools(tools);
 

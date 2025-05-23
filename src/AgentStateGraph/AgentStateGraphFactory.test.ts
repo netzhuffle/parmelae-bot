@@ -22,7 +22,7 @@ describe('AgentStateGraphFactory', () => {
       toolsNodeFactory,
       toolCallAnnouncementNodeFactory,
     );
-    const announceToolCall = jest.fn();
+    const announceToolCall = jest.fn(() => Promise.resolve(123));
 
     // Act
     const graph = factory.create({ tools, llm, announceToolCall });

@@ -1,14 +1,19 @@
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
 import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
 import { AIMessage } from '@langchain/core/messages';
+import { MessageRepository } from '../Repositories/MessageRepository.js';
 
 describe('ToolCallAnnouncementNodeFactory', () => {
   let announceToolCall: jest.Mock;
+  let messageRepository: jest.Mocked<MessageRepository>;
   let factory: ToolCallAnnouncementNodeFactory;
 
   beforeEach(() => {
-    announceToolCall = jest.fn(() => Promise.resolve());
-    factory = new ToolCallAnnouncementNodeFactory();
+    announceToolCall = jest.fn(() => Promise.resolve(123)); // Mock returns message ID
+    messageRepository = {
+      updateToolCalls: jest.fn(),
+    } as unknown as jest.Mocked<MessageRepository>;
+    factory = new ToolCallAnnouncementNodeFactory(messageRepository);
   });
 
   it('announces a single tool call with JSON input', async () => {
@@ -256,5 +261,78 @@ describe('ToolCallAnnouncementNodeFactory', () => {
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {a: 1, b: 2, c: 3}]',
     );
+  });
+
+  it('persists tool calls to database when tool calls exist', async () => {
+    const node = factory.create(announceToolCall);
+    const toolCalls = [{ name: 'TestTool', args: { foo: 1 } }];
+    const messages = [
+      new AIMessage({
+        content: 'Test content',
+        tool_calls: toolCalls,
+      }),
+    ];
+    await node({ messages });
+
+    expect(announceToolCall).toHaveBeenCalledWith(
+      'Test content\n[TestTool: {foo: 1}]',
+    );
+    expect(messageRepository.updateToolCalls).toHaveBeenCalledWith(
+      123,
+      toolCalls,
+    );
+  });
+
+  it('does not persist tool calls when only content exists', async () => {
+    const node = factory.create(announceToolCall);
+    const messages = [
+      new AIMessage({
+        content: 'Only content, no tool calls.',
+        tool_calls: [],
+      }),
+    ];
+    await node({ messages });
+
+    expect(announceToolCall).toHaveBeenCalledWith(
+      'Only content, no tool calls.',
+    );
+    expect(messageRepository.updateToolCalls).not.toHaveBeenCalled();
+  });
+
+  it('does not persist tool calls when no announcement is made', async () => {
+    const node = factory.create(announceToolCall);
+    const messages = [
+      new AIMessage({
+        content: '',
+        tool_calls: [
+          {
+            name: INTERMEDIATE_ANSWER_TOOL_NAME,
+            args: { bar: 3 },
+          },
+        ],
+      }),
+    ];
+    await node({ messages });
+
+    expect(announceToolCall).not.toHaveBeenCalled();
+    expect(messageRepository.updateToolCalls).not.toHaveBeenCalled();
+  });
+
+  it('does not persist tool calls when callback returns null', async () => {
+    const announceToolCallReturningNull = jest.fn(() => Promise.resolve(null));
+    const node = factory.create(announceToolCallReturningNull);
+    const toolCalls = [{ name: 'TestTool', args: { foo: 1 } }];
+    const messages = [
+      new AIMessage({
+        content: 'Test content',
+        tool_calls: toolCalls,
+      }),
+    ];
+    await node({ messages });
+
+    expect(announceToolCallReturningNull).toHaveBeenCalledWith(
+      'Test content\n[TestTool: {foo: 1}]',
+    );
+    expect(messageRepository.updateToolCalls).not.toHaveBeenCalled();
   });
 });

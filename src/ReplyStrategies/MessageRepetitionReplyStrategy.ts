@@ -40,12 +40,13 @@ export class MessageRepetitionReplyStrategy implements ReplyStrategy {
 
   async handle(message: Message): Promise<void> {
     if (message.stickerFileId) {
-      return this.telegram.send(
+      await this.telegram.send(
         new Sticker(message.stickerFileId),
         message.chatId,
       );
+      return;
     }
 
-    return this.telegram.send(message.text, message.chatId);
+    await this.telegram.send(message.text, message.chatId);
   }
 }

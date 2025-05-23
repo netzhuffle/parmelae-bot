@@ -49,8 +49,18 @@ model Message {
   stickerFileId     String?
   newChatMembers    ChatEntryMessagesUsers[]
   replies           Message[]                @relation("ReplyToMessage")
+  toolCalls         Json?
+  toolMessages      ToolMessage[]
 
   @@unique([telegramMessageId, chatId])
+}
+
+model ToolMessage {
+  id         Int     @id @default(autoincrement())
+  message    Message @relation(fields: [messageId], references: [id])
+  messageId  Int
+  toolCallId String
+  text       String
 }
 
 model ScheduledMessage {

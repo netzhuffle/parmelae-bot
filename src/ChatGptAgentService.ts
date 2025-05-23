@@ -156,7 +156,7 @@ export class ChatGptAgentService {
     prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,
-    announceToolCall: (text: string) => Promise<void>,
+    announceToolCall: (text: string) => Promise<number | null>,
     retries = 0,
   ): Promise<ChatGptMessage> {
     try {
@@ -192,7 +192,7 @@ export class ChatGptAgentService {
     prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,
-    announceToolCall: (text: string) => Promise<void>,
+    announceToolCall: (text: string) => Promise<number | null>,
   ): Promise<ChatGptMessage> {
     const agent = this.agentStateGraphFactory.create({
       tools: [

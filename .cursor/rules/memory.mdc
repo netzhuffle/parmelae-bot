@@ -57,7 +57,7 @@ flowchart TD
    - Tool usage patterns
 
 6. `progress.md`
-   - What works
+   - What works within the active context
    - What's left to build
    - Current status
    - Known issues

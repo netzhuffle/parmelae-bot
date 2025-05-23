@@ -37,5 +37,5 @@
 ## Critical Implementation Paths
 - Incoming Telegram message → `Bot` → `CallbackHandler` → `ReplyStrategyFinder` → Selected `ReplyStrategy` → Specific Service (e.g., `ChatGptService`) → Response → `Bot` sends reply
 - Scheduled messages loaded by `ScheduledMessageService` from DB via `ScheduledMessageRepository`, then sent by `Bot` at the scheduled time
-- Image generation via `DallEService` calls OpenAI API, then `Bot` sends the generated image
+- Image generation via `DallEService` calls OpenAI API, then `Bot` sends the generated image 
 - Tool call and response persistence: ToolCallAnnouncementNodeFactory → Database (Message.toolCalls, ToolMessage) → MessageHistoryService → LLM context. 

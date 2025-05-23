@@ -28,7 +28,7 @@ export class ReplyGenerator {
    */
   async generate(
     message: Message,
-    announceToolCall: (text: string) => Promise<void>,
+    announceToolCall: (text: string) => Promise<number | null>,
   ): Promise<string> {
     const identity =
       this.config.identityByChatId.get(message.chatId) ??

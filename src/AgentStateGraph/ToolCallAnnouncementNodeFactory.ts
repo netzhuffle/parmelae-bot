@@ -2,13 +2,17 @@ import { injectable } from 'inversify';
 import { MessagesAnnotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
+import { MessageRepository } from '../Repositories/MessageRepository.js';
 
 /**
  * Factory for creating a node that announces tool calls in a unified, content-aware format.
  * Combines all tool calls for a message into a single announcement, with AIMessage content as the first line if present.
+ * Persists tool calls to the database after announcement.
  */
 @injectable()
 export class ToolCallAnnouncementNodeFactory {
+  constructor(private readonly messageRepository: MessageRepository) {}
+
   private formatParameters(params: Record<string, unknown>): string {
     return (
       '{' +
@@ -66,9 +70,9 @@ export class ToolCallAnnouncementNodeFactory {
 
   /**
    * Creates the node for announcing tool calls.
-   * @param announceToolCall - The function to call with the announcement string.
+   * @param announceToolCall - The function to call with the announcement string. Returns the database message ID, or null if no message was stored.
    */
-  create(announceToolCall: (text: string) => Promise<void>) {
+  create(announceToolCall: (text: string) => Promise<number | null>) {
     interface ToolCall {
       name: string;
       args?: Record<string, unknown>;
@@ -78,7 +82,15 @@ export class ToolCallAnnouncementNodeFactory {
       const toolCalls = (lastMessage.tool_calls ?? []) as ToolCall[];
       const lines = this.getAnnouncementLines(lastMessage, toolCalls);
       if (lines.length > 0) {
-        await announceToolCall(lines.join('\n'));
+        const messageId = await announceToolCall(lines.join('\n'));
+
+        // Store tool calls in database only if a message was actually stored
+        if (messageId !== null && toolCalls.length > 0) {
+          await this.messageRepository.updateToolCalls(
+            messageId,
+            lastMessage.tool_calls!,
+          );
+        }
       }
       return {};
     };

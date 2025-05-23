@@ -50,5 +50,5 @@
 - Adopted Inversify for DI and Prisma for ORM to improve maintainability.
 - Introduced Strategy and Factory patterns for extensible reply logic.
 - Integrated LangChain, LangGraph, and hnswlib-node for advanced LLM workflows.
-- Structured code into services, repositories, tools, and fakes to enforce separation of concerns.
+- Structured code into services, repositories, tools, and fakes to enforce separation of concerns. 
 - **Decision to persist tool calls and tool responses for improved LLM context and reliability.** 

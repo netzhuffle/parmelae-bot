@@ -146,6 +146,21 @@ export class MessageRepository {
     return messagesToDelete;
   }
 
+  /**
+   * Updates the toolCalls field for a message.
+   * @param messageId - The ID of the message to update.
+   * @param toolCalls - The tool calls JSON data to store.
+   */
+  async updateToolCalls(
+    messageId: number,
+    toolCalls: Prisma.InputJsonValue,
+  ): Promise<void> {
+    await this.prisma.message.update({
+      where: { id: messageId },
+      data: { toolCalls },
+    });
+  }
+
   private connectChat(
     chat: Chat,
   ): Prisma.ChatCreateNestedOneWithoutMessagesInput {

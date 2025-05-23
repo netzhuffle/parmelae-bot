@@ -14,5 +14,5 @@ This document defines the core requirements and goals of the Node.js TypeScript 
 - Provide users with intelligent and context-aware replies.
 - Enable image generation via DALL·E integration.
 - Support scheduled messaging and customizable workflows.
-- Maintain high code readability, test coverage, and developer experience.
+- Maintain high code readability, test coverage, and developer experience. 
 - **Persist tool calls and tool responses in the database for improved LLM context and reliability.** 

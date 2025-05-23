@@ -28,10 +28,12 @@ export class TelegramService {
    *
    * @param message - The text or Sticker to send.
    * @param chat - The chat to send in.
+   * @return The database message ID.
    */
-  async send(message: string | Sticker, chatId: bigint): Promise<void> {
+  async send(message: string | Sticker, chatId: bigint): Promise<number> {
     const sentMessage = await this.sendWithoutStoring(message, chatId);
-    await this.messageService.store(sentMessage);
+    const storedMessage = await this.messageService.store(sentMessage);
+    return storedMessage.id;
   }
 
   /**
