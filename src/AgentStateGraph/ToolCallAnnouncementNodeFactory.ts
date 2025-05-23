@@ -1,18 +1,15 @@
 import { injectable } from 'inversify';
-import { MessagesAnnotation } from '@langchain/langgraph';
 import { AIMessage } from '@langchain/core/messages';
 import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
-import { MessageRepository } from '../Repositories/MessageRepository.js';
+import { StateAnnotation } from './StateAnnotation.js';
 
 /**
  * Factory for creating a node that announces tool calls in a unified, content-aware format.
  * Combines all tool calls for a message into a single announcement, with AIMessage content as the first line if present.
- * Persists tool calls to the database after announcement.
+ * Stores context for later persistence of tool calls and responses.
  */
 @injectable()
 export class ToolCallAnnouncementNodeFactory {
-  constructor(private readonly messageRepository: MessageRepository) {}
-
   private formatParameters(params: Record<string, unknown>): string {
     return (
       '{' +
@@ -76,22 +73,30 @@ export class ToolCallAnnouncementNodeFactory {
     interface ToolCall {
       name: string;
       args?: Record<string, unknown>;
+      id?: string;
     }
-    return async ({ messages }: typeof MessagesAnnotation.State) => {
+    return async ({ messages }: typeof StateAnnotation.State) => {
       const lastMessage = messages[messages.length - 1] as AIMessage;
       const toolCalls = (lastMessage.tool_calls ?? []) as ToolCall[];
       const lines = this.getAnnouncementLines(lastMessage, toolCalls);
+
       if (lines.length > 0) {
         const messageId = await announceToolCall(lines.join('\n'));
 
-        // Store tool calls in database only if a message was actually stored
+        // Store context for later persistence (only if a message was actually stored)
         if (messageId !== null && toolCalls.length > 0) {
-          await this.messageRepository.updateToolCalls(
-            messageId,
-            lastMessage.tool_calls!,
-          );
+          return {
+            toolExecution: {
+              announcementMessageId: messageId,
+              originalAIMessage: lastMessage,
+              currentToolCallIds: toolCalls
+                .map((tc) => tc.id)
+                .filter((id): id is string => id !== undefined),
+            },
+          };
         }
       }
+
       return {};
     };
   }

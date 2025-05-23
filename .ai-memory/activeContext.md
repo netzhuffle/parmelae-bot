@@ -1,12 +1,12 @@
 # Active Context
 
 ## Current Work Focus
-- **Implementing step 3 of tool call persistence:** Record tool response messages to the database in a new graph node.
+- **COMPLETED:** Tool call and tool response persistence implementation with consistent database storage.
 
 ## Next Steps (Detailed)
 1. ✅ Update `schema.prisma` - COMPLETED
 2. ✅ **Update the callback in `ToolCallAnnouncementNodeFactory.ts` to return the message ID from the database, so the tool call announcement node can save the `tool_calls` JSON from the `AIMessage` - COMPLETED**
-3. **IN PROGRESS:** Implement logic to record tool response messages to the database in a new graph node.
+3. ✅ **Implement logic to record tool response messages to the database in a new graph node - COMPLETED**
 4. Update `MessageHistoryService.ts` to include tool calls and tool responses when fetching message history.
 5. Review and update test coverage for all new persistence logic.
 6. Ensure all documentation and memory bank files reflect the new persistence model and logic.
@@ -19,9 +19,11 @@
 - Removed fallback logic for empty tool names; tool names are now always non-empty and checked via exported constants.
 - Adopted tool name constants pattern for all tool name checks.
 - ✅ **Completed schema changes:** Added `toolCalls` JSON field to `Message` table and new `ToolMessage` table with proper fields.
-- ✅ **Completed ToolCallAnnouncementNodeFactory updates:** Added dependency injection for MessageRepository, changed callback signature to return Promise<number>, and added logic to persist tool_calls JSON to database.
-- ✅ **Updated all callback signatures throughout the codebase:** Modified TelegramService.send to return message ID, updated reply strategies, and ensured type consistency across all components.
-- ✅ **Improved API design:** Changed callback signature from `Promise<number>` to `Promise<number | null>` where `null` indicates no message was stored. Updated ToolCallAnnouncementNodeFactory to only persist tool calls when a real message ID is returned (not null). CommandService now returns `null` instead of mock ID `0`.
+- ✅ **Completed ToolCallAnnouncementNodeFactory updates:** Removed MessageRepository dependency, changed to store context for later persistence instead of immediate persistence.
+- ✅ **Created ToolResponsePersistenceNodeFactory:** Handles atomic persistence of tool calls and responses using direct repository access.
+- ✅ **Renamed ToolContextAnnotation to StateAnnotation:** Better reflects that it stores both messages and tool execution context.
+- ✅ **Implemented selective tool call persistence:** Only tool calls that have corresponding responses are stored in the database.
+- ✅ **Updated graph flow:** Added toolResponsePersistence node between tools and agent for consistent persistence.
 - ✅ **All formatting, linting, building, and tests now pass.**
 
 ## Active Decisions and Considerations
@@ -32,10 +34,10 @@
 - Tool call announcements are now unified and content-aware, improving user feedback and reducing message noise.
 - Tool names are always non-empty; code and tests do not handle empty tool names.
 - Tool name constants are used for all tool name checks.
-- Tool calls and tool responses will be persisted and included in LLM message histories for improved context.
+- Tool calls and tool responses are now persisted and included in LLM message histories for improved context.
 - ToolMessage table fields: `id`, `message` relation, `toolCallId`, `text`.
-- **API design principle:** Callback signatures should return `null` when no persistence occurs, not mock IDs, for semantic correctness.
-- **Future consideration:** When CommandService.ts is eventually removed/refactored, the callback signature can be simplified back to `Promise<number>` since CommandService is currently the only component that returns `null` (all other components actually store messages).
+- **Consistent persistence principle:** Tool calls are only persisted if they have corresponding responses, ensuring database consistency.
+- **Hybrid architecture:** ToolCallAnnouncementNodeFactory uses callbacks for flexibility in communication, but direct repository access for persistence operations.
 
 ## Important Patterns and Preferences
 - DI container configured in inversify.config.ts for class wiring.
@@ -43,14 +45,16 @@
 - Naming conventions: Service.ts, Repository.ts, Tool.ts, Fake.ts.
 - CI checks include formatting (Prettier), schema formatting (Prisma), linting (ESLint), YAML validation, and testing (Jest).
 - Never attempt to fix apostroph (') linting issues; ask the user to correct them manually.
-- ToolMessage table and toolCalls JSON field will be used for tool call persistence.
-- Callback signatures that don't store messages should return `Promise<number | null>` and return `null` when no storage occurs.
+- ToolMessage table and toolCalls JSON field are used for tool call persistence.
+- StateAnnotation provides enhanced graph state with tool execution context.
+- **Persistence flow:** ToolCallAnnouncementNodeFactory → stores context → tools execute → ToolResponsePersistenceNodeFactory → atomic persistence of tool calls + responses.
 
 ## Learnings and Project Insights
 - AI integrations (LangChain, LangGraph, OpenAI) are encapsulated in Tools.
 - `Bot` class uses Telegraf to delegate messages through ReplyStrategyFinder.
 - PokemonTcgPocketService synchronizes YAML-based card data to the database.
 - Memory bank is critical for AI assistant context continuity.
-- Persisting tool calls and responses will improve LLM context and reliability.
-- **Implemented flow:** ToolCallAnnouncementNodeFactory → BotMentionReplyStrategy → TelegramService.send → TelegramMessageService.store → MessageRepository.store → Returns message ID → MessageRepository.updateToolCalls (only if message ID is not null).
-- **API design clarity:** Using proper return types (`null` vs mock IDs) improves code maintainability and prevents logic errors. 
+- **Implemented consistent tool persistence:** Tool calls and responses are now atomically persisted, ensuring database consistency and improved LLM context.
+- **Graph state enhancement:** StateAnnotation provides tool execution context tracking across graph nodes.
+- **Selective persistence:** Only tool calls with responses are stored, preventing orphaned data and ensuring meaningful persistence.
+- **Clean separation of concerns:** Announcement handles communication, persistence handles database operations, both use appropriate patterns (callbacks vs direct access). 

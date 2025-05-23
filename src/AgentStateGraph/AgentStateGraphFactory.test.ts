@@ -2,6 +2,7 @@ import { AgentStateGraphFactory } from './AgentStateGraphFactory.js';
 import { AgentNodeFactory } from './AgentNodeFactory.js';
 import { ToolsNodeFactory } from './ToolsNodeFactory.js';
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
+import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
 import { ChatOpenAI } from '@langchain/openai';
 import { StructuredTool } from 'langchain/tools';
 
@@ -17,10 +18,14 @@ describe('AgentStateGraphFactory', () => {
     const toolCallAnnouncementNodeFactory = {
       create: jest.fn(() => jest.fn()),
     } as unknown as ToolCallAnnouncementNodeFactory;
+    const toolResponsePersistenceNodeFactory = {
+      create: jest.fn(() => jest.fn()),
+    } as unknown as ToolResponsePersistenceNodeFactory;
     const factory = new AgentStateGraphFactory(
       agentNodeFactory,
       toolsNodeFactory,
       toolCallAnnouncementNodeFactory,
+      toolResponsePersistenceNodeFactory,
     );
     const announceToolCall = jest.fn(() => Promise.resolve(123));
 

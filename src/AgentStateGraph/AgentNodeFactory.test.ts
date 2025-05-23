@@ -1,7 +1,7 @@
 import { AgentNodeFactory } from './AgentNodeFactory.js';
 import { AIMessage } from '@langchain/core/messages';
-import { MessagesAnnotation } from '@langchain/langgraph';
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+import { StateAnnotation } from './StateAnnotation.js';
 
 describe('AgentNodeFactory', () => {
   it('returns a function that calls model.invoke and returns the response', async () => {
@@ -10,7 +10,10 @@ describe('AgentNodeFactory', () => {
     const fakeModel = new ChatOpenAiFake(aiMessage);
     const factory = new AgentNodeFactory();
     const messages = [aiMessage];
-    const state: typeof MessagesAnnotation.State = { messages };
+    const state: typeof StateAnnotation.State = {
+      messages,
+      toolExecution: {},
+    };
     const node = factory.create(fakeModel);
 
     // Act
