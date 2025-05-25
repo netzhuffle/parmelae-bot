@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import {
   MessageWithRelations,
   MessageWithUser,
-  MessageWithUserAndReplyTo,
+  MessageWithUserReplyToAndToolMessages,
   TelegramMessage,
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
@@ -21,8 +21,8 @@ const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 export class MessageRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  /** Returns the full message including user and reply-to relations. */
-  async get(id: number): Promise<MessageWithUserAndReplyTo> {
+  /** Returns the full message including user, reply-to, and tool messages relations. */
+  async get(id: number): Promise<MessageWithUserReplyToAndToolMessages> {
     return this.prisma.message.findUniqueOrThrow({
       where: {
         id,
@@ -30,6 +30,7 @@ export class MessageRepository {
       include: {
         from: true,
         replyToMessage: true,
+        toolMessages: true,
       },
     });
   }
@@ -105,7 +106,7 @@ export class MessageRepository {
   async getLastChatMessage(
     chatId: bigint | number,
     beforeMessageId: number,
-  ): Promise<MessageWithUserAndReplyTo | null> {
+  ): Promise<MessageWithUserReplyToAndToolMessages | null> {
     return this.prisma.message.findFirst({
       where: {
         chatId: chatId,
@@ -119,6 +120,7 @@ export class MessageRepository {
       include: {
         from: true,
         replyToMessage: true,
+        toolMessages: true,
       },
     });
   }

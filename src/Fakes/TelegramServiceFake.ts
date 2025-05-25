@@ -61,4 +61,8 @@ export class TelegramServiceFake extends TelegramService {
     };
     return Promise.resolve();
   }
+
+  async getFileUrl(fileId: string): Promise<string> {
+    return Promise.resolve(`https://fake-telegram-file-url.com/${fileId}`);
+  }
 }

@@ -84,16 +84,31 @@ export type TelegramMessageWithReplyTo = Prisma.MessageGetPayload<
 > &
   HasTelegramMessageId;
 
-/** Type value for a message including the user and reply-to relations. */
-const MESSAGE_WITH_USER_AND_REPLY_TO_RELATIONS =
+/** Type value for a message including user, reply-to, and tool messages relations. */
+const MESSAGE_WITH_USER_REPLY_TO_AND_TOOL_MESSAGES =
   Prisma.validator<Prisma.MessageDefaultArgs>()({
     include: {
       from: true,
       replyToMessage: true,
+      toolMessages: true,
     },
   });
 
-/** Message including the user and reply-to relations. */
-export type MessageWithUserAndReplyTo = Prisma.MessageGetPayload<
-  typeof MESSAGE_WITH_USER_AND_REPLY_TO_RELATIONS
+/** Message including user, reply-to, and tool messages relations. */
+export type MessageWithUserReplyToAndToolMessages = Prisma.MessageGetPayload<
+  typeof MESSAGE_WITH_USER_REPLY_TO_AND_TOOL_MESSAGES
+>;
+
+/** Type value for a message including user and tool messages relations. */
+const MESSAGE_WITH_USER_AND_TOOL_MESSAGES =
+  Prisma.validator<Prisma.MessageDefaultArgs>()({
+    include: {
+      from: true,
+      toolMessages: true,
+    },
+  });
+
+/** Message including user and tool messages relations. */
+export type MessageWithUserAndToolMessages = Prisma.MessageGetPayload<
+  typeof MESSAGE_WITH_USER_AND_TOOL_MESSAGES
 >;

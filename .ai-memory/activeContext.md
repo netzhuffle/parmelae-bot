@@ -2,15 +2,28 @@
 
 ## Current Work Focus
 - **COMPLETED:** Tool call and tool response persistence implementation with consistent database storage.
+- **COMPLETED:** Step 4 - Update MessageHistoryService to include tool calls and tool responses in message history for improved LLM context.
+- **COMPLETED:** Fix ConversationService content extraction to remove tool call announcements from AI message content when tool calls are present.
+- **COMPLETED:** Refactor ConversationService for improved code organization and maintainability.
+- **COMPLETED:** Critical bug fix - ensure messages with tool calls are never skipped from conversation history, regardless of text content.
 
 ## Next Steps (Detailed)
 1. ✅ Update `schema.prisma` - COMPLETED
 2. ✅ **Update the callback in `ToolCallAnnouncementNodeFactory.ts` to return the message ID from the database, so the tool call announcement node can save the `tool_calls` JSON from the `AIMessage` - COMPLETED**
 3. ✅ **Implement logic to record tool response messages to the database in a new graph node - COMPLETED**
-4. Update `MessageHistoryService.ts` to include tool calls and tool responses when fetching message history.
-5. Review and update test coverage for all new persistence logic.
-6. Ensure all documentation and memory bank files reflect the new persistence model and logic.
-7. **Future task:** Handle tool call linkage for tools that send messages directly - tools like `diceTool`, `dallETool`, etc. call `telegram.sendDice()`, `telegram.sendPhoto()` etc. which store messages in the database, but these messages are not linked back to the original tool call that triggered them. This breaks LLM context because the conversation history shows the tool call and the resulting message as separate unconnected entries. Additionally, `IntermediateAnswerTool` has a worse problem: it sends messages directly AND its tool calls are filtered out from announcements, so the tool calls are never persisted to the database at all (no record of the tool call exists). Need a solution to link tool-generated messages back to their originating tool calls, possibly through the ToolMessage table or by enhancing the tool execution context.
+4. ✅ **Update `MessageHistoryService.ts` to include tool calls and tool responses when fetching message history - COMPLETED**
+   - ✅ Update Types.ts: Add MessageWithUserAndToolMessages, rename MessageWithUserAndReplyTo to MessageWithUserReplyToAndToolMessages
+   - ✅ Update MessageRepository: Modify get() and getLastChatMessage() to include toolMessages join
+   - ✅ Update MessageHistoryService: Change getHistory() return type to use enhanced types
+   - ✅ Update ConversationService: Handle tool calls/responses conversion to LangChain messages (AIMessage with tool_calls, ToolMessage instances)
+5. ✅ **Fix ConversationService content extraction for tool calls - COMPLETED**
+   - ✅ Create utility function to extract clean AI content from messages with tool calls
+   - ✅ Handle cases where message starts with "[" (only tool calls) vs has AI content before tool calls
+   - ✅ Update ConversationService to use clean content extraction
+   - ✅ Add comprehensive tests for content extraction scenarios
+6. Review and update test coverage for all new persistence logic.
+7. Ensure all documentation and memory bank files reflect the new persistence model and logic.
+8. **Future task:** Handle tool call linkage for tools that send messages directly - tools like `diceTool`, `dallETool`, etc. call `telegram.sendDice()`, `telegram.sendPhoto()` etc. which store messages in the database, but these messages are not linked back to the original tool call that triggered them. This breaks LLM context because the conversation history shows the tool call and the resulting message as separate unconnected entries. Additionally, `IntermediateAnswerTool` has a worse problem: it sends messages directly AND its tool calls are filtered out from announcements, so the tool calls are never persisted to the database at all (no record of the tool call exists). Need a solution to link tool-generated messages back to their originating tool calls, possibly through the ToolMessage table or by enhancing the tool execution context.
 
 ## Recent Changes
 - Populated and maintained the memory bank with project structure and documentation.
@@ -24,6 +37,11 @@
 - ✅ **Renamed ToolContextAnnotation to StateAnnotation:** Better reflects that it stores both messages and tool execution context.
 - ✅ **Implemented selective tool call persistence:** Only tool calls that have corresponding responses are stored in the database.
 - ✅ **Updated graph flow:** Added toolResponsePersistence node between tools and agent for consistent persistence.
+- ✅ **Enhanced MessageHistoryService and ConversationService:** Tool calls and tool responses are now included in LLM message histories with proper LangChain message types (AIMessage with tool_calls, ToolMessage instances).
+- ✅ **Fixed ConversationService content extraction:** Implemented extractAIMessageContent() utility function to remove tool call announcements from AI message content, preventing duplication while preserving clean AI responses. Handles edge cases like messages with only tool calls or whitespace-only content.
+- ✅ **Refactored ConversationService architecture:** Improved code organization by moving extractAIMessageContent to private method and breaking down the massive getConversation method into focused private methods (shouldSkipMessage, buildMessageContent, isAssistantMessage, processAssistantMessage, processUserMessage, parseToolCalls, createToolMessages). Enhanced maintainability while preserving all existing functionality and test coverage.
+- ✅ **Optimized ConversationService performance:** Moved buildMessageContent() call to only execute for user messages where the content is actually used, avoiding unnecessary async work for assistant messages. This improves performance especially when processing assistant messages with images.
+- ✅ **Fixed critical tool calls bug:** Updated shouldSkipMessage() method to never skip messages containing tool calls, regardless of text content (empty, missing, or too long). Tool calls are essential for conversation context and LLM functionality. Added comprehensive tests to verify the fix (2 new test cases, total tests increased to 206).
 - ✅ **All formatting, linting, building, and tests now pass.**
 
 ## Active Decisions and Considerations

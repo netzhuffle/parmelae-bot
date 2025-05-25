@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 import { MessageRepository } from './Repositories/MessageRepository.js';
 import {
-  MessageWithUser,
-  MessageWithUserAndReplyTo,
+  MessageWithUserAndToolMessages,
+  MessageWithUserReplyToAndToolMessages,
 } from './Repositories/Types.js';
 
 /** Finds the conversation history. */
@@ -22,16 +22,16 @@ export class MessageHistoryService {
   async getHistory(
     toMessageId: number,
     messageCount: number,
-  ): Promise<MessageWithUser[]> {
+  ): Promise<MessageWithUserAndToolMessages[]> {
     const message = await this.messageRepository.get(toMessageId);
     return this.getHistoryForMessages([message], messageCount);
   }
 
   /** Recursively fetches older messages until enough messages are found or there are no more old messages. */
   private async getHistoryForMessages(
-    messages: MessageWithUserAndReplyTo[],
+    messages: MessageWithUserReplyToAndToolMessages[],
     totalCount: number,
-  ): Promise<MessageWithUser[]> {
+  ): Promise<MessageWithUserAndToolMessages[]> {
     if (messages.length >= totalCount) {
       return messages;
     }
