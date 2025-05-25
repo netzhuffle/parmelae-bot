@@ -1,0 +1,410 @@
+# Parmelae Bot - Product Requirements Document
+
+# Overview  
+Parmelae Bot is an intelligent Telegram bot built with Node.js and TypeScript that provides AI-driven conversational responses, image generation, scheduled messaging, and specialized Pokemon TCG Pocket card management features. The bot leverages LangChain/LangGraph for advanced AI workflows, Prisma for robust database operations, and Inversify for maintainable dependency injection architecture.
+
+The bot solves the problem of lacking intelligent, context-aware automation in Telegram environments by providing a unified interface to interact with AI models directly in chat, eliminating manual scheduling errors, and offering specialized gaming features for Pokemon TCG Pocket enthusiasts.
+
+The product is valuable because it combines enterprise-grade architecture patterns with user-friendly Telegram interactions, providing reliable AI assistance with persistent context, automated workflows, and specialized gaming features that enhance the user experience beyond simple chatbot functionality.
+
+# Core Features  
+
+## AI-Powered Conversational Responses
+- **What it does:** Provides intelligent, context-aware responses using OpenAI's GPT models through LangChain integration
+- **Why it's important:** Enables natural language interaction with AI capabilities directly within Telegram conversations
+- **How it works:** Uses LangGraph state machines to process messages through agent nodes, tool execution, and response generation with persistent conversation history
+
+## Tool Call and Response Persistence
+- **What it does:** Stores all AI tool calls and their responses in the database to maintain complete conversation context
+- **Why it's important:** Ensures LLM has access to complete reasoning chains and tool interaction history for improved response quality
+- **How it works:** ToolCallAnnouncementNodeFactory and ToolResponsePersistenceNodeFactory work together to atomically persist tool interactions with selective storage (only tool calls with responses)
+
+## Image Generation via DALL·E
+- **What it does:** Generates custom images based on text prompts using OpenAI's DALL·E API
+- **Why it's important:** Provides visual content creation capabilities directly within chat conversations
+- **How it works:** DallEService integrates with OpenAI API and sends generated images through Telegram's photo messaging
+
+## Scheduled Messaging System
+- **What it does:** Allows users to schedule messages for future delivery at specific times
+- **Why it's important:** Eliminates manual scheduling errors and enables automated workflow management
+- **How it works:** ScheduledMessageService manages database-stored scheduled messages with automated delivery via Bot service
+
+## Pokemon TCG Pocket Integration
+- **What it does:** Provides comprehensive card database management, pack opening simulations, and collection tracking
+- **Why it's important:** Offers specialized gaming features for Pokemon TCG Pocket enthusiasts with accurate probability calculations
+- **How it works:** PokemonTcgPocketService synchronizes YAML-based card data to database with tools for card search, statistics, and ownership tracking
+
+## GitHub Integration
+- **What it does:** Announces repository commits and updates to designated Telegram channels
+- **Why it's important:** Keeps development teams informed of code changes without leaving Telegram
+- **How it works:** GitHubService processes webhook events and formats commit announcements for chat delivery
+
+# User Experience  
+
+## User Personas
+- **AI Enthusiasts:** Users seeking intelligent conversational AI with persistent context and tool capabilities
+- **Pokemon TCG Pocket Players:** Gamers wanting card collection management and pack opening simulations
+- **Development Teams:** Groups needing automated GitHub notifications and scheduled messaging
+- **General Telegram Users:** Individuals wanting enhanced chat experiences with AI-powered features
+
+## Key User Flows
+
+### AI Conversation Flow
+1. User mentions bot or sends direct message
+2. Bot processes message through LangGraph agent workflow
+3. AI generates response using conversation history and tool context
+4. Bot delivers response with tool call announcements when applicable
+5. All interactions are persisted for future context
+
+### Pokemon Card Management Flow
+1. User invokes card-related commands (search, stats, add to collection)
+2. Bot queries local card database synchronized from YAML sources
+3. Bot provides detailed card information, statistics, or collection updates
+4. Database tracks ownership and provides probability calculations
+
+### Scheduled Message Flow
+1. User creates scheduled message with specific delivery time
+2. Bot stores message in database with scheduling metadata
+3. ScheduledMessageService monitors and delivers messages at specified times
+4. Users receive confirmation of successful scheduling and delivery
+
+## UI/UX Considerations
+- **Conversational Interface:** All interactions use natural language within Telegram's familiar chat environment
+- **Clear Feedback:** Bot provides immediate acknowledgment of commands and clear error messages
+- **Tool Call Transparency:** Users see announcements when AI tools are being executed for transparency
+- **Persistent Context:** Conversations maintain context across sessions through database persistence
+- **Responsive Performance:** Bot responds quickly with loading indicators for longer operations
+
+# Technical Architecture  
+
+## System Components
+
+### Core Infrastructure
+- **Bot Service:** Telegraf-based message handling and routing using Strategy pattern for reply selection
+- **Dependency Injection:** Inversify container managing all service and repository dependencies
+- **Database Layer:** Prisma ORM with SQLite for development, SQL databases for production
+- **AI Integration:** LangChain/LangGraph for agent workflows with OpenAI API integration
+
+### Service Layer
+- **ChatGptAgentService:** Main AI conversation service using LangGraph state machines
+- **DallEService:** Image generation service with OpenAI DALL·E integration
+- **ScheduledMessageService:** Time-based message delivery management
+- **PokemonTcgPocketService:** Card database synchronization and game logic
+- **GitHubService:** Repository event processing and announcement formatting
+- **MessageHistoryService:** Conversation context retrieval with tool call inclusion
+
+### Repository Layer
+- **MessageRepository:** Message CRUD operations with tool call persistence
+- **ScheduledMessageRepository:** Scheduled message data management
+- **PokemonCardRepository:** Card database operations and ownership tracking
+- **UserRepository:** User data and settings management
+
+### Agent State Graph
+- **AgentNodeFactory:** Core AI response generation
+- **ToolCallAnnouncementNodeFactory:** Tool execution announcements with callback-based persistence
+- **ToolsNodeFactory:** LangChain tool execution coordination
+- **ToolResponsePersistenceNodeFactory:** Atomic tool call and response database storage
+
+## Data Models
+
+### Core Entities
+- **Message:** Chat messages with tool calls JSON field and tool message relations
+- **User:** Telegram user profiles with settings and preferences
+- **Chat:** Telegram chat/group information and configuration
+- **ScheduledMessage:** Future message delivery scheduling
+- **ToolMessage:** Tool response storage linked to originating messages
+
+### Pokemon TCG Pocket Entities
+- **PokemonCard:** Card database with rarity, set, and metadata information
+- **PokemonBooster:** Pack definitions with probability distributions
+- **PokemonCardOwnership:** User collection tracking with quantity management
+
+## APIs and Integrations
+- **Telegram Bot API:** Message sending/receiving via Telegraf framework
+- **OpenAI API:** GPT models for conversation and DALL·E for image generation
+- **Perplexity API:** Research-backed AI responses for enhanced accuracy
+- **LangChain Tools:** Extensible tool system for AI agent capabilities
+- **Vector Store:** hnswlib-node for embedding-based similarity search
+
+## Infrastructure Requirements
+- **Node.js:** Version 22.0.0+ with ESM module support
+- **Database:** SQLite for development, PostgreSQL/MySQL for production
+- **Environment Variables:** API keys for AI services and bot token management
+- **CI/CD:** Automated formatting, linting, schema validation, and testing
+- **Monitoring:** Sentry integration for error tracking and performance monitoring
+
+# Development Roadmap  
+
+## Phase 1: Core Infrastructure (Foundation)
+**Scope:** Essential bot functionality with basic AI integration
+- Telegram bot setup with Telegraf framework
+- Basic message handling and routing infrastructure
+- Inversify dependency injection container configuration
+- Prisma database setup with core Message and User models
+- Basic ChatGPT integration for simple conversational responses
+- Essential error handling and logging infrastructure
+- Basic test framework setup with Jest
+
+## Phase 2: AI Agent System (Core Intelligence)
+**Scope:** Advanced AI capabilities with tool integration
+- LangChain/LangGraph integration for agent workflows
+- Agent state graph implementation with node factories
+- Tool system architecture with extensible tool framework
+- Basic tool implementations (intermediate answers, web search)
+- Conversation history management and context persistence
+- Reply strategy system for different message types
+- Enhanced error handling for AI operations
+
+## Phase 3: Tool Call Persistence (Context Enhancement)
+**Scope:** Complete tool interaction tracking and database storage
+- Database schema updates for tool call storage (toolCalls JSON field, ToolMessage table)
+- ToolCallAnnouncementNodeFactory for unified tool announcements
+- ToolResponsePersistenceNodeFactory for atomic persistence
+- StateAnnotation enhancement for tool execution context
+- MessageHistoryService integration with tool call/response inclusion
+- ConversationService content extraction for clean AI responses
+- Comprehensive testing for all persistence logic
+
+## Phase 4: Tool Call Message Linkage (Context Preservation)
+**Scope:** Complete conversation context preservation across reply chains
+- Database schema update for toolCallMessages many-to-many relation
+- State annotation enhancement for tool call message ID tracking
+- Agent service enhancement to return tool call message IDs with responses
+- Reply strategy updates to link final responses to tool call messages
+- Message history service enhancement to include tool call messages in conversation chains
+- Repository enhancements for tool call message linking operations
+- Comprehensive testing for linkage functionality
+
+## Phase 5: Specialized Features (Value-Added Services)
+**Scope:** Image generation and scheduled messaging capabilities
+- DALL·E integration for AI-powered image generation
+- Image handling and delivery through Telegram
+- Scheduled message system with database persistence
+- Time-based message delivery automation
+- Enhanced user settings and preferences management
+- Advanced error handling for external service integrations
+
+## Phase 6: Pokemon TCG Pocket Integration (Gaming Features)
+**Scope:** Comprehensive card game management system
+- Pokemon card database schema and models
+- YAML-based card data synchronization system
+- Card search and statistics tools
+- Pack opening simulation with probability calculations
+- User collection tracking and ownership management
+- Booster pack probability analysis with rarity distributions
+- Gaming-specific tools and commands
+
+## Phase 7: GitHub Integration (Development Workflow)
+**Scope:** Repository monitoring and team communication
+- GitHub webhook integration for commit notifications
+- Commit announcement formatting and delivery
+- Repository event processing and filtering
+- Team notification management
+- Development workflow automation features
+
+## Phase 8: Advanced Features (Performance and Reliability)
+**Scope:** Production-ready enhancements and optimizations
+- Vector store integration for semantic search capabilities
+- Advanced conversation context management
+- Performance optimizations for database queries
+- Enhanced monitoring and error tracking
+- Advanced user management and permissions
+- Scalability improvements for high-volume usage
+
+# Logical Dependency Chain
+
+## Foundation Layer (Must be built first)
+1. **Core Infrastructure Setup**
+   - Node.js/TypeScript project structure with ESM modules
+   - Inversify dependency injection container
+   - Prisma database setup with basic models
+   - Jest testing framework with fakes pattern
+   - Essential CI/CD pipeline (formatting, linting, building, testing)
+
+2. **Basic Bot Functionality**
+   - Telegraf integration for Telegram API
+   - Message handling and routing infrastructure
+   - Basic error handling and logging
+   - User and chat model persistence
+
+## AI Intelligence Layer (Core value proposition)
+3. **LangChain Integration**
+   - Agent workflow system with LangGraph
+   - Basic tool system architecture
+   - Conversation history management
+   - Reply strategy pattern implementation
+
+4. **Tool System Foundation**
+   - Extensible tool framework
+   - Basic tool implementations
+   - Tool execution coordination
+   - Error handling for tool operations
+
+## Context Persistence Layer (Critical for AI quality)
+5. **Tool Call Persistence**
+   - Database schema for tool storage
+   - Atomic persistence system
+   - Tool call announcement system
+   - Message history integration with tool context
+
+6. **Tool Call Message Linkage**
+   - Reply chain context preservation
+   - Complete conversation history tracking
+   - Enhanced message relationships
+   - Context continuity across sessions
+
+## Feature Enhancement Layer (Value-added capabilities)
+7. **Specialized AI Features**
+   - Image generation capabilities
+   - Scheduled messaging system
+   - Advanced conversation management
+   - Enhanced user experience features
+
+8. **Domain-Specific Features**
+   - Pokemon TCG Pocket integration
+   - GitHub workflow integration
+   - Gaming and development team features
+   - Specialized tool implementations
+
+## Production Readiness Layer (Scalability and reliability)
+9. **Advanced Capabilities**
+   - Vector store integration
+   - Performance optimizations
+   - Advanced monitoring
+   - Scalability enhancements
+
+## Getting to Usable Frontend Quickly
+The fastest path to a working, visible frontend is:
+1. Basic Telegram bot setup (Phase 1) - Users can immediately interact
+2. Simple ChatGPT integration (Phase 1) - Bot provides intelligent responses
+3. Basic tool system (Phase 2) - Users see AI using tools for enhanced responses
+4. Tool announcements (Phase 3) - Users get transparency into AI operations
+
+This approach ensures users have a functional, intelligent bot within the first two phases while building the foundation for advanced features.
+
+## Atomic Feature Scoping
+Each phase is designed to be:
+- **Independently valuable:** Each phase delivers working functionality
+- **Incrementally buildable:** Later phases enhance rather than replace earlier work
+- **Testable in isolation:** Comprehensive test coverage for each component
+- **Deployable:** Each phase can be deployed and used in production
+- **Extensible:** Architecture supports adding new features without major refactoring
+
+# Risks and Mitigations  
+
+## Technical Challenges
+
+### AI Integration Complexity
+- **Risk:** LangChain/LangGraph integration complexity may cause development delays
+- **Mitigation:** Start with simple agent workflows and incrementally add complexity; maintain comprehensive test coverage with fakes for external dependencies
+
+### Database Performance
+- **Risk:** Tool call persistence and message history queries may impact performance at scale
+- **Mitigation:** Implement proper database indexing, optimize queries with selective loading, and monitor performance metrics; use database query optimization techniques
+
+### Context Window Limitations
+- **Risk:** Large conversation histories may exceed AI model context windows
+- **Mitigation:** Implement conversation summarization, selective history inclusion, and context window management strategies
+
+## MVP Definition and Scope
+
+### Feature Creep Risk
+- **Risk:** Attempting to build all features simultaneously may delay MVP delivery
+- **Mitigation:** Strict adherence to phase-based development; Phase 1-2 constitute the MVP with basic bot and AI functionality
+
+### Tool Call Persistence Complexity
+- **Risk:** Tool call message linkage implementation may be more complex than anticipated
+- **Mitigation:** Break down into smaller, testable components; implement atomic persistence first, then add linkage functionality
+
+### External API Dependencies
+- **Risk:** OpenAI API changes or outages may break functionality
+- **Mitigation:** Implement fallback mechanisms, error handling, and multiple AI provider support; maintain API version compatibility
+
+## Resource Constraints
+
+### Development Time Management
+- **Risk:** Complex AI features may require more development time than estimated
+- **Mitigation:** Focus on core functionality first; use existing LangChain patterns and tools rather than custom implementations
+
+### Testing Complexity
+- **Risk:** AI and external service testing may be difficult to implement comprehensively
+- **Mitigation:** Extensive use of fakes and mocks for external dependencies; focus on testing business logic and integration points
+
+### Deployment and Infrastructure
+- **Risk:** Production deployment complexity may delay launch
+- **Mitigation:** Start with simple deployment strategies; use SQLite for development and proven database solutions for production
+
+## Quality and Reliability
+
+### Code Quality Maintenance
+- **Risk:** Rapid development may compromise code quality and maintainability
+- **Mitigation:** Strict adherence to TypeScript best practices, comprehensive test coverage, and automated CI/CD checks
+
+### Error Handling Coverage
+- **Risk:** AI and external service errors may not be handled gracefully
+- **Mitigation:** Implement comprehensive error handling patterns, user-friendly error messages, and proper logging/monitoring
+
+### Data Consistency
+- **Risk:** Tool call persistence and message linkage may create data inconsistencies
+- **Mitigation:** Atomic database operations, proper transaction management, and data validation at all persistence points
+
+# Appendix  
+
+## Research Findings
+
+### LangChain/LangGraph Architecture
+- State-based agent workflows provide better control over AI interactions than simple prompt-response patterns
+- Tool call persistence significantly improves conversation quality by maintaining complete context
+- Callback-based architecture allows flexible integration between graph nodes and external systems
+
+### Telegram Bot Best Practices
+- Telegraf framework provides robust message handling with proper error recovery
+- Strategy pattern for reply handling enables extensible bot behavior
+- Message persistence with proper relations enables advanced conversation features
+
+### Database Design Insights
+- JSON fields for tool calls provide flexibility while maintaining queryability
+- Many-to-many relations for message linkage preserve conversation context
+- Selective persistence (only tool calls with responses) ensures data consistency
+
+## Technical Specifications
+
+### Performance Requirements
+- Message response time: < 2 seconds for simple responses, < 10 seconds for complex AI operations
+- Database query optimization: Proper indexing on frequently queried fields
+- Memory usage: Efficient conversation history management to prevent memory leaks
+
+### Security Considerations
+- API key management through environment variables
+- Input validation for all user-provided data
+- Proper error handling to prevent information leakage
+
+### Scalability Targets
+- Support for multiple concurrent conversations
+- Database design that scales with message volume
+- Efficient tool call storage and retrieval patterns
+
+### Integration Standards
+- RESTful API patterns for external service integration
+- Proper error handling and retry logic for external dependencies
+- Comprehensive logging for debugging and monitoring
+
+## Development Standards
+
+### Code Quality Requirements
+- TypeScript strict mode with no implicit any
+- Comprehensive test coverage with Jest
+- ESLint and Prettier for code consistency
+- Prisma schema formatting and validation
+
+### Testing Strategy
+- Unit tests for all business logic
+- Integration tests for database operations
+- Fakes for all external dependencies
+- End-to-end testing for critical user flows
+
+### Documentation Requirements
+- Comprehensive memory bank maintenance
+- API documentation for all public interfaces
+- Architecture decision records for major technical choices
+- User documentation for bot commands and features
