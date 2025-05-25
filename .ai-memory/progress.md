@@ -56,10 +56,48 @@
 
 ## What's Left to Build
 
-### Tool Call Linkage Enhancement (Future Task)
-- **Direct Message Tools:** Tools like `diceTool`, `dallETool` that send messages directly need linkage back to originating tool calls
-- **IntermediateAnswerTool Issues:** Tool calls are filtered out from announcements and never persisted
-- **Context Preservation:** Need solution to link tool-generated messages to their originating tool calls for complete LLM context
+### Tool Call Message Linkage Implementation (NEW PRIORITY TASK)
+
+**Problem:** The bot replies to the original user message, creating a reply chain that skips intermediate tool call messages. When `MessageHistoryService` follows reply chains, it jumps from the original request directly to the final response, missing all the tool call messages that contain the reasoning/context. This breaks LLM context because the AI can't see the tool calls and responses that led to the conclusion.
+
+**Solution:** Link final response messages to their associated tool call/response messages so that conversation history includes complete tool interaction context.
+
+#### Implementation Tasks (11 Total)
+
+1. **Database Schema Update** - Add `toolCallMessages Message[]` relation to `Message` model in `schema.prisma`
+2. **State Annotation Enhancement** - Add `toolCallMessageIds: number[]` field to `ToolExecutionState` in `StateAnnotation.ts`
+3. **Tool Call Announcement Tracking** - Update `ToolCallAnnouncementNodeFactory.ts` to store announcement message ID in state
+4. **Tool Response Tracking** - Update `ToolResponsePersistenceNodeFactory.ts` to store tool response message IDs in state
+5. **Agent Service Return Enhancement** - Modify `ChatGptAgentService.generate()` to return both response content and tool call message IDs
+6. **Reply Strategy Updates** - Update `BotMentionReplyStrategy` and `RandomizedGeneratedReplyStrategy` to handle tool call message IDs
+7. **Reply Generator Enhancement** - Update `ReplyGenerator.generate()` to handle enhanced agent service response
+8. **Message Repository Enhancement** - Add method to update message with tool call message IDs
+9. **Message History Service Enhancement** - Update `getHistoryForMessages()` to include tool call messages when present
+10. **Types Enhancement** - Update message types in `Types.ts` to include `toolCallMessages` relation
+11. **Testing and Integration** - Update all relevant tests to handle new functionality
+
+#### Technical Implementation Details
+
+**Key Changes Required:**
+- Database: Many-to-many relation between messages for tool call linkage
+- State Management: Track tool call message IDs during graph execution
+- Agent Service: Return enhanced response with tool call message IDs
+- Reply Flow: Link final response to tool call messages after storage
+- Message History: Include tool call messages when following reply chains
+
+**Files to Modify:**
+- `prisma/schema.prisma` - Add toolCallMessages relation
+- `src/AgentStateGraph/StateAnnotation.ts` - Add toolCallMessageIds tracking
+- `src/AgentStateGraph/ToolCallAnnouncementNodeFactory.ts` - Store announcement message IDs
+- `src/AgentStateGraph/ToolResponsePersistenceNodeFactory.ts` - Store response message IDs
+- `src/ChatGptAgentService.ts` - Return enhanced response with tool call message IDs
+- `src/MessageGenerators/ReplyGenerator.ts` - Handle enhanced agent response
+- `src/ReplyStrategies/BotMentionReplyStrategy.ts` - Link tool call messages to final response
+- `src/ReplyStrategies/RandomizedGeneratedReplyStrategy.ts` - Link tool call messages to final response
+- `src/Repositories/MessageRepository.ts` - Add updateToolCallMessages method
+- `src/MessageHistoryService.ts` - Include tool call messages in history
+- `src/Repositories/Types.ts` - Add toolCallMessages to message types
+- All corresponding `.test.ts` files - Update tests for new functionality
 
 ### Documentation and Maintenance
 - **Memory Bank Updates:** Ensure all documentation reflects current implementation
@@ -78,12 +116,14 @@
 6. ✅ Maintains database consistency through selective persistence
 7. ✅ Provides comprehensive test coverage with proper fakes
 
+**NEW PRIORITY:** Tool Call Message Linkage implementation to ensure complete conversation context preservation when following reply chains.
+
 The implementation significantly improves LLM context by providing complete tool interaction history, enabling the AI to understand and reference previous tool usage in conversations.
 
 ## Known Issues
 
 - Some linting errors remain in test files (MessageHistoryService.test.ts) but these are in existing code not related to the current implementation
-- Future enhancement needed for tools that send messages directly (diceTool, dallETool, IntermediateAnswerTool)
+- **NEW ISSUE:** Reply chain following skips tool call messages, breaking LLM context for conversations that follow reply chains
 
 ## Evolution of Project Decisions
 
@@ -91,10 +131,12 @@ The implementation significantly improves LLM context by providing complete tool
 - **Refined Approach:** Callback-based context storage + atomic persistence in separate node
 - **Final Architecture:** Hybrid approach with ToolCallAnnouncementNodeFactory handling announcements and ToolResponsePersistenceNodeFactory handling database operations
 - **Content Strategy:** Added content extraction to prevent duplication between AI responses and tool call announcements in LLM context
+- **NEW EVOLUTION:** Tool Call Message Linkage to preserve complete conversation context when following reply chains
 
 ### 🔄 Next Priority Tasks
-1. **Review and update test coverage for all new persistence logic** - Ensure comprehensive coverage of edge cases.
-2. **Ensure all documentation and memory bank files reflect the new persistence model and logic** - Update documentation to match implementation.
+1. **Tool Call Message Linkage Implementation** - Complete all 11 tasks to link final response messages to their associated tool call/response messages
+2. **Review and update test coverage for all new linkage logic** - Ensure comprehensive coverage of edge cases
+3. **Ensure all documentation and memory bank files reflect the new linkage model and logic** - Update documentation to match implementation
 
 ### 🚀 Future Enhancement Tasks
 1. **Tool Call Linkage for Direct Message Tools:** Handle tools like `diceTool`, `dallETool`, etc. that call `telegram.sendDice()`, `telegram.sendPhoto()` directly. These messages are stored but not linked back to originating tool calls, breaking LLM context.

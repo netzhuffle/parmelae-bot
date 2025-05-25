@@ -8,6 +8,7 @@
 - Sentry provides optional error tracking when DSN is present
 - Tool call announcements are now handled by ToolCallAnnouncementNodeFactory, combining all tool calls for a message into one announcement (newline-separated), with AIMessage content as the first line if present.
 - Tool calls and tool responses will be persisted in the database (toolCalls JSON field in Message, ToolMessage table) and included in message histories for LLM workflows.
+- **NEW: Tool Call Message Linkage** - Final response messages are linked to their associated tool call/response messages via many-to-many relations to preserve complete conversation context when following reply chains.
 
 ## Key Technical Decisions
 - Use Inversify for dependency injection to decouple components and improve testability
@@ -17,6 +18,7 @@
 - Apply Strategy pattern for dynamic reply behaviors and Factory pattern for node factory creation (not for callback handler instantiation)
 - Utilize `hnswlib-node` for vector store management in embeddings
 - Persist tool calls and tool responses in the database for complete message history and LLM context.
+- **NEW: Link final response messages to tool call messages** - Use many-to-many relations to ensure conversation history includes complete tool interaction context when following reply chains.
 
 ## Design Patterns
 - Dependency Injection (Inversify) for component wiring
@@ -25,6 +27,7 @@
 - Strategy Pattern to select different reply strategies at runtime
 - Factory Pattern in node factories (e.g., ToolCallAnnouncementNodeFactory) for handler creation; CallbackHandler is now injected directly
 - Tool call and response persistence pattern (ToolMessage table, toolCalls JSON field).
+- **NEW: Message Linkage Pattern** - Many-to-many relations between messages to preserve tool call context in conversation history.
 
 ## Component Relationships
 - `Bot` depends on `CommandService`, `CallbackHandler`, and `ReplyStrategyFinder`
@@ -33,9 +36,11 @@
 - DI container configured in `inversify.config.ts` wires up all classes and constants
 - MessageHistoryService will include tool calls and tool responses when fetching message history.
 - ToolCallAnnouncementNodeFactory and related nodes will interact with the database to persist tool calls and responses.
+- **NEW: Tool Call Message Linkage Flow** - Agent service returns tool call message IDs → Reply strategies link final response to tool call messages → Message history includes complete context when following reply chains.
 
 ## Critical Implementation Paths
 - Incoming Telegram message → `Bot` → `CallbackHandler` → `ReplyStrategyFinder` → Selected `ReplyStrategy` → Specific Service (e.g., `ChatGptService`) → Response → `Bot` sends reply
 - Scheduled messages loaded by `ScheduledMessageService` from DB via `ScheduledMessageRepository`, then sent by `Bot` at the scheduled time
 - Image generation via `DallEService` calls OpenAI API, then `Bot` sends the generated image 
-- Tool call and response persistence: ToolCallAnnouncementNodeFactory → Database (Message.toolCalls, ToolMessage) → MessageHistoryService → LLM context. 
+- Tool call and response persistence: ToolCallAnnouncementNodeFactory → Database (Message.toolCalls, ToolMessage) → MessageHistoryService → LLM context.
+- **NEW: Tool Call Message Linkage Path** - Agent execution → Track tool call message IDs in state → Return IDs with response → Reply strategy stores final response → Link final response to tool call messages → Message history includes complete context. 
