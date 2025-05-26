@@ -1,0 +1,219 @@
+---
+description: 
+globs: *.ts
+alwaysApply: false
+---
+# Telegram Bot Architecture Patterns
+
+## System Architecture Flow
+
+- **Entry Point Pattern:**
+  ```typescript
+  // src/index.ts loads Inversify DI container
+  const container = new Container();
+  // Load services, repositories, and tools
+  const bot = container.get<Bot>(TYPES.Bot);
+  bot.start();
+  ```
+
+- **Message Processing Flow:**
+  ```
+  Incoming Telegram message → Bot → CallbackHandler → ReplyStrategyFinder → 
+  Selected ReplyStrategy → Specific Service → Response → Bot sends reply
+  ```
+
+## Bot Component Relationships
+
+- **Bot Dependencies:**
+  ```typescript
+  @injectable()
+  export class Bot {
+    constructor(
+      private readonly commandService: CommandService,
+      private readonly callbackHandler: CallbackHandler,
+      private readonly replyStrategyFinder: ReplyStrategyFinder
+    ) {}
+  }
+  ```
+
+- **Service-Repository Pattern:**
+  ```typescript
+  // Services depend on repositories for data access
+  @injectable()
+  export class ChatGptService {
+    constructor(
+      private readonly messageRepository: MessageRepository,
+      private readonly userRepository: UserRepository
+    ) {}
+  }
+  ```
+
+## Reply Strategy Pattern
+
+- **Strategy Selection:**
+  ```typescript
+  @injectable()
+  export class ReplyStrategyFinder {
+    findStrategy(context: MessageContext): ReplyStrategy {
+      // Dynamic strategy selection based on message context
+      if (this.isBotMention(context)) {
+        return this.botMentionStrategy;
+      }
+      // ... other strategy selection logic
+    }
+  }
+  ```
+
+- **Strategy Implementation:**
+  ```typescript
+  @injectable()
+  export class BotMentionReplyStrategy implements ReplyStrategy {
+    async handle(context: MessageContext): Promise<void> {
+      // Strategy-specific logic
+      const response = await this.generateResponse(context);
+      await this.telegram.reply(response);
+    }
+  }
+  ```
+
+## Message Handling Patterns
+
+- **Telegraf Integration:**
+  ```typescript
+  // Initialize Telegraf for Telegram updates
+  this.telegraf.on('message', async (ctx) => {
+    await this.callbackHandler.handle(ctx);
+  });
+  ```
+
+- **Message Storage Pattern:**
+  ```typescript
+  // Store messages with proper relations
+  const message = await this.messageRepository.store({
+    telegramMessageId: ctx.message.message_id,
+    chatId: ctx.chat.id,
+    fromId: ctx.from.id,
+    text: ctx.message.text,
+    // ... other fields
+  });
+  ```
+
+## Scheduled Message Pattern
+
+- **Scheduled Message Flow:**
+  ```
+  ScheduledMessageService loads from DB via ScheduledMessageRepository → 
+  Bot sends at scheduled time
+  ```
+
+- **Implementation:**
+  ```typescript
+  @injectable()
+  export class ScheduledMessageService {
+    async processScheduledMessages(): Promise<void> {
+      const messages = await this.repository.getPendingMessages();
+      for (const message of messages) {
+        await this.bot.sendMessage(message);
+      }
+    }
+  }
+  ```
+
+## Tool Integration Pattern
+
+- **Tools in Services:**
+  ```typescript
+  // Tools under /src/Tools used by Services for AI/LLM integrations
+  @injectable()
+  export class ChatGptService {
+    constructor(
+      private readonly tools: Tool[],
+      private readonly agentStateGraphFactory: AgentStateGraphFactory
+    ) {}
+  }
+  ```
+
+- **Tool Factory Pattern:**
+  ```typescript
+  @injectable()
+  export class SomeToolFactory {
+    create(chatId: bigint): SomeTool {
+      return new SomeTool(this.dependencies, chatId);
+    }
+  }
+  ```
+
+## Error Handling and Monitoring
+
+- **Sentry Integration:**
+  ```typescript
+  // Optional error tracking when DSN is present
+  if (process.env.SENTRY_DSN) {
+    Sentry.init({ dsn: process.env.SENTRY_DSN });
+  }
+  ```
+
+- **Error Propagation:**
+  ```typescript
+  try {
+    await this.processMessage(context);
+  } catch (error) {
+    Sentry.captureException(error);
+    await this.sendErrorResponse(context);
+  }
+  ```
+
+## DI Container Configuration
+
+- **Container Setup:**
+  ```typescript
+  // inversify.config.ts wires up all classes and constants
+  container.bind<Bot>(TYPES.Bot).to(Bot);
+  container.bind<MessageRepository>(TYPES.MessageRepository).to(MessageRepository);
+  container.bind<ChatGptService>(TYPES.ChatGptService).to(ChatGptService);
+  ```
+
+- **Type Constants:**
+  ```typescript
+  export const TYPES = {
+    Bot: Symbol.for('Bot'),
+    MessageRepository: Symbol.for('MessageRepository'),
+    // ... other type symbols
+  } as const;
+  ```
+
+## Testing Patterns
+
+- **Bot Testing:**
+  ```typescript
+  describe('Bot', () => {
+    let bot: Bot;
+    let mockCallbackHandler: jest.Mocked<CallbackHandler>;
+    
+    beforeEach(() => {
+      // Setup mocks and dependencies
+      bot = new Bot(mockCommandService, mockCallbackHandler, mockReplyStrategyFinder);
+    });
+  });
+  ```
+
+- **Strategy Testing:**
+  ```typescript
+  // Test strategy selection and execution
+  it('should select correct strategy for bot mention', async () => {
+    const strategy = finder.findStrategy(botMentionContext);
+    expect(strategy).toBeInstanceOf(BotMentionReplyStrategy);
+  });
+  ```
+
+## Common Anti-Patterns
+
+- ❌ **DON'T:** Put business logic in Bot class
+- ❌ **DON'T:** Directly access Telegram API outside TelegramService
+- ❌ **DON'T:** Skip dependency injection for testability
+- ❌ **DON'T:** Handle errors silently without logging
+
+- ✅ **DO:** Use strategy pattern for different message types
+- ✅ **DO:** Delegate to services for business logic
+- ✅ **DO:** Use proper error handling and monitoring
+- ✅ **DO:** Follow the established message flow pattern

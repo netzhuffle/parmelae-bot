@@ -1,0 +1,256 @@
+---
+description: 
+globs: src/AgentStateGraph/**/*.ts,src/Message*.ts
+alwaysApply: false
+---
+# Tool Call Persistence Patterns
+
+## Core Principles
+
+- **Atomic Persistence:** Tool calls and responses are stored together to ensure consistency
+- **Selective Storage:** Only persist tool calls that have corresponding responses
+- **Context Tracking:** Maintain execution context across graph nodes for proper linking
+- **Message Linkage:** Link final responses to tool call messages for complete conversation history
+
+## State Management for Tool Persistence
+
+- **Tool Execution Context:**
+  ```typescript
+  export interface ToolExecutionState {
+    announcementMessageId?: number;
+    originalAIMessage?: AIMessage;
+    currentToolCallIds?: string[];
+  }
+  ```
+
+- **Context Accumulation:**
+  ```typescript
+  // Store context for later persistence
+  return {
+    toolExecution: {
+      announcementMessageId: messageId,
+      originalAIMessage: lastMessage,
+      currentToolCallIds: toolCalls.map(tc => tc.id).filter(Boolean),
+    },
+    toolCallMessageIds: [messageId],
+  };
+  ```
+
+## Tool Call Announcement Patterns
+
+- **Unified Announcement Format:**
+  ```typescript
+  private getAnnouncementLines(
+    lastMessage: AIMessage,
+    toolCalls: ToolCall[]
+  ): string[] {
+    const lines: string[] = [];
+    
+    // Add AI message content first if present
+    if (typeof lastMessage.content === 'string' && lastMessage.content.trim()) {
+      lines.push(lastMessage.content);
+    }
+    
+    // Add tool call announcements
+    for (const toolCall of toolCalls) {
+      if (this.shouldAnnounceToolCall(toolCall)) {
+        lines.push(this.formatToolCall(toolCall));
+      }
+    }
+    
+    return lines;
+  }
+  ```
+
+- **Tool Call Filtering:**
+  ```typescript
+  private shouldAnnounceToolCall(toolCall: { name: string }): boolean {
+    return toolCall.name !== INTERMEDIATE_ANSWER_TOOL_NAME;
+  }
+  ```
+
+## Persistence Implementation
+
+- **Atomic Storage Pattern:**
+  ```typescript
+  // Only store tool calls that have corresponding responses
+  const toolCallsWithResponses = originalAIMessage.tool_calls?.filter(
+    (toolCall) =>
+      newToolMessages.some((msg) => msg.tool_call_id === toolCall.id),
+  );
+
+  // Persist tool calls to Message.toolCalls JSON
+  if (toolCallsWithResponses?.length) {
+    await this.messageRepository.updateToolCalls(
+      announcementMessageId,
+      toolCallsWithResponses,
+    );
+  }
+
+  // Persist tool responses to ToolMessage table
+  for (const toolMsg of newToolMessages) {
+    await this.toolMessageRepository.store({
+      toolCallId: toolMsg.tool_call_id,
+      text: typeof toolMsg.content === 'string' 
+        ? toolMsg.content 
+        : JSON.stringify(toolMsg.content),
+      messageId: announcementMessageId,
+    });
+  }
+  ```
+
+## Database Schema Patterns
+
+- **Tool Call Storage:**
+  ```prisma
+  model Message {
+    id           Int           @id @default(autoincrement())
+    // ... other fields
+    toolCalls    Json?         // Store tool calls as JSON
+    toolMessages ToolMessage[] // Relation to tool responses
+  }
+
+  model ToolMessage {
+    id         Int     @id @default(autoincrement())
+    message    Message @relation(fields: [messageId], references: [id])
+    messageId  Int
+    toolCallId String  // Links to tool call ID
+    text       String  // Tool response content
+  }
+  ```
+
+## Repository Method Patterns
+
+- **Tool Call Updates:**
+  ```typescript
+  async updateToolCalls(
+    messageId: number,
+    toolCalls: ToolCall[]
+  ): Promise<void> {
+    await this.prisma.message.update({
+      where: { id: messageId },
+      data: { toolCalls },
+    });
+  }
+  ```
+
+- **Tool Message Storage:**
+  ```typescript
+  async store(data: {
+    toolCallId: string;
+    text: string;
+    messageId: number;
+  }): Promise<ToolMessage> {
+    return this.prisma.toolMessage.create({ data });
+  }
+  ```
+
+## Message History Integration
+
+- **Include Tool Data in Queries:**
+  ```typescript
+  const messages = await this.prisma.message.findMany({
+    include: {
+      from: true,
+      toolMessages: true, // Include tool responses
+    },
+    where: conditions,
+  });
+  ```
+
+- **LangChain Message Conversion:**
+  ```typescript
+  // Convert tool calls to AIMessage with tool_calls
+  if (message.toolCalls) {
+    return new AIMessage({
+      content: extractedContent,
+      tool_calls: JSON.parse(message.toolCalls as string),
+    });
+  }
+
+  // Convert tool responses to ToolMessage instances
+  const toolMessages = message.toolMessages.map(tm => 
+    new ToolMessage({
+      content: tm.text,
+      tool_call_id: tm.toolCallId,
+    })
+  );
+  ```
+
+## Error Handling Patterns
+
+- **Graceful Context Handling:**
+  ```typescript
+  // Skip if no tool execution context
+  if (!announcementMessageId || !originalAIMessage || !currentToolCallIds?.length) {
+    return {};
+  }
+  ```
+
+- **Database Error Recovery:**
+  ```typescript
+  try {
+    await this.persistToolData(data);
+  } catch (error) {
+    // Log error but don't break the flow
+    console.error('Tool persistence failed:', error);
+    return {}; // Return empty state update
+  }
+  ```
+
+## Testing Patterns
+
+- **Mock Tool Execution Context:**
+  ```typescript
+  const state: typeof StateAnnotation.State = {
+    messages: [originalAIMessage, toolMessage],
+    toolExecution: {
+      announcementMessageId: 456,
+      originalAIMessage,
+      currentToolCallIds: ['call-123'],
+    },
+    toolCallMessageIds: [],
+  };
+  ```
+
+- **Verify Selective Persistence:**
+  ```typescript
+  // Test that only tool calls with responses are stored
+  expect(mockMessageRepository.updateToolCalls).toHaveBeenCalledWith(
+    456,
+    [/* only tool calls that have responses */]
+  );
+  ```
+
+## Message Linkage Patterns (Future)
+
+- **Tool Call Message Relations:**
+  ```prisma
+  model Message {
+    // ... existing fields
+    toolCallMessages Message[] @relation("MessageAfterToolCalls")
+    messageAfterToolCalls Message? @relation("MessageAfterToolCalls", fields: [messageAfterToolCallsId], references: [id])
+    messageAfterToolCallsId Int?
+  }
+  ```
+
+- **Linking Final Responses:**
+  ```typescript
+  // Link final response to tool call messages
+  await this.messageRepository.updateToolCallMessages(
+    finalResponseId,
+    toolCallMessageIds
+  );
+  ```
+
+## Common Anti-Patterns
+
+- ❌ **DON'T:** Store tool calls without corresponding responses
+- ❌ **DON'T:** Skip context validation in persistence nodes
+- ❌ **DON'T:** Persist tool calls immediately in announcement nodes
+- ❌ **DON'T:** Ignore tool call IDs when filtering responses
+
+- ✅ **DO:** Use atomic persistence for consistency
+- ✅ **DO:** Track context across graph execution
+- ✅ **DO:** Filter tool calls based on responses
+- ✅ **DO:** Include tool data in message history queries

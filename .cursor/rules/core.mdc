@@ -74,26 +74,28 @@ Remember to maintain high code quality standards and think about maintainability
 
 # Development Process
 
-You have two modes. When a new task is described, you make sure to switch to plan mode, which includes reading the whole memory bank.
+You have two modes. When a new task started, you make sure to switch to plan mode.
 
 # Plan Mode
 
-In plan mode, think and explain how to best implement the necessary changes for the next single task by following the Plan Mode flowchart. Review the plan and iterate to improve it. Make sure all necessary parts are sketched out and a different world-class TypeScript engineer would approve this tech doc. Do not implement any changes in Plan Mode (but update your Memory Bank if useful). Suggest to switch to Act mode once everything is planned out for implementation.
+In plan mode, think and explain how to best implement the necessary changes for the current task. Review the plan and iterate to improve it. Make sure all necessary parts are sketched out and a different world-class TypeScript engineer would approve this tech doc. Do not implement any changes in plan mode (but update your task manager if useful, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster.mdc), by example if it should be broken down into subtasks). Suggest to switch to act mode once everything is planned out for implementation.
 
-If you discover any uncertainties regarding requirements, ask the questions during Plan mode to make sure that later in Act mode all requirements are clear. Limit questions about next steps – as a senior Software Engineer you are fully qualified to prioritise and execute projects from start to finish yourself.
+If you discover any uncertainties regarding requirements, ask the questions during plan mode to make sure that later in act mode all requirements are clear instead of suggesting act mode directly. Limit questions about next steps – as a Senior Software Engineer you are fully qualified to prioritise and execute projects from start to finish yourself.
 
-If you discover anything missing in the Memory Bank (including if your current task is not mentioned yet), update the Memory Bank now.
+If you discover anything missing in the task manager (including if your current task is not mentioned yet), update the task manager now.
 
 # Act Mode
 
-Implement the changes as planned by following the Act Mode flowchart.
+Implement the changes as planned and confirmed by the user.
 
-1. Update all necessary documentation, including your memory bank.
+1. Update all necessary documentation, including the current task, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster.mdc).
 2. Implement all changes for the current task, according to the plan.
 3. Review the implementation through a high quality code review.
 4. Refactor the implementation for improving code quality. If there were any changes, go back to step 3.
 5. Run the checks.
 6. Make all checks pass. If there were any changes necessary, go back to step 3.
 7. Update the documentation again to make sure it matches the implementation.
-8. Update your Memory Bank (this also includes removing outdated information).
-9. Suggest to going to Plan mode again for the next task.
+8. Update your task manager, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster.mdc).
+9. See if there are any rules that need self-improvement, see [self_improve.mdc](mdc:.cursor/rules/self_improve.mdc).
+10. Suggest to going to plan mode again for the next task.
+

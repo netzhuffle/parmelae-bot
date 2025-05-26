@@ -1,0 +1,43 @@
+---
+description: 
+globs: *.ts
+alwaysApply: false
+---
+# Dependency Injection Patterns
+
+## Core Principles
+
+- **Inversion of Control:** Use Inversify container to manage dependencies
+- **Testability:** All dependencies should be injectable for easy mocking
+- **Single Responsibility:** Each class should have a focused purpose
+- **Decoupling:** Components should depend on abstractions, not concretions
+
+## Injectable Class Pattern
+
+- **Service Classes:**
+  ```typescript
+  import { injectable } from 'inversify';
+
+  @injectable()
+  export class ChatGptService {
+    constructor(
+      private readonly messageRepository: MessageRepository,
+      private readonly userRepository: UserRepository,
+      private readonly gptModelsProvider: GptModelsProvider,
+    ) {}
+
+    // Methods
+  }
+  ```
+
+## Common Anti-Patterns
+
+- ❌ **DON'T:** Create dependencies manually with `new`
+- ❌ **DON'T:** Use service locator pattern
+- ❌ **DON'T:** Create circular dependencies
+- ❌ **DON'T:** Inject too many dependencies (>5-7 suggests refactoring needed)
+
+- ✅ **DO:** Use constructor injection for all dependencies
+- ✅ **DO:** Keep dependencies focused and minimal
+- ✅ **DO:** Use interfaces for better testability when appropriate
+- ✅ **DO:** Follow single responsibility principle
