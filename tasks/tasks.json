@@ -448,41 +448,68 @@
     {
       "id": 21,
       "title": "Develop Comprehensive Documentation",
-      "description": "Create detailed documentation for architecture decisions, APIs, and user guides.",
-      "details": "",
-      "testStrategy": "",
-      "priority": "medium",
+      "description": "Enhance README.md and create self-improvement rules to maintain code quality and provide clear project guidance.",
+      "status": "done",
       "dependencies": [],
-      "status": "pending",
+      "priority": "medium",
+      "details": "Focus on making the README the single source of truth for the project while establishing better development practices through rule improvements rather than creating extensive documentation that would become outdated.",
+      "testStrategy": "Review the README.md for completeness and clarity. Verify that new self-improvement rules are effective by applying them to existing code and confirming they catch intended patterns.",
       "subtasks": [
         {
           "id": 1,
-          "title": "Document Architecture Decisions",
-          "description": "Create detailed documentation outlining the architecture decisions for the TypeScript Node.js Telegram bot, including design choices, technology stack, and structure rationale.",
+          "title": "Enhance README.md",
+          "description": "Significantly improve the README.md to be comprehensive, welcoming, and maintainable as the primary documentation source.",
           "dependencies": [],
-          "details": "Explain the choice of TypeScript and Node.js, the use of frameworks like Telegraf or GrammY, folder structure, persistent data handling, and deployment considerations such as Docker and environment variables.",
-          "status": "pending"
+          "details": "Include better project description and features, technology stack overview, comprehensive setup instructions, development guidance, brief but sufficient architecture overview, and contributing guidelines. Ensure the README serves as the single source of truth for getting started and understanding the project.\n<info added on 2025-05-26T22:39:04.591Z>\n## README.md Enhancement Complete ✅\n\nSuccessfully transformed the README.md from a basic, self-deprecating document into a comprehensive, professional, and welcoming project overview.\n\n### Key Improvements Made\n\n#### 1. **Professional Tone & Structure**\n- Removed negative self-deprecating language (\"breaks most software development practices\", \"terrible test coverage\")\n- Maintained honest personal project nature while highlighting quality and learning aspects\n- Added clear section hierarchy with emojis for visual appeal\n\n#### 2. **Comprehensive Feature Overview**\n- **Features section**: Highlighted AI conversations, Pokemon cards, extensible tools, message history, real-time features\n- **Architecture section**: Detailed technology stack and design principles\n- **Project structure**: Visual directory layout for easy navigation\n\n#### 3. **Detailed Setup Instructions**\n- **Prerequisites**: Clear requirements with versions\n- **Step-by-step setup**: From cloning to running\n- **Environment configuration**: Complete .env example with all required variables\n- **Development scripts**: All available npm commands with descriptions\n\n#### 4. **Developer-Friendly Content**\n- **Code quality standards**: TypeScript strict mode, test coverage, linting\n- **Testing philosophy**: Unit tests, integration tests, fake pattern\n- **Contributing guidelines**: Clear process for new contributors\n- **Code conventions**: File naming, error handling, documentation standards\n\n#### 5. **Production Deployment**\n- **Build process**: Complete deployment steps\n- **Environment considerations**: Database, monitoring, scaling notes\n- **Production readiness**: Despite being a personal project, follows production practices\n\n#### 6. **Bot Capabilities Documentation**\n- **AI Tools**: Comprehensive list of available tools and their purposes\n- **Pokemon features**: Detailed card collection functionality\n- **Message handling**: Strategy pattern and context awareness\n\n### Content Strategy\n- **Balanced messaging**: Personal learning project that demonstrates professional practices\n- **Comprehensive coverage**: Everything needed to understand, set up, and contribute\n- **Visual appeal**: Emojis, code blocks, clear formatting\n- **Practical focus**: Real setup instructions and working examples\n\nThe new README serves as a complete single source of truth for the project, eliminating the need for separate documentation files while remaining maintainable and current.\n</info added on 2025-05-26T22:39:04.591Z>",
+          "status": "done"
         },
         {
           "id": 2,
-          "title": "Develop API Documentation",
-          "description": "Write comprehensive API documentation covering all bot commands, endpoints, and integrations, including the AI tools and Pokemon card features.",
+          "title": "Document Architecture Decisions in README",
+          "description": "Add a concise architecture section to the README that outlines the key architecture decisions for the TypeScript Node.js Telegram bot.",
           "dependencies": [
             1
           ],
-          "details": "Detail the Telegram Bot API usage, custom commands, webhook setup, and how the AI and Pokemon card features interact with the bot APIs. Include request/response formats, environment variables, and error handling.",
-          "status": "pending"
+          "details": "Briefly explain the choice of TypeScript and Node.js, the use of frameworks like Telegraf or GrammY, folder structure, persistent data handling, and deployment considerations. Keep it concise but informative enough for new developers to understand the project structure.",
+          "status": "done"
         },
         {
           "id": 3,
-          "title": "Create User and Developer Guides",
-          "description": "Produce user guides for end-users and developer documentation for contributors, focusing on usage instructions, setup, and extending the bot features.",
+          "title": "Analyze Codebase for Self-Improvement Rules",
+          "description": "Review the codebase to identify patterns and opportunities for new self-improvement rules following self_improve.md guidelines.",
+          "dependencies": [],
+          "details": "Look for recurring patterns, potential issues, or optimization opportunities that could be addressed through automated rules. Focus on patterns that would improve code quality, maintainability, and consistency.\n<info added on 2025-05-26T22:37:33.478Z>\n## Codebase Analysis Complete\n\nI've conducted a comprehensive analysis of the parmelae-bot codebase to identify patterns for self-improvement rules. Here are the key findings:\n\n### Project Architecture Overview\n- **TypeScript Node.js application** with modern ES modules\n- **Telegram bot** using Telegraf framework\n- **AI capabilities** via LangChain/LangGraph with tool calling\n- **Database** using Prisma with SQLite\n- **Dependency injection** via Inversify\n- **Pokemon card collection** system with complex business logic\n- **Clean architecture** with repositories, services, and tools\n\n### Key Technology Stack\n- TypeScript 5.8+ with strict configuration\n- Node.js 22+ (latest LTS)\n- Telegraf for Telegram Bot API\n- LangChain/LangGraph for AI agent workflows\n- Prisma for database ORM with SQLite\n- Inversify for dependency injection\n- Jest for testing with custom fake pattern\n- Zod for schema validation\n\n### Identified Patterns for New Rules\n\n#### 1. **LangChain Tool Pattern** (High Priority)\n- Tools in `src/Tools/` follow consistent structure with `tool()` function\n- Zod schema validation for input parameters\n- Tool context extraction via `getToolContext(config)`\n- Descriptive tool names and descriptions\n- Error handling patterns for tool execution\n\n#### 2. **Testing with Fakes Pattern** (High Priority)\n- Custom fake implementations in `src/Fakes/` for testing\n- Fakes track method calls for verification\n- Reset methods for test isolation\n- Partial implementation of interfaces for focused testing\n\n#### 3. **Repository Pattern** (Medium Priority)\n- Repositories handle only CRUD operations\n- Prisma client injection via Inversify\n- Type-safe database operations with custom types\n- Consistent error handling for not found cases\n\n#### 4. **Service Layer Pattern** (Medium Priority)\n- Services contain business logic\n- Dependency injection of repositories and other services\n- Clear separation of concerns\n- Injectable decorator usage\n\n#### 5. **Error Handling Pattern** (Medium Priority)\n- Custom error classes extending Error\n- Descriptive error messages with context\n- Specific error types for different scenarios\n- Error service for centralized logging\n\n#### 6. **Telegram Bot Pattern** (Low Priority)\n- Message handling via strategy pattern\n- Reply strategy finder for different chat types\n- Message storage and retrieval patterns\n- Webhook and polling support\n\n### Existing Rule Coverage Analysis\nCurrent rules already cover:\n- ✅ Core TypeScript practices\n- ✅ Testing requirements\n- ✅ Prisma usage patterns\n- ✅ LangGraph basics\n- ✅ Development workflow\n\n### Missing Rule Opportunities\nNeed new rules for:\n- 🆕 LangChain tool development patterns\n- 🆕 Testing with fakes pattern\n- 🆕 Telegram bot message handling\n- 🆕 Error class creation standards\n- 🆕 Repository implementation patterns\n\n### Next Steps\n1. Create new rules for the identified high-priority patterns\n2. Update existing rules with better examples from the codebase\n3. Ensure rules are practical and enforceable\n</info added on 2025-05-26T22:37:33.478Z>",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Create and Update Self-Improvement Rules",
+          "description": "Develop new rules and update existing ones based on the patterns discovered during codebase analysis.",
           "dependencies": [
-            1,
-            2
+            3
           ],
-          "details": "User guides should cover how to interact with the bot and use AI and Pokemon card features. Developer guides should include setup instructions, environment configuration, code structure overview, and contribution guidelines.",
-          "status": "pending"
+          "details": "Follow the self_improve.md guidelines to create well-defined rules. Each rule should have a clear purpose, implementation guidance, and examples of correct and incorrect usage. Ensure rules are practical and will genuinely improve the codebase.\n<info added on 2025-05-26T22:51:51.280Z>\n## Self-Improvement Rules Creation Complete ✅\n\nSuccessfully created three new high-priority self-improvement rules based on the codebase analysis:\n\n### 1. **LangChain Tools Rule** (`langchain_tools.md`)\n- **Purpose**: Standardize LangChain tool development patterns\n- **Coverage**: Tool structure, Zod schema validation, context usage, error handling\n- **Key Patterns**: \n  - `tool()` function usage with proper configuration\n  - `getToolContext(config)` for service access\n  - Zod schema with detailed descriptions\n  - User-friendly error messages as strings\n  - Comprehensive testing requirements\n\n### 2. **Testing with Fakes Rule** (`testing_fakes.md`)\n- **Purpose**: Standardize the custom fake pattern used throughout the project\n- **Coverage**: Fake implementation, call tracking, test data management\n- **Key Patterns**:\n  - Fake classes in `src/Fakes/` with `Fake` suffix\n  - Call tracking arrays with descriptive names\n  - Reset functionality for test isolation\n  - Helper methods for test data setup\n  - Interface compliance with selective implementation\n\n### 3. **Error Handling Rule** (`error_handling.md`)\n- **Purpose**: Standardize error class creation and error handling patterns\n- **Coverage**: Custom error classes, assertions vs errors, error logging\n- **Key Patterns**:\n  - Specific error classes extending `Error` with context\n  - Assertions for programmer errors, exceptions for runtime issues\n  - ErrorService for centralized logging\n  - NotExhaustiveSwitchError for type safety\n  - Error recovery strategies\n\n### Rule Quality Standards Met\n- ✅ **Actionable and specific** - Each rule provides concrete implementation guidance\n- ✅ **Examples from actual code** - All patterns are based on real codebase usage\n- ✅ **Cross-referenced** - Rules reference related rules for comprehensive coverage\n- ✅ **Practical enforcement** - Rules can be applied immediately to improve code quality\n\n### Impact on Development\nThese rules will help:\n- **Maintain consistency** across LangChain tool implementations\n- **Improve test quality** with standardized fake patterns\n- **Enhance error handling** with specific, contextual error classes\n- **Reduce onboarding time** for new contributors\n- **Prevent common mistakes** through established patterns\n\n### Integration with Existing Rules\nThe new rules complement existing rules by:\n- Building on core TypeScript standards\n- Extending testing requirements with specific patterns\n- Providing domain-specific guidance for AI tools\n- Maintaining consistency with project architecture\n\nAll rules follow the established format with proper metadata, clear descriptions, and practical examples.\n</info added on 2025-05-26T22:51:51.280Z>",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "title": "Add API Usage Examples to README",
+          "description": "Include practical examples of bot commands and API usage in the README to help developers understand how to interact with the bot.",
+          "dependencies": [
+            1
+          ],
+          "details": "Provide concise examples of common bot commands, webhook setup, and how the AI and Pokemon card features can be used. Include code snippets where appropriate to illustrate usage patterns.",
+          "status": "done"
+        },
+        {
+          "id": 6,
+          "title": "Add Development and Contribution Guidelines to README",
+          "description": "Create clear sections in the README for development workflow and contribution guidelines.",
+          "dependencies": [
+            1
+          ],
+          "details": "Include information on local development setup, testing procedures, pull request process, and code style expectations. Make it easy for new contributors to understand how they can effectively participate in the project.",
+          "status": "done"
         }
       ]
     },
@@ -729,6 +756,21 @@
           "parentTaskId": 26
         }
       ]
+    },
+    {
+      "id": 27,
+      "title": "Migrate ToolFactory Classes to Dependency Injection",
+      "description": "Refactor all remaining ToolFactory classes in src/Tools/ to use dependency injection via config instead of the factory pattern, ensuring all tool dependencies are provided through the config argument.",
+      "details": "This task involves a significant architectural change to improve dependency management in the Tools module:\n\n1. Identify all remaining ToolFactory classes in the src/Tools/ directory\n2. For each factory class:\n   - Analyze the current factory implementation to understand what dependencies it's managing\n   - Refactor the code to accept dependencies directly via the config parameter\n   - Remove the factory pattern entirely\n   - Update the tool class to receive its dependencies through constructor injection\n   - Ensure the tool's interface remains compatible with existing consumers\n\n3. Update the dependency registration in the Inversify container:\n   - Modify the container configuration to bind tool dependencies directly\n   - Remove factory registrations\n   - Update any provider functions to reflect the new dependency approach\n\n4. Update all tool usage sites:\n   - Find all locations where tools are instantiated via factories\n   - Replace factory calls with direct instantiation using injected dependencies\n   - Ensure proper error handling for missing dependencies\n\n5. Update the documentation:\n   - Add clear examples of the new dependency injection pattern for tools\n   - Document the config structure expected by each tool\n   - Update any developer guides that reference the old factory pattern\n\n6. Code style and consistency:\n   - Ensure consistent naming conventions across refactored code\n   - Apply proper typing for all dependencies\n   - Add appropriate JSDoc comments for clarity\n\nThis change improves testability, reduces complexity, and aligns with modern dependency injection practices. The config-based approach provides a clearer contract for tool dependencies and makes the codebase more maintainable.",
+      "testStrategy": "1. Unit Testing:\n   - Create unit tests for each refactored tool to verify it works correctly with the new dependency injection approach\n   - Test with both valid and invalid/missing dependencies to ensure proper error handling\n   - Verify that all tool functionality remains unchanged after refactoring\n\n2. Integration Testing:\n   - Test the integration between tools and their consumers to ensure the refactoring hasn't broken any existing functionality\n   - Verify that tools can be properly instantiated and used in the application context\n   - Test the full request-response cycle for features that use these tools\n\n3. Dependency Verification:\n   - Create tests that specifically verify dependencies are correctly injected via the config parameter\n   - Test edge cases where dependencies might be undefined or incorrectly formatted\n\n4. Documentation Testing:\n   - Review updated documentation to ensure it accurately reflects the new approach\n   - Verify code examples in documentation work as expected\n\n5. Manual Testing:\n   - Perform manual testing of key features that rely on the refactored tools\n   - Verify that the application behaves identically before and after the refactoring\n\n6. Code Review:\n   - Conduct a thorough code review to ensure all factory pattern code has been removed\n   - Verify that the dependency injection implementation follows best practices\n   - Check for any remaining references to the old factory pattern",
+      "status": "pending",
+      "dependencies": [
+        3,
+        5,
+        22
+      ],
+      "priority": "medium",
+      "subtasks": []
     }
   ]
 }

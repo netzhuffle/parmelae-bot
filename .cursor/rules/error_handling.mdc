@@ -1,0 +1,165 @@
+---
+description: Standards for error handling, custom error classes, and error reporting 
+globs: src/**/*Error.ts,src/**/*.ts
+alwaysApply: false
+---
+- **Custom Error Class Standards:**
+  - **Create specific error classes** for different error scenarios
+  - **Suffix with `Error`** (e.g., `UnknownLangChainMessageRoleError`, `NotExhaustiveSwitchError`)
+  - **Extend base `Error` class** and provide descriptive messages
+  - **Place error classes** next to the related code that uses them
+  - **Export error classes** for use in other modules when needed
+
+- **Error Class Implementation:**
+  ```typescript
+  // ✅ DO: Specific error class with context
+  export class InvalidCardIdError extends Error {
+    constructor(cardId: string, expectedFormat: string) {
+      super(`Invalid card ID "${cardId}". Expected format: ${expectedFormat}`);
+      this.name = 'InvalidCardIdError';
+    }
+  }
+  
+  // ✅ DO: Error with additional properties
+  export class ApiRateLimitError extends Error {
+    constructor(
+      public readonly retryAfter: number,
+      public readonly endpoint: string,
+    ) {
+      super(`API rate limit exceeded for ${endpoint}. Retry after ${retryAfter} seconds.`);
+      this.name = 'ApiRateLimitError';
+    }
+  }
+  ```
+
+- **Error vs Assertion Usage:**
+  - **Use assertions** (`node:assert/strict`) for programmer errors that shouldn't occur in normal flow
+  - **Throw specific errors** for technical issues that can happen during normal operation
+  - **Assertions for invariants** - conditions that should always be true
+  - **Errors for external failures** - API failures, invalid user input, missing resources
+
+- **Assertion Patterns:**
+  ```typescript
+  import assert from 'node:assert/strict';
+  
+  // ✅ DO: Assert invariants and programmer errors
+  assert(user.id, 'User ID must be defined at this point');
+  assert(messages.length > 0, 'Messages array cannot be empty');
+  
+  // ❌ DON'T: Use assertions for user input validation
+  assert(userInput.trim().length > 0, 'User input cannot be empty');
+  
+  // ✅ DO: Throw specific errors for user input
+  if (userInput.trim().length === 0) {
+    throw new InvalidInputError('User input cannot be empty');
+  }
+  ```
+
+- **Error Message Standards:**
+  - **Provide context** in error messages for debugging
+  - **Include relevant values** that caused the error
+  - **Use descriptive language** that helps identify the problem
+  - **Avoid technical jargon** in user-facing error messages
+  - **Include suggestions** for resolution when possible
+
+- **Error Handling in Services:**
+  ```typescript
+  // ✅ DO: Catch and re-throw with context
+  async processUserRequest(request: UserRequest): Promise<Result> {
+    try {
+      return await this.externalApi.process(request);
+    } catch (error) {
+      if (error instanceof ApiTimeoutError) {
+        throw new ServiceUnavailableError(
+          'External service is currently unavailable. Please try again later.',
+          { originalError: error, requestId: request.id }
+        );
+      }
+      throw error; // Re-throw unknown errors
+    }
+  }
+  ```
+
+- **Error Handling in Tools:**
+  - **Return error messages as strings** rather than throwing exceptions
+  - **Provide user-friendly error descriptions** for chat display
+  - **Log technical details** while returning simple messages to users
+  - **Handle edge cases gracefully** with fallback behavior
+
+- **Error Logging Patterns:**
+  ```typescript
+  // ✅ DO: Use ErrorService for centralized logging
+  import { ErrorService } from './ErrorService.js';
+  
+  try {
+    await riskyOperation();
+  } catch (error) {
+    ErrorService.log(error);
+    // Handle error appropriately
+  }
+  
+  // ✅ DO: Log with context
+  ErrorService.log(error, {
+    userId: user.id,
+    operation: 'processPayment',
+    timestamp: new Date().toISOString(),
+  });
+  ```
+
+- **Exhaustive Switch Error Pattern:**
+  ```typescript
+  // ✅ DO: Use NotExhaustiveSwitchError for type safety
+  function handleMessageType(type: MessageType): string {
+    switch (type) {
+      case 'text':
+        return 'Handling text message';
+      case 'image':
+        return 'Handling image message';
+      case 'sticker':
+        return 'Handling sticker message';
+      default:
+        throw new NotExhaustiveSwitchError(type);
+    }
+  }
+  ```
+
+- **Error Recovery Strategies:**
+  - **Implement retry logic** for transient failures
+  - **Provide fallback behavior** when possible
+  - **Graceful degradation** for non-critical features
+  - **User notification** for permanent failures
+
+- **Testing Error Scenarios:**
+  - **Test error conditions** explicitly in unit tests
+  - **Verify error messages** contain expected information
+  - **Test error recovery** and fallback mechanisms
+  - **Use fakes** to simulate error conditions
+
+- **Error Documentation:**
+  - **Document expected errors** in JSDoc comments
+  - **Explain error recovery** strategies in service documentation
+  - **List possible error types** for public methods
+  - **Provide examples** of error handling in usage documentation
+
+- **Performance Considerations:**
+  - **Avoid creating errors** in hot code paths for control flow
+  - **Cache error instances** for frequently thrown errors when appropriate
+  - **Use error codes** for programmatic error handling
+  - **Minimize stack trace generation** for expected errors
+
+- **Error Propagation:**
+  ```typescript
+  // ✅ DO: Preserve error context while adding information
+  async function highLevelOperation(): Promise<void> {
+    try {
+      await lowLevelOperation();
+    } catch (error) {
+      if (error instanceof SpecificError) {
+        throw new HighLevelError('High level operation failed', { cause: error });
+      }
+      throw error; // Preserve unknown errors
+    }
+  }
+  ```
+
+Follow [core.mdc](mdc:.cursor/rules/core.mdc) for general standards and [testing.mdc](mdc:.cursor/rules/testing.mdc) for testing error scenarios.

@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description: Core TypeScript, Node.js, and project structure standards for the project 
+globs: **/* 
 alwaysApply: true
 ---
 You are a world-class TypeScript senior expert, tasked with maintaining and developing a robust Node.js application. Your expertise spans the entire technical stack and best practices.

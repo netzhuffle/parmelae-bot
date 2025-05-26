@@ -1,6 +1,6 @@
 ---
-description: 
-globs: *ts,*.prisma
+description: Prisma type safety, schema design, and repository patterns 
+globs: *.prisma,*.ts
 alwaysApply: false
 ---
 # Prisma Type Safety Patterns

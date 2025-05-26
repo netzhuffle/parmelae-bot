@@ -1,5 +1,5 @@
 ---
-description: 
+description: Patterns and standards for persisting tool calls and responses in the message history 
 globs: src/AgentStateGraph/**/*.ts,src/Message*.ts
 alwaysApply: false
 ---

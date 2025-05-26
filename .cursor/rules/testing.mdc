@@ -1,5 +1,5 @@
 ---
-description: 
+description: Project rules and best practices for writing and executing tests 
 globs: *.test.ts
 alwaysApply: false
 ---

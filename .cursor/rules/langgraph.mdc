@@ -1,5 +1,5 @@
 ---
-description: 
+description: LangGraph state management, node factory patterns, and best practices 
 globs: src/AgentStateGraph/**/*.ts
 alwaysApply: false
 ---

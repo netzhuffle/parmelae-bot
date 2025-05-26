@@ -1,0 +1,97 @@
+---
+description: Standards and patterns for developing LangChain tools 
+globs: src/Tools/*.ts,src/Tools/*.test.ts
+alwaysApply: false
+---
+- **Tool Structure Requirements:**
+  - **Use `tool()` function** from `@langchain/core/tools` for all tool implementations
+  - **Export as named constant** with descriptive name ending in `Tool` (e.g., `pokemonCardAddTool`)
+  - **Define Zod schema** for input validation with detailed descriptions
+  - **Use `.nullish()` instead of `.optional()`** for optional parameters (GPT models handle nullish better)
+  - **Include comprehensive tool description** explaining purpose and usage
+
+- **Schema Definition Patterns:**
+  ```typescript
+  // ✅ DO: Use Zod with detailed descriptions and nullish for optional fields
+  const schema = z.object({
+    query: z.string().describe('Search query for finding relevant information'),
+    limit: z.number().nullish().describe('Maximum number of results to return (default: 10)'),
+    category: z.enum(['web', 'images', 'news']).nullish().describe('Search category filter')
+  });
+  
+  type ToolInput = z.infer<typeof schema>;
+  
+  // ❌ DON'T: Use .optional() as GPT models don't handle optional arguments well
+  const badSchema = z.object({
+    query: z.string(),
+    limit: z.number().optional(), // Avoid this
+  });
+  ```
+
+- **Tool Implementation Standards:**
+  - **Extract tool context** using `getToolContext(config)` for accessing services
+  - **Handle errors gracefully** with descriptive error messages for the bot
+  - **Return user-friendly strings** that can be displayed in chat
+  - **Use async/await** for all asynchronous operations
+  - **Validate inputs** using the Zod schema before processing
+
+- **Tool Configuration:**
+  ```typescript
+  // ✅ DO: Proper tool configuration with inline description
+  export const myTool = tool(
+    async (input: ToolInput, config: LangGraphRunnableConfig): Promise<string> => {
+      const context = getToolContext(config);
+      // Implementation here
+    },
+    {
+      name: 'toolName',           // camelCase, descriptive
+      description: 'Clear description of what this tool does and when to use it.',
+      schema,                     // Zod schema defined above
+    },
+  );
+  ```
+
+- **Context Usage Patterns:**
+  ```typescript
+  // ✅ DO: Extract services from context
+  const context = getToolContext(config);
+  const userId = context.userId;
+  const service = context.someService;
+  
+  // ❌ DON'T: Access services directly without context
+  const service = container.get(SomeService);
+  ```
+
+- **Error Handling:**
+  - **Return error messages as strings** rather than throwing exceptions
+  - **Provide context** in error messages for user understanding
+  - **Handle edge cases** like missing data or API failures gracefully
+  - **Use constants** for common error messages to ensure consistency
+
+- **Testing Requirements:**
+  - **Create `.test.ts` file** for every tool implementation
+  - **Test with mock context** using fakes for external dependencies
+  - **Test error scenarios** including invalid inputs and service failures
+  - **Verify Zod schema validation** with various input combinations
+  - **Test tool description and name** are properly configured
+
+- **File Organization:**
+  - **Tool files** in `src/Tools/` directory
+  - **Factories are deprecated and must not be used.** All tool dependencies must be provided via the config argument (dependency injection). Migrate any remaining factories to use config-based injection.
+  - **Inline descriptions** for most tools (preferred for simplicity)
+  - **Constants file** only for descriptions/messages that require typographical apostrophes (’) (e.g., Pokémon tools use `texts.ts`).
+  - **Related tools** grouped by functionality (e.g., Pokémon tools, GitHub tools)
+
+- **Documentation Standards:**
+  - **JSDoc comments** for exported tools explaining purpose and usage
+  - **Parameter descriptions** in Zod schema are primary documentation
+  - **Example usage** in tool description when helpful
+  - **Link to related tools** or services in comments
+
+- **Performance Considerations:**
+  - **Lazy load** expensive resources only when needed
+  - **Cache results** when appropriate (following existing patterns)
+  - **Limit API calls** and implement reasonable timeouts
+  - **Handle rate limiting** gracefully with user feedback
+
+Follow [core.mdc](mdc:.cursor/rules/core.mdc) for general TypeScript and testing standards.

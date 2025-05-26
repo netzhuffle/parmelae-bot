@@ -1,5 +1,5 @@
 ---
-description: 
+description: Dependency injection patterns and best practices 
 globs: *.ts
 alwaysApply: false
 ---

@@ -1,0 +1,144 @@
+---
+description: Standards for implementing and using fake objects for isolated unit testing 
+globs: src/Fakes/*.ts,src/**/*.test.ts
+alwaysApply: false
+---
+- **Fake Implementation Standards:**
+  - **Create fake classes** in `src/Fakes/` directory for external dependencies
+  - **Suffix with `Fake`** (e.g., `MessageRepositoryFake`, `TelegramServiceFake`)
+  - **Implement same interface** as the real service/repository
+  - **Track method calls** for verification in tests
+  - **Provide reset functionality** for test isolation
+
+- **Fake Class Structure:**
+  ```typescript
+  // ✅ DO: Complete fake implementation
+  export class ServiceFake {
+    // Data to return when calling a method
+    public methodReturnData: MethodOutput[] = [];
+
+    // Call tracking arrays
+    public methodCallArgs: MethodInput|null = null;
+    public anotherMethodCallArgs: AnotherInput[] = [];
+    
+    // Method implementations
+    async method(input: MethodInput): Promise<MethodOutput[]> {
+      // Set the args for test expectations
+      this.methodCallArgs = input;
+      // Avoid complex logic
+      // Return the data previously set
+      return data;
+    }
+    
+    // Test utilities
+    reset(): void {
+      this.methodCallArgs = null;
+      this.anotherMethodCallArgs = [];
+      this.data = [];
+    }
+  }
+  ```
+
+- **Call Tracking Patterns:**
+  - **Track all method calls** with input parameters for verification
+  - **Use descriptive array names** ending with `CallArgs` (e.g., `getPreviousChatMessageCallArgs`)
+  - **Store complete input objects** to enable detailed assertions
+  - **Reset tracking arrays** in the `reset()` method
+
+- **Test Data Management:**
+  - **Set test data to return directly** instead of mimicing the actual logic
+  - **Use realistic default values** when creating test objects
+  - **Support partial object creation** for focused testing
+  - **Avoid business logic** to keep fakes simple and error-free
+
+- **Interface Compliance:**
+  ```typescript
+  // ✅ DO: Implement all interface methods
+  export class RepositoryFake implements Repository {
+    // Implement all required methods
+    async get(id: number): Promise<Entity> { /* implementation */ }
+    async store(entity: Entity): Promise<Entity> { /* implementation */ }
+    
+    // Methods not needed for current tests can throw
+    async complexMethod(): Promise<ComplexResult> {
+      return Promise.reject(new Error('complexMethod not implemented in fake'));
+    }
+  }
+  ```
+
+- **Test Usage Patterns:**
+  ```typescript
+  // ✅ DO: Proper fake usage in tests
+  describe('ServiceUnderTest', () => {
+    let service: ServiceUnderTest;
+    let repositoryFake: RepositoryFake;
+    
+    beforeEach(() => {
+      repositoryFake = new RepositoryFake();
+      service = new ServiceUnderTest(repositoryFake);
+    });
+    
+    afterEach(() => {
+      repositoryFake.reset();
+    });
+    
+    it('should call repository with correct parameters', async () => {
+      // Arrange
+      const testData = { id: 1, name: 'test' };
+      repositoryFake.data = testData;
+      
+      // Act
+      await service.processData(testData.id);
+      
+      // Assert
+      expect(repositoryFake.getCallArgs).toEqual([testData.id]);
+    });
+  });
+  ```
+
+- **Fake Testing Requirements:**
+  - **Create `.test.ts` file** for each fake implementation
+  - **Test fake behavior** matches expected interface contracts
+  - **Verify call tracking** works correctly
+  - **Test reset functionality** clears all state
+  - **Test helper methods** for adding test data
+
+- **Error Simulation:**
+  - **Provide methods** to simulate error conditions
+  - **Support conditional failures** based on input parameters
+  - **Throw realistic errors** that match real service behavior
+  - **Allow error state reset** for test isolation
+
+- **Performance Considerations:**
+  - **Keep fakes lightweight** - avoid complex business logic
+  - **Use in-memory storage** for test data
+  - **Implement only necessary methods** for current test needs
+  - **Avoid external dependencies** in fake implementations
+
+- **Documentation Standards:**
+  - **Document fake purpose** and which real service it replaces
+  - **Explain test data setup** methods and their usage
+  - **Note limitations** of the fake implementation
+  - **Provide usage examples** in JSDoc comments
+
+- **Common Fake Patterns:**
+  ```typescript
+  // ✅ DO: Conditional behavior based on input
+  async get(id: number): Promise<Entity | null> {
+    this.getCallArgs = id;
+    
+    if (this.shouldThrowError) {
+      throw new Error('Simulated error');
+    }
+    
+    return this.entities.find(e => e.id === id) ?? null;
+  }
+  ```
+
+- **Integration with Dependency Injection:**
+  - **Replace real services** in test container configuration
+  - **Use same interface** to ensure drop-in replacement
+  - **Configure fakes** before running tests
+  - **Clean up** fake state between tests
+
+Follow [testing.mdc](mdc:.cursor/rules/testing.mdc) and [core.mdc](mdc:.cursor/rules/core.mdc) for general testing and TypeScript standards.

@@ -1,5 +1,5 @@
 ---
-description: 
+description: Patterns and standards for implementing Telegram bot functionality 
 globs: *.ts
 alwaysApply: false
 ---
