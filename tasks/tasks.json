@@ -675,7 +675,7 @@
       "id": 26,
       "title": "Implement Tool Call Messages in Message History",
       "description": "Enhance the MessageHistoryService to include tool call announcement messages in the conversation history, providing complete context of tool interactions.",
-      "status": "in-progress",
+      "status": "done",
       "dependencies": [
         9
       ],
