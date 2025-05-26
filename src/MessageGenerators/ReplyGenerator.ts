@@ -5,6 +5,12 @@ import { ConversationService } from '../ConversationService.js';
 import { Config } from '../Config.js';
 import { SchiParmelaeIdentity } from './Identities/SchiParmelaeIdentity.js';
 
+/** Enhanced response from ReplyGenerator including tool call message IDs */
+export interface ReplyGeneratorResponse {
+  text: string;
+  toolCallMessageIds: number[];
+}
+
 /**
  * A generator for replies to a message after executing necessary commands.
  */
@@ -24,12 +30,12 @@ export class ReplyGenerator {
    *
    * @param message - The message to reply to
    * @param announceToolCall - A callback to announce tool calls
-   * @return The reply text
+   * @return The reply text and tool call message IDs
    */
   async generate(
     message: Message,
     announceToolCall: (text: string) => Promise<number | null>,
-  ): Promise<string> {
+  ): Promise<ReplyGeneratorResponse> {
     const identity =
       this.config.identityByChatId.get(message.chatId) ??
       this.schiParmelaeIdentity;
@@ -48,6 +54,9 @@ export class ReplyGenerator {
       conversation,
       announceToolCall,
     );
-    return completion.content;
+    return {
+      text: completion.message.content,
+      toolCallMessageIds: completion.toolCallMessageIds,
+    };
   }
 }

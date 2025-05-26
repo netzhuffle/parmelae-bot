@@ -3,6 +3,7 @@ import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy.js';
 import { Config } from '../Config.js';
 import { TelegramService } from '../TelegramService.js';
 import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator.js';
+import { MessageRepository } from '../Repositories/MessageRepository.js';
 import { TelegramMessage } from '../Repositories/Types.js';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
@@ -14,6 +15,7 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
   constructor(
     private readonly telegram: TelegramService,
     private readonly replyGenerator: ReplyGenerator,
+    private readonly messageRepository: MessageRepository,
     config: Config,
   ) {
     super(config);
@@ -28,7 +30,16 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
     const announceToolCall = async (text: string): Promise<number | null> => {
       return this.telegram.send(text, message.chatId);
     };
-    const reply = await this.replyGenerator.generate(message, announceToolCall);
-    return this.telegram.reply(reply, message);
+    const response = await this.replyGenerator.generate(
+      message,
+      announceToolCall,
+    );
+    const replyMessageId = await this.telegram.reply(response.text, message);
+
+    // Link the final response message to its tool call messages
+    await this.messageRepository.updateToolCallMessages(
+      replyMessageId,
+      response.toolCallMessageIds,
+    );
   }
 }

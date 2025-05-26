@@ -38,8 +38,8 @@ export class RandomizedStickerReplyStrategy implements ReplyStrategy {
     return Math.random() < RANDOM_REPLY_PROBABILITY;
   }
 
-  handle(message: TelegramMessage): Promise<void> {
+  async handle(message: TelegramMessage): Promise<void> {
     const sticker = STICKERS[Math.floor(Math.random() * STICKERS.length)];
-    return this.telegram.reply(sticker, message);
+    await this.telegram.reply(sticker, message);
   }
 }

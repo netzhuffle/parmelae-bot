@@ -150,6 +150,7 @@ export class TelegramMessageService {
         ? telegramMessage.sticker.file_id
         : null,
       toolCalls: null,
+      messageAfterToolCallsId: null,
       newChatMembers: this.isNewChatMembersMessage(telegramMessage)
         ? telegramMessage.new_chat_members.map((user) => ({
             messageId: telegramMessage.message_id,

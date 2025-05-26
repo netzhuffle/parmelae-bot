@@ -84,11 +84,12 @@ export class TelegramService {
    *
    * @param reply - The text or Sticker to send.
    * @param message - The message to reply to.
+   * @return The database message ID of the reply.
    */
   async reply(
     reply: string | Sticker,
     message: TelegramMessage,
-  ): Promise<void> {
+  ): Promise<number> {
     let sentMessage:
       | Typegram.Message.TextMessage
       | Typegram.Message.StickerMessage;
@@ -113,7 +114,8 @@ export class TelegramService {
         },
       );
     }
-    await this.messageService.store(sentMessage);
+    const storedMessage = await this.messageService.store(sentMessage);
+    return storedMessage.id;
   }
 
   /**

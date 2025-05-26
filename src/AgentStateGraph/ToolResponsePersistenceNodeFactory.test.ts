@@ -65,6 +65,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           originalAIMessage,
           currentToolCallIds: ['call-123', 'call-124'],
         },
+        toolCallMessageIds: [],
       };
 
       await node(state);
@@ -121,6 +122,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           originalAIMessage,
           currentToolCallIds: ['call-123'], // Only current call
         },
+        toolCallMessageIds: [],
       };
 
       await node(state);
@@ -167,6 +169,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           originalAIMessage,
           currentToolCallIds: ['call-123', 'call-124'], // Both tool calls attempted
         },
+        toolCallMessageIds: [],
       };
 
       await node(state);
@@ -189,6 +192,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
       const state: typeof StateAnnotation.State = {
         messages: [new HumanMessage('Hello'), new AIMessage('Hi there')],
         toolExecution: {}, // Empty context
+        toolCallMessageIds: [],
       };
 
       const result = await node(state);
@@ -211,6 +215,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           originalAIMessage,
           currentToolCallIds: ['call-123'],
         },
+        toolCallMessageIds: [],
       };
 
       const result = await node(state);
@@ -233,6 +238,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           originalAIMessage,
           // Missing currentToolCallIds
         },
+        toolCallMessageIds: [],
       };
 
       const result = await node(state);
@@ -260,6 +266,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           originalAIMessage,
           currentToolCallIds: ['call-123'],
         },
+        toolCallMessageIds: [],
       };
 
       mockMessageRepository.updateToolCalls.mockRejectedValue(

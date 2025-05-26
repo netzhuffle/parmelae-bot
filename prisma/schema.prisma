@@ -34,23 +34,26 @@ model DateTimeSetting {
 }
 
 model Message {
-  id                Int                      @id @default(autoincrement())
-  telegramMessageId Int?
-  chat              Chat                     @relation(fields: [chatId], references: [id])
-  chatId            BigInt
-  from              User                     @relation(fields: [fromId], references: [id])
-  fromId            BigInt
-  sentAt            DateTime
-  editedAt          DateTime?
-  replyToMessage    Message?                 @relation("ReplyToMessage", fields: [replyToMessageId], references: [id])
-  replyToMessageId  Int?
-  text              String
-  imageFileId       String?
-  stickerFileId     String?
-  newChatMembers    ChatEntryMessagesUsers[]
-  replies           Message[]                @relation("ReplyToMessage")
-  toolCalls         Json?
-  toolMessages      ToolMessage[]
+  id                      Int                      @id @default(autoincrement())
+  telegramMessageId       Int?
+  chat                    Chat                     @relation(fields: [chatId], references: [id])
+  chatId                  BigInt
+  from                    User                     @relation(fields: [fromId], references: [id])
+  fromId                  BigInt
+  sentAt                  DateTime
+  editedAt                DateTime?
+  replyToMessage          Message?                 @relation("ReplyToMessage", fields: [replyToMessageId], references: [id])
+  replyToMessageId        Int?
+  text                    String
+  imageFileId             String?
+  stickerFileId           String?
+  newChatMembers          ChatEntryMessagesUsers[]
+  replies                 Message[]                @relation("ReplyToMessage")
+  toolCalls               Json?
+  toolMessages            ToolMessage[]
+  messageAfterToolCalls   Message?                 @relation("MessageAfterToolCalls", fields: [messageAfterToolCallsId], references: [id])
+  messageAfterToolCallsId Int?
+  toolCallMessages        Message[]                @relation("MessageAfterToolCalls")
 
   @@unique([telegramMessageId, chatId])
 }

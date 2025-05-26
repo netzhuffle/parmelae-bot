@@ -163,6 +163,29 @@ export class MessageRepository {
     });
   }
 
+  /**
+   * Links a final response message to its associated tool call messages.
+   * @param finalResponseMessageId - The ID of the final response message.
+   * @param toolCallMessageIds - The IDs of the tool call messages to link.
+   */
+  async updateToolCallMessages(
+    finalResponseMessageId: number,
+    toolCallMessageIds: number[],
+  ): Promise<void> {
+    if (toolCallMessageIds.length === 0) {
+      return; // No tool call messages to link
+    }
+
+    await this.prisma.message.update({
+      where: { id: finalResponseMessageId },
+      data: {
+        toolCallMessages: {
+          connect: toolCallMessageIds.map((id) => ({ id })),
+        },
+      },
+    });
+  }
+
   private connectChat(
     chat: Chat,
   ): Prisma.ChatCreateNestedOneWithoutMessagesInput {

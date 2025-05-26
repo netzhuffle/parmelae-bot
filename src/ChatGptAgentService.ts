@@ -39,6 +39,12 @@ import { DallEService } from './DallEService.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 import { AgentStateGraphFactory } from './AgentStateGraph/AgentStateGraphFactory.js';
 
+/** Enhanced response from ChatGPT agent including tool call message IDs */
+export interface ChatGptAgentResponse {
+  message: ChatGptMessage;
+  toolCallMessageIds: number[];
+}
+
 /** The context for the tools. */
 export interface ToolContext {
   chatId: bigint;
@@ -158,7 +164,7 @@ export class ChatGptAgentService {
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
     retries = 0,
-  ): Promise<ChatGptMessage> {
+  ): Promise<ChatGptAgentResponse> {
     try {
       return this.getReply(
         message,
@@ -181,8 +187,11 @@ export class ChatGptAgentService {
       ErrorService.log(error);
       assert(error instanceof Error);
       return {
-        role: ChatGptRoles.Assistant,
-        content: `Fehler: ${error.message}`,
+        message: {
+          role: ChatGptRoles.Assistant,
+          content: `Fehler: ${error.message}`,
+        },
+        toolCallMessageIds: [],
       };
     }
   }
@@ -193,7 +202,7 @@ export class ChatGptAgentService {
     example: BaseMessage[],
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
-  ): Promise<ChatGptMessage> {
+  ): Promise<ChatGptAgentResponse> {
     const agent = this.agentStateGraphFactory.create({
       tools: [
         ...this.tools,
@@ -229,9 +238,16 @@ export class ChatGptAgentService {
     const lastMessage = agentOutput.messages[agentOutput.messages.length - 1];
     assert(lastMessage instanceof AIMessage);
     assert(typeof lastMessage.content === 'string');
+
+    // Extract tool call message IDs from the final state
+    const toolCallMessageIds = agentOutput.toolCallMessageIds;
+
     return {
-      role: ChatGptRoles.Assistant,
-      content: lastMessage.content,
+      message: {
+        role: ChatGptRoles.Assistant,
+        content: lastMessage.content,
+      },
+      toolCallMessageIds,
     };
   }
 }

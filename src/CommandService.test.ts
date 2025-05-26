@@ -29,6 +29,7 @@ describe('CommandService', () => {
       imageFileId: null,
       stickerFileId: null,
       toolCalls: null,
+      messageAfterToolCallsId: null,
     };
     const message: TelegramMessageWithReplyTo = {
       id: 234,
@@ -42,13 +43,17 @@ describe('CommandService', () => {
       imageFileId: null,
       stickerFileId: null,
       toolCalls: null,
+      messageAfterToolCallsId: null,
       replyToMessage: messageToReplyTo,
     };
     replyGenerator.generate.mockImplementation(
       async (message, announceToolCall) => {
         const messageId = await announceToolCall('Using tool X');
         expect(messageId).toBeNull(); // Should return null since no message is stored
-        return 'This is a comment';
+        return {
+          text: 'This is a comment',
+          toolCallMessageIds: [],
+        };
       },
     );
 

@@ -38,6 +38,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: null,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: false,
@@ -72,6 +73,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: null,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -109,6 +111,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCalls,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -148,6 +151,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCalls,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -188,6 +192,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCalls,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -227,6 +232,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCalls,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -269,6 +275,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCalls,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -315,6 +322,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCalls,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -358,6 +366,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCallsJson,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -395,6 +404,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: null,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: false,
@@ -431,6 +441,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCalls,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -469,6 +480,7 @@ describe('ConversationService', () => {
           imageFileId: null,
           stickerFileId: null,
           toolCalls: toolCalls,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: true,
@@ -504,6 +516,7 @@ describe('ConversationService', () => {
           imageFileId: 'file123',
           stickerFileId: null,
           toolCalls: null,
+          messageAfterToolCallsId: null,
           from: {
             id: BigInt(789),
             isBot: false,

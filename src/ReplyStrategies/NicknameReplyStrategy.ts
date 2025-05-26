@@ -99,10 +99,10 @@ export class NicknameReplyStrategy implements ReplyStrategy {
     return message.text.includes('<Spitzname>');
   }
 
-  handle(message: TelegramMessage): Promise<void> {
+  async handle(message: TelegramMessage): Promise<void> {
     const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
     const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
 
-    return this.telegram.reply(`${adjective} ${noun}`, message);
+    await this.telegram.reply(`${adjective} ${noun}`, message);
   }
 }

@@ -24,7 +24,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {foo: 1}]');
   });
 
@@ -41,7 +41,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {value: plain text}]',
     );
@@ -68,7 +68,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledTimes(1);
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {foo: 2}]\n[AnotherTool: {value: baz}]',
@@ -88,7 +88,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).not.toHaveBeenCalled();
   });
 
@@ -100,7 +100,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { foo: 1 } }],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {foo: 1}]');
   });
 
@@ -112,7 +112,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { foo: 1, bar: 2 } }],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {foo: 1, bar: 2}]',
     );
@@ -128,7 +128,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {foo: 1, qux: 2}]',
     );
@@ -142,7 +142,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: {} }],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool]');
   });
 
@@ -157,9 +157,11 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    return node({ messages, toolExecution: {} }).then(() => {
-      expect(announceToolCall).toHaveBeenCalledWith('[TestTool]');
-    });
+    return node({ messages, toolExecution: {}, toolCallMessageIds: [] }).then(
+      () => {
+        expect(announceToolCall).toHaveBeenCalledWith('[TestTool]');
+      },
+    );
   });
 
   it('announces multiple tool calls in a single message, separated by newlines', async () => {
@@ -173,7 +175,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledTimes(1);
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {foo: 2}]\n[AnotherTool: {value: baz}]',
@@ -188,7 +190,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { foo: 1 } }],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith(
       'This is the message content.\n[TestTool: {foo: 1}]',
     );
@@ -202,7 +204,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith(
       'Only content, no tool calls.',
     );
@@ -216,7 +218,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).not.toHaveBeenCalled();
   });
 
@@ -238,7 +240,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {num: 42, bool: true, arr: 1,2, obj: [object Object]}]',
     );
@@ -252,7 +254,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { a: 1, b: 2, c: 3 } }],
       }),
     ];
-    await node({ messages, toolExecution: {} });
+    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {a: 1, b: 2, c: 3}]',
     );
@@ -273,7 +275,11 @@ describe('ToolCallAnnouncementNodeFactory', () => {
     });
     const messages = [aiMessage];
 
-    const result = await node({ messages, toolExecution: {} });
+    const result = await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+    });
 
     expect(announceToolCall).toHaveBeenCalledWith(
       'Test content\n[TestTool: {foo: 1}]',
@@ -284,6 +290,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         originalAIMessage: aiMessage,
         currentToolCallIds: ['call-123'],
       },
+      toolCallMessageIds: [123],
     });
   });
 
@@ -296,7 +303,11 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       }),
     ];
 
-    const result = await node({ messages, toolExecution: {} });
+    const result = await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+    });
 
     expect(announceToolCall).toHaveBeenCalledWith(
       'Only content, no tool calls.',
@@ -318,7 +329,11 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       }),
     ];
 
-    const result = await node({ messages, toolExecution: {} });
+    const result = await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+    });
 
     expect(announceToolCall).not.toHaveBeenCalled();
     expect(result).toEqual({});
@@ -341,7 +356,11 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       }),
     ];
 
-    const result = await node({ messages, toolExecution: {} });
+    const result = await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+    });
 
     expect(announceToolCallReturningNull).toHaveBeenCalledWith(
       'Test content\n[TestTool: {foo: 1}]',
@@ -369,7 +388,11 @@ describe('ToolCallAnnouncementNodeFactory', () => {
     });
     const messages = [aiMessage];
 
-    const result = await node({ messages, toolExecution: {} });
+    const result = await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+    });
 
     expect(result).toEqual({
       toolExecution: {
@@ -377,6 +400,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         originalAIMessage: aiMessage,
         currentToolCallIds: ['call-123'], // Only the one with id
       },
+      toolCallMessageIds: [123],
     });
   });
 });

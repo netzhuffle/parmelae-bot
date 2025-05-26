@@ -93,6 +93,7 @@ export class ToolCallAnnouncementNodeFactory {
                 .map((tc) => tc.id)
                 .filter((id): id is string => id !== undefined),
             },
+            toolCallMessageIds: [messageId],
           };
         }
       }

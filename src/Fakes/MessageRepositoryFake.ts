@@ -58,6 +58,14 @@ export class MessageRepositoryFake {
     return Promise.resolve();
   }
 
+  updateToolCallMessages(
+    _finalResponseMessageId: number,
+    _toolCallMessageIds: number[],
+  ): Promise<void> {
+    // For testing purposes, we don't need to implement the full logic
+    return Promise.resolve();
+  }
+
   addMessage(
     message: Partial<MessageWithUserReplyToAndToolMessages>,
   ): MessageWithUserReplyToAndToolMessages {
@@ -73,6 +81,7 @@ export class MessageRepositoryFake {
       imageFileId: message.imageFileId ?? null,
       stickerFileId: message.stickerFileId ?? null,
       toolCalls: message.toolCalls ?? null,
+      messageAfterToolCallsId: message.messageAfterToolCallsId ?? null,
       from: message.from ?? {
         id: BigInt(789),
         isBot: false,

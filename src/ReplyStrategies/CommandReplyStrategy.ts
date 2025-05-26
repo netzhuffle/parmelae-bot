@@ -32,7 +32,7 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
     const command = this.getCommand(commandMatches[1]);
 
     const reply = await this.command.execute(command, message);
-    return this.telegram.reply(reply, message);
+    await this.telegram.reply(reply, message);
   }
 
   private getCommand(command: string): Command {

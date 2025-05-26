@@ -13,13 +13,20 @@ export interface ToolExecutionState {
 
 /**
  * Enhanced graph state annotation that includes tool execution context
- * in addition to the standard messages.
+ * and accumulated tool call message IDs in addition to the standard messages.
  */
 export const StateAnnotation = Annotation.Root({
   messages: Annotation<BaseMessage[]>({
     reducer: (x, y) => x.concat(y),
   }),
   toolExecution: Annotation<ToolExecutionState>({
-    reducer: (x, y) => ({ ...x, ...y }),
+    reducer: (x, y) => ({
+      ...x,
+      ...y,
+    }),
+  }),
+  toolCallMessageIds: Annotation<number[]>({
+    reducer: (x, y) => x.concat(y),
+    default: () => [],
   }),
 });

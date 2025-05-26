@@ -13,6 +13,7 @@ describe('AgentNodeFactory', () => {
     const state: typeof StateAnnotation.State = {
       messages,
       toolExecution: {},
+      toolCallMessageIds: [],
     };
     const node = factory.create(fakeModel);
 

@@ -15,9 +15,9 @@ export class StickerIdReplyStrategy extends PrivateChatReplyStrategy {
     return !!message.stickerFileId;
   }
 
-  handle(message: TelegramMessage): Promise<void> {
+  async handle(message: TelegramMessage): Promise<void> {
     assert(message.stickerFileId);
-    return this.telegram.reply(
+    await this.telegram.reply(
       `Sticker file_id: ${message.stickerFileId}`,
       message,
     );
