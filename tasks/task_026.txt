@@ -1,0 +1,136 @@
+# Task ID: 26
+# Title: Implement Tool Call Messages in Message History
+# Status: in-progress
+# Dependencies: 9
+# Priority: high
+# Description: Enhance the MessageHistoryService to include tool call announcement messages in the conversation history, providing complete context of tool interactions.
+# Details:
+This task involves updating the MessageHistoryService to properly include tool call messages in conversation history by leveraging the toolCallMessages relation established in Task 9.
+
+Implementation steps based on current state analysis and critical issues discovered:
+
+1. Update Types.ts to add a new type that includes toolCallMessages:
+   - Create `MESSAGE_WITH_USER_REPLY_TO_TOOL_MESSAGES_AND_TOOL_CALL_MESSAGES` validator
+   - Define corresponding type `MessageWithUserReplyToToolMessagesAndToolCallMessages`
+   - This extends the current type to include the toolCallMessages relation
+
+2. Enhance MessageRepository.ts:
+   - Add new method `getWithToolCallMessages(id: number)` that retrieves messages with toolCallMessages included
+   - Ensure this method returns the new type with toolCallMessages relation
+
+3. Modify the `MessageHistoryService.getHistoryForMessages()` method to:
+   - Use the new repository method to retrieve messages with toolCallMessages
+   - Include tool call announcement messages alongside standard messages and tool response messages
+   - Include tool response messages from announcement messages' toolMessages relation
+   - Maintain proper chronological ordering of all message types (user messages, tool call announcements, tool responses, AI replies)
+   - Implement deduplication logic using Set<number> to track included message IDs
+   - Convert ToolMessage entities to Message format for consistent handling
+
+4. Update the query logic to retrieve messages in the following sequence:
+   - Start with the original user message
+   - Include any tool call announcement messages (showing what tools are being called and why)
+   - Include tool response messages (showing the results)
+   - Include the final AI response
+
+5. Ensure backward compatibility:
+   - The enhanced functionality should not break existing code that relies on MessageHistoryService
+   - Add appropriate null checks and fallbacks for conversations that don't have tool call messages
+
+6. Performance considerations:
+   - Optimize database queries to minimize additional load when retrieving the expanded message history
+   - Consider pagination or limiting strategies for conversations with extensive tool usage
+   - Ensure deduplication logic is efficient for large conversation histories
+
+7. Code structure:
+   - Maintain clean separation of concerns
+   - Add appropriate documentation explaining the enhanced message history flow
+   - Follow existing patterns for error handling and logging
+
+# Test Strategy:
+1. Unit Tests:
+   - Create unit tests for the updated `getHistoryForMessages()` method
+   - Test with mock data representing different conversation patterns:
+     - Conversations with no tool calls
+     - Conversations with single tool calls
+     - Conversations with multiple sequential tool calls
+     - Conversations with nested tool calls
+   - Verify correct ordering of messages in the returned history
+   - Test the new `getWithToolCallMessages()` repository method
+   - Verify deduplication logic works correctly for complex message chains
+   - Test conversion of ToolMessage entities to Message format
+
+2. Integration Tests:
+   - Create integration tests that use actual database connections
+   - Verify that tool call messages are correctly retrieved alongside other message types
+   - Test with real-world conversation patterns from production data (anonymized)
+   - Ensure the new type definitions work correctly with the database schema
+   - Verify complete conversation flow: user message → tool call announcements → tool responses → AI final response
+
+3. Regression Tests:
+   - Ensure existing functionality continues to work as expected
+   - Verify that code depending on MessageHistoryService still functions correctly
+   - Test backward compatibility with code that doesn't expect tool call messages
+
+4. Performance Tests:
+   - Measure and compare performance before and after the changes
+   - Ensure the enhanced history retrieval doesn't significantly impact response times
+   - Test with large conversation histories to verify scalability
+   - Verify that including the additional toolCallMessages relation doesn't cause performance issues
+   - Evaluate the efficiency of the deduplication mechanism with large datasets
+
+5. Manual Testing:
+   - Manually verify the conversation flow in the UI
+   - Confirm that tool call messages appear in the correct order
+   - Verify that the LLM receives the complete context when responding to follow-up messages
+   - Test different conversation patterns to ensure chronological ordering works correctly
+   - Verify no duplicate tool call or tool response messages appear in the history
+
+# Subtasks:
+## 1. Update Types.ts with new type for toolCallMessages [done]
+### Dependencies: None
+### Description: Create a new type that extends the current MessageWithUserReplyToAndToolMessages to include the toolCallMessages relation
+### Details:
+
+
+## 2. Add getWithToolCallMessages method to MessageRepository [done]
+### Dependencies: None
+### Description: Implement a new method in MessageRepository that retrieves messages with toolCallMessages included
+### Details:
+
+
+## 3. Update MessageHistoryService to use new repository method [done]
+### Dependencies: None
+### Description: Modify getHistoryForMessages() to use the new repository method and include tool call messages in the history
+### Details:
+
+
+## 4. Implement chronological ordering logic [done]
+### Dependencies: None
+### Description: Ensure proper ordering of user message → tool call announcements → tool responses → AI reply in the message history
+### Details:
+
+
+## 5. Add backward compatibility and null checks [done]
+### Dependencies: None
+### Description: Ensure the enhanced functionality doesn't break existing code and handles cases where toolCallMessages don't exist
+### Details:
+
+
+## 6. Write unit and integration tests [done]
+### Dependencies: None
+### Description: Create comprehensive tests for the new functionality, including different conversation patterns
+### Details:
+
+
+## 7. Write ConversationService Integration Test [pending]
+### Dependencies: None
+### Description: Create an integration test for ConversationService to verify that tool call messages are properly included in the conversation flow, ensuring user requests, tool announcements, tool responses, and final AI responses are all present in the correct order.
+### Details:
+The test should verify the complete conversation flow:
+1. User message that triggers tool calls
+2. Tool call announcement messages (from MessageHistoryService expansion)
+3. Tool response messages (ToolMessage instances)
+4. Final AI response message
+
+The test should use the real ConversationService with MessageHistoryService to ensure the integration works end-to-end, verifying that tool call messages from the database are properly converted to LangChain message format and included in chronological order.
+

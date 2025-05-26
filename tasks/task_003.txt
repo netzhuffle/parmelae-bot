@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Configure Inversify Dependency Injection
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Set up Inversify for managing dependencies across the application.
+# Details:
+
+
+# Test Strategy:
+

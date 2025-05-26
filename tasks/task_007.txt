@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Implement LangChain Integration for AI Workflows
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Integrate LangChain/LangGraph for agent workflows and basic tool system.
+# Details:
+
+
+# Test Strategy:
+

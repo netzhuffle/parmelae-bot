@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Implement Prisma Database Schema
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Define the initial database schema using Prisma with core models (Message, User).
+# Details:
+
+
+# Test Strategy:
+

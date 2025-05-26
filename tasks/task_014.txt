@@ -1,0 +1,11 @@
+# Task ID: 14
+# Title: Implement Vector Store for Semantic Search
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Integrate hnswlib-node for embedding-based similarity search.
+# Details:
+
+
+# Test Strategy:
+

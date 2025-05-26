@@ -1,0 +1,101 @@
+# Task ID: 9
+# Title: Implement Tool Call Message Linkage
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Enhance database schema for tool call message relations and implement linkage logic to ensure complete conversation history includes tool interaction context.
+# Details:
+**Problem Statement:**
+The bot replies to the original user message, creating a reply chain that skips intermediate tool call messages. When `MessageHistoryService` follows reply chains, it jumps from the original request directly to the final response, missing all the tool call messages that contain the reasoning/context. This breaks LLM context because the AI can't see the tool calls and responses that led to the conclusion.
+
+**Solution:**
+Link final response messages to their associated tool call/response messages so that conversation history includes complete tool interaction context.
+
+**Key Files to Modify:**
+- `prisma/schema.prisma`
+- `src/AgentStateGraph/StateAnnotation.ts`
+- `src/AgentStateGraph/ToolCallAnnouncementNodeFactory.ts`
+- `src/AgentStateGraph/ToolResponsePersistenceNodeFactory.ts`
+- `src/ChatGptAgentService.ts`
+- `src/MessageGenerators/ReplyGenerator.ts`
+- `src/ReplyStrategies/BotMentionReplyStrategy.ts`
+- `src/ReplyStrategies/RandomizedGeneratedReplyStrategy.ts`
+- `src/Repositories/MessageRepository.ts`
+- `src/MessageHistoryService.ts`
+- `src/Repositories/Types.ts`
+- All corresponding `.test.ts` files
+
+# Test Strategy:
+1. Unit tests for each modified component to verify correct handling of tool call message IDs
+2. Integration tests to verify the complete flow from tool call to final response with proper linkage
+3. Test that `MessageHistoryService` correctly includes tool call messages in conversation history
+4. Test edge cases such as multiple tool calls in a single conversation
+5. Verify database schema changes work correctly with existing data
+
+# Subtasks:
+## 1. Database Schema Update [done]
+### Dependencies: None
+### Description: Add `toolCallMessages Message[]` relation to `Message` model in schema.prisma
+### Details:
+
+
+## 2. State Annotation Enhancement [done]
+### Dependencies: None
+### Description: Add `toolCallMessageIds: number[]` field to `ToolExecutionState` in StateAnnotation.ts
+### Details:
+
+
+## 3. Tool Call Announcement Tracking [done]
+### Dependencies: None
+### Description: Update `ToolCallAnnouncementNodeFactory.ts` to store announcement message ID in state
+### Details:
+
+
+## 4. Tool Response Tracking [done]
+### Dependencies: None
+### Description: Update `ToolResponsePersistenceNodeFactory.ts` to store tool response message IDs in state
+### Details:
+
+
+## 5. Agent Service Return Enhancement [done]
+### Dependencies: None
+### Description: Modify `ChatGptAgentService.generate()` to return both response content and tool call message IDs
+### Details:
+
+
+## 6. Reply Strategy Updates [done]
+### Dependencies: None
+### Description: Update `BotMentionReplyStrategy` and `RandomizedGeneratedReplyStrategy` to handle tool call message IDs
+### Details:
+
+
+## 7. Reply Generator Enhancement [done]
+### Dependencies: None
+### Description: Update `ReplyGenerator.generate()` to handle enhanced agent service response
+### Details:
+
+
+## 8. Message Repository Enhancement [done]
+### Dependencies: None
+### Description: Add method to update message with tool call message IDs
+### Details:
+
+
+## 9. Message History Service Enhancement [done]
+### Dependencies: None
+### Description: Update `getHistoryForMessages()` to include tool call messages when present
+### Details:
+
+
+## 10. Types Enhancement [done]
+### Dependencies: None
+### Description: Update message types in `Types.ts` to include `toolCallMessages` relation
+### Details:
+
+
+## 11. Testing and Integration [done]
+### Dependencies: None
+### Description: Update all relevant tests to handle new functionality and verify end-to-end behavior
+### Details:
+
+

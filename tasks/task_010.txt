@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Implement DALL·E Image Generation Service
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Integrate OpenAI's DALL·E API for image generation capabilities.
+# Details:
+
+
+# Test Strategy:
+

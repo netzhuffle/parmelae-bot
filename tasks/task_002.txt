@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Install Core Dependencies
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Install necessary dependencies like Telegraf, Prisma, Inversify, and Jest.
+# Details:
+
+
+# Test Strategy:
+
