@@ -1,6 +1,6 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import {
-  MessageWithUserReplyToAndToolMessages,
+  MessageWithUserReplyToToolMessagesAndToolCallMessages,
   MessageWithUser,
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
@@ -10,12 +10,12 @@ import {
  * Fake implementation of MessageRepository for testing.
  */
 export class MessageRepositoryFake {
-  private readonly prisma = {} as PrismaClient;
-  private messages: MessageWithUserReplyToAndToolMessages[] = [];
+  private messages: MessageWithUserReplyToToolMessagesAndToolCallMessages[] =
+    [];
   private nextId = 1;
 
   public getCallArgs: number[] = [];
-  public getLastChatMessageCallArgs: {
+  public getPreviousChatMessageCallArgs: {
     chatId: bigint | number;
     beforeMessageId: number;
   }[] = [];
@@ -24,7 +24,9 @@ export class MessageRepositoryFake {
     toolCalls: Prisma.JsonValue;
   }[] = [];
 
-  get(id: number): Promise<MessageWithUserReplyToAndToolMessages> {
+  get(
+    id: number,
+  ): Promise<MessageWithUserReplyToToolMessagesAndToolCallMessages> {
     this.getCallArgs.push(id);
     const message = this.messages.find((m) => m.id === id);
     if (!message) {
@@ -33,11 +35,11 @@ export class MessageRepositoryFake {
     return Promise.resolve(message);
   }
 
-  getLastChatMessage(
+  getPreviousChatMessage(
     chatId: bigint | number,
     beforeMessageId: number,
-  ): Promise<MessageWithUserReplyToAndToolMessages | null> {
-    this.getLastChatMessageCallArgs.push({ chatId, beforeMessageId });
+  ): Promise<MessageWithUserReplyToToolMessagesAndToolCallMessages | null> {
+    this.getPreviousChatMessageCallArgs.push({ chatId, beforeMessageId });
 
     const messagesInChat = this.messages
       .filter((m) => m.chatId === chatId && m.id < beforeMessageId)
@@ -67,9 +69,9 @@ export class MessageRepositoryFake {
   }
 
   addMessage(
-    message: Partial<MessageWithUserReplyToAndToolMessages>,
-  ): MessageWithUserReplyToAndToolMessages {
-    const fullMessage: MessageWithUserReplyToAndToolMessages = {
+    message: Partial<MessageWithUserReplyToToolMessagesAndToolCallMessages>,
+  ): MessageWithUserReplyToToolMessagesAndToolCallMessages {
+    const fullMessage: MessageWithUserReplyToToolMessagesAndToolCallMessages = {
       id: message.id ?? this.nextId++,
       telegramMessageId: message.telegramMessageId ?? 123,
       chatId: message.chatId ?? BigInt(456),
@@ -92,6 +94,7 @@ export class MessageRepositoryFake {
       },
       replyToMessage: message.replyToMessage ?? null,
       toolMessages: message.toolMessages ?? [],
+      toolCallMessages: message.toolCallMessages ?? [],
     };
 
     this.messages.push(fullMessage);
@@ -117,41 +120,10 @@ export class MessageRepositoryFake {
     return Promise.reject(new Error('deleteOld not implemented in fake'));
   }
 
-  // Private methods required by MessageRepository interface
-  private connectChat(): unknown {
-    throw new Error('connectChat not implemented in fake');
-  }
-
-  private connectUser(): unknown {
-    throw new Error('connectUser not implemented in fake');
-  }
-
-  private connectNewChatMembers(): unknown {
-    throw new Error('connectNewChatMembers not implemented in fake');
-  }
-
-  private async connectReplyToMessage(
-    _toolCallArgs: unknown,
-  ): Promise<unknown> {
-    return Promise.reject(
-      new Error('connectReplyToMessage not implemented in fake'),
-    );
-  }
-
-  private isTelegramMessage(): boolean {
-    throw new Error('isTelegramMessage not implemented in fake');
-  }
-
-  private assertIsTelegramMessageWithRelations(): void {
-    throw new Error(
-      'assertIsTelegramMessageWithRelations not implemented in fake',
-    );
-  }
-
   reset(): void {
     this.messages = [];
     this.getCallArgs = [];
-    this.getLastChatMessageCallArgs = [];
+    this.getPreviousChatMessageCallArgs = [];
     this.updateToolCallsCallArgs = [];
     this.nextId = 1;
   }

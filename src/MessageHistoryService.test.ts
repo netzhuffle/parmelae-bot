@@ -1,5 +1,6 @@
 import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageRepositoryFake } from './Fakes/MessageRepositoryFake.js';
+import { MessageWithUserAndToolMessages } from './Repositories/Types.js';
 
 describe('MessageHistoryService', () => {
   let service: MessageHistoryService;
@@ -22,25 +23,28 @@ describe('MessageHistoryService', () => {
       const result = await service.getHistory(1, 1);
 
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(message);
+      expect(result[0]).toEqual(message as MessageWithUserAndToolMessages);
       expect(repository.getCallArgs).toEqual([1]);
     });
 
-    it('should include tool messages in returned messages', async () => {
-      const toolMessages = [
-        { id: 1, messageId: 1, toolCallId: 'call-123', text: 'Tool response' },
-      ];
+    it('should include tool call messages in returned messages', async () => {
       repository.addMessage({
         id: 1,
-        text: 'Message with tools',
+        text: 'Message with tool calls',
         toolCalls: [{ id: 'call-123', name: 'test_tool' }],
-        toolMessages,
+        toolMessages: [
+          {
+            id: 1,
+            messageId: 1,
+            toolCallId: 'call-123',
+            text: 'Tool response',
+          },
+        ],
       });
 
       const result = await service.getHistory(1, 1);
 
       expect(result).toHaveLength(1);
-      expect(result[0].toolMessages).toEqual(toolMessages);
       expect(result[0].toolCalls).toEqual([
         { id: 'call-123', name: 'test_tool' },
       ]);
@@ -92,7 +96,7 @@ describe('MessageHistoryService', () => {
       expect(result[0].text).toBe('First message');
       expect(result[1].text).toBe('Second message');
       expect(repository.getCallArgs).toEqual([2]);
-      expect(repository.getLastChatMessageCallArgs).toEqual([
+      expect(repository.getPreviousChatMessageCallArgs).toEqual([
         { chatId, beforeMessageId: 2 },
       ]);
     });
@@ -137,7 +141,9 @@ describe('MessageHistoryService', () => {
       const result = await service.getHistory(1, 5);
 
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(singleMessage);
+      expect(result[0]).toEqual(
+        singleMessage as MessageWithUserAndToolMessages,
+      );
     });
 
     it('should handle complex reply chain with tool messages', async () => {
@@ -195,6 +201,232 @@ describe('MessageHistoryService', () => {
       expect(result[1].text).toBe('Reply to original');
       expect(result[2].text).toBe('Reply with tools');
       expect(result[2].toolMessages).toHaveLength(1);
+    });
+
+    it('should include multiple tool call messages', async () => {
+      const chatId = BigInt(100);
+
+      // Create user message
+      const originalMessage = repository.addMessage({
+        id: 9,
+        chatId,
+        text: 'User question',
+        toolMessages: [],
+      });
+
+      // Create tool call announcement messages
+      const toolCallMessage1 = repository.addMessage({
+        id: 10,
+        chatId,
+        text: 'Calling search tool...',
+        toolMessages: [],
+        from: {
+          id: BigInt(999),
+          isBot: true,
+          firstName: 'Bot',
+          lastName: null,
+          username: 'testbot',
+          languageCode: 'en',
+        },
+      });
+
+      const toolCallMessage2 = repository.addMessage({
+        id: 11,
+        chatId,
+        text: 'Calling calculation tool...',
+        toolMessages: [],
+        from: {
+          id: BigInt(999),
+          isBot: true,
+          firstName: 'Bot',
+          lastName: null,
+          username: 'testbot',
+          languageCode: 'en',
+        },
+      });
+
+      // Create final response message that links to tool call messages
+      repository.addMessage({
+        id: 12,
+        chatId,
+        text: 'Based on the search and calculation, here is the answer.',
+        replyToMessage: originalMessage,
+        replyToMessageId: 9,
+        toolMessages: [],
+        toolCallMessages: [toolCallMessage1, toolCallMessage2], // Link to tool call messages
+      });
+
+      const result = await service.getHistory(12, 4);
+
+      // Should include all 4 messages in chronological order
+      expect(result).toHaveLength(4);
+      expect(result[0].id).toBe(9);
+      expect(result[0].text).toBe('User question');
+      expect(result[1].id).toBe(10);
+      expect(result[1].text).toBe('Calling search tool...');
+      expect(result[2].id).toBe(11);
+      expect(result[2].text).toBe('Calling calculation tool...');
+      expect(result[3].id).toBe(12);
+      expect(result[3].text).toBe(
+        'Based on the search and calculation, here is the answer.',
+      );
+    });
+
+    it('should include multiple tool call messages in reply chain', async () => {
+      const chatId = BigInt(100);
+
+      // Create user message
+      const originalMessage = repository.addMessage({
+        id: 9,
+        chatId,
+        text: 'User question',
+        toolMessages: [],
+      });
+
+      // Create tool call announcement messages
+      const toolCallMessage1 = repository.addMessage({
+        id: 10,
+        chatId,
+        text: 'Calling search tool...',
+        toolMessages: [],
+        from: {
+          id: BigInt(999),
+          isBot: true,
+          firstName: 'Bot',
+          lastName: null,
+          username: 'testbot',
+          languageCode: 'en',
+        },
+      });
+
+      const toolCallMessage2 = repository.addMessage({
+        id: 11,
+        chatId,
+        text: 'Calling calculation tool...',
+        toolMessages: [],
+        from: {
+          id: BigInt(999),
+          isBot: true,
+          firstName: 'Bot',
+          lastName: null,
+          username: 'testbot',
+          languageCode: 'en',
+        },
+      });
+
+      // Create final response message that links to tool call messages
+      const finalResponseMessage = repository.addMessage({
+        id: 12,
+        chatId,
+        text: 'Based on the search and calculation, here is the answer.',
+        replyToMessage: originalMessage,
+        replyToMessageId: 9,
+        toolMessages: [],
+        toolCallMessages: [toolCallMessage1, toolCallMessage2], // Link to tool call messages
+      });
+
+      // Create user reply
+      repository.addMessage({
+        id: 13,
+        chatId,
+        text: 'Thanks',
+        replyToMessage: finalResponseMessage,
+        replyToMessageId: 12,
+        toolMessages: [],
+      });
+
+      const result = await service.getHistory(13, 2);
+
+      // Should include all 4 messages in chronological order
+      expect(result).toHaveLength(4);
+      expect(result[0].id).toBe(10);
+      expect(result[0].text).toBe('Calling search tool...');
+      expect(result[1].id).toBe(11);
+      expect(result[1].text).toBe('Calling calculation tool...');
+      expect(result[2].id).toBe(12);
+      expect(result[2].text).toBe(
+        'Based on the search and calculation, here is the answer.',
+      );
+      expect(result[3].id).toBe(13);
+      expect(result[3].text).toBe('Thanks');
+    });
+
+    it('should include multiple tool call messages in history chain', async () => {
+      const chatId = BigInt(100);
+
+      // Create user message
+      const originalMessage = repository.addMessage({
+        id: 9,
+        chatId,
+        text: 'User question',
+        toolMessages: [],
+      });
+
+      // Create tool call announcement message
+      const toolCallMessage1 = repository.addMessage({
+        id: 10,
+        chatId,
+        text: 'Calling search tool...',
+        toolMessages: [],
+        from: {
+          id: BigInt(999),
+          isBot: true,
+          firstName: 'Bot',
+          lastName: null,
+          username: 'testbot',
+          languageCode: 'en',
+        },
+      });
+
+      const toolCallMessage2 = repository.addMessage({
+        id: 11,
+        chatId,
+        text: 'Calling calculation tool...',
+        toolMessages: [],
+        from: {
+          id: BigInt(999),
+          isBot: true,
+          firstName: 'Bot',
+          lastName: null,
+          username: 'testbot',
+          languageCode: 'en',
+        },
+      });
+
+      // Create final response message that links to tool call messages
+      repository.addMessage({
+        id: 12,
+        chatId,
+        text: 'Based on the search and calculation, here is the answer.',
+        replyToMessage: originalMessage,
+        replyToMessageId: 9,
+        toolMessages: [],
+        toolCallMessages: [toolCallMessage1, toolCallMessage2], // Link to tool call messages
+      });
+
+      // Create user reply
+      repository.addMessage({
+        id: 13,
+        chatId,
+        text: 'Thanks',
+        // Not a reply
+        toolMessages: [],
+      });
+
+      const result = await service.getHistory(13, 2);
+
+      // Should include all 4 messages in chronological order
+      expect(result).toHaveLength(4);
+      expect(result[0].id).toBe(10);
+      expect(result[0].text).toBe('Calling search tool...');
+      expect(result[1].id).toBe(11);
+      expect(result[1].text).toBe('Calling calculation tool...');
+      expect(result[2].id).toBe(12);
+      expect(result[2].text).toBe(
+        'Based on the search and calculation, here is the answer.',
+      );
+      expect(result[3].id).toBe(13);
+      expect(result[3].text).toBe('Thanks');
     });
   });
 });

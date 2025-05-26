@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import {
   MessageWithRelations,
   MessageWithUser,
-  MessageWithUserReplyToAndToolMessages,
+  MessageWithUserReplyToToolMessagesAndToolCallMessages,
   TelegramMessage,
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
@@ -21,8 +21,10 @@ const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 export class MessageRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  /** Returns the full message including user, reply-to, and tool messages relations. */
-  async get(id: number): Promise<MessageWithUserReplyToAndToolMessages> {
+  /** Returns the full message including user, reply-to, tool messages, and tool call messages relations. */
+  async get(
+    id: number,
+  ): Promise<MessageWithUserReplyToToolMessagesAndToolCallMessages> {
     return this.prisma.message.findUniqueOrThrow({
       where: {
         id,
@@ -31,6 +33,13 @@ export class MessageRepository {
         from: true,
         replyToMessage: true,
         toolMessages: true,
+        toolCallMessages: {
+          include: {
+            from: true,
+            replyToMessage: true,
+            toolMessages: true,
+          },
+        },
       },
     });
   }
@@ -102,11 +111,11 @@ export class MessageRepository {
     return this.getWithAllRelations(databaseMessage.id);
   }
 
-  /** Gets the last message from a chat before the given message id, if there is any. */
-  async getLastChatMessage(
+  /** Gets the previous message from a chat before the given message id, if there is any. */
+  async getPreviousChatMessage(
     chatId: bigint | number,
     beforeMessageId: number,
-  ): Promise<MessageWithUserReplyToAndToolMessages | null> {
+  ): Promise<MessageWithUserReplyToToolMessagesAndToolCallMessages | null> {
     return this.prisma.message.findFirst({
       where: {
         chatId: chatId,
@@ -121,6 +130,13 @@ export class MessageRepository {
         from: true,
         replyToMessage: true,
         toolMessages: true,
+        toolCallMessages: {
+          include: {
+            from: true,
+            replyToMessage: true,
+            toolMessages: true,
+          },
+        },
       },
     });
   }

@@ -29,18 +29,18 @@ describe('MessageRepositoryFake', () => {
     });
   });
 
-  describe('getLastChatMessage', () => {
+  describe('getPreviousChatMessage', () => {
     it('should return the most recent message in chat before given id', async () => {
       const chatId = BigInt(100);
       repository.addMessage({ id: 1, chatId, text: 'First message' });
       repository.addMessage({ id: 2, chatId, text: 'Second message' });
       repository.addMessage({ id: 3, chatId, text: 'Third message' });
 
-      const result = await repository.getLastChatMessage(chatId, 3);
+      const result = await repository.getPreviousChatMessage(chatId, 3);
 
       expect(result?.id).toBe(2);
       expect(result?.text).toBe('Second message');
-      expect(repository.getLastChatMessageCallArgs).toEqual([
+      expect(repository.getPreviousChatMessageCallArgs).toEqual([
         { chatId, beforeMessageId: 3 },
       ]);
     });
@@ -49,7 +49,7 @@ describe('MessageRepositoryFake', () => {
       const chatId = BigInt(100);
       repository.addMessage({ id: 5, chatId, text: 'Only message' });
 
-      const result = await repository.getLastChatMessage(chatId, 3);
+      const result = await repository.getPreviousChatMessage(chatId, 3);
 
       expect(result).toBeNull();
     });
@@ -60,7 +60,7 @@ describe('MessageRepositoryFake', () => {
       repository.addMessage({ id: 1, chatId: chatId1, text: 'Chat 1 message' });
       repository.addMessage({ id: 2, chatId: chatId2, text: 'Chat 2 message' });
 
-      const result = await repository.getLastChatMessage(chatId1, 5);
+      const result = await repository.getPreviousChatMessage(chatId1, 5);
 
       expect(result?.chatId).toBe(chatId1);
       expect(result?.text).toBe('Chat 1 message');
@@ -119,7 +119,7 @@ describe('MessageRepositoryFake', () => {
       repository.reset();
 
       expect(repository.getCallArgs).toEqual([]);
-      expect(repository.getLastChatMessageCallArgs).toEqual([]);
+      expect(repository.getPreviousChatMessageCallArgs).toEqual([]);
       expect(repository.updateToolCallsCallArgs).toEqual([]);
     });
   });
