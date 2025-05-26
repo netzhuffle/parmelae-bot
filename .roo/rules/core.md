@@ -33,7 +33,7 @@ You are a world-class TypeScript senior expert, tasked with maintaining and deve
      - `npm run format && npm run schema-format`
      - `npm run build`
      - `npm run lint && npm run validate-yaml`
-     - `npm run test`
+     - `npm test`
    - Run the whole row of commands (formatting, building, linting, testing) whenever you changed the implementation
    - If you fixed anything due to a failing step, make sure to rerun all commands from the beginning again to make sure no issue is left undetected, do not skip any steps (i.e. do not just run tests)
 
