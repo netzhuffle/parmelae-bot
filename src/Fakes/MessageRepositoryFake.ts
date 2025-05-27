@@ -102,13 +102,6 @@ export class MessageRepositoryFake {
   }
 
   // Additional methods required by MessageRepository interface
-  async getWithAllRelations(
-    _id: number,
-  ): Promise<TelegramMessageWithRelations> {
-    return Promise.reject(
-      new Error('getWithAllRelations not implemented in fake'),
-    );
-  }
 
   async store(
     _message: UnstoredMessageWithRelations,

@@ -1,5 +1,6 @@
 import { Chat, Message, Prisma, PrismaClient, User } from '@prisma/client';
 import { injectable } from 'inversify';
+import assert from 'node:assert/strict';
 import {
   MessageWithRelations,
   MessageWithUser,
@@ -8,13 +9,47 @@ import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
 } from './Types.js';
-import { assert } from 'console';
 
 /** Number of milliseconds in a day */
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 
 /** Number of milliseconds in 7 days */
 const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
+
+/** Include pattern for telegram messages with telegram-specific relations */
+const TELEGRAM_MESSAGE_INCLUDE = Prisma.validator<Prisma.MessageDefaultArgs>()({
+  include: {
+    chat: true,
+    from: true,
+    replyToMessage: {
+      include: {
+        from: true,
+      },
+    },
+    newChatMembers: {
+      include: {
+        user: true,
+      },
+    },
+  },
+});
+
+/** Include pattern for conversation messages with full tool context */
+const CONVERSATION_MESSAGE_INCLUDE =
+  Prisma.validator<Prisma.MessageDefaultArgs>()({
+    include: {
+      from: true,
+      replyToMessage: true,
+      toolMessages: true,
+      toolCallMessages: {
+        include: {
+          from: true,
+          replyToMessage: true,
+          toolMessages: true,
+        },
+      },
+    },
+  });
 
 /** Repository for messages */
 @injectable()
@@ -29,48 +64,8 @@ export class MessageRepository {
       where: {
         id,
       },
-      include: {
-        from: true,
-        replyToMessage: true,
-        toolMessages: true,
-        toolCallMessages: {
-          include: {
-            from: true,
-            replyToMessage: true,
-            toolMessages: true,
-          },
-        },
-      },
+      ...CONVERSATION_MESSAGE_INCLUDE,
     });
-  }
-
-  /** Returns the full message including all relations. */
-  async getWithAllRelations(id: number): Promise<TelegramMessageWithRelations> {
-    const message = await this.prisma.message.findUniqueOrThrow({
-      where: {
-        id,
-        telegramMessageId: {
-          not: null,
-        },
-      },
-      include: {
-        chat: true,
-        from: true,
-        replyToMessage: {
-          include: {
-            from: true,
-          },
-        },
-        newChatMembers: {
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
-    this.assertIsTelegramMessageWithRelations(message);
-
-    return message;
   }
 
   /** Stores a telegram message and its author. */
@@ -85,9 +80,11 @@ export class MessageRepository {
             chatId: message.chat.id,
           },
         },
+        ...TELEGRAM_MESSAGE_INCLUDE,
       });
       if (databaseMessage) {
-        return this.getWithAllRelations(databaseMessage.id);
+        this.assertIsTelegramMessageWithRelations(databaseMessage);
+        return databaseMessage;
       }
     }
 
@@ -107,8 +104,10 @@ export class MessageRepository {
         from: this.connectUser(message.from),
         newChatMembers: this.connectNewChatMembers(message),
       },
+      ...TELEGRAM_MESSAGE_INCLUDE,
     });
-    return this.getWithAllRelations(databaseMessage.id);
+    this.assertIsTelegramMessageWithRelations(databaseMessage);
+    return databaseMessage;
   }
 
   /** Gets the previous message from a chat before the given message id, if there is any. */
@@ -126,18 +125,7 @@ export class MessageRepository {
       orderBy: {
         id: 'desc',
       },
-      include: {
-        from: true,
-        replyToMessage: true,
-        toolMessages: true,
-        toolCallMessages: {
-          include: {
-            from: true,
-            replyToMessage: true,
-            toolMessages: true,
-          },
-        },
-      },
+      ...CONVERSATION_MESSAGE_INCLUDE,
     });
   }
 

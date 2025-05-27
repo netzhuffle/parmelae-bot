@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { Sticker } from './Sticker.js';
 import { TelegramMessageService } from './TelegramMessageService.js';
-import { assert } from 'console';
+import assert from 'node:assert/strict';
 import { Telegraf } from 'telegraf';
 import * as Typegram from '@telegraf/types';
 import { TelegramMessage } from './Repositories/Types.js';

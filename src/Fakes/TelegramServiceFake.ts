@@ -2,7 +2,7 @@ import { TelegramService } from '../TelegramService.js';
 import { TelegramMessageService } from '../TelegramMessageService.js';
 import { Telegraf } from 'telegraf';
 import * as Typegram from '@telegraf/types';
-import { assert } from 'console';
+import assert from 'node:assert/strict';
 
 export class TelegramServiceFake extends TelegramService {
   result?: {
@@ -44,7 +44,7 @@ export class TelegramServiceFake extends TelegramService {
       message_id: 123,
       date: 1234567890,
       chat: { id: Number(chatId), type: 'group', title: 'Test Group' },
-      dice: { emoji, value: this.result!.value },
+      dice: { emoji, value: this.result.value },
     });
   }
 
