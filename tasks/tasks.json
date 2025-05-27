@@ -770,7 +770,383 @@
         22
       ],
       "priority": "medium",
-      "subtasks": []
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Identify ToolFactory Classes",
+          "description": "Locate and document all classes implementing ToolFactory.",
+          "dependencies": [],
+          "details": "Use code analysis tools to find all ToolFactory implementations.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Refactor for Dependency Injection",
+          "description": "Modify ToolFactory classes to use dependency injection.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement interfaces and inject dependencies via constructors or setters.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Update Container Configuration",
+          "description": "Configure the dependency injection container to manage ToolFactory instances.",
+          "dependencies": [
+            2
+          ],
+          "details": "Register ToolFactory classes and their dependencies in the container.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Modify Usage Sites",
+          "description": "Update code where ToolFactory instances are used to leverage dependency injection.",
+          "dependencies": [
+            3
+          ],
+          "details": "Replace direct instantiation with container-resolved instances.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Update Documentation",
+          "description": "Document changes and best practices for using dependency injection with ToolFactory.",
+          "dependencies": [
+            4
+          ],
+          "details": "Include examples and guidelines for future development.",
+          "status": "pending"
+        },
+        {
+          "id": 6,
+          "title": "Develop Testing Strategies",
+          "description": "Create unit tests and integration tests for the refactored code.",
+          "dependencies": [
+            4
+          ],
+          "details": "Ensure tests cover all scenarios and edge cases.",
+          "status": "pending"
+        },
+        {
+          "id": 7,
+          "title": "Conduct Code Review",
+          "description": "Peer review the refactored code for quality and adherence to standards.",
+          "dependencies": [
+            5,
+            6
+          ],
+          "details": "Focus on maintainability, readability, and performance.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "title": "Persist IntermediateAnswerTool Messages in Message History",
+      "description": "Update the message persistence logic to ensure that messages sent via IntermediateAnswerTool are properly logged as tool calls in the message history, making them available for context in future bot interactions.",
+      "details": "This task addresses a critical gap in the current message persistence flow where intermediate answers sent to Telegram chats are not being properly persisted in the message history, causing the bot to lose context of these interactions.\n\nImplementation steps:\n\n1. **Analyze Current Message Flow**:\n   - Review the current implementation of `IntermediateAnswerTool` in `src/Tools/IntermediateAnswerTool.ts`\n   - Identify how messages are currently being sent to Telegram but not persisted\n   - Examine the existing tool call persistence mechanism implemented in Task 8 and Task 9\n   - Understand how Task 26 enhanced the MessageHistoryService to include tool call messages\n\n2. **Update IntermediateAnswerTool Implementation**:\n   - Modify the `execute` method in `IntermediateAnswerTool.ts` to not only send messages to Telegram but also persist them\n   - Ensure the tool properly creates and stores a tool call record in the database\n   - Link the intermediate answer message to the original user message using the established toolCallMessages relation\n\n3. **Integrate with MessageHistoryService**:\n   - Update the MessageHistoryService to recognize and include intermediate answer messages when retrieving conversation history\n   - Ensure proper ordering of messages in the conversation flow, maintaining chronological integrity\n   - Verify that intermediate answers appear in the correct context when history is retrieved\n\n4. **Handle Edge Cases**:\n   - Implement proper error handling for failed message persistence\n   - Ensure that multiple intermediate answers within a single conversation are all properly tracked\n   - Add safeguards to prevent duplicate message persistence\n\n5. **Update Types and Interfaces**:\n   - Extend or modify any necessary type definitions to accommodate intermediate answer messages\n   - Ensure type safety throughout the implementation\n\n6. **Documentation**:\n   - Update documentation to reflect the changes in message persistence behavior\n   - Document the new flow of intermediate answer messages through the system",
+      "testStrategy": "1. **Unit Testing**:\n   - Create unit tests for the updated `IntermediateAnswerTool` implementation\n   - Verify that the tool correctly persists messages to the database\n   - Mock the necessary dependencies to isolate the testing scope\n\n2. **Integration Testing**:\n   - Test the integration between `IntermediateAnswerTool` and `MessageHistoryService`\n   - Verify that persisted intermediate answers are correctly retrieved as part of conversation history\n   - Test with multiple intermediate answers in a single conversation\n\n3. **End-to-End Testing**:\n   - Create a test scenario that triggers the use of `IntermediateAnswerTool` multiple times\n   - Verify that all intermediate answers appear in the Telegram chat\n   - Confirm that subsequent bot interactions have access to the context from these intermediate answers\n   - Test conversation continuity after bot restarts to ensure persistence is working correctly\n\n4. **Regression Testing**:\n   - Ensure that existing functionality related to message history and tool calls continues to work\n   - Verify that the changes don't negatively impact performance or create race conditions\n\n5. **Manual Testing**:\n   - Conduct manual testing with real Telegram interactions\n   - Verify that the bot \"remembers\" information shared through intermediate answers in later parts of the conversation\n   - Test complex conversation flows with multiple intermediate answers",
+      "status": "pending",
+      "dependencies": [
+        8,
+        9,
+        26
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Analyze Current Message Flow",
+          "description": "Review and document the existing message flow to identify all components and paths a message traverses.",
+          "dependencies": [],
+          "details": "Map out message routing, transformation, and processing steps in the current system.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Update IntermediateAnswerTool for Persistence",
+          "description": "Modify IntermediateAnswerTool to persist intermediate messages and ensure context retention.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement database integration and update logic to store and retrieve intermediate messages.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Integrate with MessageHistoryService",
+          "description": "Connect IntermediateAnswerTool with MessageHistoryService to track message history.",
+          "dependencies": [
+            2
+          ],
+          "details": "Ensure each message update is reflected in the message history, using appropriate headers or storage mechanisms.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Handle Edge Cases",
+          "description": "Identify and implement handling for edge cases such as message loss, duplication, or corruption.",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Add error handling, retry logic, and validation to ensure robust message persistence and history tracking.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Update Types and Interfaces",
+          "description": "Revise types and interfaces to accommodate new persistence and history tracking requirements.",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Update data models, API contracts, and message schemas as needed.",
+          "status": "pending"
+        },
+        {
+          "id": 6,
+          "title": "Update Documentation",
+          "description": "Document all changes, including new features, edge case handling, and updated interfaces.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "details": "Write or update technical documentation, API docs, and user guides to reflect the new system behavior.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "title": "Review and Enhance Tool-Generated Message Handling",
+      "description": "Analyze and improve the handling of messages sent by tools like diceTool to ensure proper persistence, logging, and context tracking in the Telegram chat system.",
+      "details": "This task involves a comprehensive review of how messages generated by tools are currently handled in the system, with a focus on ensuring consistency across all tool types.\n\n1. **Current State Analysis**:\n   - Review all existing tools in `src/Tools/` directory, particularly focusing on `diceTool.ts` and other tools that send messages directly to Telegram chats\n   - Analyze how these tool-generated messages are currently being persisted in the database\n   - Compare with the implementation of `IntermediateAnswerTool` and other tools that have recently been updated for proper message persistence\n   - Identify any inconsistencies or gaps in how different tools handle message sending and persistence\n\n2. **Gap Identification**:\n   - Document tools that may not be properly persisting their messages in the message history\n   - Identify tools that might be bypassing the standard message flow, potentially causing context loss\n   - Check if tool-generated messages are properly linked to their parent conversations\n   - Verify if tool messages include appropriate metadata for context tracking\n\n3. **Implementation Improvements**:\n   - Standardize the approach for tool message persistence across all tools:\n     ```typescript\n     // Example standardized approach for tool message sending\n     export class SomeToolImplementation {\n       async execute(params: ToolParams): Promise<ToolResult> {\n         // Tool logic\n         \n         // Ensure message is properly persisted with context\n         const message = await this.messageHistoryService.createToolCallMessage({\n           chatId: params.chatId,\n           toolName: this.name,\n           content: messageContent,\n           parentMessageId: params.parentMessageId // Maintain context linkage\n         });\n         \n         // Send to Telegram\n         await this.telegramService.sendMessage(params.chatId, messageContent);\n         \n         return { success: true, messageId: message.id };\n       }\n     }\n     ```\n   \n   - Update `diceTool.ts` and any other tools identified with similar issues to follow the standardized pattern\n   - Ensure all tool-generated messages are properly categorized in the database schema\n   - Add appropriate logging for all tool message operations\n\n4. **Documentation Update**:\n   - Create or update documentation on the correct pattern for implementing tools that send messages\n   - Document the message flow and persistence requirements for tool developers",
+      "testStrategy": "1. **Unit Testing**:\n   - Create unit tests for each modified tool to verify they correctly persist messages:\n     ```typescript\n     describe('diceTool', () => {\n       it('should persist messages in message history when sending to Telegram', async () => {\n         // Setup mocks for messageHistoryService and telegramService\n         const messageHistoryService = { createToolCallMessage: jest.fn().mockResolvedValue({ id: 'test-id' }) };\n         const telegramService = { sendMessage: jest.fn() };\n         \n         const tool = new DiceTool({ messageHistoryService, telegramService });\n         await tool.execute({ chatId: 123, parentMessageId: 'parent-id' });\n         \n         // Verify message was persisted\n         expect(messageHistoryService.createToolCallMessage).toHaveBeenCalled();\n         // Verify correct parameters were passed\n         expect(messageHistoryService.createToolCallMessage.mock.calls[0][0]).toHaveProperty('parentMessageId', 'parent-id');\n       });\n     });\n     ```\n\n2. **Integration Testing**:\n   - Test the complete message flow from tool invocation to persistence:\n     - Trigger each tool that sends messages in a test environment\n     - Verify the messages appear in the database with correct relationships\n     - Confirm the messages are properly linked to their parent conversations\n\n3. **Manual Testing**:\n   - Create a test conversation that invokes various tools\n   - Verify that all tool-generated messages appear in the conversation history\n   - Check that when retrieving conversation history, tool messages are included in the correct order\n   - Test that the bot maintains proper context awareness of previous tool interactions\n\n4. **Regression Testing**:\n   - Ensure that existing functionality continues to work after changes\n   - Verify that other tools not directly modified still function correctly\n   - Test that message history retrieval works properly for conversations with mixed regular and tool messages",
+      "status": "pending",
+      "dependencies": [
+        8,
+        9,
+        26,
+        28
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Analyze Current Tool Message Handling",
+          "description": "Review and document how each tool currently processes, stores, and retrieves messages.",
+          "dependencies": [],
+          "details": "Identify existing message handling logic, persistence mechanisms, and any inconsistencies or limitations in current implementations.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Identify Gaps in Message Handling",
+          "description": "Compare current message handling approaches to identify gaps, inefficiencies, or risks.",
+          "dependencies": [
+            1
+          ],
+          "details": "Highlight areas where standardization is needed, such as error handling, persistence, or context management.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Standardize Persistence Approach",
+          "description": "Define a unified persistence strategy for message handling across all tools.",
+          "dependencies": [
+            2
+          ],
+          "details": "Develop guidelines and patterns for storing, retrieving, and managing message data consistently.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Update Affected Tools",
+          "description": "Implement the standardized persistence approach in all relevant tools.",
+          "dependencies": [
+            3
+          ],
+          "details": "Modify code and configurations to align with the new message handling pattern, ensuring backward compatibility where necessary.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Document the New Pattern",
+          "description": "Create comprehensive documentation for the standardized message handling approach.",
+          "dependencies": [
+            4
+          ],
+          "details": "Produce guides, diagrams, and examples to help teams understand and adopt the new pattern.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "title": "Review and Enhance DALL-E Image Message Handling",
+      "description": "Analyze and improve the handling of image messages generated by dallETool to ensure proper persistence, logging, and context tracking in the Telegram chat system.",
+      "details": "This task involves a comprehensive review of how image messages generated by dallETool are currently handled in the system, with a focus on ensuring consistency with other message types.\n\n1. **Current State Analysis**:\n   - Review the implementation of `dallETool.ts` in the `src/Tools/` directory\n   - Analyze how image messages are currently sent to Telegram chats\n   - Examine the current persistence mechanism for these image messages\n   - Identify how (or if) these messages are linked to the original tool call\n   - Determine if image messages are properly included in conversation history\n\n2. **Gap Identification**:\n   - Compare image message handling with text message handling\n   - Identify any inconsistencies in how image messages are persisted compared to other tool-generated messages\n   - Check if image messages are properly linked to their originating tool calls\n   - Verify if image messages appear correctly in conversation history for context\n   - Assess logging coverage for image-related operations\n\n3. **Implementation Improvements**:\n   - Update the dallETool implementation to ensure image messages are properly persisted\n   - Modify the message persistence logic to handle image messages consistently with other message types\n   - Ensure proper linkage between image messages and their originating tool calls\n   - Update the MessageHistoryService to include image messages in conversation history\n   - Enhance logging for image generation and delivery operations\n\n4. **Special Considerations for Images**:\n   - Implement proper handling for image metadata (size, format, generation parameters)\n   - Consider storage implications for image data (whether to store image data or references)\n   - Address any Telegram-specific requirements for image message handling\n   - Ensure proper error handling for image generation and delivery failures\n   - Consider performance implications of including images in conversation history\n\n5. **Documentation Updates**:\n   - Document the enhanced image message handling process\n   - Update relevant documentation to reflect changes in image message persistence\n   - Provide guidelines for future tool implementations that generate non-text content",
+      "testStrategy": "1. **Unit Testing**:\n   - Create unit tests for the updated dallETool implementation\n   - Test the persistence logic for image messages\n   - Verify proper linkage between image messages and tool calls\n   - Test error handling for image generation and delivery failures\n\n2. **Integration Testing**:\n   - Test the end-to-end flow of image generation and delivery\n   - Verify that image messages appear correctly in conversation history\n   - Test the retrieval of conversation history that includes image messages\n   - Ensure that the LLM receives proper context that includes references to generated images\n\n3. **Manual Testing Scenarios**:\n   - Generate an image using dallETool and verify it appears in Telegram\n   - Check the database to confirm proper persistence of the image message\n   - Verify the image message is linked to the original tool call\n   - Continue the conversation and confirm the bot has context of the previously generated image\n   - Test error scenarios (e.g., image generation failure) to ensure proper handling\n\n4. **Regression Testing**:\n   - Verify that changes to image message handling don't affect other message types\n   - Ensure that conversation history retrieval works correctly for mixed conversations (text and images)\n   - Confirm that all existing functionality related to tool calls continues to work as expected\n\n5. **Performance Testing**:\n   - Measure any performance impact of the enhanced image message handling\n   - Verify that including images in conversation history doesn't significantly impact response times",
+      "status": "pending",
+      "dependencies": [
+        10,
+        29,
+        9,
+        26
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Review Current Image Message Handling",
+          "description": "Analyze existing logic for receiving, processing, and displaying image messages, including media type detection and error handling.",
+          "dependencies": [],
+          "details": "Document current workflows, identify bottlenecks, and note any limitations in image processing or display.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Identify Gaps in Image Handling",
+          "description": "Identify missing features, security risks, and performance issues in current image message handling.",
+          "dependencies": [
+            1
+          ],
+          "details": "Compare with industry best practices for image handling in messaging, noting gaps in metadata management, storage, and user experience.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Update Persistence Logic for Image Messages",
+          "description": "Enhance persistence logic to reliably store and retrieve image messages, ensuring data integrity and context tracking.",
+          "dependencies": [
+            2
+          ],
+          "details": "Implement robust database or storage solutions for image messages, including versioning and context association.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Handle Image Metadata and Storage",
+          "description": "Develop logic to manage image metadata (e.g., format, size, creation date) and optimize storage for performance and cost.",
+          "dependencies": [
+            3
+          ],
+          "details": "Store metadata alongside images, implement compression and resizing as needed, and ensure secure access.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Improve Logging for Image Operations",
+          "description": "Enhance logging to capture detailed information about image uploads, processing, storage, and errors.",
+          "dependencies": [
+            4
+          ],
+          "details": "Implement structured logging for all image-related operations, including metadata changes and storage events.",
+          "status": "pending"
+        },
+        {
+          "id": 6,
+          "title": "Update Documentation for Image Handling",
+          "description": "Revise and expand documentation to reflect new image handling features, metadata management, and logging practices.",
+          "dependencies": [
+            5
+          ],
+          "details": "Document workflows, API changes, storage structure, and troubleshooting steps for image message handling.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "title": "Review and Enhance Persistence of Additional Response Types",
+      "description": "Analyze which bot or tool responses are not currently tracked in message history, evaluate the impact of including them, and implement changes if beneficial for context retention, debugging, or user experience.",
+      "details": "This task involves a comprehensive review of all response types in the system and determining which ones should be persisted in the message history:\n\n1. **Current State Analysis**:\n   - Review all existing message types and response formats in the system\n   - Identify response types not currently persisted in message history, focusing on:\n     - System messages (errors, notifications, status updates)\n     - Ephemeral messages (temporary responses that disappear)\n     - Metadata messages (information about the conversation state)\n     - Interactive elements (buttons, inline keyboards, etc.)\n     - Media types beyond images (audio, video, documents, etc.)\n   - Document each type with examples and current handling approach\n\n2. **Impact Assessment**:\n   - For each identified response type, evaluate:\n     - Context value: How much does this response type contribute to conversation context?\n     - Debugging utility: Would persistence help with troubleshooting issues?\n     - User experience impact: How would persistence affect the user's ability to follow conversation flow?\n     - Storage implications: Estimate additional storage requirements\n     - Performance considerations: Assess any potential impact on system performance\n\n3. **Implementation Plan**:\n   - Prioritize response types based on the impact assessment\n   - For each type selected for implementation:\n     - Update database schema if necessary to accommodate new message types\n     - Extend MessageHistoryService to capture and persist these messages\n     - Modify message retrieval logic to properly include these messages in context\n     - Update any UI/display logic to properly render these message types in history views\n\n4. **Integration with Existing Systems**:\n   - Ensure compatibility with the existing message linkage system (from Task 9)\n   - Coordinate with the tool call message handling (from Tasks 26, 29, and 30)\n   - Maintain consistency with the overall message persistence approach\n\n5. **Documentation Updates**:\n   - Update system documentation to reflect new message types being persisted\n   - Document any configuration options for enabling/disabling persistence of specific types\n   - Provide examples of how these new message types appear in conversation history",
+      "testStrategy": "1. **Unit Testing**:\n   - Create unit tests for each new message type persistence implementation\n   - Test both persistence and retrieval functionality\n   - Verify correct handling of edge cases (empty messages, malformed data, etc.)\n\n2. **Integration Testing**:\n   - Set up test scenarios that generate each type of response\n   - Verify that responses are correctly persisted in the database\n   - Confirm that persisted messages are properly retrieved and included in conversation context\n   - Test the complete flow from message generation to persistence to retrieval\n\n3. **Performance Testing**:\n   - Measure the impact on database size with the additional message types\n   - Benchmark message retrieval performance before and after implementation\n   - Test with large conversation histories to ensure scalability\n\n4. **User Experience Validation**:\n   - Create test conversations that include all message types\n   - Review the conversation history from a user perspective\n   - Verify that the additional context improves rather than clutters the conversation flow\n   - Ensure that the UI properly displays all message types in history views\n\n5. **Regression Testing**:\n   - Verify that existing message types are still handled correctly\n   - Ensure that the changes don't break any existing functionality\n   - Test all related features that depend on message history\n\n6. **Documentation Verification**:\n   - Review updated documentation for accuracy and completeness\n   - Verify that examples match the actual implementation",
+      "status": "pending",
+      "dependencies": [
+        26,
+        28,
+        29,
+        30
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Analyze Response Types",
+          "description": "Review and categorize different types of responses to understand their characteristics and requirements.",
+          "dependencies": [],
+          "details": "Identify regular messages, signals, file messages, and other types to assess their persistence needs.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Assess Impact of Persistence",
+          "description": "Evaluate the benefits and challenges of implementing persistence for each response type.",
+          "dependencies": [
+            1
+          ],
+          "details": "Consider factors like data storage, retrieval efficiency, and user experience.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Plan Implementation for Selected Types",
+          "description": "Decide which response types will have persistence implemented based on the impact assessment.",
+          "dependencies": [
+            2
+          ],
+          "details": "Develop a strategy for integrating persistence into the selected types.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Integrate with Existing Systems",
+          "description": "Modify existing infrastructure to support persistence for the chosen response types.",
+          "dependencies": [
+            3
+          ],
+          "details": "Update databases, APIs, and other relevant components to accommodate persistence.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Update Documentation",
+          "description": "Revise system documentation to reflect changes related to persistence.",
+          "dependencies": [
+            4
+          ],
+          "details": "Ensure that all documentation accurately describes the new persistence features.",
+          "status": "pending"
+        },
+        {
+          "id": 6,
+          "title": "Conduct Comprehensive Testing",
+          "description": "Perform thorough tests to ensure persistence works correctly across all integrated systems.",
+          "dependencies": [
+            5
+          ],
+          "details": "Verify data storage, retrieval, and overall system performance.",
+          "status": "pending"
+        },
+        {
+          "id": 7,
+          "title": "Deploy and Monitor",
+          "description": "Deploy the updated system and monitor its performance to identify any issues.",
+          "dependencies": [
+            6
+          ],
+          "details": "Continuously assess user experience and system reliability post-deployment.",
+          "status": "pending"
+        }
+      ]
     }
   ]
 }

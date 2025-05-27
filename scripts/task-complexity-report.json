@@ -1,9 +1,9 @@
 {
   "meta": {
-    "generatedAt": "2025-05-26T00:07:08.351Z",
-    "tasksAnalyzed": 1,
-    "totalTasks": 26,
-    "analysisCount": 9,
+    "generatedAt": "2025-05-27T12:00:41.953Z",
+    "tasksAnalyzed": 11,
+    "totalTasks": 31,
+    "analysisCount": 14,
     "thresholdScore": 5,
     "projectName": "Taskmaster",
     "usedResearch": true
@@ -18,30 +18,6 @@
       "reasoning": "This task involves multiple components and requires updates to several files, including database schema modifications and enhancements to various service and strategy classes."
     },
     {
-      "taskId": 15,
-      "taskTitle": "Optimize Database Queries for Performance",
-      "complexityScore": 6,
-      "recommendedSubtasks": 4,
-      "expansionPrompt": "Identify and optimize database queries by implementing proper indexing and query restructuring.",
-      "reasoning": "Optimizing database queries typically involves analyzing existing queries, identifying bottlenecks, and applying indexing or query optimization techniques."
-    },
-    {
-      "taskId": 17,
-      "taskTitle": "Implement User Management and Permissions",
-      "complexityScore": 7,
-      "recommendedSubtasks": 6,
-      "expansionPrompt": "Develop a user management system with role-based permissions for advanced features.",
-      "reasoning": "Implementing user management involves creating user roles, permission structures, and integrating these with existing features."
-    },
-    {
-      "taskId": 18,
-      "taskTitle": "Implement Scalability Enhancements",
-      "complexityScore": 8,
-      "recommendedSubtasks": 5,
-      "expansionPrompt": "Enhance the bot's scalability by optimizing resource usage and improving performance under high load.",
-      "reasoning": "Scalability enhancements require analyzing current bottlenecks, optimizing resource management, and possibly implementing load balancing or distributed processing."
-    },
-    {
       "taskId": 21,
       "taskTitle": "Develop Comprehensive Documentation",
       "complexityScore": 4,
@@ -50,36 +26,100 @@
       "reasoning": "Documentation involves organizing and writing clear guides, which can be straightforward but time-consuming."
     },
     {
-      "taskId": 23,
-      "taskTitle": "Conduct End-to-End Testing",
-      "complexityScore": 5,
-      "recommendedSubtasks": 4,
-      "expansionPrompt": "Perform end-to-end testing for critical user flows and features to ensure system integrity.",
-      "reasoning": "End-to-end testing requires identifying key user flows, designing test scenarios, and executing these tests across the system."
-    },
-    {
-      "taskId": 24,
-      "taskTitle": "Deploy Bot to Production Environment",
-      "complexityScore": 7,
-      "recommendedSubtasks": 5,
-      "expansionPrompt": "Deploy the bot to a production environment with proper monitoring and logging setup.",
-      "reasoning": "Deployment involves setting up infrastructure, configuring monitoring tools, and ensuring logging is properly implemented."
-    },
-    {
-      "taskId": 25,
-      "taskTitle": "Monitor and Optimize Bot Performance",
-      "complexityScore": 6,
-      "recommendedSubtasks": 4,
-      "expansionPrompt": "Continuously monitor bot performance and apply optimizations as needed.",
-      "reasoning": "Monitoring and optimization involve setting up performance metrics, analyzing data, and applying fixes or improvements based on findings."
-    },
-    {
       "taskId": 26,
       "taskTitle": "Implement Tool Call Messages in Message History",
       "complexityScore": 7,
       "recommendedSubtasks": 6,
       "expansionPrompt": "Break down the implementation of tool call messages in MessageHistoryService into detailed subtasks covering service modification, query logic update, backward compatibility, performance optimization, code structuring, and testing strategies.",
       "reasoning": "This task involves multiple complex aspects including modifying service logic to integrate new message types, ensuring correct chronological ordering, maintaining backward compatibility, optimizing performance for potentially large data sets, and comprehensive testing (unit, integration, regression, performance, manual). The dependency on another task and the need to handle various conversation patterns add to the complexity, warranting a moderately high complexity score and multiple subtasks for clear implementation and testing phases."
+    },
+    {
+      "taskId": 15,
+      "taskTitle": "Optimize Database Queries for Performance",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Expand the task by detailing steps for query profiling, indexing strategies, Prisma query refactoring, performance monitoring setup, and validation of improvements.",
+      "reasoning": "The task involves multiple technical aspects including query analysis, indexing, Prisma-specific optimizations, and monitoring integration, requiring careful coordination and testing to improve database performance effectively."
+    },
+    {
+      "taskId": 17,
+      "taskTitle": "Implement User Management and Permissions",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Expand the task to include detailed design of user-role-permission models, authentication mechanisms, RBAC implementation, integration with bot features, admin tools, and comprehensive testing.",
+      "reasoning": "User management with permissions is complex due to the need for secure authentication, role-based access control, integration with existing features, and admin tooling, all requiring thorough design and testing."
+    },
+    {
+      "taskId": 18,
+      "taskTitle": "Implement Scalability Enhancements",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Expand the task by outlining bottleneck analysis, Node.js performance tuning, database connection pooling, distributed processing integration, and scalability testing.",
+      "reasoning": "Scalability improvements involve identifying performance bottlenecks, optimizing asynchronous processing, managing database connections efficiently, and implementing distributed systems, which are moderately complex and interdependent."
+    },
+    {
+      "taskId": 23,
+      "taskTitle": "Conduct End-to-End Testing",
+      "complexityScore": 5,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Expand the task to cover identification of critical user flows, test scenario design, automated test implementation, execution, and validation.",
+      "reasoning": "End-to-end testing requires systematic coverage of key user interactions with automated tools and validation, which is straightforward but essential for quality assurance."
+    },
+    {
+      "taskId": 24,
+      "taskTitle": "Deploy Bot to Production Environment",
+      "complexityScore": 6,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Expand the task to include environment setup, secure configuration, monitoring and logging integration, CI/CD pipeline setup, and deployment verification.",
+      "reasoning": "Deployment involves multiple coordinated steps including environment configuration, security, monitoring, automation, and validation, making it moderately complex."
+    },
+    {
+      "taskId": 25,
+      "taskTitle": "Monitor and Optimize Bot Performance",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Expand the task by detailing performance metric setup, alerting system implementation, resource utilization monitoring, and iterative optimization cycles.",
+      "reasoning": "Continuous monitoring and optimization require setting up metrics, alerts, resource tracking, and iterative improvements, which is a continuous but manageable process."
+    },
+    {
+      "taskId": 27,
+      "taskTitle": "Migrate ToolFactory Classes to Dependency Injection",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Expand the task to include identification of all ToolFactory classes, detailed refactoring steps for dependency injection, container configuration updates, usage site modifications, documentation updates, testing strategies, and code review.",
+      "reasoning": "This task involves significant architectural refactoring affecting multiple components, requiring careful planning, testing, and documentation to ensure maintainability and correctness."
+    },
+    {
+      "taskId": 28,
+      "taskTitle": "Persist IntermediateAnswerTool Messages in Message History",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Expand the task by analyzing current message flow, updating IntermediateAnswerTool for persistence, integrating with MessageHistoryService, handling edge cases, updating types/interfaces, and documentation.",
+      "reasoning": "Ensuring proper persistence of intermediate messages involves modifying message flow, database integration, error handling, and documentation, which is moderately complex and critical for context retention."
+    },
+    {
+      "taskId": 29,
+      "taskTitle": "Review and Enhance Tool-Generated Message Handling",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Expand the task to analyze current tool message handling, identify gaps, standardize persistence approach, update affected tools, and document the new pattern.",
+      "reasoning": "Standardizing message handling across multiple tools requires thorough analysis, code updates, and documentation to maintain consistency and context integrity."
+    },
+    {
+      "taskId": 30,
+      "taskTitle": "Review and Enhance DALL-E Image Message Handling",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Expand the task by reviewing current image message handling, identifying gaps, updating persistence logic, handling image metadata and storage, improving logging, and updating documentation.",
+      "reasoning": "Handling image messages involves additional complexity due to media metadata, storage considerations, and ensuring consistent persistence and context tracking."
+    },
+    {
+      "taskId": 31,
+      "taskTitle": "Review and Enhance Persistence of Additional Response Types",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Expand the task to analyze all response types, assess impact of persistence, plan implementation for selected types, integrate with existing systems, update documentation, and conduct comprehensive testing.",
+      "reasoning": "This task requires a broad review of diverse message types, impact evaluation, schema and service updates, and thorough testing to improve context retention and user experience."
     }
   ]
 }
