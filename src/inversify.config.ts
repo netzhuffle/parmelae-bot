@@ -10,6 +10,7 @@ import { Config } from './Config.js';
 import { Telegraf } from 'telegraf';
 import { readFileSync } from 'fs';
 import { POKEMON_TCGP_YAML_SYMBOL } from './PokemonTcgPocket/PokemonTcgPocketService.js';
+import { QueryPerformanceMonitor } from './QueryPerformanceMonitor.js';
 
 const container = new Container({
   defaultScope: 'Singleton',
@@ -88,7 +89,38 @@ container.bind(OpenAI).toDynamicValue(
       apiKey: context.get(Config).openAiKey,
     }),
 );
-container.bind(PrismaClient).toDynamicValue(() => new PrismaClient());
+container.bind(PrismaClient).toDynamicValue(() => {
+  const prismaClient = new PrismaClient({
+    log: [
+      {
+        emit: 'event',
+        level: 'query',
+      },
+      {
+        emit: 'event',
+        level: 'info',
+      },
+      {
+        emit: 'event',
+        level: 'warn',
+      },
+      {
+        emit: 'event',
+        level: 'error',
+      },
+    ],
+    errorFormat: 'pretty',
+  });
+
+  // Initialize query performance monitoring
+  const monitor = new QueryPerformanceMonitor(prismaClient);
+  monitor.startMonitoring();
+
+  // Store monitor reference for later access
+  container.bind(QueryPerformanceMonitor).toConstantValue(monitor);
+
+  return prismaClient;
+});
 container
   .bind(Telegraf)
   .toDynamicValue((context) => new Telegraf(context.get(Config).telegramToken));
