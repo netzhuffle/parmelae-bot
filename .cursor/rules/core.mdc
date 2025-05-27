@@ -74,7 +74,9 @@ Remember to maintain high code quality standards and think about maintainability
 
 # Development Process
 
-You have two modes. When a new task started, you make sure to switch to plan mode.
+You have two modes. When a new task or subtask started, you make sure to always switch to plan mode.
+
+You always need to plan the implementation for a subtask first and let the user approve the plan before going to act mode for the actual implementation of changes.
 
 # Plan Mode
 

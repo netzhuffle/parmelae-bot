@@ -56,6 +56,12 @@ model Message {
   toolCallMessages        Message[]                @relation("MessageAfterToolCalls")
 
   @@unique([telegramMessageId, chatId])
+  @@index([chatId])
+  @@index([chatId, sentAt])
+  @@index([chatId, id])
+  @@index([sentAt])
+  @@index([fromId])
+  @@index([replyToMessageId])
 }
 
 model ToolMessage {
@@ -64,6 +70,9 @@ model ToolMessage {
   messageId  Int
   toolCallId String
   text       String
+
+  @@index([messageId])
+  @@index([toolCallId])
 }
 
 model ScheduledMessage {
@@ -75,6 +84,10 @@ model ScheduledMessage {
   sendAt      DateTime
   scheduledAt DateTime @default(now())
   text        String
+
+  @@index([sendAt])
+  @@index([chatId])
+  @@index([fromId])
 }
 
 model User {
@@ -88,6 +101,9 @@ model User {
   chatEntryMessages ChatEntryMessagesUsers[]
   scheduledMessages ScheduledMessage[]
   ownedPokemonCards PokemonCard[]
+
+  @@index([isBot])
+  @@index([username])
 }
 
 model PokemonSet {
@@ -96,6 +112,8 @@ model PokemonSet {
   name     String
   boosters PokemonBooster[]
   cards    PokemonCard[]
+
+  @@index([name])
 }
 
 model PokemonBooster {
@@ -107,6 +125,8 @@ model PokemonBooster {
   cards          PokemonCard[]
 
   @@unique([setId, name])
+  @@index([setId])
+  @@index([hasShinyRarity])
 }
 
 model PokemonCard {
@@ -120,6 +140,9 @@ model PokemonCard {
   owners   User[]
 
   @@unique([setId, number])
+  @@index([setId])
+  @@index([rarity])
+  @@index([name])
 }
 
 enum Rarity {
