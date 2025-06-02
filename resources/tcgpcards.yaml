@@ -4140,6 +4140,318 @@ A3:
       boosters:
         - Lunala
         - Solgaleo
+A3a:
+  name: Dimensionale Krise
+  cards:
+    1:
+      name: Lilminip
+      rarity: ♢
+    2:
+      name: Dressella
+      rarity: ♢
+    3:
+      name: Bauz
+      rarity: ♢
+    4:
+      name: Arboretoss
+      rarity: ♢♢
+    5:
+      name: Silvarro
+      rarity: ♢♢♢
+    6:
+      name: Masskito ex
+      rarity: ♢♢♢♢
+    7:
+      name: Schabelle
+      rarity: ♢♢
+    8:
+      name: Katagami
+      rarity: ♢
+    9:
+      name: Kopplosio
+      rarity: ♢♢
+    10:
+      name: Mantax
+      rarity: ♢
+    11:
+      name: Kanivanha
+      rarity: ♢
+    12:
+      name: Tohaido
+      rarity: ♢♢
+    13:
+      name: Sheinux
+      rarity: ♢
+    14:
+      name: Luxio
+      rarity: ♢
+    15:
+      name: Luxtra
+      rarity: ♢♢♢
+    16:
+      name: Elezeba
+      rarity: ♢
+    17:
+      name: Zebritz
+      rarity: ♢
+    18:
+      name: Emolga
+      rarity: ♢
+    19:
+      name: Kapu-Riki ex
+      rarity: ♢♢♢♢
+    20:
+      name: Voltriant
+      rarity: ♢♢
+    21:
+      name: Zeraora
+      rarity: ♢♢♢
+    22:
+      name: Piepi
+      rarity: ♢
+    23:
+      name: Pixi
+      rarity: ♢♢
+    24:
+      name: Paragoni
+      rarity: ♢
+    25:
+      name: Trombork
+      rarity: ♢
+    26:
+      name: Bubungus
+      rarity: ♢
+    27:
+      name: Lamellux
+      rarity: ♢♢♢
+    28:
+      name: Meditie
+      rarity: ♢
+    29:
+      name: Meditalis
+      rarity: ♢♢
+    30:
+      name: Puppance
+      rarity: ♢
+    31:
+      name: Lepumentas
+      rarity: ♢♢
+    32:
+      name: Wuffels
+      rarity: ♢
+    33:
+      name: Wolwerock ex
+      rarity: ♢♢♢♢
+    34:
+      name: Quartermak
+      rarity: ♢
+    35:
+      name: Sankabuh
+      rarity: ♢
+    36:
+      name: Colossand
+      rarity: ♢♢
+    37:
+      name: Alola-Mauzi
+      rarity: ♢
+    38:
+      name: Alola-Snobilikat
+      rarity: ♢♢
+    39:
+      name: Ganovil
+      rarity: ♢
+    40:
+      name: Rokkaiman
+      rarity: ♢
+    41:
+      name: Rabigator
+      rarity: ♢♢
+    42:
+      name: Anego
+      rarity: ♢♢♢
+    43:
+      name: Schlingking ex
+      rarity: ♢♢♢♢
+    44:
+      name: Venicro
+      rarity: ♢
+    45:
+      name: Agoyon
+      rarity: ♢♢♢
+    46:
+      name: Alola-Digda
+      rarity: ♢
+    47:
+      name: Alola-Digdri ex
+      rarity: ♢♢♢♢
+    48:
+      name: Stollunior
+      rarity: ♢
+    49:
+      name: Sollrak
+      rarity: ♢
+    50:
+      name: Stolloss
+      rarity: ♢♢
+    51:
+      name: Kastadur
+      rarity: ♢
+    52:
+      name: Tentantel
+      rarity: ♢♢
+    53:
+      name: Muramura
+      rarity: ♢♢
+    54:
+      name: Yorkleff
+      rarity: ♢
+    55:
+      name: Terribark
+      rarity: ♢
+    56:
+      name: Bissbark
+      rarity: ♢♢
+    57:
+      name: Velursi
+      rarity: ♢
+    58:
+      name: Kosturso
+      rarity: ♢♢
+    59:
+      name: Kommandutan
+      rarity: ♢
+    60:
+      name: Typ:Null
+      rarity: ♢♢
+    61:
+      name: Amigento
+      rarity: ♢♢♢
+    62:
+      name: Kaguron
+      rarity: ♢♢♢
+    63:
+      name: Bestienwand
+      rarity: ♢♢
+    64:
+      name: Schutz
+      rarity: ♢♢
+    65:
+      name: Elektrokabel
+      rarity: ♢♢
+    66:
+      name: Bestienit
+      rarity: ♢♢
+    67:
+      name: Gladio
+      rarity: ♢♢
+    68:
+      name: LeBelle
+      rarity: ♢♢
+    69:
+      name: Samantha
+      rarity: ♢♢
+    70:
+      name: Bauz
+      rarity: ☆
+    71:
+      name: Schabelle
+      rarity: ☆
+    72:
+      name: Kopplosio
+      rarity: ☆
+    73:
+      name: Alola-Mauzi
+      rarity: ☆
+    74:
+      name: Amigento
+      rarity: ☆
+    75:
+      name: Kaguron
+      rarity: ☆
+    76:
+      name: Masskito ex
+      rarity: ☆☆
+    77:
+      name: Kapu-Riki ex
+      rarity: ☆☆
+    78:
+      name: Wolwerock ex
+      rarity: ☆☆
+    79:
+      name: Schlingking ex
+      rarity: ☆☆
+    80:
+      name: Alola-Digdri ex
+      rarity: ☆☆
+    81:
+      name: Gladio
+      rarity: ☆☆
+    82:
+      name: LeBelle
+      rarity: ☆☆
+    83:
+      name: Samantha
+      rarity: ☆☆
+    84:
+      name: Kapu-Riki ex
+      rarity: ☆☆
+    85:
+      name: Wolwerock ex
+      rarity: ☆☆
+    86:
+      name: Schlingking ex
+      rarity: ☆☆
+    87:
+      name: Alola-Digdri ex
+      rarity: ☆☆
+    88:
+      name: Masskito ex
+      rarity: ☆☆☆
+    89:
+      name: Fukano
+      rarity: ✸
+    90:
+      name: Arkani
+      rarity: ✸
+    91:
+      name: Froxy
+      rarity: ✸
+    92:
+      name: Amphizel
+      rarity: ✸
+    93:
+      name: Quajutsu
+      rarity: ✸
+    94:
+      name: Rossana
+      rarity: ✸
+    95:
+      name: Taubsi
+      rarity: ✸
+    96:
+      name: Tauboga
+      rarity: ✸
+    97:
+      name: Tauboss
+      rarity: ✸
+    98:
+      name: Aerodactyl
+      rarity: ✸
+    99:
+      name: Celebi ex
+      rarity: ✸✸
+    100:
+      name: Arkani ex
+      rarity: ✸✸
+    101:
+      name: Aerodactyl ex
+      rarity: ✸✸
+    102:
+      name: Tauboss ex
+      rarity: ✸✸
+    103:
+      name: Anego
+      rarity: ♛
 PROMO-A:
   name: Promo-A
   boosters: ~
@@ -4328,4 +4640,24 @@ PROMO-A:
     72:
       name: Alola-Sleima
     73:
-      name: Turkanon
+      name: Tukanon
+    74:
+      name: Zeraora
+    75:
+      name: Katagami
+    76:
+      name: Kopplosio
+    77:
+      name: Voltriant
+    78:
+      name: Morgenschwingen-Necrozma
+    79:
+      name: Abendmähne-Necrozma
+    80:
+      name: Muramura
+    81:
+      name: Ultra-Necrozma ex
+    82:
+      name: Venicro
+    83:
+      name: Velursi
