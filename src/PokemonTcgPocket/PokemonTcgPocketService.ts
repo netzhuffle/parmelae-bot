@@ -103,6 +103,13 @@ export const OWNERSHIP_FILTER_VALUES = [
 /** Ownership filter type */
 export type OwnershipFilter = (typeof OWNERSHIP_FILTER_VALUES)[number];
 
+/** Service-layer ownership status with explicit missing state */
+export enum CardOwnershipStatus {
+  OWNED = 'OWNED',
+  NOT_NEEDED = 'NOT_NEEDED',
+  MISSING = 'MISSING',
+}
+
 /** Symbol for injecting the Pokemon TCG Pocket YAML content */
 export const POKEMON_TCGP_YAML_SYMBOL = Symbol('PokemonTcgPocketYaml');
 
@@ -164,7 +171,7 @@ const RARITY_REVERSE_MAP: Record<Rarity, string> = {
 /** Card with ownership information */
 interface CardWithOwnership {
   card: PokemonCard;
-  isOwned: boolean;
+  ownershipStatus: CardOwnershipStatus;
 }
 
 /** Group of cards with ownership statistics */
@@ -363,18 +370,39 @@ export class PokemonTcgPocketService {
 
     return {
       displayName,
-      sets: rawStats.sets.map(({ set, cards }) => ({
-        name: set.name,
-        stats: this.formatSetStats(this.calculateSetStats(cards)),
-      })),
+      sets: rawStats.sets.map(({ set, cards }) => {
+        const cardsWithServiceStatus: CardWithOwnership[] = cards.map(
+          ({ card, ownershipStatus }) => ({
+            card,
+            ownershipStatus,
+          }),
+        );
+        return {
+          name: set.name,
+          stats: this.formatSetStats(
+            this.calculateSetStats(cardsWithServiceStatus),
+          ),
+        };
+      }),
       boosters: rawStats.sets.flatMap(({ boosters }) =>
         boosters.map(({ booster, cards }) => {
-          const missingCards = cards
-            .filter(({ isOwned }) => !isOwned)
-            .map(({ card }) => card);
-          const allCards = cards.map(({ card }) => card);
+          const cardsWithServiceStatus: CardWithOwnership[] = cards.map(
+            ({ card, ownershipStatus }) => ({
+              card,
+              ownershipStatus,
+            }),
+          );
 
-          const diamondCards = cards.filter(({ card }) =>
+          const missingCards = cardsWithServiceStatus
+            .filter(
+              ({ ownershipStatus }) =>
+                ownershipStatus !== CardOwnershipStatus.OWNED &&
+                ownershipStatus !== CardOwnershipStatus.NOT_NEEDED,
+            )
+            .map(({ card }) => card);
+          const allCards = cardsWithServiceStatus.map(({ card }) => card);
+
+          const diamondCards = cardsWithServiceStatus.filter(({ card }) =>
             this.isCardOfRarity(card, [
               Rarity.ONE_DIAMOND,
               Rarity.TWO_DIAMONDS,
@@ -383,7 +411,7 @@ export class PokemonTcgPocketService {
             ]),
           );
 
-          const tradableCards = cards.filter(({ card }) =>
+          const tradableCards = cardsWithServiceStatus.filter(({ card }) =>
             this.isCardOfRarity(card, [
               Rarity.ONE_DIAMOND,
               Rarity.TWO_DIAMONDS,
@@ -395,7 +423,10 @@ export class PokemonTcgPocketService {
 
           return {
             name: booster.name,
-            diamondOwned: diamondCards.filter(({ isOwned }) => isOwned).length,
+            diamondOwned: diamondCards.filter(
+              ({ ownershipStatus }) =>
+                ownershipStatus === CardOwnershipStatus.OWNED,
+            ).length,
             diamondTotal: diamondCards.length,
             newDiamondCardProbability:
               this.probabilityService.calculateNewDiamondCardProbability(
@@ -403,8 +434,10 @@ export class PokemonTcgPocketService {
                 missingCards,
                 booster.hasShinyRarity,
               ) * 100,
-            tradableOwned: tradableCards.filter(({ isOwned }) => isOwned)
-              .length,
+            tradableOwned: tradableCards.filter(
+              ({ ownershipStatus }) =>
+                ownershipStatus === CardOwnershipStatus.OWNED,
+            ).length,
             tradableTotal: tradableCards.length,
             newTradableCardProbability:
               this.probabilityService.calculateNewTradableCardProbability(
@@ -412,8 +445,11 @@ export class PokemonTcgPocketService {
                 missingCards,
                 booster.hasShinyRarity,
               ) * 100,
-            allOwned: cards.filter(({ isOwned }) => isOwned).length,
-            allTotal: cards.length,
+            allOwned: cardsWithServiceStatus.filter(
+              ({ ownershipStatus }) =>
+                ownershipStatus === CardOwnershipStatus.OWNED,
+            ).length,
+            allTotal: cardsWithServiceStatus.length,
             newCardProbability:
               this.probabilityService.calculateNewCardProbability(
                 allCards,
@@ -474,7 +510,9 @@ export class PokemonTcgPocketService {
     const filteredCards = cards.filter(({ card }) => filter(card));
     return {
       cards: filteredCards,
-      owned: filteredCards.filter(({ isOwned }) => isOwned).length,
+      owned: filteredCards.filter(
+        ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.OWNED,
+      ).length,
       total: filteredCards.length,
     };
   }

@@ -108,20 +108,44 @@ alwaysApply: false
 
 - **Exhaustive Switch Error Pattern:**
   ```typescript
-  // ✅ DO: Use NotExhaustiveSwitchError for type safety
+  import { NotExhaustiveSwitchError } from '../NotExhaustiveSwitchError.js';
+  
+  // ✅ DO: Use NotExhaustiveSwitchError for compile-time type safety
+  function convertOwnershipStatus(status: OwnershipStatus | null): CardOwnershipStatus {
+    switch (status) {
+      case OwnershipStatus.OWNED:
+        return CardOwnershipStatus.OWNED;
+      case OwnershipStatus.NOT_NEEDED:
+        return CardOwnershipStatus.NOT_NEEDED;
+      case null:
+        return CardOwnershipStatus.MISSING;
+      default:
+        // TypeScript ensures this is never reached if all cases are handled
+        throw new NotExhaustiveSwitchError(status);
+    }
+  }
+  
+  // ✅ DO: Handle enum exhaustively with never type checking
   function handleMessageType(type: MessageType): string {
     switch (type) {
-      case 'text':
+      case MessageType.TEXT:
         return 'Handling text message';
-      case 'image':
+      case MessageType.IMAGE:
         return 'Handling image message';
-      case 'sticker':
+      case MessageType.STICKER:
         return 'Handling sticker message';
       default:
         throw new NotExhaustiveSwitchError(type);
     }
   }
   ```
+
+- **NotExhaustiveSwitchError Benefits:**
+  - **Compile-time safety**: TypeScript's `never` type ensures all enum cases are handled
+  - **Runtime protection**: Catches unexpected values that slip through type checking
+  - **Consistent error handling**: Standardized approach across the codebase
+  - **Future-proof**: Adding new enum values will cause compile-time errors until handled
+  - **Clear error messages**: Automatically includes the unexpected value in the error message
 
 - **Error Recovery Strategies:**
   - **Implement retry logic** for transient failures

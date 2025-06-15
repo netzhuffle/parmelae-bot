@@ -10,8 +10,12 @@ import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabas
 import { PokemonTcgPocketNotFoundError } from '../Errors/PokemonTcgPocketNotFoundError.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { PokemonCardWithRelations } from './Types.js';
-import { OwnershipFilter } from '../PokemonTcgPocketService.js';
+import {
+  OwnershipFilter,
+  CardOwnershipStatus,
+} from '../PokemonTcgPocketService.js';
 import { OwnershipStatus } from '@prisma/client';
+import { NotExhaustiveSwitchError } from '../../NotExhaustiveSwitchError.js';
 
 /** Repository for Pokémon TCG Pocket data */
 @injectable()
@@ -316,13 +320,13 @@ export class PokemonTcgPocketRepository {
       set: PokemonSet;
       cards: {
         card: PokemonCard;
-        isOwned: boolean;
+        ownershipStatus: CardOwnershipStatus;
       }[];
       boosters: {
         booster: PokemonBooster;
         cards: {
           card: PokemonCard;
-          isOwned: boolean;
+          ownershipStatus: CardOwnershipStatus;
         }[];
       }[];
     }[];
@@ -359,16 +363,41 @@ export class PokemonTcgPocketRepository {
 
       return {
         sets: sets.map((set) => ({
-          set,
+          set: {
+            id: set.id,
+            key: set.key,
+            name: set.name,
+          },
           cards: set.cards.map((card) => ({
-            card,
-            isOwned: card.ownership.length > 0,
+            card: {
+              id: card.id,
+              name: card.name,
+              number: card.number,
+              setId: card.setId,
+              rarity: card.rarity,
+            },
+            ownershipStatus: this.convertToCardOwnershipStatus(
+              card.ownership[0]?.status ?? null,
+            ),
           })),
           boosters: set.boosters.map((booster) => ({
-            booster,
+            booster: {
+              id: booster.id,
+              name: booster.name,
+              setId: booster.setId,
+              hasShinyRarity: booster.hasShinyRarity,
+            },
             cards: booster.cards.map((card) => ({
-              card,
-              isOwned: card.ownership.length > 0,
+              card: {
+                id: card.id,
+                name: card.name,
+                number: card.number,
+                setId: card.setId,
+                rarity: card.rarity,
+              },
+              ownershipStatus: this.convertToCardOwnershipStatus(
+                card.ownership[0]?.status ?? null,
+              ),
             })),
           })),
         })),
@@ -376,7 +405,7 @@ export class PokemonTcgPocketRepository {
     } catch (error) {
       throw new PokemonTcgPocketDatabaseError(
         'retrieve',
-        `collection stats for user ${userId}`,
+        'collection stats',
         this.formatError(error),
       );
     }
@@ -477,5 +506,20 @@ export class PokemonTcgPocketRepository {
       return error;
     }
     return String(error);
+  }
+
+  protected convertToCardOwnershipStatus(
+    status: OwnershipStatus | null,
+  ): CardOwnershipStatus {
+    switch (status) {
+      case OwnershipStatus.OWNED:
+        return CardOwnershipStatus.OWNED;
+      case OwnershipStatus.NOT_NEEDED:
+        return CardOwnershipStatus.NOT_NEEDED;
+      case null:
+        return CardOwnershipStatus.MISSING;
+      default:
+        throw new NotExhaustiveSwitchError(status);
+    }
   }
 }

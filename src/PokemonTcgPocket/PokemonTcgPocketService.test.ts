@@ -1,6 +1,6 @@
 import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
-import { Rarity } from '@prisma/client';
+import { Rarity, OwnershipStatus } from '@prisma/client';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 
 describe('PokemonTcgPocketService', () => {
@@ -688,6 +688,111 @@ TEST:
       // eslint-disable-next-line @typescript-eslint/dot-notation
       const formatted = service['formatSetStats'](stats);
       expect(formatted).toEqual(['3']);
+    });
+  });
+
+  describe('getCollectionStats with ownership status', () => {
+    it('should exclude NOT_NEEDED cards from probability calculations', async () => {
+      // Set up test data
+      await repository.createSet('A1', 'Test Set');
+      await repository.createBooster('Test Booster', 'A1');
+
+      // Create 3 ONE_DIAMOND cards (guaranteed to appear in first 3 slots of normal packs)
+      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
+        'Test Booster',
+      ]);
+      await repository.createCard('Card 2', 'A1', 2, Rarity.ONE_DIAMOND, [
+        'Test Booster',
+      ]);
+      await repository.createCard('Card 3', 'A1', 3, Rarity.ONE_DIAMOND, [
+        'Test Booster',
+      ]);
+
+      const userId = BigInt(1);
+      const cards = repository.getAllCards();
+
+      // Add Card 1 as OWNED, Card 2 as NOT_NEEDED, leave Card 3 as missing
+      await repository.addCardToCollection(
+        cards[0].id,
+        userId,
+        OwnershipStatus.OWNED,
+      );
+      await repository.addCardToCollection(
+        cards[1].id,
+        userId,
+        OwnershipStatus.NOT_NEEDED,
+      );
+      // Card 3 remains unowned (missing)
+
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        '',
+      );
+
+      const stats = await service.getCollectionStats(userId);
+
+      // Verify that only Card 3 (the truly missing card) is considered for probability calculations
+      expect(stats.boosters).toHaveLength(1);
+      const boosterStats = stats.boosters[0];
+
+      // Should show 1 owned (Card 1), total 3 cards
+      expect(boosterStats.allOwned).toBe(1);
+      expect(boosterStats.allTotal).toBe(3);
+
+      // With 1 missing card out of 3 total, probability should be approximately 70.335%
+      expect(boosterStats.newCardProbability).toBeCloseTo(70.335, 1);
+      expect(boosterStats.newCardProbability).toBeGreaterThan(70);
+      expect(boosterStats.newCardProbability).toBeLessThan(71);
+    });
+
+    it('should return 0% probability when all cards are owned or not needed', async () => {
+      // Set up test data
+      await repository.createSet('A1', 'Test Set');
+      await repository.createBooster('Test Booster', 'A1');
+
+      // Create 2 cards
+      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
+        'Test Booster',
+      ]);
+      await repository.createCard('Card 2', 'A1', 2, Rarity.ONE_DIAMOND, [
+        'Test Booster',
+      ]);
+
+      const userId = BigInt(1);
+      const cards = repository.getAllCards();
+
+      // Add Card 1 as OWNED, Card 2 as NOT_NEEDED (no missing cards)
+      await repository.addCardToCollection(
+        cards[0].id,
+        userId,
+        OwnershipStatus.OWNED,
+      );
+      await repository.addCardToCollection(
+        cards[1].id,
+        userId,
+        OwnershipStatus.NOT_NEEDED,
+      );
+
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        '',
+      );
+
+      const stats = await service.getCollectionStats(userId);
+
+      expect(stats.boosters).toHaveLength(1);
+      const boosterStats = stats.boosters[0];
+
+      // Should show 1 owned (Card 1), total 2 cards
+      expect(boosterStats.allOwned).toBe(1);
+      expect(boosterStats.allTotal).toBe(2);
+
+      // Probability should be exactly 0 since no cards are truly missing
+      expect(boosterStats.newCardProbability).toBe(0);
     });
   });
 });
