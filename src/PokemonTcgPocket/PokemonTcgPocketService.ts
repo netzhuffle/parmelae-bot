@@ -178,6 +178,7 @@ interface CardWithOwnership {
 interface CardGroup {
   cards: CardWithOwnership[];
   owned: number;
+  notNeeded: number;
   total: number;
 }
 
@@ -311,33 +312,51 @@ export class PokemonTcgPocketService {
     boosters: {
       name: string;
       diamondOwned: number;
+      diamondNotNeeded: number;
       diamondTotal: number;
       newDiamondCardProbability: number;
       tradableOwned: number;
+      tradableNotNeeded: number;
       tradableTotal: number;
       newTradableCardProbability: number;
       allOwned: number;
+      allNotNeeded: number;
       allTotal: number;
       newCardProbability: number;
     }[],
   ): string[] {
+    // Helper function to format owned+notNeeded/total
+    const formatBoosterCount = (
+      owned: number,
+      notNeeded: number,
+      total: number,
+    ): string => {
+      if (notNeeded === 0) {
+        return `${owned}/${total}`;
+      }
+      return `${owned}+${notNeeded}/${total}`;
+    };
+
     const lines: string[] = ['Booster Packs:'];
     for (const {
       name,
       diamondOwned,
+      diamondNotNeeded,
       diamondTotal,
       newDiamondCardProbability,
       tradableOwned,
+      tradableNotNeeded,
       tradableTotal,
       newTradableCardProbability,
       allOwned,
+      allNotNeeded,
       allTotal,
       newCardProbability,
     } of boosters) {
       lines.push(
-        `${name}: ♢–♢♢♢♢ ${diamondOwned}/${diamondTotal} ⋅ p${newDiamondCardProbability.toFixed(2)}%` +
-          ` | ♢–☆ ${tradableOwned}/${tradableTotal} ⋅ p${newTradableCardProbability.toFixed(2)}%` +
-          ` | ♢–♛ ${allOwned}/${allTotal} ⋅ p${newCardProbability.toFixed(2)}%`,
+        `${name}: ♢–♢♢♢♢ ${formatBoosterCount(diamondOwned, diamondNotNeeded, diamondTotal)} ⋅ p${newDiamondCardProbability.toFixed(2)}%` +
+          ` | ♢–☆ ${formatBoosterCount(tradableOwned, tradableNotNeeded, tradableTotal)} ⋅ p${newTradableCardProbability.toFixed(2)}%` +
+          ` | ♢–♛ ${formatBoosterCount(allOwned, allNotNeeded, allTotal)} ⋅ p${newCardProbability.toFixed(2)}%`,
       );
     }
     lines.push('');
@@ -355,12 +374,15 @@ export class PokemonTcgPocketService {
     boosters: {
       name: string;
       diamondOwned: number;
+      diamondNotNeeded: number;
       diamondTotal: number;
       newDiamondCardProbability: number;
       tradableOwned: number;
+      tradableNotNeeded: number;
       tradableTotal: number;
       newTradableCardProbability: number;
       allOwned: number;
+      allNotNeeded: number;
       allTotal: number;
       newCardProbability: number;
     }[];
@@ -427,6 +449,10 @@ export class PokemonTcgPocketService {
               ({ ownershipStatus }) =>
                 ownershipStatus === CardOwnershipStatus.OWNED,
             ).length,
+            diamondNotNeeded: diamondCards.filter(
+              ({ ownershipStatus }) =>
+                ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+            ).length,
             diamondTotal: diamondCards.length,
             newDiamondCardProbability:
               this.probabilityService.calculateNewDiamondCardProbability(
@@ -438,6 +464,10 @@ export class PokemonTcgPocketService {
               ({ ownershipStatus }) =>
                 ownershipStatus === CardOwnershipStatus.OWNED,
             ).length,
+            tradableNotNeeded: tradableCards.filter(
+              ({ ownershipStatus }) =>
+                ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+            ).length,
             tradableTotal: tradableCards.length,
             newTradableCardProbability:
               this.probabilityService.calculateNewTradableCardProbability(
@@ -448,6 +478,10 @@ export class PokemonTcgPocketService {
             allOwned: cardsWithServiceStatus.filter(
               ({ ownershipStatus }) =>
                 ownershipStatus === CardOwnershipStatus.OWNED,
+            ).length,
+            allNotNeeded: cardsWithServiceStatus.filter(
+              ({ ownershipStatus }) =>
+                ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
             ).length,
             allTotal: cardsWithServiceStatus.length,
             newCardProbability:
@@ -513,6 +547,10 @@ export class PokemonTcgPocketService {
       owned: filteredCards.filter(
         ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.OWNED,
       ).length,
+      notNeeded: filteredCards.filter(
+        ({ ownershipStatus }) =>
+          ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+      ).length,
       total: filteredCards.length,
     };
   }
@@ -527,25 +565,46 @@ export class PokemonTcgPocketService {
   }): string[] {
     const parts: string[] = [];
 
+    // Helper function to format owned+notNeeded/total
+    const formatCount = (group: CardGroup): string => {
+      if (group.notNeeded === 0) {
+        return `${group.owned}/${group.total}`;
+      }
+      return `${group.owned}+${group.notNeeded}/${group.total}`;
+    };
+
     // Always show total for diamond cards
     if (stats.diamonds.total > 0) {
-      parts.push(`♦️ ${stats.diamonds.owned}/${stats.diamonds.total}`);
+      parts.push(`♦️ ${formatCount(stats.diamonds)}`);
     }
 
-    // Only show owned count for stars, shinies, and crowns if the user owns at least one
-    if (stats.stars.owned > 0) {
-      parts.push(`⭐️ ${stats.stars.owned}`);
+    // Show count for stars, shinies, and crowns if the user has any (owned or not needed)
+    // For these rarities, only show the count, not the total
+    if (stats.stars.owned > 0 || stats.stars.notNeeded > 0) {
+      const starsCount = stats.stars.notNeeded === 0 
+        ? stats.stars.owned.toString()
+        : `${stats.stars.owned}+${stats.stars.notNeeded}`;
+      parts.push(`⭐️ ${starsCount}`);
     }
-    if (stats.shinies.owned > 0) {
-      parts.push(`✴️ ${stats.shinies.owned}`);
+    if (stats.shinies.owned > 0 || stats.shinies.notNeeded > 0) {
+      const shiniesCount = stats.shinies.notNeeded === 0 
+        ? stats.shinies.owned.toString()
+        : `${stats.shinies.owned}+${stats.shinies.notNeeded}`;
+      parts.push(`✴️ ${shiniesCount}`);
     }
-    if (stats.crowns.owned > 0) {
-      parts.push(`👑 ${stats.crowns.owned}`);
+    if (stats.crowns.owned > 0 || stats.crowns.notNeeded > 0) {
+      const crownsCount = stats.crowns.notNeeded === 0 
+        ? stats.crowns.owned.toString()
+        : `${stats.crowns.owned}+${stats.crowns.notNeeded}`;
+      parts.push(`👑 ${crownsCount}`);
     }
 
     if (parts.length === 0) {
-      // For promo sets without rarities
-      parts.push(stats.promos.owned.toString());
+      // For promo sets without rarities - show only count, not total
+      const promosCount = stats.promos.notNeeded === 0 
+        ? stats.promos.owned.toString()
+        : `${stats.promos.owned}+${stats.promos.notNeeded}`;
+      parts.push(promosCount);
     }
 
     return parts;

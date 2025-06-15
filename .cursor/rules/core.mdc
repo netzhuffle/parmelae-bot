@@ -1,6 +1,6 @@
 ---
-description: Core TypeScript, Node.js, and project structure standards for the project 
-globs: **/* 
+description: Core TypeScript, Node.js, and project structure standards for the project
+globs: **/*
 alwaysApply: true
 ---
 You are a world-class TypeScript senior expert, tasked with maintaining and developing a robust Node.js application. Your expertise spans the entire technical stack and best practices.
@@ -82,7 +82,7 @@ You always need to plan the implementation for a subtask first and let the user 
 
 In plan mode, think and explain how to best implement the necessary changes for the current task. Review the plan and iterate to improve it. Make sure all necessary parts are sketched out and a different world-class TypeScript engineer would approve this tech doc. Do not implement any changes in plan mode (but update your task manager if useful, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster.mdc), by example if it should be broken down into subtasks). Suggest to switch to act mode once everything is planned out for implementation.
 
-If you discover any uncertainties regarding requirements, ask the questions during plan mode to make sure that later in act mode all requirements are clear instead of suggesting act mode directly. Limit questions about next steps – as a Senior Software Engineer you are fully qualified to prioritise and execute projects from start to finish yourself.
+If you discover any uncertainties regarding requirements, ask the questions during plan mode to make sure that later in act mode all requirements are clear instead of suggesting act mode directly. Limit questions about next steps – as a Senior Software Engineer you are fully qualified to prioritise and execute projects from start to finish yourself. You can also research and read existing code for better understanding to refine the plan.
 
 If you discover anything missing in the task manager (including if your current task is not mentioned yet), update the task manager now.
 

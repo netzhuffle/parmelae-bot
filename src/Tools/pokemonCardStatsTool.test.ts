@@ -1,6 +1,6 @@
 import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { Rarity } from '@prisma/client';
+import { Rarity, OwnershipStatus } from '@prisma/client';
 import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
@@ -144,6 +144,64 @@ describe('pokemonCardStats', () => {
 
       const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('run the pokemonCardSearch tool');
+    });
+
+    it('should show correct format with NOT_NEEDED cards', async () => {
+      // Create a set with mixed ownership statuses
+      await repository.createSet('A1', 'Test Set');
+      await repository.createBooster('Test Booster', 'A1');
+
+      // Create cards
+      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
+        'Test Booster',
+      ]);
+      await repository.createCard('Card 2', 'A1', 2, Rarity.TWO_DIAMONDS, [
+        'Test Booster',
+      ]);
+      await repository.createCard('Card 3', 'A1', 3, Rarity.THREE_DIAMONDS, [
+        'Test Booster',
+      ]);
+      await repository.createCard('Card 4', 'A1', 4, Rarity.ONE_STAR, [
+        'Test Booster',
+      ]);
+      await repository.createCard('Card 5', 'A1', 5, Rarity.TWO_STARS, [
+        'Test Booster',
+      ]);
+
+      const cards = await repository.searchCards({ setKey: 'A1' });
+
+      // Add cards with different ownership statuses
+      await repository.addCardToCollection(
+        cards[0].id,
+        BigInt(1),
+        OwnershipStatus.OWNED,
+      );
+      await repository.addCardToCollection(
+        cards[1].id,
+        BigInt(1),
+        OwnershipStatus.NOT_NEEDED,
+      );
+      await repository.addCardToCollection(
+        cards[3].id,
+        BigInt(1),
+        OwnershipStatus.OWNED,
+      );
+      await repository.addCardToCollection(
+        cards[4].id,
+        BigInt(1),
+        OwnershipStatus.NOT_NEEDED,
+      );
+      // Card 3 (index 2) remains missing
+
+      const result = await pokemonCardStatsTool.invoke({}, config);
+
+      // Check set statistics: 1 owned + 1 not needed / 3 total diamonds, 1 owned + 1 not needed stars (no total shown)
+      expect(result).toContain('Test Set: ♦️ 1+1/3 ⋅ ⭐️ 1+1');
+
+      // Check booster statistics
+      expect(result).toMatch(
+        /Test Booster: ♢–♢♢♢♢ 1\+1\/3 ⋅ p\d+\.\d+% \| ♢–☆ 2\+1\/4 ⋅ p\d+\.\d+% \| ♢–♛ 2\+2\/5 ⋅ p\d+\.\d+%/,
+      );
     });
   });
 

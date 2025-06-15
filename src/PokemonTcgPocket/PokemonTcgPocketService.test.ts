@@ -636,11 +636,11 @@ TEST:
 
       // Test with all rarity types
       const stats = {
-        diamonds: { cards: [], owned: 2, total: 5 },
-        stars: { cards: [], owned: 3, total: 3 },
-        shinies: { cards: [], owned: 1, total: 2 },
-        crowns: { cards: [], owned: 1, total: 2 },
-        promos: { cards: [], owned: 0, total: 0 },
+        diamonds: { cards: [], owned: 2, notNeeded: 0, total: 5 },
+        stars: { cards: [], owned: 3, notNeeded: 0, total: 3 },
+        shinies: { cards: [], owned: 1, notNeeded: 0, total: 2 },
+        crowns: { cards: [], owned: 1, notNeeded: 0, total: 2 },
+        promos: { cards: [], owned: 0, notNeeded: 0, total: 0 },
       };
 
       // eslint-disable-next-line @typescript-eslint/dot-notation
@@ -657,11 +657,11 @@ TEST:
 
       // Test with some rarities having 0 owned cards
       const stats = {
-        diamonds: { cards: [], owned: 2, total: 5 },
-        stars: { cards: [], owned: 0, total: 3 },
-        shinies: { cards: [], owned: 1, total: 2 },
-        crowns: { cards: [], owned: 0, total: 2 },
-        promos: { cards: [], owned: 0, total: 0 },
+        diamonds: { cards: [], owned: 2, notNeeded: 0, total: 5 },
+        stars: { cards: [], owned: 0, notNeeded: 0, total: 3 },
+        shinies: { cards: [], owned: 1, notNeeded: 0, total: 2 },
+        crowns: { cards: [], owned: 0, notNeeded: 0, total: 2 },
+        promos: { cards: [], owned: 0, notNeeded: 0, total: 0 },
       };
 
       // eslint-disable-next-line @typescript-eslint/dot-notation
@@ -678,11 +678,11 @@ TEST:
 
       // Test with only promo cards
       const stats = {
-        diamonds: { cards: [], owned: 0, total: 0 },
-        stars: { cards: [], owned: 0, total: 0 },
-        shinies: { cards: [], owned: 0, total: 0 },
-        crowns: { cards: [], owned: 0, total: 0 },
-        promos: { cards: [], owned: 3, total: 5 },
+        diamonds: { cards: [], owned: 0, notNeeded: 0, total: 0 },
+        stars: { cards: [], owned: 0, notNeeded: 0, total: 0 },
+        shinies: { cards: [], owned: 0, notNeeded: 0, total: 0 },
+        crowns: { cards: [], owned: 0, notNeeded: 0, total: 0 },
+        promos: { cards: [], owned: 3, notNeeded: 0, total: 5 },
       };
 
       // eslint-disable-next-line @typescript-eslint/dot-notation

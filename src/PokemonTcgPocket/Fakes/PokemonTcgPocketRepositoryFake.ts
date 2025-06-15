@@ -556,6 +556,4 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     booster.hasShinyRarity = hasShinyRarity;
     return await Promise.resolve(booster);
   }
-
-
 }
