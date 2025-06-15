@@ -9,6 +9,7 @@ import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepo
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { PokemonCardWithRelations } from '../Repositories/Types.js';
 import { OwnershipFilter } from '../PokemonTcgPocketService.js';
+import { OwnershipStatus } from '@prisma/client';
 import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
@@ -229,34 +230,50 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
             ...card,
             set: setByKey,
             boosters: this.getCardBoosters(card.id),
-            owners: Array.from(this.cardOwners.get(card.id) ?? []).map(
+            ownership: Array.from(this.cardOwners.get(card.id) ?? []).map(
               (userId) => ({
-                id: userId,
-                isBot: false,
-                firstName: 'Test' + userId,
-                lastName: null,
-                username: Number(userId) % 2 === 0 ? null : 'test' + userId,
-                languageCode: null,
+                id: this.nextId++, // ownership record id
+                cardId: card.id,
+                userId: userId,
+                status: OwnershipStatus.OWNED,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                user: {
+                  id: userId,
+                  isBot: false,
+                  firstName: 'Test' + userId,
+                  lastName: null,
+                  username: Number(userId) % 2 === 0 ? null : 'test' + userId,
+                  languageCode: null,
+                },
               }),
             ),
           };
         }
         const boosters = this.getCardBoosters(card.id);
-        const owners = Array.from(this.cardOwners.get(card.id) ?? []).map(
+        const ownership = Array.from(this.cardOwners.get(card.id) ?? []).map(
           (userId) => ({
-            id: userId,
-            isBot: false,
-            firstName: 'Test' + userId,
-            lastName: null,
-            username: Number(userId) % 2 === 0 ? null : 'test' + userId,
-            languageCode: null,
+            id: this.nextId++, // ownership record id
+            cardId: card.id,
+            userId: userId,
+            status: 'OWNED' as const,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            user: {
+              id: userId,
+              isBot: false,
+              firstName: 'Test' + userId,
+              lastName: null,
+              username: Number(userId) % 2 === 0 ? null : 'test' + userId,
+              languageCode: null,
+            },
           }),
         );
         return {
           ...card,
           set,
           boosters,
-          owners,
+          ownership,
         };
       }),
     );
@@ -266,6 +283,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   addCardToCollection(
     cardId: number,
     userId: bigint,
+    status: OwnershipStatus = OwnershipStatus.OWNED,
   ): Promise<PokemonCardWithRelations> {
     const card = this.findCardById(cardId);
     if (!card) {
@@ -283,20 +301,28 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       (s) => s.id === card.setId,
     )!;
     const boosters = this.getCardBoosters(card.id);
-    const updatedOwners = Array.from(owners).map((ownerId) => ({
-      id: ownerId,
-      isBot: false,
-      firstName: 'Test' + ownerId,
-      lastName: null,
-      username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
-      languageCode: null,
+    const ownership = Array.from(owners).map((ownerId) => ({
+      id: this.nextId++,
+      cardId: card.id,
+      userId: ownerId,
+      status: status,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      user: {
+        id: ownerId,
+        isBot: false,
+        firstName: 'Test' + ownerId,
+        lastName: null,
+        username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
+        languageCode: null,
+      },
     }));
 
     return Promise.resolve({
       ...card,
       set,
       boosters,
-      owners: updatedOwners,
+      ownership,
     });
   }
 
@@ -319,20 +345,28 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       (s) => s.id === card.setId,
     )!;
     const boosters = this.getCardBoosters(card.id);
-    const updatedOwners = Array.from(owners ?? []).map((ownerId) => ({
-      id: ownerId,
-      isBot: false,
-      firstName: 'Test' + ownerId,
-      lastName: null,
-      username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
-      languageCode: null,
+    const ownership = Array.from(owners ?? []).map((ownerId) => ({
+      id: this.nextId++,
+      cardId: card.id,
+      userId: ownerId,
+      status: OwnershipStatus.OWNED,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      user: {
+        id: ownerId,
+        isBot: false,
+        firstName: 'Test' + ownerId,
+        lastName: null,
+        username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
+        languageCode: null,
+      },
     }));
 
     return Promise.resolve({
       ...card,
       set,
       boosters,
-      owners: updatedOwners,
+      ownership,
     });
   }
 

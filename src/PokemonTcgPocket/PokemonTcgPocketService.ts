@@ -5,7 +5,6 @@ import {
   Rarity,
   PokemonSet,
   PokemonBooster,
-  User,
   PokemonCard,
 } from '@prisma/client';
 import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketInvalidBoosterError.js';
@@ -245,7 +244,7 @@ export class PokemonTcgPocketService {
       .map((b: PokemonBooster) => b.name)
       .join(',');
     const isOwned = userId
-      ? card.owners.some((o: User) => o.id === userId)
+      ? card.ownership.some((o) => o.userId === userId)
       : false;
     const raritySymbol = card.rarity ? RARITY_REVERSE_MAP[card.rarity] : '';
     return `${card.set.key}-${card.number.toString().padStart(3, '0')},${card.name},${raritySymbol},${card.set.name},${boosterNames},${isOwned ? 'Yes' : 'No'}`;

@@ -11,6 +11,7 @@ import { PokemonTcgPocketNotFoundError } from '../Errors/PokemonTcgPocketNotFoun
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { PokemonCardWithRelations } from './Types.js';
 import { OwnershipFilter } from '../PokemonTcgPocketService.js';
+import { OwnershipStatus } from '@prisma/client';
 
 /** Repository for Pokémon TCG Pocket data */
 @injectable()
@@ -206,9 +207,9 @@ export class PokemonTcgPocketRepository {
       const ownershipCondition =
         filters.userId && filters.ownershipFilter
           ? filters.ownershipFilter === 'owned'
-            ? { some: { id: filters.userId } }
+            ? { some: { userId: filters.userId } }
             : filters.ownershipFilter === 'missing'
-              ? { none: { id: filters.userId } }
+              ? { none: { userId: filters.userId } }
               : undefined
           : undefined;
 
@@ -227,12 +228,16 @@ export class PokemonTcgPocketRepository {
                 },
               }
             : undefined,
-          owners: ownershipCondition,
+          ownership: ownershipCondition,
         },
         include: {
           set: true,
           boosters: true,
-          owners: true,
+          ownership: {
+            include: {
+              user: true,
+            },
+          },
         },
         orderBy: [{ set: { key: 'asc' } }, { number: 'asc' }],
       });
@@ -249,19 +254,27 @@ export class PokemonTcgPocketRepository {
   async addCardToCollection(
     cardId: number,
     userId: bigint,
+    status: OwnershipStatus = OwnershipStatus.OWNED,
   ): Promise<PokemonCardWithRelations> {
     try {
       return this.prisma.pokemonCard.update({
         where: { id: cardId },
         data: {
-          owners: {
-            connect: { id: userId },
+          ownership: {
+            create: {
+              userId,
+              status,
+            },
           },
         },
         include: {
           set: true,
           boosters: true,
-          owners: true,
+          ownership: {
+            include: {
+              user: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -310,8 +323,11 @@ export class PokemonTcgPocketRepository {
         include: {
           cards: {
             include: {
-              owners: {
-                where: { id: userId },
+              ownership: {
+                where: { userId },
+                include: {
+                  user: true,
+                },
               },
             },
           },
@@ -319,8 +335,11 @@ export class PokemonTcgPocketRepository {
             include: {
               cards: {
                 include: {
-                  owners: {
-                    where: { id: userId },
+                  ownership: {
+                    where: { userId },
+                    include: {
+                      user: true,
+                    },
                   },
                 },
               },
@@ -334,13 +353,13 @@ export class PokemonTcgPocketRepository {
           set,
           cards: set.cards.map((card) => ({
             card,
-            isOwned: card.owners.length > 0,
+            isOwned: card.ownership.length > 0,
           })),
           boosters: set.boosters.map((booster) => ({
             booster,
             cards: booster.cards.map((card) => ({
               card,
-              isOwned: card.owners.length > 0,
+              isOwned: card.ownership.length > 0,
             })),
           })),
         })),
@@ -363,14 +382,20 @@ export class PokemonTcgPocketRepository {
       return this.prisma.pokemonCard.update({
         where: { id: cardId },
         data: {
-          owners: {
-            disconnect: { id: userId },
+          ownership: {
+            deleteMany: {
+              userId,
+            },
           },
         },
         include: {
           set: true,
           boosters: true,
-          owners: true,
+          ownership: {
+            include: {
+              user: true,
+            },
+          },
         },
       });
     } catch (error) {

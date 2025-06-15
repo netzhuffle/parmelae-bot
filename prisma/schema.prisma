@@ -100,7 +100,7 @@ model User {
   messages          Message[]
   chatEntryMessages ChatEntryMessagesUsers[]
   scheduledMessages ScheduledMessage[]
-  ownedPokemonCards PokemonCard[]
+  cardOwnerships    PokemonCardOwnership[]
 
   @@index([isBot])
   @@index([username])
@@ -130,19 +130,35 @@ model PokemonBooster {
 }
 
 model PokemonCard {
-  id       Int              @id @default(autoincrement())
-  name     String
-  set      PokemonSet       @relation(fields: [setId], references: [id])
-  setId    Int
-  number   Int
-  rarity   Rarity?
-  boosters PokemonBooster[]
-  owners   User[]
+  id        Int                    @id @default(autoincrement())
+  name      String
+  set       PokemonSet             @relation(fields: [setId], references: [id])
+  setId     Int
+  number    Int
+  rarity    Rarity?
+  boosters  PokemonBooster[]
+  ownership PokemonCardOwnership[]
 
   @@unique([setId, number])
   @@index([setId])
   @@index([rarity])
   @@index([name])
+}
+
+model PokemonCardOwnership {
+  id        Int             @id @default(autoincrement())
+  card      PokemonCard     @relation(fields: [cardId], references: [id])
+  cardId    Int
+  user      User            @relation(fields: [userId], references: [id])
+  userId    BigInt
+  status    OwnershipStatus
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@unique([cardId, userId])
+  @@index([userId])
+  @@index([cardId])
+  @@index([status])
 }
 
 enum Rarity {
@@ -157,4 +173,9 @@ enum Rarity {
   ONE_SHINY
   TWO_SHINY
   CROWN
+}
+
+enum OwnershipStatus {
+  OWNED
+  NOT_NEEDED
 }

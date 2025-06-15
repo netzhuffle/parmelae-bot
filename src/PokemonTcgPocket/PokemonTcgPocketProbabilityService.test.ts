@@ -548,7 +548,7 @@ function createTestCards(): PokemonCardWithRelations[] {
         number: id,
         rarity,
         boosters: [],
-        owners: [],
+        ownership: [],
         set: {
           name: 'Test Set',
           id: 1,
@@ -569,7 +569,7 @@ function createCard(rarity: Rarity): PokemonCardWithRelations {
     number: 0,
     rarity,
     boosters: [],
-    owners: [],
+    ownership: [],
     set: {
       name: 'Test Set',
       id: 0,

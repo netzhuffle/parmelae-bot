@@ -9,17 +9,23 @@ import { Prisma } from '@prisma/client';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-/** Type value for a Pokemon card including set and boosters relations. */
+/** Type value for a Pokemon card including set, boosters, and ownership relations. */
 const POKEMON_CARD_WITH_RELATIONS =
   Prisma.validator<Prisma.PokemonCardDefaultArgs>()({
     include: {
       set: true,
       boosters: true,
-      owners: true,
+      ownership: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
 
-/** Pokemon card including set and boosters relations. */
+/** Pokemon card including set, boosters, and ownership relations. */
 export type PokemonCardWithRelations = Prisma.PokemonCardGetPayload<
   typeof POKEMON_CARD_WITH_RELATIONS
 >;
+
+

@@ -1,7 +1,7 @@
 import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
-import { Rarity } from '@prisma/client';
+import { Rarity, OwnershipStatus } from '@prisma/client';
 import { jest } from '@jest/globals';
 import { pokemonCardAddTool } from './pokemonCardAddTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
@@ -241,8 +241,10 @@ describe('pokemonCardAdd', () => {
       const cards = await repository.searchCards({
         userId: BigInt(1),
       });
-      expect(cards[0].owners).toHaveLength(1);
-      expect(cards[1].owners).toHaveLength(1);
+      expect(cards[0].ownership).toHaveLength(1);
+      expect(cards[0].ownership[0].status).toBe(OwnershipStatus.OWNED);
+      expect(cards[1].ownership).toHaveLength(1);
+      expect(cards[1].ownership[0].status).toBe(OwnershipStatus.OWNED);
     });
 
     it('should remove multiple cards if bulk operation enabled', async () => {

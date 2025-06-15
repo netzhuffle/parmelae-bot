@@ -1,6 +1,6 @@
 import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { Rarity } from '@prisma/client';
+import { Rarity, OwnershipStatus } from '@prisma/client';
 import { PokemonTcgPocketRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketRepository.js';
 import { jest } from '@jest/globals';
 import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
@@ -369,6 +369,19 @@ describe('pokemonCardSearch', () => {
       lines.forEach((line) => {
         expect(line.endsWith(',Yes')).toBe(true);
       });
+
+      // Verify that the ownership status is set correctly in the repository
+      const cards = await repository.searchCards({
+        userId: BigInt(1),
+        ownershipFilter: 'owned',
+      });
+      expect(cards).toHaveLength(3);
+      cards.forEach((card) => {
+        expect(card.ownership).toHaveLength(1);
+        expect(card.ownership[0].status).toBe(OwnershipStatus.OWNED);
+        expect(card.ownership[0].userId).toBe(BigInt(1));
+      });
+
       expect(repository.searchCards).toHaveBeenCalledWith({
         userId: BigInt(1),
         ownershipFilter: 'owned',

@@ -127,7 +127,7 @@ export const pokemonCardAddTool = tool(
     if (remove) {
       // For remove operation, check if user owns the cards
       const allOwned = cards.every((card) =>
-        card.owners.some((owner) => owner.id === userId),
+        card.ownership.some((ownership) => ownership.userId === userId),
       );
       if (!allOwned) {
         return NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE(
@@ -138,7 +138,7 @@ export const pokemonCardAddTool = tool(
     } else {
       // For add operation, check if user doesn't own the cards
       const anyOwned = cards.some((card) =>
-        card.owners.some((owner) => owner.id === userId),
+        card.ownership.some((ownership) => ownership.userId === userId),
       );
       if (anyOwned) {
         return NO_MATCHING_MISSING_CARDS_MESSAGE(displayName, cardDetails);
