@@ -1,5 +1,6 @@
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { OwnershipStatus } from '@prisma/client';
 import {
   SET_KEY_VALUES,
   SET_KEY_NAMES,
@@ -53,6 +54,12 @@ const schema = z.object({
     .describe(
       'Whether to add/remove multiple cards with the exact same parameters in one tool call. Only pass true if the user specifically requested to add/remove multiple cards with the exact same parameters (including name and/or ID). If false, the call will only add one card and ask for clarification if multiple cards match the criteria – this is usually what the user wants.',
     ),
+  markAsNotNeeded: z
+    .boolean()
+    .optional()
+    .describe(
+      'Whether to mark the card as "not needed" instead of owned when adding. Only applies when remove is false. If true, the card will be marked as not needed (excluded from probability calculations). If false or undefined, the card will be marked as owned.',
+    ),
 });
 
 type PokemonCardAddInput = z.infer<typeof schema>;
@@ -66,6 +73,7 @@ export const pokemonCardAddTool = tool(
       rarity,
       remove,
       bulkOperation,
+      markAsNotNeeded,
     }: PokemonCardAddInput,
     config: LangGraphRunnableConfig,
   ): Promise<string> => {
@@ -136,7 +144,7 @@ export const pokemonCardAddTool = tool(
         );
       }
     } else {
-      // For add operation, check if user doesn't own the cards
+      // For add operation, check if user doesn't own the cards or they have a different status
       const anyOwned = cards.some((card) =>
         card.ownership.some((ownership) => ownership.userId === userId),
       );
@@ -146,7 +154,17 @@ export const pokemonCardAddTool = tool(
     }
 
     // Process the cards (add/remove)
-    return service.processCards(cards, userId, remove, bulkOperation);
+    const ownershipStatus =
+      markAsNotNeeded && !remove
+        ? OwnershipStatus.NOT_NEEDED
+        : OwnershipStatus.OWNED;
+    return service.processCards(
+      cards,
+      userId,
+      remove,
+      bulkOperation,
+      ownershipStatus,
+    );
   },
   {
     name: 'pokemonCardAdd',

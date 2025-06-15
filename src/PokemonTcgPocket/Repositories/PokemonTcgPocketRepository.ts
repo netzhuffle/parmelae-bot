@@ -207,10 +207,19 @@ export class PokemonTcgPocketRepository {
       const ownershipCondition =
         filters.userId && filters.ownershipFilter
           ? filters.ownershipFilter === 'owned'
-            ? { some: { userId: filters.userId } }
+            ? {
+                some: { userId: filters.userId, status: OwnershipStatus.OWNED },
+              }
             : filters.ownershipFilter === 'missing'
               ? { none: { userId: filters.userId } }
-              : undefined
+              : filters.ownershipFilter === 'not_needed'
+                ? {
+                    some: {
+                      userId: filters.userId,
+                      status: OwnershipStatus.NOT_NEEDED,
+                    },
+                  }
+                : undefined
           : undefined;
 
       return this.prisma.pokemonCard.findMany({

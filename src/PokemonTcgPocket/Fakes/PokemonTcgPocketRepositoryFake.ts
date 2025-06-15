@@ -19,6 +19,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   private cards = new Map<string, PokemonCard>();
   private cardBoosters = new Map<number, Set<number>>();
   private cardOwners = new Map<number, Set<bigint>>();
+  private cardOwnershipStatus = new Map<string, OwnershipStatus>();
   private nextId = 1;
   private idOnlyCards = new Set<number>();
 
@@ -197,13 +198,26 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     if (searchCriteria?.userId !== undefined) {
       const userId = searchCriteria.userId;
       if (searchCriteria.ownershipFilter === 'owned') {
-        cards = cards.filter((card) =>
-          (this.cardOwners.get(card.id) ?? new Set()).has(userId),
-        );
+        cards = cards.filter((card) => {
+          const owners = this.cardOwners.get(card.id);
+          if (!owners?.has(userId)) return false;
+          const statusKey = `${card.id}_${userId}`;
+          const status = this.cardOwnershipStatus.get(statusKey);
+          return status === OwnershipStatus.OWNED;
+        });
       } else if (searchCriteria.ownershipFilter === 'missing') {
-        cards = cards.filter(
-          (card) => !(this.cardOwners.get(card.id) ?? new Set()).has(userId),
-        );
+        cards = cards.filter((card) => {
+          const owners = this.cardOwners.get(card.id);
+          return !owners?.has(userId);
+        });
+      } else if (searchCriteria.ownershipFilter === 'not_needed') {
+        cards = cards.filter((card) => {
+          const owners = this.cardOwners.get(card.id);
+          if (!owners?.has(userId)) return false;
+          const statusKey = `${card.id}_${userId}`;
+          const status = this.cardOwnershipStatus.get(statusKey);
+          return status === OwnershipStatus.NOT_NEEDED;
+        });
       }
     }
 
@@ -252,22 +266,27 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
         }
         const boosters = this.getCardBoosters(card.id);
         const ownership = Array.from(this.cardOwners.get(card.id) ?? []).map(
-          (userId) => ({
-            id: this.nextId++, // ownership record id
-            cardId: card.id,
-            userId: userId,
-            status: 'OWNED' as const,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            user: {
-              id: userId,
-              isBot: false,
-              firstName: 'Test' + userId,
-              lastName: null,
-              username: Number(userId) % 2 === 0 ? null : 'test' + userId,
-              languageCode: null,
-            },
-          }),
+          (userId) => {
+            const statusKey = `${card.id}_${userId}`;
+            const ownershipStatus =
+              this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+            return {
+              id: this.nextId++, // ownership record id
+              cardId: card.id,
+              userId: userId,
+              status: ownershipStatus,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              user: {
+                id: userId,
+                isBot: false,
+                firstName: 'Test' + userId,
+                lastName: null,
+                username: Number(userId) % 2 === 0 ? null : 'test' + userId,
+                languageCode: null,
+              },
+            };
+          },
         );
         return {
           ...card,
@@ -297,26 +316,35 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     }
     owners.add(userId);
 
+    // Store the ownership status separately
+    const statusKey = `${cardId}_${userId}`;
+    this.cardOwnershipStatus.set(statusKey, status);
+
     const set = Array.from(this.sets.values()).find(
       (s) => s.id === card.setId,
     )!;
     const boosters = this.getCardBoosters(card.id);
-    const ownership = Array.from(owners).map((ownerId) => ({
-      id: this.nextId++,
-      cardId: card.id,
-      userId: ownerId,
-      status: status,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      user: {
-        id: ownerId,
-        isBot: false,
-        firstName: 'Test' + ownerId,
-        lastName: null,
-        username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
-        languageCode: null,
-      },
-    }));
+    const ownership = Array.from(owners).map((ownerId) => {
+      const statusKey = `${card.id}_${ownerId}`;
+      const ownershipStatus =
+        this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+      return {
+        id: this.nextId++,
+        cardId: card.id,
+        userId: ownerId,
+        status: ownershipStatus,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        user: {
+          id: ownerId,
+          isBot: false,
+          firstName: 'Test' + ownerId,
+          lastName: null,
+          username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
+          languageCode: null,
+        },
+      };
+    });
 
     return Promise.resolve({
       ...card,
@@ -345,22 +373,27 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       (s) => s.id === card.setId,
     )!;
     const boosters = this.getCardBoosters(card.id);
-    const ownership = Array.from(owners ?? []).map((ownerId) => ({
-      id: this.nextId++,
-      cardId: card.id,
-      userId: ownerId,
-      status: OwnershipStatus.OWNED,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      user: {
-        id: ownerId,
-        isBot: false,
-        firstName: 'Test' + ownerId,
-        lastName: null,
-        username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
-        languageCode: null,
-      },
-    }));
+    const ownership = Array.from(owners ?? []).map((ownerId) => {
+      const statusKey = `${card.id}_${ownerId}`;
+      const ownershipStatus =
+        this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+      return {
+        id: this.nextId++,
+        cardId: card.id,
+        userId: ownerId,
+        status: ownershipStatus,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        user: {
+          id: ownerId,
+          isBot: false,
+          firstName: 'Test' + ownerId,
+          lastName: null,
+          username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
+          languageCode: null,
+        },
+      };
+    });
 
     return Promise.resolve({
       ...card,
@@ -416,6 +449,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     this.cards.clear();
     this.cardBoosters.clear();
     this.cardOwners.clear();
+    this.cardOwnershipStatus.clear();
     this.idOnlyCards.clear();
     this.nextId = 1;
   }

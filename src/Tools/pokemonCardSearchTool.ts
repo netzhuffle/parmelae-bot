@@ -46,7 +46,7 @@ const schema = z.object({
     .enum(OWNERSHIP_FILTER_VALUES)
     .nullish()
     .describe(
-      'Filter by card ownership of the user who wrote the last message: Pass value null instead of a string for all cards, pass "owned" for cards they own, pass "missing" for cards they do not own.',
+      'Filter by card ownership of the user who wrote the last message: Pass value null instead of a string for all cards, pass "owned" for cards they own, pass "missing" for cards they do not own, pass "not_needed" for cards they marked as not needed.',
     ),
 });
 

@@ -171,6 +171,69 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
       expect(result).toContain('no card was added');
     });
+
+    it('should mark a card as not needed when markAsNotNeeded is true', async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+
+      const result = await pokemonCardAddTool.invoke(
+        {
+          card: 'A1-001',
+          rarity: null,
+          remove: false,
+          setKey: null,
+          booster: null,
+          bulkOperation: false,
+          markAsNotNeeded: true,
+        },
+        config,
+      );
+
+      expect(result).toContain('added card to @test1');
+      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
+      expect(result).toContain(
+        'A1-001,Test Card,♢,Test Set,,No (marked as not needed)',
+      );
+
+      // Verify the card was marked with NOT_NEEDED status
+      const cards = await repository.searchCards({
+        userId: BigInt(1),
+      });
+      expect(cards[0].ownership).toHaveLength(1);
+      expect(cards[0].ownership[0].status).toBe(OwnershipStatus.NOT_NEEDED);
+    });
+
+    it('should ignore markAsNotNeeded when removing cards', async () => {
+      await repository.createSet('A1', 'Test Set');
+      const card = await repository.createCard(
+        'Test Card',
+        'A1',
+        1,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      await repository.addCardToCollection(
+        card.id,
+        BigInt(1),
+        OwnershipStatus.NOT_NEEDED,
+      );
+
+      const result = await pokemonCardAddTool.invoke(
+        {
+          card: 'A1-001',
+          remove: true,
+          rarity: null,
+          setKey: null,
+          booster: null,
+          bulkOperation: false,
+          markAsNotNeeded: true, // Should be ignored for remove operations
+        },
+        config,
+      );
+
+      expect(result).toContain('removed card from @test1');
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
+    });
   });
 
   describe('removing cards', () => {

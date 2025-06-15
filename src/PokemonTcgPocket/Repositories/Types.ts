@@ -27,5 +27,3 @@ const POKEMON_CARD_WITH_RELATIONS =
 export type PokemonCardWithRelations = Prisma.PokemonCardGetPayload<
   typeof POKEMON_CARD_WITH_RELATIONS
 >;
-
-

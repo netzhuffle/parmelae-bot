@@ -439,6 +439,85 @@ describe('pokemonCardSearch', () => {
         ownershipFilter: 'all',
       });
     });
+
+    it('should pass ownership filter when set to not_needed', async () => {
+      await repository.createSet('A1', 'Test Set');
+      const card1 = await repository.createCard(
+        'Card 1',
+        'A1',
+        1,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      const card2 = await repository.createCard(
+        'Card 2',
+        'A1',
+        2,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+      const card3 = await repository.createCard(
+        'Card 3',
+        'A1',
+        3,
+        Rarity.ONE_DIAMOND,
+        [],
+      );
+
+      // Mark cards as not needed
+      await repository.addCardToCollection(
+        card1.id,
+        BigInt(1),
+        OwnershipStatus.NOT_NEEDED,
+      );
+      await repository.addCardToCollection(
+        card2.id,
+        BigInt(1),
+        OwnershipStatus.NOT_NEEDED,
+      );
+      await repository.addCardToCollection(
+        card3.id,
+        BigInt(1),
+        OwnershipStatus.NOT_NEEDED,
+      );
+
+      const result = await pokemonCardSearchTool.invoke(
+        {
+          card: null,
+          setKey: null,
+          booster: null,
+          rarity: null,
+          ownershipFilter: 'not_needed',
+        },
+        config,
+      );
+
+      expect(result).toContain('Card 1');
+      expect(result).toContain('Card 2');
+      expect(result).toContain('Card 3');
+      // Verify all cards show as "No (marked as not needed)"
+      const lines = result.split('\n').slice(1); // Skip header
+      lines.forEach((line) => {
+        expect(line.endsWith(',No (marked as not needed)')).toBe(true);
+      });
+
+      // Verify that the ownership status is set correctly in the repository
+      const cards = await repository.searchCards({
+        userId: BigInt(1),
+        ownershipFilter: 'not_needed',
+      });
+      expect(cards).toHaveLength(3);
+      cards.forEach((card) => {
+        expect(card.ownership).toHaveLength(1);
+        expect(card.ownership[0].status).toBe(OwnershipStatus.NOT_NEEDED);
+        expect(card.ownership[0].userId).toBe(BigInt(1));
+      });
+
+      expect(repository.searchCards).toHaveBeenCalledWith({
+        userId: BigInt(1),
+        ownershipFilter: 'not_needed',
+      });
+    });
   });
 
   describe('ownership display', () => {

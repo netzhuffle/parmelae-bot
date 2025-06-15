@@ -6,6 +6,7 @@ import {
   PokemonSet,
   PokemonBooster,
   PokemonCard,
+  OwnershipStatus,
 } from '@prisma/client';
 import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketInvalidBoosterError.js';
 import { PokemonTcgPocketInvalidRarityError } from './Errors/PokemonTcgPocketInvalidRarityError.js';
@@ -92,7 +93,12 @@ export const BOOSTER_VALUES = [
 export type Booster = (typeof BOOSTER_VALUES)[number];
 
 /** Ownership filter values */
-export const OWNERSHIP_FILTER_VALUES = ['all', 'owned', 'missing'] as const;
+export const OWNERSHIP_FILTER_VALUES = [
+  'all',
+  'owned',
+  'missing',
+  'not_needed',
+] as const;
 
 /** Ownership filter type */
 export type OwnershipFilter = (typeof OWNERSHIP_FILTER_VALUES)[number];
@@ -195,8 +201,9 @@ export class PokemonTcgPocketService {
   async addCardToCollection(
     cardId: number,
     userId: bigint,
+    status: OwnershipStatus = OwnershipStatus.OWNED,
   ): Promise<PokemonCardWithRelations> {
-    return this.repository.addCardToCollection(cardId, userId);
+    return this.repository.addCardToCollection(cardId, userId, status);
   }
 
   /** Removes a card from a user's collection */
@@ -243,11 +250,21 @@ export class PokemonTcgPocketService {
     const boosterNames = card.boosters
       .map((b: PokemonBooster) => b.name)
       .join(',');
-    const isOwned = userId
-      ? card.ownership.some((o) => o.userId === userId)
-      : false;
+
+    let ownershipStatus = 'No';
+    if (userId) {
+      const ownership = card.ownership.find((o) => o.userId === userId);
+      if (ownership) {
+        if (ownership.status === OwnershipStatus.OWNED) {
+          ownershipStatus = 'Yes';
+        } else if (ownership.status === OwnershipStatus.NOT_NEEDED) {
+          ownershipStatus = 'No (marked as not needed)';
+        }
+      }
+    }
+
     const raritySymbol = card.rarity ? RARITY_REVERSE_MAP[card.rarity] : '';
-    return `${card.set.key}-${card.number.toString().padStart(3, '0')},${card.name},${raritySymbol},${card.set.name},${boosterNames},${isOwned ? 'Yes' : 'No'}`;
+    return `${card.set.key}-${card.number.toString().padStart(3, '0')},${card.name},${raritySymbol},${card.set.name},${boosterNames},${ownershipStatus}`;
   }
 
   /** Gets formatted collection statistics for a user */
@@ -852,6 +869,7 @@ export class PokemonTcgPocketService {
     userId: bigint,
     remove: boolean,
     bulkOperation: boolean,
+    ownershipStatus: OwnershipStatus = OwnershipStatus.OWNED,
   ): Promise<string> {
     const displayName = await this.getDisplayName(userId);
     const operation = remove ? 'removed' : 'added';
@@ -868,7 +886,7 @@ export class PokemonTcgPocketService {
         cards.map((card) =>
           remove
             ? this.removeCardFromCollection(card.id, userId)
-            : this.addCardToCollection(card.id, userId),
+            : this.addCardToCollection(card.id, userId, ownershipStatus),
         ),
       );
 
@@ -888,7 +906,7 @@ export class PokemonTcgPocketService {
     const card = cards[0];
     const updatedCard = remove
       ? await this.removeCardFromCollection(card.id, userId)
-      : await this.addCardToCollection(card.id, userId);
+      : await this.addCardToCollection(card.id, userId, ownershipStatus);
 
     const header = SINGLE_OPERATION_HEADER_MESSAGE(
       operation,
