@@ -1238,11 +1238,292 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": 33,
+        "title": "Migrate Zod Validation Library from Version 3 to Version 4",
+        "description": "Upgrade the Zod validation library from v3 to v4 across the entire codebase, including updating dependencies, schemas, and validation logic to ensure compatibility and leverage new features.",
+        "details": "1. Update the package.json to replace Zod v3 dependency with Zod v4, using the new import path \"zod/v4\" to enable incremental migration without breaking existing code.\n2. Review all Zod schema definitions throughout the codebase, especially in src/Tools/, and refactor them to comply with Zod v4 syntax and API changes, utilizing available codemods if applicable.\n3. Update LangChain tool schemas that use Zod validation to the new v4 standards, ensuring all input validations are compatible.\n4. Refactor any custom validation patterns or utilities that depend on Zod internals to align with v4's updated error handling and API.\n5. Analyze TypeScript type inference changes introduced by Zod v4 and adjust type annotations or usage accordingly to maintain type safety.\n6. Perform comprehensive testing of all validation logic to confirm that the migration does not introduce regressions or break existing functionality.\n7. Document any notable changes or migration steps for future reference and team awareness.",
+        "testStrategy": "1. Unit Testing: Create or update unit tests for all schemas and validation logic to verify they correctly accept valid inputs and reject invalid ones under Zod v4.\n2. Integration Testing: Test LangChain tools and other modules that rely on Zod validation to ensure end-to-end functionality remains intact.\n3. Regression Testing: Run existing test suites to detect any unintended side effects caused by the migration.\n4. Manual Testing: Perform exploratory testing on critical user flows involving validated inputs to catch edge cases.\n5. Use Zod's error formatting and validation error utilities to verify that error messages are user-friendly and consistent with expectations.\n6. Leverage available codemods or migration guides to cross-check that all deprecated or changed APIs have been updated properly.",
+        "status": "pending",
+        "dependencies": [
+          5,
+          27
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Analyze Current Schema and API Usage",
+            "description": "Review the existing Zod v3 schemas and API usage across the codebase, with special focus on LangChain tool schemas to identify all points requiring migration.",
+            "dependencies": [],
+            "details": "Map out all schema definitions, validation logic, and API calls that use Zod v3 to prepare for refactoring and compatibility updates.",
+            "status": "pending"
+          },
+          {
+            "id": 2,
+            "title": "Refactor Schemas to Zod v4",
+            "description": "Apply schema refactoring to migrate from Zod v3 to v4, updating deprecated APIs and adapting to new validation and error handling mechanisms.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use available codemods as a baseline for automated migration, then manually adjust schemas to align with Zod v4's updated object and string APIs and unified error handling.",
+            "status": "pending"
+          },
+          {
+            "id": 3,
+            "title": "Update LangChain Tool Schemas and APIs",
+            "description": "Specifically update LangChain tool schemas and related API usages to ensure compatibility with Zod v4 and the new schema structures.",
+            "dependencies": [
+              2
+            ],
+            "details": "Refactor LangChain tool schemas to conform with Zod v4 changes, ensuring all tool interfaces and validation logic are consistent and functional.",
+            "status": "pending"
+          },
+          {
+            "id": 4,
+            "title": "Adjust Custom Validation Logic",
+            "description": "Modify any custom validation functions or logic that depend on Zod v3 behavior to be compatible with Zod v4's updated validation and error handling.",
+            "dependencies": [
+              2
+            ],
+            "details": "Review and update custom validators, error messages, and validation flows to leverage Zod v4 improvements and avoid regressions.",
+            "status": "pending"
+          },
+          {
+            "id": 5,
+            "title": "Update TypeScript Type Inference",
+            "description": "Revise TypeScript types and inference mechanisms to align with changes in Zod v4 schemas and API, ensuring type safety and correctness.",
+            "dependencies": [
+              2
+            ],
+            "details": "Audit and update TypeScript typings related to schemas and validation results, adapting to any new type inference patterns introduced in Zod v4.",
+            "status": "pending"
+          },
+          {
+            "id": 6,
+            "title": "Conduct Comprehensive Testing",
+            "description": "Perform thorough testing including unit, integration, and regression tests to verify schema correctness, validation behavior, and LangChain tool functionality post-migration.",
+            "dependencies": [
+              3,
+              4,
+              5
+            ],
+            "details": "Develop and run test suites to catch any issues introduced by migration, focusing on edge cases and compatibility across the codebase.",
+            "status": "pending"
+          },
+          {
+            "id": 7,
+            "title": "Update Documentation and Developer Guides",
+            "description": "Revise all relevant documentation to reflect schema changes, API updates, and new validation patterns introduced by the migration to Zod v4.",
+            "dependencies": [
+              6
+            ],
+            "details": "Ensure that internal and external documentation, including LangChain tool usage guides, are accurate and helpful for developers working with the updated codebase.",
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "id": 34,
+        "title": "Migrate Image Generation from DALL·E to Latest OpenAI Image APIs",
+        "description": "Update the existing DALL·E image generation implementation to utilize OpenAI's latest image generation APIs, models, and best practices for improved functionality and maintainability.",
+        "details": "1. Review the current DALL·E image generation implementation as documented in Task #10 to understand existing integration points and code structure.\n\n2. Replace the current API calls with the latest OpenAI Image API endpoints, supporting models such as 'dall-e-3' and 'gpt-image-1', ensuring compatibility with new parameters and features.\n\n3. Implement support for new image generation models, including DALL·E 3, leveraging improved prompt handling, quality settings, and image size options as per OpenAI's updated API specifications.\n\n4. Enhance prompt processing to utilize improved prompt engineering techniques and support multi-turn editing or streaming if applicable.\n\n5. Update error handling and response validation to robustly manage API errors, rate limits, and unexpected responses, ensuring graceful degradation and informative logging.\n\n6. Modify image persistence logic to handle new metadata fields returned by the updated API, ensuring consistent storage and retrieval of generated images and related data.\n\n7. Conduct comprehensive testing of image generation functionality across various use cases, including different prompt types, image sizes, and quality settings.\n\n8. Update all relevant documentation, including tool descriptions, usage instructions, and developer notes to reflect the migration and new capabilities.\n\n9. Coordinate with Task #30 (Review and Enhance DALL-E Image Message Handling) to ensure consistent handling and persistence of generated images in the Telegram chat system.\n\n10. Follow OpenAI's official guidelines and best practices for image generation API usage to maximize efficiency and quality.",
+        "testStrategy": "1. Unit Testing:\n   - Mock the new OpenAI image generation API calls to verify correct request formation and response handling.\n   - Test prompt processing logic with various input scenarios to ensure correct parameter mapping.\n   - Validate error handling by simulating API failures and unexpected responses.\n\n2. Integration Testing:\n   - Perform end-to-end tests generating images using the new API in a controlled environment.\n   - Verify that generated images are correctly persisted with updated metadata.\n   - Confirm that image messages are properly linked and displayed in the Telegram chat system, coordinating with Task #30.\n\n3. Regression Testing:\n   - Ensure that all previous image generation use cases still function correctly with the new implementation.\n\n4. Documentation Review:\n   - Verify that all updated documentation accurately reflects the new API usage and features.\n\n5. Performance Testing:\n   - Measure response times and resource usage to confirm improvements or identify regressions.\n\n6. User Acceptance Testing:\n   - Collect feedback on image quality and generation reliability from end users or stakeholders.",
+        "status": "pending",
+        "dependencies": [
+          10,
+          30
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Review Current Implementation",
+            "description": "Conduct a thorough analysis of the existing system focusing on API usage, prompt processing, error handling, and persistence logic.",
+            "dependencies": [],
+            "details": "Document current API calls, prompt handling mechanisms, error management strategies, and data persistence methods to establish a baseline for improvements.",
+            "status": "pending"
+          },
+          {
+            "id": 2,
+            "title": "Replace Existing API Calls",
+            "description": "Identify and replace outdated or deprecated API calls with updated versions or new APIs that support enhanced features and models.",
+            "dependencies": [
+              1
+            ],
+            "details": "Map old API endpoints to new ones, update authentication and request formats, and ensure compatibility with new API specifications.",
+            "status": "pending"
+          },
+          {
+            "id": 3,
+            "title": "Support New Models Integration",
+            "description": "Extend system capabilities to support multiple new AI models as required by the project scope.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement model selection logic, update API parameters for new models, and ensure seamless switching or concurrent usage of different models.",
+            "status": "pending"
+          },
+          {
+            "id": 4,
+            "title": "Enhance Prompt Processing",
+            "description": "Improve the prompt processing pipeline to handle new model requirements and optimize input formatting and token usage.",
+            "dependencies": [
+              3
+            ],
+            "details": "Refactor prompt construction, add validation and preprocessing steps, and optimize prompt length and structure for better model performance.",
+            "status": "pending"
+          },
+          {
+            "id": 5,
+            "title": "Update Error Handling Mechanisms",
+            "description": "Revise error detection, logging, and recovery strategies to accommodate new API behaviors and model responses.",
+            "dependencies": [
+              4
+            ],
+            "details": "Implement robust error categorization, retry logic, and user-friendly error reporting aligned with OpenAI best practices.",
+            "status": "pending"
+          },
+          {
+            "id": 6,
+            "title": "Modify Persistence Logic",
+            "description": "Adapt data storage and retrieval processes to support changes in data structures and new model outputs.",
+            "dependencies": [
+              5
+            ],
+            "details": "Update database schemas if necessary, ensure data consistency, and optimize persistence for performance and scalability.",
+            "status": "pending"
+          },
+          {
+            "id": 7,
+            "title": "Conduct Comprehensive Testing",
+            "description": "Perform unit, integration, and system testing to validate all changes including API integration, model support, prompt processing, error handling, and persistence.",
+            "dependencies": [
+              6
+            ],
+            "details": "Develop test cases covering all new features and edge cases, automate tests where possible, and document test results.",
+            "status": "pending"
+          },
+          {
+            "id": 8,
+            "title": "Update Documentation",
+            "description": "Revise technical and user documentation to reflect all changes in APIs, models, prompt processing, error handling, and persistence logic.",
+            "dependencies": [
+              7
+            ],
+            "details": "Ensure documentation is clear, comprehensive, and aligned with OpenAI best practices for API usage and integration.",
+            "status": "pending"
+          },
+          {
+            "id": 9,
+            "title": "Coordinate with Related Tasks and Teams",
+            "description": "Engage with other teams and related project tasks to ensure alignment and integration consistency across the system.",
+            "dependencies": [
+              1
+            ],
+            "details": "Schedule regular sync meetings, share progress updates, and resolve dependencies or conflicts with other components or teams.",
+            "status": "pending"
+          },
+          {
+            "id": 10,
+            "title": "Ensure Adherence to OpenAI Best Practices",
+            "description": "Review all implementation aspects to confirm compliance with OpenAI's recommended guidelines and best practices for API usage and model integration.",
+            "dependencies": [
+              8
+            ],
+            "details": "Audit code, configurations, and workflows against OpenAI standards, and implement any necessary adjustments to maintain compliance and optimize performance.",
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "id": 35,
+        "title": "Migrate from SerpAPI to OpenAI Web Search",
+        "description": "Replace the current SerpAPI-based search functionality with OpenAI's web search capabilities, consolidating search capabilities under the OpenAI ecosystem for better integration and improved results.",
+        "details": "This migration requires a systematic approach to replace SerpAPI with OpenAI's web search:\n\n1. **Analysis Phase**:\n   - Review the current `GoogleSearchToolFactory` implementation to understand how SerpAPI is integrated\n   - Document the current search request/response flow and data structures\n   - Identify all components that depend on SerpAPI search results\n\n2. **OpenAI Web Search Integration**:\n   - Research OpenAI's web search API documentation, focusing on:\n     - Authentication requirements\n     - Request parameters and limitations\n     - Response format and structure\n     - Rate limits and pricing considerations\n   - Create a new `OpenAIWebSearchTool` class that implements the same interface as the current search tool\n   - Implement the necessary API calls to OpenAI's web search endpoints using the OpenAI SDK\n\n3. **Response Handling**:\n   - Develop parsers for OpenAI's search response format\n   - Map OpenAI search results to the format expected by the application\n   - Handle pagination or result limits differently if OpenAI's API has different constraints\n\n4. **Configuration Updates**:\n   - Update the application configuration to remove SerpAPI API keys and endpoints\n   - Add OpenAI web search specific configuration options\n   - Ensure backward compatibility during transition if needed\n\n5. **Tool Schema Updates**:\n   - Update the search tool schemas to reflect OpenAI's capabilities\n   - Modify tool descriptions to accurately represent the new search functionality\n   - Adjust any parameter validation to match OpenAI's requirements\n\n6. **Code Cleanup**:\n   - Remove all SerpAPI-specific code and dependencies\n   - Update import statements and package.json\n   - Remove unused variables, functions, and classes\n\n7. **Documentation**:\n   - Update developer documentation to reflect the new search implementation\n   - Document any changes in behavior or capabilities for users",
+        "testStrategy": "1. **Unit Testing**:\n   - Create unit tests for the new `OpenAIWebSearchTool` class\n   - Test the request formation logic with various query types\n   - Test response parsing with mocked OpenAI search responses\n   - Verify error handling for common failure scenarios (rate limits, authentication issues, etc.)\n\n2. **Integration Testing**:\n   - Test the search functionality with real OpenAI API calls using a test API key\n   - Verify results for different types of queries (factual, navigational, transactional)\n   - Compare results with the previous SerpAPI implementation for quality and completeness\n   - Test pagination or result limit handling\n\n3. **End-to-End Testing**:\n   - Test the complete user flow from query input to search result presentation\n   - Verify that search results are properly formatted and displayed to users\n   - Test with edge cases like very long queries, queries in different languages, etc.\n\n4. **Performance Testing**:\n   - Measure and compare response times between SerpAPI and OpenAI web search\n   - Test under load to ensure the system handles concurrent search requests properly\n   - Monitor API usage to ensure it stays within expected limits\n\n5. **Regression Testing**:\n   - Ensure all existing functionality that relied on search results continues to work\n   - Verify that no other parts of the application are affected by the migration",
+        "status": "pending",
+        "dependencies": [
+          27,
+          20
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Analyze Current Integration",
+            "description": "Review and document the existing GoogleSearchToolFactory and SerpAPI integration, including how search queries are handled and responses processed.",
+            "dependencies": [],
+            "details": "Understand the current architecture, data flow, and dependencies related to GoogleSearchToolFactory and SerpAPI to identify all points of integration and potential impact areas.",
+            "status": "pending"
+          },
+          {
+            "id": 2,
+            "title": "Research OpenAI API for Web Search",
+            "description": "Investigate OpenAI's web search capabilities, including API endpoints, response formats, rate limits, and authentication requirements.",
+            "dependencies": [],
+            "details": "Gather documentation and examples on how to use OpenAI's web search API to replace SerpAPI, focusing on differences in request/response structure and constraints.",
+            "status": "pending"
+          },
+          {
+            "id": 3,
+            "title": "Implement OpenAI API Integration",
+            "description": "Develop the integration of OpenAI's web search API to replace GoogleSearchToolFactory and SerpAPI, ensuring proper request handling and response parsing.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create new modules or update existing ones to send queries to OpenAI's API, handle responses, and map results to the expected format used by the application.",
+            "status": "pending"
+          },
+          {
+            "id": 4,
+            "title": "Update Configuration and Tool Schema",
+            "description": "Modify configuration files and tool schemas to support the new OpenAI web search integration and remove SerpAPI-specific settings.",
+            "dependencies": [
+              3
+            ],
+            "details": "Ensure all configuration parameters reflect the new API usage, including API keys, endpoints, and any feature toggles. Update tool schemas to align with new response structures.",
+            "status": "pending"
+          },
+          {
+            "id": 5,
+            "title": "Handle Response Mapping and Backward Compatibility",
+            "description": "Map OpenAI API responses to the existing application's expected data structures and ensure backward compatibility where necessary.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Implement transformation logic to convert OpenAI responses into formats compatible with existing components, minimizing disruption to downstream processes.",
+            "status": "pending"
+          },
+          {
+            "id": 6,
+            "title": "Code Cleanup and SerpAPI Dependency Removal",
+            "description": "Remove all SerpAPI-related code, dependencies, and references from the codebase to prevent conflicts and reduce technical debt.",
+            "dependencies": [
+              5
+            ],
+            "details": "Audit the codebase for SerpAPI usage, delete obsolete files, update package manifests, and refactor code to eliminate unused imports and variables.",
+            "status": "pending"
+          },
+          {
+            "id": 7,
+            "title": "Update Documentation and Testing",
+            "description": "Revise all relevant documentation to reflect the new OpenAI web search integration and create or update tests to validate the migration.",
+            "dependencies": [
+              6
+            ],
+            "details": "Document new setup instructions, API usage, configuration changes, and update test cases or add new ones to cover the new integration and ensure stability.",
+            "status": "pending"
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-06-15T22:13:07.960Z",
+      "updated": "2025-07-01T21:41:30.071Z",
       "description": "Tasks for master context"
     }
   }

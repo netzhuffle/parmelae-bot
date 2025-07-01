@@ -1,9 +1,9 @@
 {
 	"meta": {
-		"generatedAt": "2025-06-15T19:27:22.926Z",
-		"tasksAnalyzed": 1,
-		"totalTasks": 32,
-		"analysisCount": 15,
+		"generatedAt": "2025-07-01T21:43:32.366Z",
+		"tasksAnalyzed": 3,
+		"totalTasks": 35,
+		"analysisCount": 18,
 		"thresholdScore": 5,
 		"projectName": "Taskmaster",
 		"usedResearch": true
@@ -128,6 +128,30 @@
 			"recommendedSubtasks": 8,
 			"expansionPrompt": "Break down each major component (database schema updates, tool updates, probability calculations, statistics display, and testing) into individual subtasks, ensuring each subtask is focused and testable. For example, separate schema enum addition, model updates, each tool modification, probability logic change, statistics display update, and each testing type.",
 			"reasoning": "The task involves multiple codebase layers (database, tools, services, statistics), each requiring careful updates and integration. The complexity is moderate to high due to cross-cutting concerns, enum integration, and ensuring consistent behavior across tools and calculations. Breaking into 8 subtasks allows focused work on each logical unit and thorough testing coverage[4][5]."
+		},
+		{
+			"taskId": 33,
+			"taskTitle": "Migrate Zod Validation Library from Version 3 to Version 4",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down the migration into subtasks covering dependency update, schema refactoring, LangChain tool schema updates, custom validation adjustments, TypeScript type inference updates, comprehensive testing, and documentation.",
+			"reasoning": "The migration involves multiple codebase-wide changes including dependency updates, schema refactoring with API changes, and type inference adjustments. While codemods exist to automate parts, careful manual review and testing are required to avoid regressions and maintain type safety, making it moderately complex."
+		},
+		{
+			"taskId": 34,
+			"taskTitle": "Migrate Image Generation from DALL·E to Latest OpenAI Image APIs",
+			"complexityScore": 8,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Expand the task into subtasks for reviewing current implementation, replacing API calls, supporting new models, enhancing prompt processing, updating error handling, modifying persistence logic, comprehensive testing, documentation updates, coordination with related tasks, and adherence to OpenAI best practices.",
+			"reasoning": "This task requires integration with new APIs, support for multiple new models and features, robust error handling, and coordination with other system components. The breadth of changes and need for thorough testing and documentation increase its complexity."
+		},
+		{
+			"taskId": 35,
+			"taskTitle": "Migrate from SerpAPI to OpenAI Web Search",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Divide the migration into subtasks including analysis of current integration, OpenAI API research and integration, response handling and mapping, configuration updates, tool schema updates, code cleanup, and documentation revisions.",
+			"reasoning": "Replacing a core search component involves understanding existing integration, implementing a new API with different response formats and constraints, updating configurations and schemas, and ensuring backward compatibility. Testing and cleanup add to the moderate complexity."
 		}
 	]
 }
