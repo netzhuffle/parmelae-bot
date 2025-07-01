@@ -581,29 +581,33 @@ export class PokemonTcgPocketService {
     // Show count for stars, shinies, and crowns if the user has any (owned or not needed)
     // For these rarities, only show the count, not the total
     if (stats.stars.owned > 0 || stats.stars.notNeeded > 0) {
-      const starsCount = stats.stars.notNeeded === 0 
-        ? stats.stars.owned.toString()
-        : `${stats.stars.owned}+${stats.stars.notNeeded}`;
+      const starsCount =
+        stats.stars.notNeeded === 0
+          ? stats.stars.owned.toString()
+          : `${stats.stars.owned}+${stats.stars.notNeeded}`;
       parts.push(`⭐️ ${starsCount}`);
     }
     if (stats.shinies.owned > 0 || stats.shinies.notNeeded > 0) {
-      const shiniesCount = stats.shinies.notNeeded === 0 
-        ? stats.shinies.owned.toString()
-        : `${stats.shinies.owned}+${stats.shinies.notNeeded}`;
+      const shiniesCount =
+        stats.shinies.notNeeded === 0
+          ? stats.shinies.owned.toString()
+          : `${stats.shinies.owned}+${stats.shinies.notNeeded}`;
       parts.push(`✴️ ${shiniesCount}`);
     }
     if (stats.crowns.owned > 0 || stats.crowns.notNeeded > 0) {
-      const crownsCount = stats.crowns.notNeeded === 0 
-        ? stats.crowns.owned.toString()
-        : `${stats.crowns.owned}+${stats.crowns.notNeeded}`;
+      const crownsCount =
+        stats.crowns.notNeeded === 0
+          ? stats.crowns.owned.toString()
+          : `${stats.crowns.owned}+${stats.crowns.notNeeded}`;
       parts.push(`👑 ${crownsCount}`);
     }
 
     if (parts.length === 0) {
       // For promo sets without rarities - show only count, not total
-      const promosCount = stats.promos.notNeeded === 0 
-        ? stats.promos.owned.toString()
-        : `${stats.promos.owned}+${stats.promos.notNeeded}`;
+      const promosCount =
+        stats.promos.notNeeded === 0
+          ? stats.promos.owned.toString()
+          : `${stats.promos.owned}+${stats.promos.notNeeded}`;
       parts.push(promosCount);
     }
 
