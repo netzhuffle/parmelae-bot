@@ -4452,6 +4452,330 @@ A3a:
     103:
       name: Anego
       rarity: ♛
+A3b:
+  name: Evoli-Hain
+  cards:
+    1:
+      name: Tropius
+      rarity: ♢♢
+    2:
+      name: Folipurba
+      rarity: ♢♢♢
+    3:
+      name: Frubberl
+      rarity: ♢
+    4:
+      name: Frubaila
+      rarity: ♢
+    5:
+      name: Fruyal
+      rarity: ♢♢
+    6:
+      name: Knapfel
+      rarity: ♢
+    7:
+      name: Schlapfel
+      rarity: ♢♢
+    8:
+      name: Flamara
+      rarity: ♢♢♢
+    9:
+      name: Flamara ex
+      rarity: ♢♢♢♢
+    10:
+      name: Qurtel
+      rarity: ♢
+    11:
+      name: Flamiau
+      rarity: ♢
+    12:
+      name: Miezunder
+      rarity: ♢
+    13:
+      name: Fuegro
+      rarity: ♢♢
+    14:
+      name: Molunk
+      rarity: ♢
+    15:
+      name: Amfira
+      rarity: ♢♢
+    16:
+      name: Aquana
+      rarity: ♢♢♢
+    17:
+      name: Glaziola
+      rarity: ♢♢♢
+    18:
+      name: Gelatini
+      rarity: ♢
+    19:
+      name: Gelatroppo
+      rarity: ♢
+    20:
+      name: Gelatwino
+      rarity: ♢♢
+    21:
+      name: Mamolida
+      rarity: ♢
+    22:
+      name: Robball
+      rarity: ♢
+    23:
+      name: Marikeck
+      rarity: ♢
+    24:
+      name: Primarene ex
+      rarity: ♢♢♢♢
+    25:
+      name: Blitza
+      rarity: ♢♢♢
+    26:
+      name: Wattzapf
+      rarity: ♢
+    27:
+      name: Voltula
+      rarity: ♢♢
+    28:
+      name: Psiana
+      rarity: ♢♢♢
+    29:
+      name: Fleknoil
+      rarity: ♢
+    30:
+      name: Fletiamo
+      rarity: ♢♢
+    31:
+      name: Flauschling
+      rarity: ♢
+    32:
+      name: Sabbaione
+      rarity: ♢♢
+    33:
+      name: Feelinara
+      rarity: ♢♢♢
+    34:
+      name: Feelinara ex
+      rarity: ♢♢♢♢
+    35:
+      name: Mimigma
+      rarity: ♢♢
+    36:
+      name: Hokumil
+      rarity: ♢
+    37:
+      name: Pokusan
+      rarity: ♢♢
+    38:
+      name: Schmerbe
+      rarity: ♢
+    39:
+      name: Welsar
+      rarity: ♢♢
+    40:
+      name: Lin-Fu
+      rarity: ♢
+    41:
+      name: Wie-Shu
+      rarity: ♢♢
+    42:
+      name: Rocara
+      rarity: ♢
+    43:
+      name: Nachtara
+      rarity: ♢♢♢
+    44:
+      name: Zobiris
+      rarity: ♢
+    45:
+      name: Felilou
+      rarity: ♢
+    46:
+      name: Kleoparda
+      rarity: ♢♢
+    47:
+      name: Flunkifer
+      rarity: ♢
+    48:
+      name: Togedemaru
+      rarity: ♢
+    49:
+      name: Meltan
+      rarity: ♢
+    50:
+      name: Melmetal
+      rarity: ♢♢
+    51:
+      name: Dratini
+      rarity: ♢
+    52:
+      name: Dragonir
+      rarity: ♢
+    53:
+      name: Dragoran ex
+      rarity: ♢♢♢♢
+    54:
+      name: Sen-Long
+      rarity: ♢♢
+    55:
+      name: Evoli
+      rarity: ♢
+    56:
+      name: Evoli ex
+      rarity: ♢♢♢♢
+    57:
+      name: Relaxo ex
+      rarity: ♢♢♢♢
+    58:
+      name: Griffel
+      rarity: ♢
+    59:
+      name: Ambidiffel
+      rarity: ♢♢
+    60:
+      name: Plaudagei
+      rarity: ♢
+    61:
+      name: Ohrdoch
+      rarity: ♢
+    62:
+      name: Picochilla
+      rarity: ♢
+    63:
+      name: Chillabell
+      rarity: ♢♢
+    64:
+      name: Raffel
+      rarity: ♢
+    65:
+      name: Schlaraffel
+      rarity: ♢♢
+    66:
+      name: Evoli-Rucksack
+      rarity: ♢♢
+    67:
+      name: Überreste
+      rarity: ♢♢
+    68:
+      name: Tali
+      rarity: ♢♢
+    69:
+      name: Cosima
+      rarity: ♢♢
+    70:
+      name: Folipurba
+      rarity: ☆
+    71:
+      name: Flamara
+      rarity: ☆
+    72:
+      name: Aquana
+      rarity: ☆
+    73:
+      name: Glaziola
+      rarity: ☆
+    74:
+      name: Blitza
+      rarity: ☆
+    75:
+      name: Psiana
+      rarity: ☆
+    76:
+      name: Feelinara
+      rarity: ☆
+    77:
+      name: Nachtara
+      rarity: ☆
+    78:
+      name: Evoli
+      rarity: ☆
+    79:
+      name: Flamara ex
+      rarity: ☆☆
+    80:
+      name: Primarene ex
+      rarity: ☆☆
+    81:
+      name: Feelinara ex
+      rarity: ☆☆
+    82:
+      name: Dragoran ex
+      rarity: ☆☆
+    83:
+      name: Evoli ex
+      rarity: ☆☆
+    84:
+      name: Relaxo ex
+      rarity: ☆☆
+    85:
+      name: Tali
+      rarity: ☆☆
+    86:
+      name: Cosima ex
+      rarity: ☆☆
+    87:
+      name: Flamara ex
+      rarity: ☆☆
+    88:
+      name: Primarene ex
+      rarity: ☆☆
+    89:
+      name: Feelinara ex
+      rarity: ☆☆
+    90:
+      name: Dragoran ex
+      rarity: ☆☆
+    91:
+      name: Relaxo ex
+      rarity: ☆☆
+    92:
+      name: Evoli ex
+      rarity: ☆☆☆
+    93:
+      name: Pinsir
+      rarity: ✸
+    94:
+      name: Lapras
+      rarity: ✸
+    95:
+      name: Voltobal
+      rarity: ✸
+    96:
+      name: Lektrobal
+      rarity: ✸
+    97:
+      name: Trasla
+      rarity: ✸
+    98:
+      name: Kirlia
+      rarity: ✸
+    99:
+      name: Gardevoir
+      rarity: ✸
+    100:
+      name: Rettan
+      rarity: ✸
+    101:
+      name: Arbok
+      rarity: ✸
+    102:
+      name: Porenta
+      rarity: ✸
+    103:
+      name: Lavados ex
+      rarity: ✸✸
+    104:
+      name: Arktos ex
+      rarity: ✸✸
+    105:
+      name: Zapdos ex
+      rarity: ✸✸
+    106:
+      name: Galagladi ex
+      rarity: ✸✸
+    107:
+      name: Evoli-Rucksack
+      rarity: ♛
 PROMO-A:
   name: Promo-A
   boosters: ~
@@ -4661,3 +4985,21 @@ PROMO-A:
       name: Venicro
     83:
       name: Velursi
+    84:
+      name: Kapu-Riki ex
+    85:
+      name: Gelatini
+    86:
+      name: Blitza
+    87:
+      name: Pokusan
+    88:
+      name: Dragonir
+    89:
+      name: Ohrdoch
+    90:
+      name: Togedemaru
+    91:
+      name: Schlaraffel
+    92:
+      name: Evoli
