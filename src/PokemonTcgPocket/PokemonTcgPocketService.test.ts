@@ -1,3 +1,4 @@
+import { describe, beforeEach, it, afterEach, expect, spyOn } from 'bun:test';
 import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity, OwnershipStatus } from '@prisma/client';
@@ -32,9 +33,13 @@ TEST:
           yaml,
         );
 
-        await expect(
-          service.synchronizeCardDatabaseWithYamlSource(),
-        ).rejects.toThrow('Invalid rarity');
+        try {
+          await service.synchronizeCardDatabaseWithYamlSource();
+          expect.unreachable('Expected promise to reject');
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toContain('Invalid rarity');
+        }
       });
 
       it('accepts cards with all valid rarity symbols', async () => {
@@ -126,9 +131,13 @@ TEST-SET:
           yaml,
         );
 
-        await expect(
-          service.synchronizeCardDatabaseWithYamlSource(),
-        ).rejects.toThrow('duplicated mapping key');
+        try {
+          await service.synchronizeCardDatabaseWithYamlSource();
+          expect.unreachable('Expected promise to reject');
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toContain('duplicated mapping key');
+        }
       });
 
       it('rejects non-integer card numbers', async () => {
@@ -147,9 +156,13 @@ TEST:
           yaml,
         );
 
-        await expect(
-          service.synchronizeCardDatabaseWithYamlSource(),
-        ).rejects.toThrow('Invalid card number');
+        try {
+          await service.synchronizeCardDatabaseWithYamlSource();
+          expect.unreachable('Expected promise to reject');
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toContain('Invalid card number');
+        }
       });
     });
 
@@ -172,9 +185,15 @@ TEST:
           yaml,
         );
 
-        await expect(
-          service.synchronizeCardDatabaseWithYamlSource(),
-        ).rejects.toThrow('Card Test Card references non-existent boosters');
+        try {
+          await service.synchronizeCardDatabaseWithYamlSource();
+          expect.unreachable('Expected promise to reject');
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toContain(
+            'Card Test Card references non-existent boosters',
+          );
+        }
       });
     });
   });
@@ -615,7 +634,7 @@ TEST:
         repository,
         '',
       );
-      const searchCardsSpy = jest.spyOn(repository, 'searchCards');
+      const searchCardsSpy = spyOn(repository, 'searchCards');
 
       const nameSearchCards = await service.searchCards({ cardName: 'chu' });
 

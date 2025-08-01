@@ -1,10 +1,11 @@
+import { describe, beforeEach, it, expect } from 'bun:test';
 import { diceTool } from './diceTool.js';
 import { TelegramServiceFake } from '../Fakes/TelegramServiceFake.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 
 const TEST_CHAT_ID = '123456789';
 const BASE_TELEGRAM_REQUEST = {
-  method: 'sendDice',
+  method: 'sendDice' as const,
   chatId: TEST_CHAT_ID,
 };
 

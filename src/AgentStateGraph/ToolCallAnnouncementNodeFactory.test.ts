@@ -1,13 +1,14 @@
+import { describe, beforeEach, it, expect, mock, Mock } from 'bun:test';
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
 import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
 import { AIMessage } from '@langchain/core/messages';
 
 describe('ToolCallAnnouncementNodeFactory', () => {
-  let announceToolCall: jest.Mock;
+  let announceToolCall: Mock<() => Promise<number>>;
   let factory: ToolCallAnnouncementNodeFactory;
 
   beforeEach(() => {
-    announceToolCall = jest.fn(() => Promise.resolve(123)); // Mock returns message ID
+    announceToolCall = mock(() => Promise.resolve(123));
     factory = new ToolCallAnnouncementNodeFactory();
   });
 
@@ -340,7 +341,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
   });
 
   it('does not store tool execution context when callback returns null', async () => {
-    const announceToolCallReturningNull = jest.fn(() => Promise.resolve(null));
+    const announceToolCallReturningNull = mock(() => Promise.resolve(null));
     const node = factory.create(announceToolCallReturningNull);
     const toolCalls = [
       {

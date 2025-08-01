@@ -1,24 +1,9 @@
+import { describe, it, beforeEach, expect, setSystemTime } from 'bun:test';
 import { dateTimeTool } from './dateTimeTool.js';
 
 describe('dateTimeTool', () => {
-  let originalDate: DateConstructor;
-
-  beforeAll(() => {
-    originalDate = global.Date;
-  });
-
-  afterAll(() => {
-    global.Date = originalDate;
-  });
-
   beforeEach(() => {
-    const mockDate = new Date('2024-01-15T14:30:00Z');
-    global.Date = class extends Date {
-      constructor() {
-        super();
-        return mockDate;
-      }
-    } as DateConstructor;
+    setSystemTime(new Date('2024-01-15T14:30:00Z'));
   });
 
   it('should return current date and time in Swiss timezone', async () => {

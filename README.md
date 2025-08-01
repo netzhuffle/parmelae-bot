@@ -25,7 +25,7 @@ This project demonstrates modern TypeScript patterns and clean architecture prin
 - **Prisma ORM** with SQLite for data persistence
 - **Inversify** for dependency injection and IoC
 - **Telegraf** for robust Telegram Bot API integration
-- **Comprehensive Testing** with Jest and custom fake patterns
+- **Comprehensive Testing** with bun and custom fake patterns
 
 ### Project Structure
 
@@ -95,7 +95,7 @@ src/
 
 - `npm run run-dev` - Start development server with hot reload
 - `npm run build` - Build TypeScript to JavaScript
-- `npm run test` - Run Jest test suite
+- `npm run test` - Run bun test suite
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
 - `npm run checks` - Run all quality checks (format, build, lint, test)

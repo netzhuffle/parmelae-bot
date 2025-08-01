@@ -1,23 +1,30 @@
+import { describe, beforeEach, it, expect, mock } from 'bun:test';
 import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
 import { MessageRepository } from '../Repositories/MessageRepository.js';
 import { ToolMessageRepository } from '../Repositories/ToolMessageRepository.js';
 import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
 import { StateAnnotation } from './StateAnnotation.js';
 
+// Create mock functions separately for proper assertion tracking
+const mockUpdateToolCalls = mock(() => Promise.resolve());
+const mockStore = mock();
+
 const mockMessageRepository = {
-  updateToolCalls: jest.fn(),
-} as unknown as jest.Mocked<MessageRepository>;
+  updateToolCalls: mockUpdateToolCalls,
+} as unknown as MessageRepository;
 
 const mockToolMessageRepository = {
-  store: jest.fn(),
-} as unknown as jest.Mocked<ToolMessageRepository>;
+  store: mockStore,
+} as unknown as ToolMessageRepository;
 
 describe('ToolResponsePersistenceNodeFactory', () => {
   let factory: ToolResponsePersistenceNodeFactory;
-  let node: ReturnType<ToolResponsePersistenceNodeFactory['create']>;
+  let node: (state: typeof StateAnnotation.State) => Promise<object>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Clear mock calls manually since we're using separate mock references
+    mockUpdateToolCalls.mockClear();
+    mockStore.mockClear();
     factory = new ToolResponsePersistenceNodeFactory(
       mockMessageRepository,
       mockToolMessageRepository,
@@ -70,18 +77,18 @@ describe('ToolResponsePersistenceNodeFactory', () => {
 
       await node(state);
 
-      expect(mockMessageRepository.updateToolCalls).toHaveBeenCalledWith(
+      expect(mockUpdateToolCalls).toHaveBeenCalledWith(
         456,
         originalAIMessage.tool_calls,
       );
 
-      expect(mockToolMessageRepository.store).toHaveBeenCalledTimes(2);
-      expect(mockToolMessageRepository.store).toHaveBeenCalledWith({
+      expect(mockStore).toHaveBeenCalledTimes(2);
+      expect(mockStore).toHaveBeenCalledWith({
         toolCallId: 'call-123',
         text: 'Weather is sunny, 22°C',
         messageId: 456,
       });
-      expect(mockToolMessageRepository.store).toHaveBeenCalledWith({
+      expect(mockStore).toHaveBeenCalledWith({
         toolCallId: 'call-124',
         text: 'Current time is 14:30',
         messageId: 456,
@@ -127,8 +134,8 @@ describe('ToolResponsePersistenceNodeFactory', () => {
 
       await node(state);
 
-      expect(mockToolMessageRepository.store).toHaveBeenCalledTimes(1);
-      expect(mockToolMessageRepository.store).toHaveBeenCalledWith({
+      expect(mockStore).toHaveBeenCalledTimes(1);
+      expect(mockStore).toHaveBeenCalledWith({
         toolCallId: 'call-123',
         text: 'Weather is sunny, 22°C',
         messageId: 456,
@@ -175,13 +182,13 @@ describe('ToolResponsePersistenceNodeFactory', () => {
       await node(state);
 
       // Should only store the tool call that has a response
-      expect(mockMessageRepository.updateToolCalls).toHaveBeenCalledWith(
+      expect(mockUpdateToolCalls).toHaveBeenCalledWith(
         456,
         [originalAIMessage.tool_calls![0]], // Only the first tool call
       );
 
-      expect(mockToolMessageRepository.store).toHaveBeenCalledTimes(1);
-      expect(mockToolMessageRepository.store).toHaveBeenCalledWith({
+      expect(mockStore).toHaveBeenCalledTimes(1);
+      expect(mockStore).toHaveBeenCalledWith({
         toolCallId: 'call-123',
         text: 'Weather is sunny, 22°C',
         messageId: 456,
@@ -197,8 +204,8 @@ describe('ToolResponsePersistenceNodeFactory', () => {
 
       const result = await node(state);
 
-      expect(mockMessageRepository.updateToolCalls).not.toHaveBeenCalled();
-      expect(mockToolMessageRepository.store).not.toHaveBeenCalled();
+      expect(mockUpdateToolCalls).not.toHaveBeenCalled();
+      expect(mockStore).not.toHaveBeenCalled();
       expect(result).toEqual({});
     });
 
@@ -220,8 +227,8 @@ describe('ToolResponsePersistenceNodeFactory', () => {
 
       const result = await node(state);
 
-      expect(mockMessageRepository.updateToolCalls).not.toHaveBeenCalled();
-      expect(mockToolMessageRepository.store).not.toHaveBeenCalled();
+      expect(mockUpdateToolCalls).not.toHaveBeenCalled();
+      expect(mockStore).not.toHaveBeenCalled();
       expect(result).toEqual({});
     });
 
@@ -243,8 +250,8 @@ describe('ToolResponsePersistenceNodeFactory', () => {
 
       const result = await node(state);
 
-      expect(mockMessageRepository.updateToolCalls).not.toHaveBeenCalled();
-      expect(mockToolMessageRepository.store).not.toHaveBeenCalled();
+      expect(mockUpdateToolCalls).not.toHaveBeenCalled();
+      expect(mockStore).not.toHaveBeenCalled();
       expect(result).toEqual({});
     });
 
@@ -269,11 +276,18 @@ describe('ToolResponsePersistenceNodeFactory', () => {
         toolCallMessageIds: [],
       };
 
-      mockMessageRepository.updateToolCalls.mockRejectedValue(
-        new Error('Database error'),
+      // Replace the mock implementation to reject with an error
+      mockUpdateToolCalls.mockImplementation(() =>
+        Promise.reject(new Error('Database error')),
       );
 
-      await expect(node(state)).rejects.toThrow('Database error');
+      try {
+        await node(state);
+        expect.unreachable('Expected promise to reject');
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toContain('Database error');
+      }
     });
   });
 });

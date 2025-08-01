@@ -1,3 +1,4 @@
+import { describe, beforeEach, it, expect } from 'bun:test';
 import { MessageRepositoryFake } from './MessageRepositoryFake.js';
 
 describe('MessageRepositoryFake', () => {
@@ -20,7 +21,7 @@ describe('MessageRepositoryFake', () => {
     it('should throw error when message does not exist', async () => {
       try {
         await repository.get(999);
-        fail('Expected error to be thrown');
+        expect.unreachable('Expected promise to reject');
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
         expect((error as Error).message).toBe('Message with id 999 not found');

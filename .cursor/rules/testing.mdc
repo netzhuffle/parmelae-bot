@@ -3,25 +3,68 @@ description: Project rules and best practices for writing and executing tests
 globs: *.test.ts
 alwaysApply: false
 ---
-This describes the project rules for writing and executing tests.
 
-- Every TypeScript file must have a corresponding .test.ts file in the same folder
-- Prefer fakes over mocks, placed in /src/Fakes/
-- Only fake I/O operations (DB, network); unit and integration test all business logic
-- Keep fakes simple and void of any business logic (because there are no tests for tests!), instead just verify that the fake methods are called with the correct arguments and verify they then return default values or the return values set by the test
-- Use Jest’s testing framework
-- Test files should follow pattern: [originalFileName].test.ts
-- Tests should be simple to make it easy to judge correctness. That means no business logic in tests, no fancy function calling (repetition in tests is completely fine), and extra focus on readability
-- Write test following the arrange, act, assert pattern
-- Always verify the following things in tests:
+# Testing Standards
+
+- **Every TypeScript file must have a corresponding .test.ts file** in the same folder
+- **Prefer fakes over mocks**, placed in `/src/Fakes/` (see [testing_fakes.mdc](mdc:.cursor/rules/testing_fakes.mdc))
+- **Only fake I/O operations** (DB, network); unit and integration test all business logic
+- **Keep fakes simple** and void of any business logic (because there are no tests for tests!)
+- **Test files should follow pattern**: `[originalFileName].test.ts`
+
+## Bun:Test Implementation
+
+**All test files MUST import required functions from `bun:test`:**
+
+```typescript
+// ✅ DO: Import all needed testing functions
+import { describe, beforeEach, it, expect } from 'bun:test';
+
+// ✅ DO: Import additional functions as needed
+import { describe, beforeAll, afterAll, beforeEach, afterEach, it, test, expect, mock, spyOn, jest } from 'bun:test';
+```
+
+## Test Structure
+
+- **Follow arrange, act, assert pattern**
+- **Keep tests simple** for easy correctness judgment
+- **No business logic in tests** - repetition is fine, focus on readability
+- **Always verify:**
   - Code runs without errors
-  - The correct methods are called with the correct arguments
-  - The correct return values are returned or set
-- Avoid testing for full, long strings – test for parts relevant to the test
-- When you are done with an implementation, test writing, and refactoring, run formatting, linters, and tests with the following succession of commands:
-  - `npm run format && npm run schema-format`
-  - `npm run build`
-  - `npm run lint && npm run validate-yaml`
-  - `npm test`
-- Run the whole row of commands (formatting, building, linting, testing) whenever you changed the implementation or tests
-- If you fixed anything due to a failing step, make sure to rerun all commands from the beginning again to make sure no issue is left undetected, do not skip any steps (i.e. do not just run tests)
+  - Correct methods are called with correct arguments
+  - Correct return values are returned or set
+- **Avoid testing full, long strings** – test for relevant parts only
+
+## Test Execution Commands
+
+When done with implementation, test writing, and refactoring, run the full validation suite:
+
+```bash
+npm run format && npm run schema-format
+npm run build  
+npm run lint && npm run validate-yaml
+npm test  # This runs: bun test src
+```
+
+**Always run the complete sequence** - if any step fails, fix the issue and restart from the beginning. Never skip steps.
+
+## Test Examples from Codebase
+
+**Basic Unit Test:**
+```typescript
+// From src/Tools/diceTool.test.ts
+import { describe, beforeEach, it, expect } from 'bun:test';
+import { diceTool } from './diceTool.js';
+
+describe('diceTool', () => {
+  beforeEach(() => {
+    // Setup code
+  });
+
+  it('should roll dice correctly', async () => {
+    // Arrange, Act, Assert
+  });
+});
+```
+
+Follow [testing_fakes.mdc](mdc:.cursor/rules/testing_fakes.mdc) for fake implementation patterns and [error_handling.mdc](mdc:.cursor/rules/error_handling.mdc) for testing error scenarios.

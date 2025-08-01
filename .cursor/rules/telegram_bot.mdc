@@ -188,7 +188,7 @@ alwaysApply: false
   ```typescript
   describe('Bot', () => {
     let bot: Bot;
-    let mockCallbackHandler: jest.Mocked<CallbackHandler>;
+    let mockCallbackHandler: Mock<() => Promise<void>>;
     
     beforeEach(() => {
       // Setup mocks and dependencies

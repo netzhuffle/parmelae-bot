@@ -30,7 +30,7 @@ export class MessageRepositoryFake {
     this.getCallArgs.push(id);
     const message = this.messages.find((m) => m.id === id);
     if (!message) {
-      throw new Error(`Message with id ${id} not found`);
+      return Promise.reject(new Error(`Message with id ${id} not found`));
     }
     return Promise.resolve(message);
   }

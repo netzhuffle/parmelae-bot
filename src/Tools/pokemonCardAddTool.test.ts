@@ -1,12 +1,10 @@
+import { describe, beforeEach, it, afterEach, expect, spyOn } from 'bun:test';
 import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 import { Rarity, OwnershipStatus } from '@prisma/client';
-import { jest } from '@jest/globals';
 import { pokemonCardAddTool } from './pokemonCardAddTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
-
-jest.mock('@langchain/core/context');
 
 describe('pokemonCardAdd', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -803,7 +801,7 @@ describe('pokemonCardAdd', () => {
         Rarity.ONE_DIAMOND,
         [],
       );
-      jest.spyOn(repository, 'searchCards');
+      spyOn(repository, 'searchCards');
     });
 
     it('should show card details when adding with mismatched criteria', async () => {

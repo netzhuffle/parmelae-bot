@@ -1,3 +1,4 @@
+import { describe, beforeEach, it, expect } from 'bun:test';
 import { dallETool } from './dallETool.js';
 import { TelegramServiceFake } from '../Fakes/TelegramServiceFake.js';
 import { DallEServiceFake } from '../Fakes/DallEServiceFake.js';

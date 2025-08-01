@@ -1,8 +1,8 @@
+import { describe, beforeEach, it, spyOn, afterEach, expect } from 'bun:test';
 import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity, OwnershipStatus } from '@prisma/client';
 import { PokemonTcgPocketRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketRepository.js';
-import { jest } from '@jest/globals';
 import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 import { ToolContext } from '../ChatGptAgentService.js';
 import { createTestToolConfig } from '../ChatGptAgentService.js';
@@ -23,12 +23,11 @@ describe('pokemonCardSearch', () => {
       userId: BigInt(1),
       pokemonTcgPocketService: service,
     });
-    jest.spyOn(repository, 'searchCards');
+    spyOn(repository, 'searchCards');
   });
 
   afterEach(() => {
     repository.clear();
-    jest.clearAllMocks();
   });
 
   it('should format results as CSV with all columns', async () => {
@@ -589,7 +588,7 @@ describe('pokemonCardSearch', () => {
       Rarity.ONE_DIAMOND,
       [],
     );
-    jest.spyOn(repository, 'searchCards');
+    spyOn(repository, 'searchCards');
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -626,7 +625,7 @@ describe('pokemonCardSearch', () => {
       Rarity.ONE_DIAMOND,
       [],
     );
-    jest.spyOn(repository, 'searchCards');
+    spyOn(repository, 'searchCards');
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -664,7 +663,7 @@ describe('pokemonCardSearch', () => {
       Rarity.ONE_DIAMOND,
       [],
     );
-    jest.spyOn(repository, 'searchCards');
+    spyOn(repository, 'searchCards');
 
     const result = await pokemonCardSearchTool.invoke(
       {

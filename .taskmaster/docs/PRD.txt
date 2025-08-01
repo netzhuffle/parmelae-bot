@@ -143,7 +143,7 @@ The product is valuable because it combines enterprise-grade architecture patter
 - Prisma database setup with core Message and User models
 - Basic ChatGPT integration for simple conversational responses
 - Essential error handling and logging infrastructure
-- Basic test framework setup with Jest
+- Basic test framework setup with bun:test
 
 ## Phase 2: AI Agent System (Core Intelligence)
 **Scope:** Advanced AI capabilities with tool integration
@@ -218,7 +218,7 @@ The product is valuable because it combines enterprise-grade architecture patter
    - Node.js/TypeScript project structure with ESM modules
    - Inversify dependency injection container
    - Prisma database setup with basic models
-   - Jest testing framework with fakes pattern
+   - bun:test testing framework with fakes pattern
    - Essential CI/CD pipeline (formatting, linting, building, testing)
 
 2. **Basic Bot Functionality**
@@ -393,7 +393,7 @@ Each phase is designed to be:
 
 ### Code Quality Requirements
 - TypeScript strict mode with no implicit any
-- Comprehensive test coverage with Jest
+- Comprehensive test coverage with bun:test
 - ESLint and Prettier for code consistency
 - Prisma schema formatting and validation
 

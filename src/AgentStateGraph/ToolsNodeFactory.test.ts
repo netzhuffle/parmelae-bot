@@ -1,21 +1,18 @@
+import { describe, it, mock, expect } from 'bun:test';
 import { ToolsNodeFactory } from './ToolsNodeFactory.js';
 import { StructuredTool } from 'langchain/tools';
-
-// Mock ToolNode from @langchain/langgraph/prebuilt
-jest.mock('@langchain/langgraph/prebuilt', () => ({
-  ToolNode: jest
-    .fn()
-    .mockImplementation((tools: StructuredTool[]) => ({ tools })),
-}));
-
 import { ToolNode } from '@langchain/langgraph/prebuilt';
+
+void mock.module('@langchain/langgraph/prebuilt', () => ({
+  ToolNode: mock((tools: StructuredTool[]) => ({ tools })),
+}));
 
 describe('ToolsNodeFactory', () => {
   it('returns a ToolNode constructed with the provided tools', () => {
     // Arrange
     const tools: StructuredTool[] = [
-      { name: 'tool1', call: jest.fn() } as unknown as StructuredTool,
-      { name: 'tool2', call: jest.fn() } as unknown as StructuredTool,
+      { name: 'tool1', call: mock() } as unknown as StructuredTool,
+      { name: 'tool2', call: mock() } as unknown as StructuredTool,
     ];
     const factory = new ToolsNodeFactory();
 

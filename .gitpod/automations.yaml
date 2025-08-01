@@ -23,6 +23,7 @@ tasks:
       npm install
       npm run build
       npm run migrate
+      curl -fsSL https://bun.sh/install | bash
   check:
     name: Check
     description: Runs formatting, linters, and tests

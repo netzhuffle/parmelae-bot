@@ -1,18 +1,18 @@
+import { beforeEach, describe, it, mock, expect } from 'bun:test';
+import { Message } from '@prisma/client';
 import { CommandService } from './CommandService.js';
 import { Commands } from './Command.js';
 import { ReplyGenerator } from './MessageGenerators/ReplyGenerator.js';
 import { TelegramMessageWithReplyTo } from './Repositories/Types.js';
 
-jest.mock('./MessageGenerators/ReplyGenerator.js');
-
 describe('CommandService', () => {
   let commandService: CommandService;
-  let replyGenerator: jest.Mocked<ReplyGenerator>;
+  let replyGenerator: ReplyGenerator;
 
   beforeEach(() => {
     replyGenerator = {
-      generate: jest.fn(),
-    } as unknown as jest.Mocked<ReplyGenerator>;
+      generate: mock(),
+    } as unknown as ReplyGenerator;
     commandService = new CommandService(replyGenerator);
   });
 
@@ -46,8 +46,11 @@ describe('CommandService', () => {
       messageAfterToolCallsId: null,
       replyToMessage: messageToReplyTo,
     };
-    replyGenerator.generate.mockImplementation(
-      async (message, announceToolCall) => {
+    replyGenerator.generate = mock(
+      async (
+        message: Message,
+        announceToolCall: (text: string) => Promise<number | null>,
+      ) => {
         const messageId = await announceToolCall('Using tool X');
         expect(messageId).toBeNull(); // Should return null since no message is stored
         return {
