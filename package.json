@@ -20,10 +20,10 @@
     "migrate-prod": "prisma migrate deploy"
   },
   "dependencies": {
-    "@langchain/community": "0.3.47",
-    "@langchain/core": "0.3.61",
-    "@langchain/langgraph": "0.3.6",
-    "@langchain/openai": "0.5.16",
+    "@langchain/community": "^0.3.49",
+    "@langchain/core": "^0.3.66",
+    "@langchain/langgraph": "^0.4.2",
+    "@langchain/openai": "^0.6.3",
     "@prisma/client": "^6.13.0",
     "@sentry/node": "^10.0.0",
     "axios": "0.26.1",
@@ -33,7 +33,7 @@
     "inversify": "^7.7.0",
     "inversify-inject-decorators": "^3.1.0",
     "js-yaml": "^4.1.0",
-    "langchain": "0.3.29",
+    "langchain": "^0.3.30",
     "octokit": "^5.0.3",
     "openai": "4.103.0",
     "pdf-parse": "^1.1.1",
