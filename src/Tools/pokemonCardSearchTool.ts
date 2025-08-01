@@ -1,5 +1,5 @@
 import { tool } from '@langchain/core/tools';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   SET_KEY_VALUES,
   SET_KEY_NAMES,

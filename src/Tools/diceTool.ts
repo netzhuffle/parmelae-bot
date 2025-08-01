@@ -1,5 +1,5 @@
 import { tool } from '@langchain/core/tools';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { NotExhaustiveSwitchError } from '../NotExhaustiveSwitchError.js';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';
