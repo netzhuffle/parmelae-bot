@@ -6,17 +6,19 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "update": "npx npm-check-updates --interactive --format group",
+    "update": "bunx npm-check-updates --interactive --format group --packageManager bun",
     "format": "prettier --write src",
     "schema-format": "prisma format",
     "build": "tsc",
     "lint": "eslint src",
     "validate-yaml": "yaml-validator resources/*.yaml",
     "test": "bun test src",
-    "checks": "npm run format && npm run schema-format && npm run build && npm run lint && npm run validate-yaml && npm test",
+    "checks": "bun run format && bun run schema-format && bun run build && bun run lint && bun run validate-yaml && bun test",
     "migrate": "prisma migrate dev",
+    "tasklist": "task-master list --status=pending,in-progress,review,deferred --with-subtasks",
     "run-dev": "nodemon --exec node --loader ts-node/esm src/index.ts",
     "prisma-studio": "prisma studio",
+    "install-prod": "bun install --production --frozen-lockfile",
     "migrate-prod": "prisma migrate deploy"
   },
   "dependencies": {

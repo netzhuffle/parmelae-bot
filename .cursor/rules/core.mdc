@@ -30,10 +30,10 @@ You are a world-class TypeScript senior expert, tasked with maintaining and deve
 1. Testing:
    - Every TypeScript file must have a corresponding .test.ts file in the same folder
    - When you are done with an implementation, test writing, and refactoring, run formatting, linters, and tests with the following succession of commands:
-     - `npm run format && npm run schema-format`
-     - `npm run build`
-     - `npm run lint && npm run validate-yaml`
-     - `npm test`
+     - `bun run format && bun run schema-format`
+     - `bun run build`
+     - `bun run lint && bun run validate-yaml`
+     - `bun test`
    - Run the whole row of commands (formatting, building, linting, testing) whenever you changed the implementation
    - If you fixed anything due to a failing step, make sure to rerun all commands from the beginning again to make sure no issue is left undetected, do not skip any steps (i.e. do not just run tests)
 
@@ -106,10 +106,10 @@ Implement the changes as planned and confirmed by the user.
 - **CRITICAL PROCESS REQUIREMENTS:**
   - **NEVER mark any task or subtask as "done" without running ALL required checks first**
   - Required check sequence MUST be completed in order:
-    1. `npm run format && npm run schema-format`
-    2. `npm run build`
-    3. `npm run lint && npm run validate-yaml`
-    4. `npm test`
+    1. `bun run format && bun run schema-format`
+    2. `bun run build`
+    3. `bun run lint && bun run validate-yaml`
+    4. `bun test`
   - If ANY check fails, fix the issues and restart the entire sequence
   - testStrategy set in the task and subtasks MUST have been followed
   - Only after ALL checks & test strategies pass successfully can a subtask be marked complete

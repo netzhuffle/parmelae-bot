@@ -40,10 +40,10 @@ import { describe, beforeAll, afterAll, beforeEach, afterEach, it, test, expect,
 When done with implementation, test writing, and refactoring, run the full validation suite:
 
 ```bash
-npm run format && npm run schema-format
-npm run build  
-npm run lint && npm run validate-yaml
-npm test  # This runs: bun test src
+bun run format && bun run schema-format
+bun run build  
+bun run lint && bun run validate-yaml
+bun test
 ```
 
 **Always run the complete sequence** - if any step fails, fix the issue and restart from the beginning. Never skip steps.

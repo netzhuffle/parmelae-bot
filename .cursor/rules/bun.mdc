@@ -1,0 +1,33 @@
+---
+description: Bun runtime and package manager patterns, best practices, and compatibility guidelines
+globs: **/*
+alwaysApply: false
+---
+
+# Bun Development Patterns
+
+**Project Status**: Currently using **Bun for package management** with **Node.js runtime**. Full Bun runtime migration planned for future.
+
+## Package Management with Bun
+
+### **Installation Commands**
+```bash
+# ✅ DO: Use bun install for dependency installation
+bun install
+
+# ✅ DO: Use production script for deployment
+bun run install-prod  # Equivalent to: bun install --production --frozen-lockfile
+
+# ✅ DO: Use bunx instead of npx
+bunx npm-check-updates --interactive
+```
+
+## Compatibility Guidelines
+
+### **Runtime Compatibility**
+- **Current**: Bun package management + Node.js runtime
+- **Scripts**: Use `bun run` for package.json scripts
+- **Execution**: Use `node` for application runtime
+
+
+See [testing.mdc](mdc:.cursor/rules/testing.mdc) for Bun testing patterns and [core.mdc](mdc:.cursor/rules/core.mdc) for general development workflow integration.

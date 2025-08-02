@@ -1695,11 +1695,149 @@
         "dependencies": [],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 41,
+        "title": "Migrate from Node.js 22+ to Bun Runtime",
+        "description": "Complete migration of the project runtime from Node.js 22+ to Bun to leverage improved performance and native TypeScript support, ensuring compatibility with key dependencies and infrastructure.",
+        "details": "1. Research and document incompatibilities and compatibility notes for Prisma, LangChain, Telegraf, and Inversify with Bun using official Bun documentation and community resources. 2. Replace Node.js-specific dependencies such as ts-node and @types/node with Bun equivalents like bun-types. 3. Update TypeScript configuration (tsconfig.json) to include Bun-specific settings, e.g., adding \"types\": [\"bun-types\"] and adjusting module and target options for Bun compatibility. 4. Modify package.json scripts to use Bun commands (e.g., replace \"node\" and \"ts-node\" commands with \"bun\" commands). 5. Update devcontainer.json to use a Bun-based container image instead of Node.js. 6. Address native module compatibility issues, particularly Prisma's query engine, by researching Bun support for native binaries and applying necessary workarounds or updates. 7. Conduct thorough automated testing of all core functionality, focusing on database operations and Telegram bot interactions via LangChain and Telegraf. 8. Perform manual end-to-end smoke tests through Telegram to verify bot functionality remains intact. 9. Plan and document a gradual rollout and rollback strategy to mitigate risks during deployment. 10. Create follow-up tasks to migrate code to better Bun APIs and optimize usage. 11. Update all relevant documentation and internal guidelines to reflect the runtime change to Bun. 12. Perform performance benchmarking to validate the benefits of migration compared to Node.js runtime.\n<info added on 2025-08-02T15:20:08.002Z>\n13. Strategic Decision: Focus exclusively on Bun runtime testing and deployment. Since the migration goal is complete transition to Bun, all testing efforts will concentrate on validating functionality under Bun runtime only. Node.js compatibility testing and maintenance will be discontinued post-migration to streamline the development process and ensure full commitment to the Bun ecosystem.\n</info added on 2025-08-02T15:20:08.002Z>",
+        "testStrategy": "- Run full automated test suite using Bun's test runner to ensure all unit and integration tests pass without regressions. - Specifically test database interactions with Prisma to confirm native module compatibility and query correctness. - Test Telegram bot functionality end-to-end, including message handling and LangChain integrations, via manual and automated tests. - Validate package scripts and devcontainer environment by building and running development containers and CI pipelines. - Conduct performance benchmarking comparing pre- and post-migration metrics to confirm expected improvements. - Perform staged rollout in controlled environments with monitoring and rollback capability. - Review updated documentation and internal rules for accuracy and completeness.",
+        "status": "in-progress",
+        "dependencies": [
+          3,
+          36,
+          "42"
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Research Compatibility and Incompatibilities with Bun",
+            "description": "Investigate and document compatibility issues and notes for key dependencies Prisma, LangChain, Telegraf, and Inversify when migrating from Node.js to Bun.",
+            "dependencies": [],
+            "details": "Use official Bun documentation and community resources to identify incompatibilities, especially focusing on native module support such as Prisma's query engine and Bun's handling of native binaries.\n<info added on 2025-08-02T15:20:03.491Z>\nResearch findings on Bun compatibility:\n\n1. **Prisma**: Works with Bun for basic usage, including schema definition and client generation. Prisma's query engine relies on native binaries, which Bun can handle, but ensure compatibility. Prisma CLI commands still require Node.js, so keep it installed alongside Bun. Test Prisma migrations and client generation thoroughly in your Bun environment.\n\n2. **LangChain**: Pure JS/TS library, should work under Bun with minimal issues. Test LangChain workflows, especially those involving HTTP calls and tool bindings.\n\n3. **Telegraf**: Runs on Bun with minor issues related to native module dependencies. Test all Telegram API interactions under Bun. Use polyfills if needed.\n\n4. **Inversify**: Works with Bun, but ensure proper decorator and metadata setup. Verify TypeScript configuration for decorators and metadata. Test DI container initialization.\n\n5. **Native Module Support**: Bun supports native modules but requires compatibility checks. Ensure Prisma's native binaries are present and compatible.\n\n6. **TypeScript and Bun**: Bun has first-class TypeScript support. Align `tsconfig.json` with Bun's expectations.\n\n**Decision**: Focus solely on testing under Bun, as the goal is to fully transition and only deploy if Bun works fine.\n</info added on 2025-08-02T15:20:03.491Z>",
+            "status": "pending",
+            "testStrategy": "Verify findings by running minimal test cases or sample projects using these dependencies under Bun."
+          },
+          {
+            "id": 2,
+            "title": "Replace Node.js-Specific Dependencies with Bun Equivalents",
+            "description": "Replace Node.js-specific packages like ts-node and @types/node with Bun-compatible alternatives such as bun-types.",
+            "dependencies": [
+              "41.1"
+            ],
+            "details": "Update package.json dependencies and remove Node.js-specific tooling, ensuring Bun-native types and tools are integrated for TypeScript support.",
+            "status": "in-progress",
+            "testStrategy": "Run type checking and compilation tests to confirm Bun types are correctly recognized."
+          },
+          {
+            "id": 3,
+            "title": "Update Configuration Files for Bun Compatibility",
+            "description": "Modify TypeScript configuration (tsconfig.json), package.json scripts, and devcontainer.json to support Bun runtime and commands.",
+            "dependencies": [
+              "41.2"
+            ],
+            "details": "Add Bun-specific TypeScript settings such as \"types\": [\"bun-types\"], adjust module and target options, replace Node.js commands with Bun commands in scripts, and update development container images to Bun-based ones.",
+            "status": "pending",
+            "testStrategy": "Validate configuration changes by running build and start scripts using Bun and verifying container environment setup."
+          },
+          {
+            "id": 4,
+            "title": "Conduct Comprehensive Testing of Bun Migration",
+            "description": "Perform automated and manual testing to ensure all core functionalities, including database operations and Telegram bot interactions, work correctly under Bun.",
+            "dependencies": [
+              "41.3"
+            ],
+            "details": "Run full automated test suites using Bun's test runner, focusing on Prisma database queries and LangChain/Telegraf bot features. Conduct manual end-to-end smoke tests via Telegram to verify bot behavior.",
+            "status": "pending",
+            "testStrategy": "Compare test results with previous Node.js runs to detect regressions and confirm native module compatibility."
+          },
+          {
+            "id": 5,
+            "title": "Document Migration Process and Plan Rollout Strategy",
+            "description": "Create detailed documentation of the migration steps, compatibility notes, and a gradual rollout and rollback plan to mitigate deployment risks.",
+            "dependencies": [
+              "41.4"
+            ],
+            "details": "Include performance benchmarking results comparing Node.js and Bun, update internal guidelines to reflect runtime changes, and outline follow-up tasks for further Bun API optimizations.",
+            "status": "pending",
+            "testStrategy": "Review documentation completeness and clarity with the development team; monitor rollout progress and rollback effectiveness during deployment."
+          }
+        ]
+      },
+      {
+        "id": 42,
+        "title": "Migrate from npm install to bun install",
+        "description": "Replace npm install commands with bun install in package management processes while maintaining Node.js runtime compatibility, serving as a prerequisite for full Bun runtime migration.",
+        "details": "This task involves migrating the package management system from npm to Bun while keeping the Node.js runtime, allowing for independent testing of Bun's package management capabilities:\n\n1. **Package.json Script Updates**:\n   - Replace all `npm install` commands in package.json scripts with `bun install`\n   - Update pre-install, post-install, and other lifecycle scripts to use Bun commands\n   - Modify CI/CD scripts and documentation references to use `bun install` instead of `npm install`\n\n2. **Configuration Compatibility**:\n   - Leverage Bun's .npmrc compatibility to maintain existing npm configurations\n   - Test that existing .npmrc settings (registry configurations, authentication tokens, etc.) work correctly with Bun\n   - Verify that private registry configurations and scoped package settings are preserved\n\n3. **Dependency Resolution Testing**:\n   - Run `bun install` on the current project to ensure all dependencies resolve correctly\n   - Compare the generated lockfile (bun.lockb) with package-lock.json to identify any version discrepancies\n   - Test that all peer dependencies and optional dependencies are handled properly\n   - Verify that development dependencies and production dependencies are correctly categorized\n\n4. **Performance and Compatibility Validation**:\n   - Measure installation time differences between npm and Bun for performance benchmarking\n   - Test installation in different environments (local development, CI/CD, Docker containers)\n   - Ensure that post-install scripts and binary linking work correctly with Bun\n   - Validate that node_modules structure is compatible with existing tooling\n\n5. **Documentation and Migration Notes**:\n   - Document any behavioral differences between npm and Bun package management\n   - Create migration guide for team members switching to Bun install\n   - Update README.md and development setup instructions to reflect the change\n   - Record any packages that have installation issues or require special handling with Bun",
+        "testStrategy": "1. **Installation Verification**:\n   - Delete node_modules and package-lock.json, then run `bun install` to ensure clean installation works\n   - Verify that all dependencies listed in package.json are correctly installed in node_modules\n   - Check that binary files are properly linked and executable scripts work as expected\n\n2. **Compatibility Testing**:\n   - Run the existing test suite after Bun installation to ensure no runtime issues\n   - Test that all npm scripts continue to work correctly with Bun-installed dependencies\n   - Verify that TypeScript compilation and other build processes work without modification\n\n3. **Cross-Environment Testing**:\n   - Test `bun install` in development, staging, and CI/CD environments\n   - Verify installation works correctly in Docker containers and different operating systems\n   - Test with both clean installs and incremental updates to existing node_modules\n\n4. **Performance Benchmarking**:\n   - Measure and compare installation times between npm and Bun across different scenarios\n   - Test installation speed with and without existing node_modules directory\n   - Verify that Bun's caching mechanisms work correctly for repeated installations\n\n5. **Regression Testing**:\n   - Ensure all existing functionality works identically after switching to Bun install\n   - Test that development tools (linters, formatters, test runners) continue to work\n   - Verify that production builds and deployments are unaffected by the package manager change",
+        "status": "done",
+        "dependencies": [
+          2,
+          36
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Environment Setup and Current State Backup",
+            "description": "Prepare the development environment for migration by installing Bun, backing up current npm configuration, and documenting the existing package management state.",
+            "dependencies": [],
+            "details": "Install Bun globally if not already installed. Create backup copies of package-lock.json, .npmrc, and package.json files. Document current npm version and configuration settings. Verify Bun installation by running 'bun --version' and ensure it's accessible in the development environment. Clean existing node_modules directory while preserving package-lock.json for automatic conversion.",
+            "status": "done",
+            "testStrategy": "Verify Bun installation with version check, confirm backup files are created successfully, and validate that package-lock.json is preserved for conversion."
+          },
+          {
+            "id": 2,
+            "title": "Execute Bun Install Migration and Lockfile Conversion",
+            "description": "Run bun install to automatically convert package-lock.json to bun.lockb and install all dependencies using Bun's package manager.",
+            "dependencies": [
+              "42.1"
+            ],
+            "details": "Execute 'bun install' command which will automatically read package-lock.json and convert it to bun.lockb format. Monitor the installation process for any errors or warnings. Verify that all dependencies from package.json are correctly installed in node_modules. Compare dependency versions between the original package-lock.json and the new bun.lockb to identify any discrepancies. Ensure that both production and development dependencies are properly resolved.",
+            "status": "done",
+            "testStrategy": "Compare installed package versions with package.json specifications, verify node_modules structure matches expected layout, and confirm all binary files are properly linked."
+          },
+          {
+            "id": 3,
+            "title": "Update Package.json Scripts and Commands",
+            "description": "Replace all npm-specific commands in package.json scripts with Bun equivalents, including changing npx to bunx and npm install to bun install.",
+            "dependencies": [
+              "42.2"
+            ],
+            "details": "Update all scripts in package.json that use 'npm install', 'npm run', or 'npx' commands to use 'bun install', 'bun run', and 'bunx' respectively. Review pre-install, post-install, and other lifecycle scripts to ensure compatibility with Bun. Update any CI/CD script references and development workflow commands. Maintain script functionality while leveraging Bun's improved performance for package management operations.",
+            "status": "done",
+            "testStrategy": "Execute each updated script to verify functionality, test that bunx commands work correctly for package executables, and validate that lifecycle scripts run without errors."
+          },
+          {
+            "id": 4,
+            "title": "Configuration Compatibility and Registry Validation",
+            "description": "Verify that existing .npmrc configurations work with Bun and test private registry access and authentication if applicable.",
+            "dependencies": [
+              "42.2"
+            ],
+            "details": "Test that Bun correctly reads and respects existing .npmrc configuration files, including registry URLs, authentication tokens, and scoped package settings. Verify workspace support if the project uses npm workspaces. Test private registry access by attempting to install packages from configured private registries. Ensure that proxy settings, SSL configurations, and other npm-specific settings are properly handled by Bun.",
+            "status": "done",
+            "testStrategy": "Install packages from configured registries, verify authentication works for private packages, and test workspace functionality if applicable."
+          },
+          {
+            "id": 5,
+            "title": "Testing, Documentation, and Cleanup",
+            "description": "Validate the complete migration by testing the development workflow, updating documentation, and cleaning up obsolete npm artifacts.",
+            "dependencies": [
+              "42.3",
+              "42.4"
+            ],
+            "details": "Test the complete development workflow including dependency installation, script execution, and build processes using Bun while maintaining Node.js runtime. Update README.md and development setup instructions to reflect the change to Bun install. Create migration notes documenting any behavioral differences and packages requiring special handling. Remove package-lock.json after confirming bun.lockb works correctly. Update internal development guidelines to specify Bun as the package manager while maintaining Node.js runtime compatibility.\n<info added on 2025-08-02T17:15:35.255Z>\n**MIGRATION COMPLETED SUCCESSFULLY**\n\nAll testing, documentation, and cleanup tasks have been completed with full validation:\n\n**Documentation Updates Completed:**\n- README.md updated with comprehensive Bun package management instructions\n- Prerequisites clarified to specify Node.js runtime with Bun package management\n- GitHub CI/CD workflow (.github/workflows/deploy.yml) migrated to use Bun\n- Core development rules updated (.cursor/rules/core.mdc and testing.mdc)\n- Gitpod configuration updated (.gitpod/automations.yaml)\n\n**Fresh Installation Testing Validated:**\n- Complete removal of node_modules and fresh bun install tested successfully\n- 1069 packages installed in 5.01s using only bun.lock (significant performance improvement from ~141s with npm)\n- Build and test processes confirmed working without package-lock.json\n\n**LangChain Override Validation Implemented:**\n- Comprehensive test suite created (src/langchain-core-override.test.ts)\n- Validates @langchain/core@0.3.66 override matches bun.lock JSONC format\n- Automated detection of version mismatches to prevent dependency inconsistencies\n\n**Final Cleanup Completed:**\n- package-lock.json removed (no longer needed)\n- .gitignore updated to prevent future package-lock.json creation\n- Complete migration documentation with performance metrics and results summary\n\n**Migration Results:**\n- Migration Type: Package Management Only (npm → Bun)\n- Runtime: Node.js maintained (Task 41 handles runtime migration)\n- Status: 100% Complete and Fully Functional\n- Performance Gain: ~96% faster package installation (5.01s vs 141s)\n\nThe npm to Bun package management migration is now complete, tested, documented, and ready for production use.\n</info added on 2025-08-02T17:15:35.255Z>",
+            "status": "done",
+            "testStrategy": "Run full development workflow from clean state, execute build and test processes, verify all team members can follow updated documentation, and confirm no functionality regressions."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-02T00:14:42.654Z",
+      "updated": "2025-08-02T17:15:43.024Z",
       "description": "Tasks for master context"
     }
   }

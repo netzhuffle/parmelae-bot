@@ -5,14 +5,14 @@ services:
     triggeredBy:
       - manual
     commands:
-      start: npm run run-dev
+      start: bun run run-dev
   prisma:
     name: Prisma Studio
     description: Runs Prisma Studio to inspect the database
     triggeredBy:
       - manual
     commands:
-      start: npm run prisma-studio
+      start: bun run prisma-studio
 tasks:
   init:
     name: Initialize
@@ -20,13 +20,12 @@ tasks:
     triggeredBy:
       - postDevcontainerStart
     command: |
-      npm install
-      npm run build
-      npm run migrate
-      curl -fsSL https://bun.sh/install | bash
+      bun install
+      bun run build
+      bun run migrate
   check:
     name: Check
     description: Runs formatting, linters, and tests
     triggeredBy:
       - manual
-    command: npm run checks
+    command: bun run checks

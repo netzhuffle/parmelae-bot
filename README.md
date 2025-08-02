@@ -44,8 +44,8 @@ src/
 
 ### Prerequisites
 
-- **Node.js 22+** (LTS recommended)
-- **npm** or **yarn**
+- **Node.js 22** (LTS recommended) - for running the application
+- **Bun** - for package management and tests (use version from .bun-version file)
 - **Telegram Bot Token** from [@BotFather](https://t.me/BotFather)
 - **OpenAI API Key** for AI features
 
@@ -55,12 +55,12 @@ src/
    ```bash
    git clone <repository-url>
    cd parmelae-bot
-   npm install
+   bun install
    ```
 
 2. **Set up the database**
    ```bash
-   npx prisma migrate dev
+   bun run migrate
    ```
 
 3. **Configure environment**
@@ -86,21 +86,21 @@ src/
 
 5. **Start development server**
    ```bash
-   npm run run-dev
+   bun run run-dev
    ```
 
 ## 🛠️ Development
 
 ### Available Scripts
 
-- `npm run run-dev` - Start development server with hot reload
-- `npm run build` - Build TypeScript to JavaScript
-- `npm run test` - Run bun test suite
-- `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
-- `npm run checks` - Run all quality checks (format, build, lint, test)
-- `npm run migrate` - Run database migrations
-- `npm run prisma-studio` - Open Prisma Studio for database management
+- `bun run run-dev` - Start development server with hot reload
+- `bun run lint` - Run linter
+- `bun run format` - Format code
+- `bun run build` - Verify TypeScript build (type checking)
+- `bun test` - Run test suite
+- `bun run checks` - Run all quality checks (format, build, lint, test)
+- `bun run migrate` - Run database migrations
+- `bun run prisma-studio` - Open Prisma Studio for database management
 
 ### Code Quality
 
@@ -153,13 +153,13 @@ The bot includes various AI-powered tools:
 
 ```bash
 # Build the application
-npm run build
+bun run build
 
 # Install production dependencies only
-npm install --omit=dev
+bun run install-prod
 
 # Run database migrations
-npm run migrate-prod
+bun run migrate-prod
 
 # Start the application
 node dist/index.js
@@ -177,7 +177,7 @@ node dist/index.js
 1. **Fork the repository** and create a feature branch
 2. **Follow the existing patterns** - examine similar files for conventions
 3. **Write tests** - every new feature needs corresponding tests
-4. **Run quality checks** - `npm run checks` must pass
+4. **Run quality checks** - `bun run checks` must pass
 5. **Update documentation** - keep README and code comments current
 
 ### Code Conventions

@@ -5,9 +5,15 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"oven.bun-vscode",
 				"dbaeumer.vscode-eslint",
 				"Prisma.prisma"
 			]
+		}
+	},
+	"features": {
+		"ghcr.io/prulloac/devcontainer-features/bun:1": {
+			"version": "1.2.19"
 		}
 	}
 }
