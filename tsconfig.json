@@ -2,6 +2,7 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "target": "ES2022",
@@ -16,10 +17,10 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*",
+    "src/**/*"
   ],
   "ts-node": {
     "transpileOnly": true,
-    "esm": true,
+    "esm": true
   }
 }
