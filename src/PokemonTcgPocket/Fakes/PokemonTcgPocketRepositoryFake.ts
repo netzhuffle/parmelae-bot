@@ -368,6 +368,102 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     });
   }
 
+  /** Get card IDs within a number range in a specific set */
+  getCardIdsInRange(
+    setKey: string,
+    startNumber: number,
+    endNumber: number,
+  ): Promise<number[]> {
+    const cards = Array.from(this.cards.values());
+    const set = Array.from(this.sets.values()).find((s) => s.key === setKey);
+
+    if (!set) {
+      return Promise.resolve([]);
+    }
+
+    const filteredCards = cards.filter((card) => {
+      // Check set match
+      if (card.setId !== set.id) return false;
+
+      // Check number range
+      if (card.number < startNumber || card.number > endNumber) return false;
+
+      return true;
+    });
+
+    // Return just the card IDs, sorted by number
+    const cardIds = filteredCards
+      .sort((a, b) => a.number - b.number)
+      .map((card) => card.id);
+
+    return Promise.resolve(cardIds);
+  }
+
+  /** Adds multiple cards to a user's collection in bulk with upsert logic */
+  addMultipleCardsToCollection(
+    cardIds: number[],
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations[]> {
+    const result: PokemonCardWithRelations[] = [];
+
+    for (const cardId of cardIds) {
+      const card = this.findCardById(cardId);
+      if (!card) {
+        continue; // Skip non-existent cards
+      }
+
+      let owners = this.cardOwners.get(cardId);
+      if (!owners) {
+        owners = new Set<bigint>();
+        this.cardOwners.set(cardId, owners);
+      }
+
+      // Upsert logic: create or update ownership status (always OWNED for bulk adds)
+      owners.add(userId);
+      const statusKey = `${cardId}_${userId}`;
+      this.cardOwnershipStatus.set(statusKey, OwnershipStatus.OWNED);
+
+      const set = Array.from(this.sets.values()).find(
+        (s) => s.id === card.setId,
+      )!;
+      const boosters = this.getCardBoosters(card.id);
+      const ownership = Array.from(owners).map((ownerId) => {
+        const statusKey = `${card.id}_${ownerId}`;
+        const ownershipStatus =
+          this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+        return {
+          id: this.nextId++,
+          cardId: card.id,
+          userId: ownerId,
+          status: ownershipStatus,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          user: {
+            id: ownerId,
+            isBot: false,
+            firstName: 'Test' + ownerId,
+            lastName: null,
+            username: Number(ownerId) % 2 === 0 ? null : 'test' + ownerId,
+            languageCode: null,
+          },
+        };
+      });
+
+      result.push({
+        ...card,
+        set,
+        boosters,
+        ownership,
+      });
+    }
+
+    return Promise.resolve(
+      result.sort(
+        (a, b) => a.set.key.localeCompare(b.set.key) || a.number - b.number,
+      ),
+    );
+  }
+
   /** Removes a card from a user's collection */
   removeCardFromCollection(
     cardId: number,

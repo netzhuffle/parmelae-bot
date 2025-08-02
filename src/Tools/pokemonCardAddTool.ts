@@ -18,6 +18,7 @@ import {
   NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE,
   NO_MATCHING_MISSING_CARDS_MESSAGE,
 } from '../PokemonTcgPocket/texts.js';
+import { POKEMON_CARD_ADD_TOOL_NAME } from './toolNames.js';
 
 const schema = z.object({
   card: z
@@ -167,7 +168,7 @@ export const pokemonCardAddTool = tool(
     );
   },
   {
-    name: 'pokemonCardAdd',
+    name: POKEMON_CARD_ADD_TOOL_NAME,
     description: POKEMON_CARD_ADD_TOOL_DESCRIPTION,
     schema,
   },

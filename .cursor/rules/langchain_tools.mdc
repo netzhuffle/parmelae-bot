@@ -34,6 +34,7 @@ alwaysApply: false
   - **Return user-friendly strings** that can be displayed in chat
   - **Use async/await** for all asynchronous operations
   - **Validate inputs** using the Zod schema before processing
+  - **Tool names** referenced in other tool’s descriptions must not be hardcoded, but imported as constant
 
 - **Tool Configuration:**
   ```typescript
@@ -68,12 +69,36 @@ alwaysApply: false
   - **Handle edge cases** like missing data or API failures gracefully
   - **Use constants** for common error messages to ensure consistency
 
+- **Tool Registration (CRITICAL):**
+  - **MUST register in ChatGptAgentService** - Tools are non-functional until added to the `tools` array in `ChatGptAgentService.ts`
+  - **Import the tool** in `ChatGptAgentService.ts` 
+  - **Add to tools array** alongside other tools like `pokemonCardAddTool`
+  - **Test integration** - Verify the tool is actually available to the agent, not just unit tested
+  
+  ```typescript
+  // ✅ DO: Register tool in ChatGptAgentService.ts
+  import { myNewTool } from './Tools/myNewTool.js';
+  
+  @injectable()
+  export class ChatGptAgentService {
+    private readonly tools: (StructuredTool | Tool)[] = [
+      new Calculator(),
+      diceTool,
+      myNewTool, // <-- Add your tool here
+      pokemonCardAddTool,
+    ];
+  }
+  
+  // ❌ DON'T: Create tool without registering it (renders tool completely non-functional)
+  ```
+
 - **Testing Requirements:**
   - **Create `.test.ts` file** for every tool implementation
   - **Test with mock context** using fakes for external dependencies
   - **Test error scenarios** including invalid inputs and service failures
   - **Verify Zod schema validation** with various input combinations
   - **Test tool description and name** are properly configured
+  - **Test integration** - Ensure tool is registered and available (not just unit functionality)
 
 - **File Organization:**
   - **Tool files** in `src/Tools/` directory

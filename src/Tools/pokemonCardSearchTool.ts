@@ -14,8 +14,7 @@ import {
   CARD_EXISTS_BUT_NO_MATCH_MESSAGE,
   LIMITED_RESULTS_MESSAGE,
 } from '../PokemonTcgPocket/texts.js';
-
-export const POKEMON_CARD_SEARCH_TOOL_NAME = 'pokemonCardSearch';
+import { POKEMON_CARD_SEARCH_TOOL_NAME } from './toolNames.js';
 
 const schema = z.object({
   card: z

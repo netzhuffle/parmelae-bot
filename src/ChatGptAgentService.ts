@@ -31,6 +31,7 @@ import { dallETool } from './Tools/dallETool.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
 import { pokemonCardSearchTool } from './Tools/pokemonCardSearchTool.js';
 import { pokemonCardAddTool } from './Tools/pokemonCardAddTool.js';
+import { pokemonCardRangeAddTool } from './Tools/pokemonCardRangeAddTool.js';
 import { pokemonCardStatsTool } from './Tools/pokemonCardStatsTool.js';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
@@ -107,6 +108,7 @@ export class ChatGptAgentService {
     dateTimeTool,
     pokemonCardSearchTool,
     pokemonCardAddTool,
+    pokemonCardRangeAddTool,
     pokemonCardStatsTool,
   ];
 

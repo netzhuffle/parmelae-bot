@@ -1833,11 +1833,138 @@
             "testStrategy": "Run full development workflow from clean state, execute build and test processes, verify all team members can follow updated documentation, and confirm no functionality regressions."
           }
         ]
+      },
+      {
+        "id": 43,
+        "title": "Implement Automated Backup and Restore System for Prisma SQLite Database",
+        "description": "Develop an automated backup system for the Prisma SQLite database integrated into the GitHub Actions deployment workflow, including backup creation, storage, retention, verification, and a restore script for emergency recovery.",
+        "details": "1. Implement a GitHub Actions workflow step that runs immediately after SSH setup during deployment to create a backup of the prisma/sqlite.db file. Use Node.js with the 'better-sqlite3' package to perform a safe SQLite backup via its .backup() method to avoid corruption during live database access.\n2. Name backup files with a timestamp format: sqlite-backup-YYYY-MM-DD-HH-mm-ss.db, and store them on the production server in a designated backup directory.\n3. Implement automatic cleanup logic within the workflow or a separate script to retain only the 5 most recent backups, deleting older files to manage storage.\n4. Add verification steps to confirm the backup file was created successfully and is accessible before proceeding with deployment.\n5. Develop a restore script that can be run manually on the production server to replace the current database with a selected backup file, ensuring emergency recovery capability.\n6. Ensure all scripts and workflows handle errors gracefully and log relevant information for audit and troubleshooting.\n7. Follow best practices for secure handling of backup files and access permissions on the production server.\n8. Document the backup and restore procedures clearly for operational use.",
+        "testStrategy": "1. Unit test the backup script locally using a test SQLite database to verify backup creation and naming conventions.\n2. Test the cleanup logic by simulating multiple backup files and confirming only the 5 most recent remain.\n3. Run the GitHub Actions workflow in a staging environment to validate the backup step executes correctly after SSH setup and before deployment.\n4. Verify backup file integrity by attempting to open and query the backup database.\n5. Test the restore script by restoring a backup to a test environment and confirming the database state matches the backup.\n6. Perform end-to-end deployment tests ensuring that backups are created and verified before deployment proceeds.\n7. Include failure scenario tests, such as backup creation failure, to confirm deployment halts and errors are logged.\n8. Review logs and artifacts from the workflow runs to ensure transparency and traceability of backup operations.",
+        "status": "pending",
+        "dependencies": [
+          4
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create GitHub Actions Backup Workflow Step",
+            "description": "Implement a GitHub Actions workflow step that runs immediately after SSH setup during deployment to create a backup of the prisma/sqlite.db file using Node.js and the 'better-sqlite3' package's .backup() method.",
+            "dependencies": [],
+            "details": "Develop a Node.js script that uses 'better-sqlite3' to safely backup the live SQLite database file to avoid corruption. Integrate this script into the GitHub Actions deployment workflow to execute after SSH setup.",
+            "status": "pending",
+            "testStrategy": "Unit test the backup script locally with a test SQLite database to verify backup creation and naming conventions. Validate the workflow step in a staging environment."
+          },
+          {
+            "id": 2,
+            "title": "Implement Backup File Naming and Storage",
+            "description": "Name backup files using the timestamp format sqlite-backup-YYYY-MM-DD-HH-mm-ss.db and store them in a designated backup directory on the production server.",
+            "dependencies": [
+              "43.1"
+            ],
+            "details": "Ensure the backup script generates filenames with the specified timestamp format and saves backups to a secure, designated directory on the production server with appropriate permissions.",
+            "status": "pending",
+            "testStrategy": "Verify backup files are created with correct names and stored in the correct directory with proper access rights."
+          },
+          {
+            "id": 3,
+            "title": "Develop Backup Retention and Cleanup Logic",
+            "description": "Implement automatic cleanup logic within the workflow or a separate script to retain only the 5 most recent backups, deleting older files to manage storage space.",
+            "dependencies": [
+              "43.2"
+            ],
+            "details": "Create a script or workflow step that lists backup files, sorts them by timestamp, and deletes backups older than the 5 most recent to control storage usage.",
+            "status": "pending",
+            "testStrategy": "Simulate multiple backup files and confirm only the 5 most recent remain after cleanup execution."
+          },
+          {
+            "id": 4,
+            "title": "Add Backup Verification and Error Handling",
+            "description": "Add verification steps to confirm the backup file was created successfully and is accessible before proceeding with deployment, including graceful error handling and logging.",
+            "dependencies": [
+              "43.3"
+            ],
+            "details": "Implement checks to verify backup file existence and readability. Ensure all scripts and workflows handle errors gracefully and log relevant information for audit and troubleshooting purposes.",
+            "status": "pending",
+            "testStrategy": "Test failure scenarios such as permission errors or missing files and verify that errors are logged and handled without breaking the deployment."
+          },
+          {
+            "id": 5,
+            "title": "Develop Manual Restore Script and Documentation",
+            "description": "Develop a restore script to manually replace the current database with a selected backup file on the production server, ensuring emergency recovery capability, and document backup and restore procedures.",
+            "dependencies": [
+              "43.4"
+            ],
+            "details": "Create a script that allows manual restoration of the database from a chosen backup file with safety checks. Document the backup and restore processes clearly for operational use, including security best practices for backup file handling.",
+            "status": "pending",
+            "testStrategy": "Test the restore script by restoring from backups in a staging environment and verify database integrity post-restore. Review documentation for clarity and completeness."
+          }
+        ]
+      },
+      {
+        "id": 44,
+        "title": "Create pokemonCardRangeAddTool for Bulk Adding Pokemon Cards by ID Range",
+        "description": "Develop a LangChain tool named pokemonCardRangeAddTool that adds multiple Pokemon cards from a specified set within a given inclusive ID range to the user's collection, accepting setKey, startId, and endId as parameters.",
+        "details": "1. Define the tool interface with three parameters validated by Zod: setKey (enum SET_KEY_VALUES), startId (number), and endId (number).\n2. Follow the implementation pattern of pokemonCardAddTool.ts, including importing and using the PokemonTcgPocketService for card operations.\n3. Implement iteration over the card IDs from startId to endId inclusive within the specified setKey.\n4. For each card ID, attempt to add the card to the user's collection using the service; handle cases where a card does not exist by logging or collecting these instances.\n5. Aggregate results to provide user feedback indicating which cards were successfully added and which were missing or failed.\n6. Incorporate robust error handling consistent with Task 16, including catching service errors and providing meaningful messages.\n7. Use the tool context properly to access user session or authentication details as needed.\n8. Ensure the tool is fully typed with TypeScript and includes comprehensive Zod schema validation for input parameters.\n9. Write the tool as a reusable LangChain tool module, following existing project conventions and code style.\n10. Document the tool's usage and error cases clearly in code comments.",
+        "testStrategy": "1. Unit tests for Zod schema validation to ensure only valid setKey, startId, and endId inputs are accepted.\n2. Mock PokemonTcgPocketService to simulate adding cards and test iteration logic over the ID range.\n3. Test behavior when some card IDs in the range do not exist, verifying proper error handling and user feedback.\n4. Integration tests to verify the tool correctly interacts with the real PokemonTcgPocketService and updates the user's collection.\n5. Test error scenarios such as service failures or invalid parameters to confirm graceful degradation and informative error messages.\n6. Verify that the tool context is correctly utilized for user identification and permissions.\n7. Code review to ensure adherence to project patterns as established in pokemonCardAddTool.ts and error handling standards from Task 16.",
+        "status": "done",
+        "dependencies": [
+          12,
+          16
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Tool Interface and Input Validation",
+            "description": "Create the pokemonCardRangeAddTool interface with three parameters: setKey, startId, and endId. Use Zod to validate these inputs, ensuring setKey is an enum of SET_KEY_VALUES and startId and endId are numbers.",
+            "dependencies": [],
+            "details": "Implement Zod schema validation for input parameters to enforce correct types and valid enum values for setKey. This forms the foundation for the tool's input handling.\n<info added on 2025-08-02T21:37:52.226Z>\nStarting implementation with approved minimal Zod schema approach. Creating pokemonCardRangeAddTool.ts file with simplified schema structure and custom validation chain for enhanced error messaging. This will provide better user feedback compared to default Zod error messages while maintaining type safety for setKey enum validation and numeric input requirements.\n</info added on 2025-08-02T21:37:52.226Z>\n<info added on 2025-08-02T21:43:33.669Z>\nSubtask 44.1 has been completed successfully. The implementation includes a comprehensive pokemonCardRangeAddTool.ts file with minimal Zod schema validation and custom validation chain providing user-friendly error messages. Key validation features implemented: positive number validation (≥1), range order validation (startId ≤ endId), range size limits (≤100 cards), and card number format limits (≤999). Complete test coverage added in pokemonCardRangeAddTool.test.ts with 88 lines of validation tests. The tool follows established patterns from pokemonCardAddTool.ts and uses placeholder implementation with TODO comments for functionality to be added in subsequent subtasks. All quality checks passed including formatting, build, linting, and tests.\n</info added on 2025-08-02T21:43:33.669Z>\n<info added on 2025-08-02T21:47:24.639Z>\nValidation logic has been simplified based on user feedback. Removed unnecessary validation checks for numbers < 1, > 999, and range size limits, keeping only the logical validation that startId <= endId. Updated corresponding tests to remove the unnecessary test cases. The user correctly pointed out that database queries will naturally handle edge cases \"for free\". The simplified validation now only enforces range order (startId <= endId) as a logical requirement, while removing artificial limitations for positive numbers, card format limits, and range size limits. This approach is cleaner and more practical, letting the database do natural filtering instead of imposing artificial restrictions. The tool is now more user-friendly and less restrictive while all quality checks continue to pass.\n</info added on 2025-08-02T21:47:24.639Z>",
+            "status": "done",
+            "testStrategy": "Unit tests to verify Zod schema accepts valid inputs and rejects invalid ones for setKey, startId, and endId."
+          },
+          {
+            "id": 2,
+            "title": "Implement Card Addition Logic Using PokemonTcgPocketService",
+            "description": "Develop the core logic to iterate over the inclusive ID range from startId to endId within the specified setKey, adding each card to the user's collection via PokemonTcgPocketService.",
+            "dependencies": [],
+            "details": "Follow the implementation pattern of pokemonCardAddTool.ts, importing and utilizing PokemonTcgPocketService for card operations. For each card ID, attempt to add the card and handle cases where the card does not exist.\n<info added on 2025-08-02T22:13:19.365Z>\nImplementation started with approved plan:\n- Using bulk searchCardsInRange method with userId parameter (no ownership filter) for efficient card validation\n- Implementing upsert logic in addCardsToCollection method to create missing cards and update NOT_NEEDED status to OWNED\n- Skipping duplicate handling logic since ID ranges inherently contain no duplicates\n- Following existing service patterns for consistent error handling and user feedback mechanisms\n</info added on 2025-08-02T22:13:19.365Z>\n<info added on 2025-08-02T22:21:36.385Z>\nSUBTASK COMPLETED: Successfully implemented the pokemonCardRangeAddTool with bulk database operations for optimal performance. Key achievements include bulk searchCardsInRange() and addMultipleCardsToCollection() methods in both repository and service layers, proper upsert logic that creates missing cards and updates NOT_NEEDED status to OWNED, efficient single-query validation and bulk insert/update operations, comprehensive error handling for non-existent sets and empty ranges, and consistent user experience using existing processCards() service method. Technical implementation features repository methods with userId parameter for API consistency, Promise.all upsert operations, service wrapper methods maintaining clean abstraction, updated fake implementations supporting bulk methods with proper upsert behavior, and complete tool implementation with validation and error handling. Quality assurance confirmed with all 486 tests passing, comprehensive test coverage for validation and bulk operations, updated test expectations matching actual service output format, and performance optimization through bulk database operations instead of individual queries.\n</info added on 2025-08-02T22:21:36.385Z>\n<info added on 2025-08-02T22:35:41.193Z>\nMAJOR IMPROVEMENTS COMPLETED based on user feedback: Removed eslint-disable comments by eliminating unused userId parameter from searchCardsInRange method signatures. Optimized data flow by renaming searchCardsInRange to searchCardIdsInRange with return type number[] instead of PokemonCardWithRelations[] since only IDs are needed for validation and adding cards. Added critical validation that ensures all expected cards in the range actually exist in the database by calculating expected count (endId - startId + 1), comparing with found cards count, and reporting missing cards with clear error message if count doesn't match. Improved method consistency so both single and bulk add operations use similar patterns, with bulk operations using Promise.all with upsert logic for better performance. Key benefits include more efficient queries (only select card IDs, not full relations), better validation (prevents partial range additions), cleaner code (no eslint-disable comments), consistent patterns between single/bulk operations, and clear user feedback about missing cards in ranges. All tests pass, including new test for partial range validation.\n</info added on 2025-08-02T22:35:41.193Z>\n<info added on 2025-08-02T22:49:15.245Z>\nFINAL OPTIMIZATIONS COMPLETED based on user's excellent suggestions:\n\n**1. Database Count Optimization:**\n- Replaced `searchCardIdsInRange()` with two efficient methods:\n  - `countCardsInRange()`: Uses `prisma.count()` for validation (much more efficient than fetching IDs just to count them)  \n  - `getCardIdsInRange()`: Fetches actual IDs only when needed for the add operation\n- Tool now uses count first to validate, then gets IDs only if validation passes\n\n**2. Simplified Status Parameter:**\n- Removed unnecessary `status` parameter from `addMultipleCardsToCollection()` \n- Bulk operations always set ownership to OWNED (the intended behavior)\n- Reduced API complexity and eliminates confusion about what status to use\n\n**Key Performance Benefits:**\n- More efficient validation: `COUNT()` query instead of fetching full records\n- Cleaner API: No unnecessary status parameters for bulk operations  \n- Better separation of concerns: count for validation, get IDs for implementation\n- Consistent behavior: bulk operations always mean \"add to collection as OWNED\"\n\n**Technical Implementation:**\n- Repository: Added `countCardsInRange()` and `getCardIdsInRange()` methods\n- Service: Updated to use two-step approach (count → validate → get IDs → add)\n- Tool: Streamlined flow with efficient validation before costly operations\n- Tests: Updated to test both count and get operations separately\n- All 496 tests pass\n\nThe user's feedback resulted in significantly more efficient and cleaner code!\n</info added on 2025-08-02T22:49:15.245Z>",
+            "status": "done",
+            "testStrategy": "Mock PokemonTcgPocketService to simulate adding cards and test iteration over the ID range, including handling of non-existent card IDs."
+          },
+          {
+            "id": 3,
+            "title": "Implement Robust Error Handling and Logging",
+            "description": "Incorporate error handling consistent with Task 16, catching service errors during card addition and logging or collecting information about missing or failed card additions.",
+            "dependencies": [],
+            "details": "Ensure meaningful error messages are provided to the user and that failures do not interrupt the entire batch process. Log or collect details of cards that could not be added.",
+            "status": "done",
+            "testStrategy": "Test error scenarios such as service failures and missing cards to verify proper error handling and logging."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Tool Context for User Session and Authentication",
+            "description": "Use the tool context properly to access user session or authentication details required by PokemonTcgPocketService to add cards to the correct user's collection.",
+            "dependencies": [],
+            "details": "Ensure the tool accesses and uses authentication tokens or session information securely and correctly to perform user-specific operations.",
+            "status": "done",
+            "testStrategy": "Test with authenticated and unauthenticated contexts to verify correct handling of user session data."
+          },
+          {
+            "id": 5,
+            "title": "Finalize Tool Module with TypeScript Typing, Documentation, and Project Conventions",
+            "description": "Complete the tool as a reusable LangChain module fully typed with TypeScript, including comprehensive Zod validation, following existing project code style, and documenting usage and error cases clearly in code comments.",
+            "dependencies": [],
+            "details": "Ensure the module is maintainable and reusable, with clear documentation for developers and users. Adhere to project conventions for consistency.\n<info added on 2025-08-02T23:11:45.480Z>\nSUBTASK 44.5 COMPLETED: Finalized pokemonCardRangeAddTool with comprehensive documentation and standards compliance.\n\n**Documentation Enhancements:**\n- Added comprehensive JSDoc documentation with detailed description, examples, parameters, and feature list\n- Enhanced Zod schema descriptions with detailed parameter explanations including set key mappings\n- Improved inline code comments explaining each step of the process\n- Added explicit TypeScript type annotations for better code clarity\n\n**Standards Compliance Verified:**\n- ✅ LangChain Tool Standards: Proper tool() usage, schema validation, error handling, async/await patterns\n- ✅ TypeScript Standards: Explicit typing, builds without errors, proper type inference usage\n- ✅ Code Style Consistency: Matches patterns from pokemonCardAddTool.ts and other Pokemon tools\n- ✅ Project Conventions: Correct file organization, naming patterns, import structure, dependency injection\n\n**Quality Assurance:**\n- ✅ Formatting: `bun run format && bun run schema-format` - passed\n- ✅ Build: `bun run build` - no TypeScript errors\n- ✅ Linting: `bun run lint && bun run validate-yaml` - no issues\n- ✅ Tests: All 19 tests pass (9 tool tests + 10 service tests)\n\n**Final Tool Features:**\n- Comprehensive parameter descriptions with set key mappings\n- Detailed JSDoc with usage examples and feature documentation\n- Explicit error handling with user-friendly messages\n- Efficient single-query database operations\n- Complete test coverage including mixed ownership scenarios\n- Full compliance with project coding standards and LangChain tool patterns\n\nThe pokemonCardRangeAddTool is now production-ready with professional documentation and standards compliance.\n</info added on 2025-08-02T23:11:45.480Z>",
+            "status": "done",
+            "testStrategy": "Code review and integration tests to ensure compliance with project standards and documentation completeness."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-02T17:15:43.024Z",
+      "updated": "2025-08-02T23:11:57.345Z",
       "description": "Tasks for master context"
     }
   }

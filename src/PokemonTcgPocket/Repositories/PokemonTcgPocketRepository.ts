@@ -272,6 +272,38 @@ export class PokemonTcgPocketRepository {
     }
   }
 
+  /** Get card IDs within a number range in a specific set */
+  async getCardIdsInRange(
+    setKey: string,
+    startNumber: number,
+    endNumber: number,
+  ): Promise<number[]> {
+    try {
+      const cards = await this.prisma.pokemonCard.findMany({
+        where: {
+          number: {
+            gte: startNumber,
+            lte: endNumber,
+          },
+          set: {
+            key: setKey,
+          },
+        },
+        select: {
+          id: true,
+        },
+        orderBy: [{ number: 'asc' }],
+      });
+      return cards.map((card) => card.id);
+    } catch (error) {
+      throw new PokemonTcgPocketDatabaseError(
+        'get',
+        `card IDs in range ${startNumber}-${endNumber} for set ${setKey}`,
+        this.formatError(error),
+      );
+    }
+  }
+
   /** Adds a card to a user's collection */
   async addCardToCollection(
     cardId: number,
@@ -303,6 +335,62 @@ export class PokemonTcgPocketRepository {
       throw new PokemonTcgPocketDatabaseError(
         'add',
         `card ${cardId} to user ${userId}'s collection`,
+        this.formatError(error),
+      );
+    }
+  }
+
+  /** Adds multiple cards to a user's collection in bulk with upsert logic */
+  async addMultipleCardsToCollection(
+    cardIds: number[],
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations[]> {
+    try {
+      // Use upsert logic for each card to handle:
+      // - Create new ownership if not exists
+      // - Update NOT_NEEDED to OWNED if exists with NOT_NEEDED status
+      // - Leave OWNED cards unchanged
+      await Promise.all(
+        cardIds.map((cardId) =>
+          this.prisma.pokemonCardOwnership.upsert({
+            where: {
+              cardId_userId: {
+                cardId,
+                userId,
+              },
+            },
+            update: {
+              status: OwnershipStatus.OWNED, // Always update to OWNED for bulk adds
+            },
+            create: {
+              cardId,
+              userId,
+              status: OwnershipStatus.OWNED,
+            },
+          }),
+        ),
+      );
+
+      // Then, fetch and return the updated cards with their relations
+      return this.prisma.pokemonCard.findMany({
+        where: {
+          id: { in: cardIds },
+        },
+        include: {
+          set: true,
+          boosters: true,
+          ownership: {
+            include: {
+              user: true,
+            },
+          },
+        },
+        orderBy: [{ set: { key: 'asc' } }, { number: 'asc' }],
+      });
+    } catch (error) {
+      throw new PokemonTcgPocketDatabaseError(
+        'add',
+        `${cardIds.length} cards to user ${userId}'s collection`,
         this.formatError(error),
       );
     }

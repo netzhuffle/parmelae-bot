@@ -235,6 +235,23 @@ export class PokemonTcgPocketService {
     return this.repository.removeCardFromCollection(cardId, userId);
   }
 
+  /** Get card IDs in a range within a specific set */
+  async getCardIdsInRange(
+    setKey: string,
+    startNumber: number,
+    endNumber: number,
+  ): Promise<number[]> {
+    return this.repository.getCardIdsInRange(setKey, startNumber, endNumber);
+  }
+
+  /** Adds multiple cards to a user's collection in bulk */
+  async addMultipleCardsToCollection(
+    cardIds: number[],
+    userId: bigint,
+  ): Promise<PokemonCardWithRelations[]> {
+    return this.repository.addMultipleCardsToCollection(cardIds, userId);
+  }
+
   /** Synchronizes the database with the YAML source file. */
   async synchronizeCardDatabaseWithYamlSource(): Promise<void> {
     const sets = load(this.yamlContent) as Sets;
