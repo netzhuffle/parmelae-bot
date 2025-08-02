@@ -74,33 +74,34 @@ Remember to maintain high code quality standards and think about maintainability
 
 # Development Process
 
-You have two modes. When a new task or subtask started, you make sure to always switch to plan mode.
+You have two modes. Whenever a new task or subtask starts or the user gives you entirely new directions, you make sure to always switch to plan mode.
 
 You always need to plan the implementation for a subtask first and let the user approve the plan before going to act mode for the actual implementation of changes.
 
 # Plan Mode
 
-In plan mode, think and explain how to best implement the necessary changes for the current task. Review the plan and iterate to improve it. Make sure all necessary parts are sketched out and a different world-class TypeScript engineer would approve this tech doc. Do not implement any changes in plan mode (but update your task manager if useful, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster.mdc), by example if it should be broken down into subtasks). Suggest to switch to act mode once everything is planned out for implementation.
+In plan mode, think and explain how to best implement the necessary changes for the current subtask. Review the plan and iterate to improve it. Make sure all necessary parts are sketched out and a different world-class TypeScript engineer would approve this tech doc. Do not implement any changes in plan mode (but update your task manager if useful, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster/taskmaster.mdc), by example if the current task should be broken down into more subtasks). Suggest to switch to act mode once everything is planned out for implementation.
 
-If you discover any uncertainties regarding requirements, ask the questions during plan mode to make sure that later in act mode all requirements are clear instead of suggesting act mode directly. Limit questions about next steps – as a Senior Software Engineer you are fully qualified to prioritise and execute projects from start to finish yourself. You can also research and read existing code for better understanding to refine the plan.
+If you discover any uncertainties regarding requirements, ask the questions during plan mode to make sure that later in act mode all requirements are clear instead of suggesting act mode directly. Avoid basic questions about next steps – as a Senior Software Engineer you are fully qualified to prioritise and execute projects from start to finish yourself. You can also research and read existing code for better understanding to refine the plan.
 
-If you discover anything missing in the task manager (including if your current task is not mentioned yet), update the task manager now.
+If you discover anything missing in Taskmaster (including if your current task is not mentioned yet), update Taskmaster now.
 
 # Act Mode
 
 Implement the changes as planned and confirmed by the user.
 
-1. Update all necessary documentation, including the current task, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster.mdc).
-2. Implement all changes for the current task, according to the plan.
-3. Review the implementation through a high quality code review.
-4. Refactor the implementation for improving code quality. If there were any changes, go back to step 3.
+1. Update all necessary documentation, including Taskmaster, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster/taskmaster.mdc).
+2. Add all substeps for the current subtask to your to-do list.
+3. Implement all changes for the current task, according to the plan from plan mode, the task and subtask description and details in Taskmaster and on your to-do list.
+4. Self-review your implementation through a high quality code review.
+5. Refactor the implementation for improving code quality. If there were any changes, go back to step 4.
 5. Run the checks.
-6. Make all checks pass. If there were any changes necessary, go back to step 3.
+6. Make all checks pass. If there were any changes necessary, go back to step 4.
 7. Update the documentation again to make sure it matches the implementation.
-8. Update your task manager, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster.mdc).
+8. Verify the test strategy recorded for your current subtask and task in Taskmaster.
+8. Update the documentation in Taskmaster and your to-do list.
 9. See if there are any rules that need self-improvement, see [self_improve.mdc](mdc:.cursor/rules/self_improve.mdc).
-10. Suggest to going to plan mode again for the next task.
-
+10. Suggest to going to plan mode again for the next subtask.
 
 - **CRITICAL PROCESS REQUIREMENTS:**
   - **NEVER mark any task or subtask as "done" without running ALL required checks first**
