@@ -1684,11 +1684,22 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 40,
+        "title": "Gather Requirements for 6-Card Pack Probability Calculations",
+        "description": "Collect detailed requirements from stakeholders about 6-card pack mechanics, structure, and probability distributions to enable proper implementation of the PokemonTcgPocketProbabilityService updates.",
+        "details": "This requirements gathering task is essential before implementing 6-card pack support in the PokemonTcgPocketProbabilityService. The current service assumes all packs have exactly 5 cards, but the new `hasSixPacks` field requires understanding the mechanics of variable pack sizes.\n\n**Key Requirements to Gather:**\n\n1. **Pack Structure Definition:**\n   - Document the exact card structure for 6-card packs (guaranteed slots vs distributed slots)\n   - Clarify if ONE_DIAMOND guaranteed slots still exist in 6-card packs\n   - Define rarity distributions for each slot position in 6-card packs\n   - Determine if additional cards come from the same pool or have different distributions\n\n2. **Pack Type Probability Matrix:**\n   - For boosters with `hasSixPacks=true`, determine if they contain only 6-card packs or a mix of 5-card and 6-card packs\n   - If mixed, establish the probability distribution between 5-card and 6-card packs\n   - Clarify god pack behavior: do they remain 5-card or also become 6-card packs?\n   - Define any special conditions or triggers for 6-card pack generation\n\n3. **Card Selection and Rarity Logic:**\n   - Understand how `isSixPackOnly` cards integrate with the new pack structure\n   - Determine if 6-card packs have different base rarity distributions than 5-card packs\n   - Clarify if the additional card(s) in 6-card packs follow existing rarity rules or have special distributions\n\n4. **Integration Requirements:**\n   - Define how the service should detect pack size (automatic based on `booster.hasSixPacks` or configurable)\n   - Establish backward compatibility requirements for existing 5-card pack calculations\n   - Determine if new API methods are needed or if existing `calculateNewCardProbability` methods should be extended\n\n**Deliverables:**\n- Comprehensive requirements document with pack structure specifications\n- Probability distribution tables for all pack types and sizes\n- Integration specification for service updates\n- Test scenarios covering all pack size combinations",
+        "testStrategy": "1. **Requirements Validation:**\n   - Review gathered requirements with multiple stakeholders to ensure completeness and accuracy\n   - Create visual diagrams showing pack structures and probability flows for validation\n   - Verify that all edge cases and special scenarios are documented\n\n2. **Consistency Verification:**\n   - Cross-reference 6-card pack requirements with existing 5-card pack logic to identify conflicts\n   - Validate that probability distributions sum to 100% for all pack types\n   - Ensure `isSixPackOnly` card behavior is clearly defined and testable\n\n3. **Implementation Readiness Check:**\n   - Confirm that all technical questions needed for PokemonTcgPocketProbabilityService updates are answered\n   - Verify that requirements provide sufficient detail for extending PACK_CONFIG and probability calculation methods\n   - Ensure test scenarios are comprehensive enough to validate the implementation\n\n4. **Stakeholder Sign-off:**\n   - Obtain formal approval from product owners and technical leads on the documented requirements\n   - Confirm that the requirements align with business objectives and technical constraints",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-02T00:08:22.531Z",
+      "updated": "2025-08-02T00:14:42.654Z",
       "description": "Tasks for master context"
     }
   }
