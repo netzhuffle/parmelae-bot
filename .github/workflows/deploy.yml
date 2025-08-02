@@ -44,7 +44,7 @@ jobs:
       - name: Deploy
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: rsync -chilOrz --stats --delete --include node_modules --include dist --exclude-from .gitignore --exclude .git ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
+        run: rsync -chilOrz --stats --delete --exclude .git --exclude .gitignore --exclude .env --exclude .cursor --exclude .devcontainer --exclude .github --exclude .taskmaster --exclude .vscode --include node_modules --include dist ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
 
       - name: Start
         env:

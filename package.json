@@ -1,7 +1,7 @@
 {
   "private": true,
   "type": "module",
-  "main": "built/index.js",
+  "main": "dist/index.js",
   "engines": {
     "node": ">=22.0.0"
   },
