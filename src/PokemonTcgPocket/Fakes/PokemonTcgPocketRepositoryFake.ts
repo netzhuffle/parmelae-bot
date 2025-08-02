@@ -84,19 +84,28 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       name,
       setId: set.id,
       hasShinyRarity: false,
+      hasSixPacks: false,
     };
     this.boosters.set(`${set.id}_${name}`, booster);
     return Promise.resolve(booster);
   }
 
   /** Creates a new card */
-  createCard(
-    name: string,
-    setKey: string,
-    number: number,
-    rarity: Rarity | null,
-    boosterNames: string[],
-  ): Promise<PokemonCard> {
+  createCard({
+    name,
+    setKey,
+    number,
+    rarity,
+    boosterNames,
+    isSixPackOnly,
+  }: {
+    name: string;
+    setKey: string;
+    number: number;
+    rarity: Rarity | null;
+    boosterNames: string[];
+    isSixPackOnly: boolean;
+  }): Promise<PokemonCard> {
     const set = this.sets.get(setKey);
     if (!set) {
       throw new Error(`Set ${setKey} not found`);
@@ -108,6 +117,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       setId: set.id,
       number,
       rarity,
+      isSixPackOnly,
     };
     this.cards.set(`${setKey}_${number}`, card);
 
@@ -132,13 +142,14 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     rarity: Rarity | null,
     boosterNames: string[],
   ): Promise<PokemonCard> {
-    const card = await this.createCard(
+    const card = await this.createCard({
       name,
       setKey,
       number,
       rarity,
       boosterNames,
-    );
+      isSixPackOnly: false,
+    });
     this.idOnlyCards.add(card.id);
     return card;
   }
@@ -554,6 +565,25 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       );
     }
     booster.hasShinyRarity = hasShinyRarity;
+    return await Promise.resolve(booster);
+  }
+
+  /** Updates the hasSixPacks field of a booster */
+  async updateBoosterSixPacks(
+    boosterId: number,
+    hasSixPacks: boolean,
+  ): Promise<PokemonBooster> {
+    const booster = Array.from(this.boosters.values()).find(
+      (b) => b.id === boosterId,
+    );
+    if (!booster) {
+      throw new PokemonTcgPocketDatabaseError(
+        'update',
+        `booster ${boosterId} six packs`,
+        'Booster not found',
+      );
+    }
+    booster.hasSixPacks = hasSixPacks;
     return await Promise.resolve(booster);
   }
 }

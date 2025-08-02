@@ -359,6 +359,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 1,
           rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: false,
         },
         {
           id: 2,
@@ -366,6 +367,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 2,
           rarity: Rarity.ONE_STAR,
+          isSixPackOnly: false,
         },
       ];
       const missingCards: PokemonCard[] = [];
@@ -387,6 +389,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 1,
           rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: false,
         },
         {
           id: 2,
@@ -394,6 +397,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 2,
           rarity: Rarity.ONE_STAR,
+          isSixPackOnly: false,
         },
       ];
       const missingCards = [
@@ -403,6 +407,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 3,
           rarity: Rarity.TWO_STARS,
+          isSixPackOnly: false,
         },
         {
           id: 4,
@@ -410,6 +415,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 4,
           rarity: Rarity.THREE_STARS,
+          isSixPackOnly: false,
         },
       ];
 
@@ -430,6 +436,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 1,
           rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: false,
         },
         {
           id: 2,
@@ -437,6 +444,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 2,
           rarity: Rarity.TWO_DIAMONDS,
+          isSixPackOnly: false,
         },
         {
           id: 3,
@@ -444,6 +452,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 3,
           rarity: Rarity.ONE_STAR,
+          isSixPackOnly: false,
         },
         {
           id: 4,
@@ -451,6 +460,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 4,
           rarity: Rarity.TWO_STARS,
+          isSixPackOnly: false,
         },
         {
           id: 5,
@@ -458,6 +468,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 5,
           rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: false,
         },
       ];
       const missingCards = [
@@ -467,6 +478,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 6,
           rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: false,
         },
         {
           id: 7,
@@ -474,6 +486,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 7,
           rarity: Rarity.ONE_STAR,
+          isSixPackOnly: false,
         },
       ];
 
@@ -495,6 +508,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 1,
           rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: false,
         },
         {
           id: 2,
@@ -502,6 +516,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 2,
           rarity: Rarity.ONE_STAR,
+          isSixPackOnly: false,
         },
       ];
       const missingCards = [
@@ -511,6 +526,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 3,
           rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: false,
         },
         {
           id: 4,
@@ -518,6 +534,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           setId: 1,
           number: 4,
           rarity: Rarity.ONE_STAR,
+          isSixPackOnly: false,
         },
       ];
 
@@ -548,6 +565,7 @@ function createTestCards(): PokemonCardWithRelations[] {
         setId: 1,
         number: id,
         rarity,
+        isSixPackOnly: false,
         boosters: [],
         ownership: [],
         set: {
@@ -569,6 +587,7 @@ function createCard(rarity: Rarity): PokemonCardWithRelations {
     setId: 0,
     number: 0,
     rarity,
+    isSixPackOnly: false,
     boosters: [],
     ownership: [],
     set: {

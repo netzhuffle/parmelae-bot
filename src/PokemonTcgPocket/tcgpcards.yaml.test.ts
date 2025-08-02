@@ -206,6 +206,16 @@ describe('tcgpcards.yaml', () => {
         });
       });
     });
+
+    it('should have valid isSixPackOnly values', () => {
+      Object.values(sets).forEach((setData: SetData) => {
+        Object.values(setData.cards).forEach((card: Card) => {
+          if ('isSixPackOnly' in card) {
+            expect(card.isSixPackOnly).toBe(true);
+          }
+        });
+      });
+    });
   });
 
   describe('Service and YAML consistency', () => {

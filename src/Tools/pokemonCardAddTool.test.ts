@@ -31,7 +31,14 @@ describe('pokemonCardAdd', () => {
   describe('adding cards', () => {
     it('should add a single card to collection using card ID', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -52,7 +59,14 @@ describe('pokemonCardAdd', () => {
 
     it('should add a single card to collection using card name', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -73,20 +87,22 @@ describe('pokemonCardAdd', () => {
 
     it('should refuse to add if multiple matches found', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -109,20 +125,22 @@ describe('pokemonCardAdd', () => {
 
     it('should add multiple cards if bulk operation enabled', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -144,13 +162,14 @@ describe('pokemonCardAdd', () => {
 
     it('should not add already owned cards', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card = await repository.createCard(
-        'Test Card',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card = await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card.id, BigInt(1));
 
       const result = await pokemonCardAddTool.invoke(
@@ -172,7 +191,14 @@ describe('pokemonCardAdd', () => {
 
     it('should mark a card as not needed when markAsNotNeeded is true', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -203,13 +229,14 @@ describe('pokemonCardAdd', () => {
 
     it('should ignore markAsNotNeeded when removing cards', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card = await repository.createCard(
-        'Test Card',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card = await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(
         card.id,
         BigInt(1),
@@ -237,13 +264,14 @@ describe('pokemonCardAdd', () => {
   describe('removing cards', () => {
     it('should remove a single card from collection', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card = await repository.createCard(
-        'Test Card',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card = await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card.id, BigInt(1));
 
       const result = await pokemonCardAddTool.invoke(
@@ -265,20 +293,22 @@ describe('pokemonCardAdd', () => {
 
     it('should refuse to remove if multiple matches found', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card1 = await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      const card2 = await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card1 = await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card2 = await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 
@@ -310,20 +340,22 @@ describe('pokemonCardAdd', () => {
 
     it('should remove multiple cards if bulk operation enabled', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card1 = await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      const card2 = await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card1 = await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card2 = await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 
@@ -345,7 +377,14 @@ describe('pokemonCardAdd', () => {
 
     it('should not remove unowned cards', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -385,13 +424,14 @@ describe('pokemonCardAdd', () => {
 
     it('should indicate when cards exist but user already owns them', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card = await repository.createCard(
-        'Test Card',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card = await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card.id, BigInt(1));
 
       const result = await pokemonCardAddTool.invoke(
@@ -413,7 +453,14 @@ describe('pokemonCardAdd', () => {
 
     it('should indicate when cards exist but user does not own them when removing', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -436,13 +483,14 @@ describe('pokemonCardAdd', () => {
       config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
-      const card = await repository.createCard(
-        'Test Card',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card = await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card.id, BigInt(2));
 
       const result = await pokemonCardAddTool.invoke(
@@ -466,7 +514,14 @@ describe('pokemonCardAdd', () => {
       config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -489,7 +544,14 @@ describe('pokemonCardAdd', () => {
   describe('user display', () => {
     beforeEach(async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
     });
 
     it('should show username when available', async () => {
@@ -514,7 +576,14 @@ describe('pokemonCardAdd', () => {
       config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -537,20 +606,22 @@ describe('pokemonCardAdd', () => {
       config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -574,7 +645,14 @@ describe('pokemonCardAdd', () => {
       config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -598,20 +676,22 @@ describe('pokemonCardAdd', () => {
       config.configurable.userId = BigInt(2);
 
       await repository.createSet('A1', 'Test Set');
-      const card1 = await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      const card2 = await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card1 = await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card2 = await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card1.id, BigInt(2));
       await repository.addCardToCollection(card2.id, BigInt(2));
 
@@ -637,7 +717,14 @@ describe('pokemonCardAdd', () => {
   describe('output format', () => {
     it('should include collection stats after adding a card', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -658,13 +745,14 @@ describe('pokemonCardAdd', () => {
 
     it('should include collection stats after removing a card', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card = await repository.createCard(
-        'Test Card',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card = await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card.id, BigInt(1));
 
       const result = await pokemonCardAddTool.invoke(
@@ -686,20 +774,22 @@ describe('pokemonCardAdd', () => {
 
     it('should include collection stats after bulk operations', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -720,20 +810,22 @@ describe('pokemonCardAdd', () => {
 
     it('should include collection stats after adding multiple cards', async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -755,20 +847,22 @@ describe('pokemonCardAdd', () => {
 
     it('should include collection stats after removing multiple cards', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card1 = await repository.createCard(
-        'Test Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      const card2 = await repository.createCard(
-        'Test Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card1 = await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card2 = await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
 

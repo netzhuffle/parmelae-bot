@@ -30,21 +30,105 @@ describe('pokemonCardStats', () => {
       // Create a set with all rarity types
       await repository.createSet('A1', 'Unschlagbare Gene');
       // Diamond cards (total: 5)
-      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
-      await repository.createCard('Card 2', 'A1', 2, Rarity.TWO_DIAMONDS, []);
-      await repository.createCard('Card 3', 'A1', 3, Rarity.TWO_DIAMONDS, []);
-      await repository.createCard('Card 4', 'A1', 4, Rarity.THREE_DIAMONDS, []);
-      await repository.createCard('Card 5', 'A1', 5, Rarity.THREE_DIAMONDS, []);
+      await repository.createCard({
+        name: 'Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.TWO_DIAMONDS,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 3',
+        setKey: 'A1',
+        number: 3,
+        rarity: Rarity.TWO_DIAMONDS,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 4',
+        setKey: 'A1',
+        number: 4,
+        rarity: Rarity.THREE_DIAMONDS,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 5',
+        setKey: 'A1',
+        number: 5,
+        rarity: Rarity.THREE_DIAMONDS,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       // Star cards (total: 3)
-      await repository.createCard('Card 6', 'A1', 6, Rarity.ONE_STAR, []);
-      await repository.createCard('Card 7', 'A1', 7, Rarity.TWO_STARS, []);
-      await repository.createCard('Card 8', 'A1', 8, Rarity.TWO_STARS, []);
+      await repository.createCard({
+        name: 'Card 6',
+        setKey: 'A1',
+        number: 6,
+        rarity: Rarity.ONE_STAR,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 7',
+        setKey: 'A1',
+        number: 7,
+        rarity: Rarity.TWO_STARS,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 8',
+        setKey: 'A1',
+        number: 8,
+        rarity: Rarity.TWO_STARS,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       // Shiny cards (total: 2)
-      await repository.createCard('Card 9', 'A1', 9, Rarity.ONE_SHINY, []);
-      await repository.createCard('Card 10', 'A1', 10, Rarity.TWO_SHINY, []);
+      await repository.createCard({
+        name: 'Card 9',
+        setKey: 'A1',
+        number: 9,
+        rarity: Rarity.ONE_SHINY,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 10',
+        setKey: 'A1',
+        number: 10,
+        rarity: Rarity.TWO_SHINY,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       // Crown cards (total: 2)
-      await repository.createCard('Card 11', 'A1', 11, Rarity.CROWN, []);
-      await repository.createCard('Card 12', 'A1', 12, Rarity.CROWN, []);
+      await repository.createCard({
+        name: 'Card 11',
+        setKey: 'A1',
+        number: 11,
+        rarity: Rarity.CROWN,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 12',
+        setKey: 'A1',
+        number: 12,
+        rarity: Rarity.CROWN,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       // Add some cards to collection
       const cards = await repository.searchCards({ setKey: 'A1' });
@@ -69,9 +153,30 @@ describe('pokemonCardStats', () => {
 
     it('should show correct format for promo sets without rarities', async () => {
       await repository.createSet('PA', 'Promo-A');
-      await repository.createCard('Promo 1', 'PA', 1, null, []);
-      await repository.createCard('Promo 2', 'PA', 2, null, []);
-      await repository.createCard('Promo 3', 'PA', 3, null, []);
+      await repository.createCard({
+        name: 'Promo 1',
+        setKey: 'PA',
+        number: 1,
+        rarity: null,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Promo 2',
+        setKey: 'PA',
+        number: 2,
+        rarity: null,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Promo 3',
+        setKey: 'PA',
+        number: 3,
+        rarity: null,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       // Add one promo card to collection
       const cards = await repository.searchCards({ setKey: 'PA' });
@@ -88,23 +193,48 @@ describe('pokemonCardStats', () => {
       await repository.createBooster('Mewtu', 'A1');
 
       // Create cards in Glurak booster
-      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
-        'Glurak',
-      ]);
-      await repository.createCard('Card 2', 'A1', 2, Rarity.TWO_DIAMONDS, [
-        'Glurak',
-      ]);
-      await repository.createCard('Card 3', 'A1', 3, Rarity.ONE_STAR, [
-        'Glurak',
-      ]);
+      await repository.createCard({
+        name: 'Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Glurak'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.TWO_DIAMONDS,
+        boosterNames: ['Glurak'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 3',
+        setKey: 'A1',
+        number: 3,
+        rarity: Rarity.ONE_STAR,
+        boosterNames: ['Glurak'],
+        isSixPackOnly: false,
+      });
 
       // Create cards in Mewtu booster
-      await repository.createCard('Card 4', 'A1', 4, Rarity.ONE_STAR, [
-        'Mewtu',
-      ]);
-      await repository.createCard('Card 5', 'A1', 5, Rarity.TWO_STARS, [
-        'Mewtu',
-      ]);
+      await repository.createCard({
+        name: 'Card 4',
+        setKey: 'A1',
+        number: 4,
+        rarity: Rarity.ONE_STAR,
+        boosterNames: ['Mewtu'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 5',
+        setKey: 'A1',
+        number: 5,
+        rarity: Rarity.TWO_STARS,
+        boosterNames: ['Mewtu'],
+        isSixPackOnly: false,
+      });
 
       // Add some cards to collection
       const cards = await repository.searchCards({ setKey: 'A1' });
@@ -153,21 +283,46 @@ describe('pokemonCardStats', () => {
       await repository.createBooster('Test Booster', 'A1');
 
       // Create cards
-      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
-        'Test Booster',
-      ]);
-      await repository.createCard('Card 2', 'A1', 2, Rarity.TWO_DIAMONDS, [
-        'Test Booster',
-      ]);
-      await repository.createCard('Card 3', 'A1', 3, Rarity.THREE_DIAMONDS, [
-        'Test Booster',
-      ]);
-      await repository.createCard('Card 4', 'A1', 4, Rarity.ONE_STAR, [
-        'Test Booster',
-      ]);
-      await repository.createCard('Card 5', 'A1', 5, Rarity.TWO_STARS, [
-        'Test Booster',
-      ]);
+      await repository.createCard({
+        name: 'Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.TWO_DIAMONDS,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 3',
+        setKey: 'A1',
+        number: 3,
+        rarity: Rarity.THREE_DIAMONDS,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 4',
+        setKey: 'A1',
+        number: 4,
+        rarity: Rarity.ONE_STAR,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 5',
+        setKey: 'A1',
+        number: 5,
+        rarity: Rarity.TWO_STARS,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
 
       const cards = await repository.searchCards({ setKey: 'A1' });
 

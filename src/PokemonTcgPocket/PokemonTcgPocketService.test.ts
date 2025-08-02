@@ -617,17 +617,194 @@ TEST:
     });
   });
 
+  describe('Booster six-pack availability', () => {
+    it('should set hasSixPacks to true for boosters containing six-pack-only cards', async () => {
+      const yaml = `
+A1:
+  name: Test Set
+  boosters:
+    - Booster1
+    - Booster2
+    - Booster3
+  cards:
+    1:
+      name: Regular Card
+      rarity: ♢
+      boosters:
+        - Booster1
+        - Booster3
+    2:
+      name: Six Pack Only Card
+      rarity: ♢♢
+      isSixPackOnly: true
+      boosters:
+        - Booster1
+        - Booster2
+    3:
+      name: Another Regular Card
+      rarity: ♢♢♢
+      boosters: Booster3
+`;
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        yaml,
+      );
+      await service.synchronizeCardDatabaseWithYamlSource();
+
+      // Verify cards were created with correct isSixPackOnly values
+      const cards = repository.getAllCards();
+      expect(cards).toHaveLength(3);
+
+      const regularCard = cards.find((c) => c.name === 'Regular Card')!;
+      expect(regularCard.isSixPackOnly).toBe(false);
+
+      const sixPackCard = cards.find((c) => c.name === 'Six Pack Only Card')!;
+      expect(sixPackCard.isSixPackOnly).toBe(true);
+
+      const anotherRegularCard = cards.find(
+        (c) => c.name === 'Another Regular Card',
+      )!;
+      expect(anotherRegularCard.isSixPackOnly).toBe(false);
+
+      // Get boosters
+      const boosters = repository.getAllBoosters();
+      expect(boosters).toHaveLength(3);
+
+      // Verify Booster1 (contains six-pack card) has hasSixPacks true
+      const booster1 = boosters.find((b) => b.name === 'Booster1')!;
+      expect(booster1.hasSixPacks).toBe(true);
+
+      // Verify Booster2 (contains six-pack card) has hasSixPacks true
+      const booster2 = boosters.find((b) => b.name === 'Booster2')!;
+      expect(booster2.hasSixPacks).toBe(true);
+
+      // Verify Booster3 (no six-pack cards) has hasSixPacks false
+      const booster3 = boosters.find((b) => b.name === 'Booster3')!;
+      expect(booster3.hasSixPacks).toBe(false);
+    });
+
+    it('should set hasSixPacks to true for boosters containing six-pack-only cards when cards are in multiple boosters', async () => {
+      const yaml = `
+A1:
+  name: Test Set
+  boosters:
+    - Booster1
+    - Booster2
+  cards:
+    1:
+      name: Regular Card
+      rarity: ♢
+    2:
+      name: Six Pack Only Card
+      rarity: ♢♢
+      isSixPackOnly: true
+      boosters: Booster1
+    3:
+      name: Another Six Pack Only Card
+      rarity: ♢♢♢
+      isSixPackOnly: true
+      boosters: Booster2
+`;
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        yaml,
+      );
+      await service.synchronizeCardDatabaseWithYamlSource();
+
+      // Verify cards were created with correct isSixPackOnly values
+      const cards = repository.getAllCards();
+      expect(cards).toHaveLength(3);
+
+      const regularCard = cards.find((c) => c.name === 'Regular Card')!;
+      expect(regularCard.isSixPackOnly).toBe(false);
+
+      const sixPackCard1 = cards.find((c) => c.name === 'Six Pack Only Card')!;
+      expect(sixPackCard1.isSixPackOnly).toBe(true);
+
+      const sixPackCard2 = cards.find(
+        (c) => c.name === 'Another Six Pack Only Card',
+      )!;
+      expect(sixPackCard2.isSixPackOnly).toBe(true);
+
+      // Get boosters
+      const boosters = repository.getAllBoosters();
+      expect(boosters).toHaveLength(2);
+
+      // Both boosters should have hasSixPacks true since they each contain a six-pack card
+      const booster1 = boosters.find((b) => b.name === 'Booster1')!;
+      expect(booster1.hasSixPacks).toBe(true);
+
+      const booster2 = boosters.find((b) => b.name === 'Booster2')!;
+      expect(booster2.hasSixPacks).toBe(true);
+    });
+
+    it('should set hasSixPacks to false for all boosters when no six-pack-only cards exist', async () => {
+      const yaml = `
+A1:
+  name: Test Set
+  boosters:
+    - Booster1
+    - Booster2
+  cards:
+    1:
+      name: Regular Card 1
+      rarity: ♢
+    2:
+      name: Regular Card 2
+      rarity: ♢♢
+    3:
+      name: Regular Card 3
+      rarity: ♢♢♢
+`;
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        yaml,
+      );
+      await service.synchronizeCardDatabaseWithYamlSource();
+
+      // Verify all cards have isSixPackOnly false
+      const cards = repository.getAllCards();
+      expect(cards).toHaveLength(3);
+      cards.forEach((card) => {
+        expect(card.isSixPackOnly).toBe(false);
+      });
+
+      // Verify all boosters have hasSixPacks false
+      const boosters = repository.getAllBoosters();
+      expect(boosters).toHaveLength(2);
+      boosters.forEach((booster) => {
+        expect(booster.hasSixPacks).toBe(false);
+      });
+    });
+  });
+
   describe('searchCards smoke test', () => {
     // Smoke test for searchCards - full test suite is in pokemonCardSearchTool.test.ts
     it('should pass search criteria to repository', async () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createBooster('Test Booster', 'A1');
-      await repository.createCard('Pikachu', 'A1', 1, Rarity.ONE_DIAMOND, [
-        'Test Booster',
-      ]);
-      await repository.createCard('Raichu', 'A1', 2, Rarity.TWO_DIAMONDS, [
-        'Test Booster',
-      ]);
+      await repository.createCard({
+        name: 'Pikachu',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Raichu',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.TWO_DIAMONDS,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
       const probabilityService = new PokemonTcgPocketProbabilityService();
       const service = new PokemonTcgPocketService(
         probabilityService,
@@ -717,15 +894,30 @@ TEST:
       await repository.createBooster('Test Booster', 'A1');
 
       // Create 3 ONE_DIAMOND cards (guaranteed to appear in first 3 slots of normal packs)
-      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
-        'Test Booster',
-      ]);
-      await repository.createCard('Card 2', 'A1', 2, Rarity.ONE_DIAMOND, [
-        'Test Booster',
-      ]);
-      await repository.createCard('Card 3', 'A1', 3, Rarity.ONE_DIAMOND, [
-        'Test Booster',
-      ]);
+      await repository.createCard({
+        name: 'Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 3',
+        setKey: 'A1',
+        number: 3,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
 
       const userId = BigInt(1);
       const cards = repository.getAllCards();
@@ -772,12 +964,22 @@ TEST:
       await repository.createBooster('Test Booster', 'A1');
 
       // Create 2 cards
-      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
-        'Test Booster',
-      ]);
-      await repository.createCard('Card 2', 'A1', 2, Rarity.ONE_DIAMOND, [
-        'Test Booster',
-      ]);
+      await repository.createCard({
+        name: 'Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
 
       const userId = BigInt(1);
       const cards = repository.getAllCards();

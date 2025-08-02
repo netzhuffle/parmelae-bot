@@ -159,13 +159,21 @@ export class PokemonTcgPocketRepository {
   }
 
   /** Creates a new card */
-  async createCard(
-    name: string,
-    setKey: string,
-    number: number,
-    rarity: Rarity | null,
-    boosterNames: string[],
-  ): Promise<PokemonCard> {
+  async createCard({
+    name,
+    setKey,
+    number,
+    rarity,
+    boosterNames,
+    isSixPackOnly,
+  }: {
+    name: string;
+    setKey: string;
+    number: number;
+    rarity: Rarity | null;
+    boosterNames: string[];
+    isSixPackOnly: boolean;
+  }): Promise<PokemonCard> {
     try {
       const setId = await this.resolveSetId(setKey);
       if (!setId) {
@@ -180,6 +188,7 @@ export class PokemonTcgPocketRepository {
           setId,
           number,
           rarity,
+          isSixPackOnly,
           boosters: {
             connect: boosterIds.map((id) => ({ id })),
           },
@@ -375,6 +384,7 @@ export class PokemonTcgPocketRepository {
               number: card.number,
               setId: card.setId,
               rarity: card.rarity,
+              isSixPackOnly: card.isSixPackOnly,
             },
             ownershipStatus: this.convertToCardOwnershipStatus(
               card.ownership[0]?.status ?? null,
@@ -386,6 +396,7 @@ export class PokemonTcgPocketRepository {
               name: booster.name,
               setId: booster.setId,
               hasShinyRarity: booster.hasShinyRarity,
+              hasSixPacks: booster.hasSixPacks,
             },
             cards: booster.cards.map((card) => ({
               card: {
@@ -394,6 +405,7 @@ export class PokemonTcgPocketRepository {
                 number: card.number,
                 setId: card.setId,
                 rarity: card.rarity,
+                isSixPackOnly: card.isSixPackOnly,
               },
               ownershipStatus: this.convertToCardOwnershipStatus(
                 card.ownership[0]?.status ?? null,
@@ -459,6 +471,25 @@ export class PokemonTcgPocketRepository {
       throw new PokemonTcgPocketDatabaseError(
         'update',
         `booster ${boosterId} shiny rarity`,
+        this.formatError(error),
+      );
+    }
+  }
+
+  /** Updates the hasSixPacks field of a booster */
+  async updateBoosterSixPacks(
+    boosterId: number,
+    hasSixPacks: boolean,
+  ): Promise<PokemonBooster> {
+    try {
+      return this.prisma.pokemonBooster.update({
+        where: { id: boosterId },
+        data: { hasSixPacks },
+      });
+    } catch (error) {
+      throw new PokemonTcgPocketDatabaseError(
+        'update',
+        `booster ${boosterId} six packs`,
         this.formatError(error),
       );
     }

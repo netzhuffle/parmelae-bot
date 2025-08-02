@@ -1602,11 +1602,93 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 38,
+        "title": "Add Database Support for Six-Pack Exclusive Cards and Boosters",
+        "description": "Extend the database schema to support six-pack exclusive cards and boosters by adding boolean fields to track card exclusivity and booster types, then update the YAML reading logic to populate these fields.",
+        "details": "### Database Schema Updates\n\n1. **Update PokemonCard Model in schema.prisma:**\n   ```prisma\n   model PokemonCard {\n     // existing fields...\n     isSixPackOnly Boolean @default(false)\n     // other fields...\n   }\n   ```\n\n2. **Update PokemonBooster Model in schema.prisma:**\n   ```prisma\n   model PokemonBooster {\n     // existing fields...\n     hasSixPacks Boolean @default(false)\n     // other fields...\n   }\n   ```\n\n3. **Generate and Apply Database Migration:**\n   - Run `npx prisma migrate dev --name add-six-pack-fields` to create migration files\n   - Apply the migration to update the database schema\n\n### YAML Reading Logic Updates\n\n4. **Update PokemonTcgPocketService:**\n   - Modify the card parsing logic to check for `isSixPackOnly` property in tcgpcards.yaml\n   - Set `isSixPackOnly: true` for cards that have this property, `false` otherwise\n   - Implement booster analysis logic to determine `hasSixPacks` status:\n     - For each booster, check if any of its contained cards have `isSixPackOnly: true`\n     - Set `hasSixPacks: true` if any six-pack exclusive cards are found, `false` otherwise\n\n5. **Data Consistency Considerations:**\n   - Ensure existing cards default to `isSixPackOnly: false` during migration\n   - Ensure existing boosters default to `hasSixPacks: false` during migration\n   - Implement validation to ensure data integrity between cards and boosters\n\n6. **Performance Optimization:**\n   - Consider batching database updates for large datasets\n   - Implement efficient queries to minimize database calls during YAML processing",
+        "testStrategy": "1. **Database Schema Testing:**\n   - Verify that the new fields are properly added to both PokemonCard and PokemonBooster models\n   - Test that default values (false) are correctly applied to existing records\n   - Confirm that Prisma client generates correct TypeScript types for the new fields\n\n2. **YAML Processing Testing:**\n   - Create test YAML data with cards that have `isSixPackOnly: true` and verify they are correctly parsed\n   - Test cards without the `isSixPackOnly` property default to `false`\n   - Verify that boosters containing six-pack exclusive cards are correctly marked with `hasSixPacks: true`\n   - Test that boosters with no six-pack exclusive cards have `hasSixPacks: false`\n\n3. **Integration Testing:**\n   - Run the complete YAML import process and verify all cards and boosters have correct field values\n   - Test database queries to ensure the new fields can be properly filtered and searched\n   - Verify that existing Pokemon card management tools continue to work with the updated schema\n\n4. **Data Validation Testing:**\n   - Confirm that the relationship between `isSixPackOnly` cards and `hasSixPacks` boosters is logically consistent\n   - Test edge cases such as empty boosters or cards with missing properties\n   - Validate that migration doesn't break existing functionality or data integrity",
+        "status": "done",
+        "dependencies": [
+          4,
+          12
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Extend Database Schema with Six-Pack Fields",
+            "description": "Add boolean fields to the PokemonCard and PokemonBooster models in schema.prisma to track six-pack exclusivity and booster types.",
+            "dependencies": [],
+            "details": "Update PokemonCard model by adding 'isSixPackOnly Boolean @default(false)'. Update PokemonBooster model by adding 'hasSixPacks Boolean @default(false)'. Ensure these fields follow existing schema conventions.\n<info added on 2025-08-01T23:10:28.621Z>\n✅ Schema updates completed successfully. Added isSixPackOnly field to PokemonCard model and hasSixPacks field to PokemonBooster model, both with Boolean @default(false) and appropriate indexes for query performance. Schema validation passed with no linting errors and maintains backward compatibility.\n</info added on 2025-08-01T23:10:28.621Z>",
+            "status": "done",
+            "testStrategy": "Verify new fields exist in Prisma schema, have correct default values, and generate appropriate TypeScript types."
+          },
+          {
+            "id": 2,
+            "title": "Generate and Apply Database Migration",
+            "description": "Create and apply a Prisma migration to update the database schema with the new six-pack related fields.",
+            "dependencies": [
+              "38.1"
+            ],
+            "details": "Run 'npx prisma migrate dev --name add-six-pack-fields' to generate migration files. Apply migration to update the database schema and verify no data loss or corruption.\n<info added on 2025-08-01T23:11:36.497Z>\nMigration successfully generated and applied with name `20250801231055_add_six_pack_fields`. Schema changes include adding `hasSixPacks` boolean field to PokemonBooster table and `isSixPackOnly` boolean field to PokemonCard table, both with default false values and performance indexes. Prisma Client regenerated to v6.13.0. All existing data preserved during migration with no corruption or loss detected. Database ready for YAML parsing logic implementation.\n</info added on 2025-08-01T23:11:36.497Z>",
+            "status": "done",
+            "testStrategy": "Confirm migration applies successfully, existing records default to false for new fields, and database schema matches Prisma models."
+          },
+          {
+            "id": 3,
+            "title": "Update YAML Parsing Logic for Six-Pack Fields",
+            "description": "Modify PokemonTcgPocketService to parse 'isSixPackOnly' from tcgpcards.yaml and determine 'hasSixPacks' for boosters based on contained cards.",
+            "dependencies": [
+              "38.2"
+            ],
+            "details": "Enhance card parsing to set 'isSixPackOnly' true or false based on YAML data. Implement logic to analyze each booster’s cards; set 'hasSixPacks' true if any card is six-pack exclusive, false otherwise.\n<info added on 2025-08-01T23:36:55.239Z>\nYAML parsing logic successfully implemented:\n\n**Core Implementation Completed:**\n1. **Updated Card interface** in PokemonTcgPocketService.ts to include `isSixPackOnly?: boolean`\n2. **Modified synchronizeCard method** to extract and pass isSixPackOnly value\n3. **Enhanced synchronizeCards method** to track six-pack boosters:\n   - Added boostersWithSixPackCards tracking (parallel to shiny cards pattern)\n   - Cards with isSixPackOnly=true mark their boosters for hasSixPacks=true\n   - Bulk update boosters using new updateBoosterSixPacks method\n4. **Repository updates:**\n   - Added updateBoosterSixPacks method for bulk updates\n   - Updated createCard to use object destructuring pattern for better readability\n   - Now takes: { name, setKey, number, rarity, boosterNames, isSixPackOnly }\n5. **Fake repository updated** to match the new object-based API\n\n**YAML Processing Flow:**\n- Cards with `isSixPackOnly: true` in YAML → database isSixPackOnly=true\n- Cards without this property → database isSixPackOnly=false  \n- Boosters containing any six-pack cards → database hasSixPacks=true\n- Other boosters → database hasSixPacks=false\n\n**API Improvement:**\n- Refactored createCard from 6 positional parameters to object destructuring\n- Much more readable calls: `createCard({ name: 'Pikachu', setKey: 'A1', number: 1, rarity, boosterNames: ['Charizard'], isSixPackOnly: false })`\n\nThe core six-pack functionality is fully implemented and working. Test files still need updating to use the new object syntax, but that's a separate cleanup task.\n</info added on 2025-08-01T23:36:55.239Z>\n<info added on 2025-08-01T23:48:36.069Z>\n**FINAL IMPLEMENTATION SUCCESS** - All checks passed!\n\n**Complete Six-Pack Implementation:**\n1. **YAML Parsing Logic**: Successfully reads `isSixPackOnly` from tcgpcards.yaml\n2. **Database Updates**: Cards and boosters properly marked with six-pack status\n3. **API Improvement**: Refactored `createCard` to clean object destructuring pattern\n4. **Test File Updates**: Fixed all 87 createCard calls across 4 test files using automated script\n\n**All Required Checks Completed Successfully:**\n✅ Formatting: `npm run format && npm run schema-format` - PASSED\n✅ Build: `npm run build` - PASSED (all TypeScript errors resolved)  \n✅ Linting: `npm run lint && npm run validate-yaml` - PASSED\n✅ Tests: `npm test` - PASSED (220 tests across 24 files)\n\nThe subtask is now fully complete with all quality gates satisfied!\n</info added on 2025-08-01T23:48:36.069Z>",
+            "status": "done",
+            "testStrategy": "Test parsing with sample YAML files containing six-pack exclusive cards and boosters. Validate correct field population in memory before database update."
+          },
+          {
+            "id": 4,
+            "title": "Implement Data Consistency and Validation",
+            "description": "Ensure data integrity by defaulting existing cards and boosters to false for six-pack fields and validating consistency between cards and boosters.",
+            "dependencies": [
+              "38.3"
+            ],
+            "details": "During migration and data import, set default false values for existing records. Add validation logic to confirm boosters marked with 'hasSixPacks' contain at least one 'isSixPackOnly' card. Handle edge cases and errors.",
+            "status": "done",
+            "testStrategy": "Create tests to verify default values on legacy data and validation rules prevent inconsistent states."
+          },
+          {
+            "id": 5,
+            "title": "Optimize Performance for Large Dataset Processing",
+            "description": "Improve efficiency of database updates and YAML processing to handle large datasets with minimal performance impact.",
+            "dependencies": [
+              "38.4"
+            ],
+            "details": "Implement batching for database writes during import. Optimize queries to reduce calls when checking six-pack exclusivity. Profile and tune parsing and update routines for scalability.",
+            "status": "cancelled",
+            "testStrategy": "Benchmark processing time and resource usage before and after optimization. Ensure no regressions in correctness."
+          }
+        ]
+      },
+      {
+        "id": 39,
+        "title": "Optimize Pokemon TCG Pocket YAML Processing for Large Dataset Performance",
+        "description": "Implement batching, query optimization, single-pass processing, and performance monitoring to significantly improve YAML import performance for large Pokemon TCG Pocket datasets.",
+        "details": "1. Replace individual database calls for cards and boosters with batch operations by implementing createCardsBatch() and updateBoostersBatch() repository methods to reduce calls from O(n) to O(1) per set.\n2. Optimize database queries using transactions and connection pooling to ensure atomicity and reduce overhead.\n3. Refactor the processing pipeline to perform single-pass processing of YAML data, deferring batch updates to minimize repeated validation and multiple loops.\n4. Develop a PerformanceProfiler module to benchmark processing times, track database call counts, and monitor memory usage during YAML imports.\n5. Integrate automated performance regression tests with defined thresholds (e.g., processing 10,000 cards under 30 seconds, achieving 10x improvement over baseline).\n6. Ensure compatibility with existing Pokemon TCG Pocket integration and database schema, leveraging prior tasks such as Task 12 (Pokemon TCG Pocket Integration) and Task 4 (Prisma Database Schema).\n7. Follow best practices for Node.js and TypeScript performance optimization, including asynchronous batch processing and efficient resource management.\n8. Document all changes and provide usage examples for batch methods and performance monitoring tools.",
+        "testStrategy": "1. Unit test batch repository methods to verify correct bulk creation and update of cards and boosters.\n2. Conduct integration tests importing large YAML datasets (e.g., 1,000 and 10,000 cards) measuring processing time and database call counts.\n3. Validate that processing time meets performance targets (e.g., 10x improvement, under 30 seconds for 10,000 cards).\n4. Use PerformanceProfiler to generate detailed reports and verify no regressions occur in subsequent runs.\n5. Perform regression testing to ensure no functional degradation in card and booster data integrity.\n6. Review logs and metrics to confirm transaction usage and connection pooling effectiveness.\n7. Include load testing to simulate production-scale imports and monitor system resource usage.",
+        "status": "pending",
+        "dependencies": [
+          4,
+          12
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-01T21:02:48.691Z",
+      "updated": "2025-08-02T00:08:22.531Z",
       "description": "Tasks for master context"
     }
   }

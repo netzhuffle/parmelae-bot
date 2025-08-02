@@ -57,6 +57,7 @@ export const SET_KEY_VALUES = [
   'A3',
   'A3a',
   'A3b',
+  'A4',
   'PROMO-A',
 ] as const;
 
@@ -73,6 +74,7 @@ export const SET_KEY_NAMES: Record<SetKey, string> = {
   A3: 'Hüter des Firmaments',
   A3a: 'Dimensionale Krise',
   A3b: 'Evoli-Hain',
+  A4: 'Weisheit von Meer und Himmel',
   'PROMO-A': 'Promo-A',
 };
 
@@ -90,6 +92,8 @@ export const BOOSTER_VALUES = [
   'Lunala',
   'Dimensionale Krise',
   'Evoli-Hain',
+  'Ho-Oh',
+  'Lugia',
 ] as const;
 
 /** Booster type */
@@ -126,6 +130,12 @@ export interface Card {
   boosters?: string | string[] | null;
   /** Reference to another set that has a card with the same name that this card is equal to */
   equalTo?: string;
+  /**
+   * Whether this card is exclusive to packs with six cards.
+   *
+   * Also marks the booster as having the possibility of six-card packs.
+   */
+  isSixPackOnly?: boolean;
 }
 
 /** Set data from the YAML file */
@@ -688,10 +698,11 @@ export class PokemonTcgPocketService {
     // Create a set of valid booster names for this set
     const validBoosterNames = new Set(boosters.map((b) => b.name));
 
-    // Track which boosters contain shiny cards
+    // Track which boosters contain shiny cards and can have packs with six cards
     const boostersWithShinyCards = new Set<string>();
+    const boostersWithSixCardPacks = new Set<string>();
 
-    // First pass: Process all cards and track which boosters contain shiny cards
+    // First pass: Process all cards and track which boosters contain shiny cards and can have packs with six cards
     for (const [cardNumberString, card] of Object.entries(setData.cards)) {
       const cardNumber = parseInt(cardNumberString, 10);
       if (isNaN(cardNumber)) {
@@ -701,26 +712,38 @@ export class PokemonTcgPocketService {
         );
       }
 
+      const cardBoosterNames = this.convertToBoosterNameArray(
+        card,
+        validBoosterNames,
+        setKey,
+      );
+
       // If card has shiny rarity, mark its boosters
       if (card.rarity === '✸' || card.rarity === '✸✸') {
-        const cardBoosterNames = this.convertToBoosterNameArray(
-          card,
-          validBoosterNames,
-          setKey,
-        );
         cardBoosterNames.forEach((name) => boostersWithShinyCards.add(name));
+      }
+
+      // If card is exclusive to six-card packs, mark its boosters
+      if (card.isSixPackOnly === true) {
+        cardBoosterNames.forEach((name) => boostersWithSixCardPacks.add(name));
       }
     }
 
-    // Update hasShinyRarity for boosters
-    await Promise.all(
-      boosters.map((booster) =>
+    // Update hasShinyRarity and hasSixPacks for boosters
+    await Promise.all([
+      ...boosters.map((booster) =>
         this.repository.updateBoosterShinyRarity(
           booster.id,
           boostersWithShinyCards.has(booster.name),
         ),
       ),
-    );
+      ...boosters.map((booster) =>
+        this.repository.updateBoosterSixPacks(
+          booster.id,
+          boostersWithSixCardPacks.has(booster.name),
+        ),
+      ),
+    ]);
 
     // Second pass: Create all cards
     for (const [cardNumberString, card] of Object.entries(setData.cards)) {
@@ -756,14 +779,16 @@ export class PokemonTcgPocketService {
       setKey,
     );
     const rarity = this.convertSymbolToRarity(cardData.rarity);
+    const isSixPackOnly = cardData.isSixPackOnly === true;
 
-    await this.repository.createCard(
-      cardData.name,
+    await this.repository.createCard({
+      name: cardData.name,
       setKey,
       number,
       rarity,
-      cardBoosterNames,
-    );
+      boosterNames: cardBoosterNames,
+      isSixPackOnly,
+    });
   }
 
   private convertToBoosterNameArray(

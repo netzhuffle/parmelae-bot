@@ -33,9 +33,14 @@ describe('pokemonCardSearch', () => {
   it('should format results as CSV with all columns', async () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createBooster('Glurak', 'A1');
-    await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, [
-      'Glurak',
-    ]);
+    await repository.createCard({
+      name: 'Test Card',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_DIAMOND,
+      boosterNames: ['Glurak'],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -92,7 +97,14 @@ describe('pokemonCardSearch', () => {
     await repository.createSet('A1', 'Test Set');
     // Create 25 cards
     for (let i = 1; i <= 25; i++) {
-      await repository.createCard(`Card ${i}`, 'A1', i, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: `Card ${i}`,
+        setKey: 'A1',
+        number: i,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
     }
 
     const result = await pokemonCardSearchTool.invoke(
@@ -123,7 +135,14 @@ describe('pokemonCardSearch', () => {
 
   it('should filter by card name', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
+    await repository.createCard({
+      name: 'Card 1',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_DIAMOND,
+      boosterNames: [],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -145,7 +164,14 @@ describe('pokemonCardSearch', () => {
 
   it('should filter by set key', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
+    await repository.createCard({
+      name: 'Card 1',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_DIAMOND,
+      boosterNames: [],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -169,9 +195,14 @@ describe('pokemonCardSearch', () => {
   it('should filter by booster', async () => {
     await repository.createSet('A1', 'Test Set');
     await repository.createBooster('Glurak', 'A1');
-    await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, [
-      'Glurak',
-    ]);
+    await repository.createCard({
+      name: 'Card 1',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_DIAMOND,
+      boosterNames: ['Glurak'],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -194,7 +225,14 @@ describe('pokemonCardSearch', () => {
 
   it('should filter by rarity', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
+    await repository.createCard({
+      name: 'Card 1',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_DIAMOND,
+      boosterNames: [],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -217,7 +255,14 @@ describe('pokemonCardSearch', () => {
 
   it('should parse and filter by card ID', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
+    await repository.createCard({
+      name: 'Card 1',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_DIAMOND,
+      boosterNames: [],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -241,7 +286,14 @@ describe('pokemonCardSearch', () => {
 
   it('should handle cards without boosters', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
+    await repository.createCard({
+      name: 'Card 1',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_DIAMOND,
+      boosterNames: [],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -267,7 +319,14 @@ describe('pokemonCardSearch', () => {
 
   it('should handle cards without rarity', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createCard('Card 1', 'A1', 1, null, []);
+    await repository.createCard({
+      name: 'Card 1',
+      setKey: 'A1',
+      number: 1,
+      rarity: null,
+      boosterNames: [],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
@@ -294,9 +353,30 @@ describe('pokemonCardSearch', () => {
   describe('ownership filtering', () => {
     beforeEach(async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
-      await repository.createCard('Card 2', 'A1', 2, Rarity.TWO_DIAMONDS, []);
-      await repository.createCard('Card 3', 'A1', 3, Rarity.THREE_DIAMONDS, []);
+      await repository.createCard({
+        name: 'Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.TWO_DIAMONDS,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Card 3',
+        setKey: 'A1',
+        number: 3,
+        rarity: Rarity.THREE_DIAMONDS,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
     });
 
     it('should return all cards when ownership filter is not set', async () => {
@@ -324,27 +404,30 @@ describe('pokemonCardSearch', () => {
 
     it('should pass ownership filter when set to owned', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card1 = await repository.createCard(
-        'Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      const card2 = await repository.createCard(
-        'Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      const card3 = await repository.createCard(
-        'Card 3',
-        'A1',
-        3,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card1 = await repository.createCard({
+        name: 'Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card2 = await repository.createCard({
+        name: 'Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card3 = await repository.createCard({
+        name: 'Card 3',
+        setKey: 'A1',
+        number: 3,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
       await repository.addCardToCollection(card1.id, BigInt(1));
       await repository.addCardToCollection(card2.id, BigInt(1));
       await repository.addCardToCollection(card3.id, BigInt(1));
@@ -441,27 +524,30 @@ describe('pokemonCardSearch', () => {
 
     it('should pass ownership filter when set to not_needed', async () => {
       await repository.createSet('A1', 'Test Set');
-      const card1 = await repository.createCard(
-        'Card 1',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      const card2 = await repository.createCard(
-        'Card 2',
-        'A1',
-        2,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
-      const card3 = await repository.createCard(
-        'Card 3',
-        'A1',
-        3,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      const card1 = await repository.createCard({
+        name: 'Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card2 = await repository.createCard({
+        name: 'Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card3 = await repository.createCard({
+        name: 'Card 3',
+        setKey: 'A1',
+        number: 3,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
 
       // Mark cards as not needed
       await repository.addCardToCollection(
@@ -522,7 +608,14 @@ describe('pokemonCardSearch', () => {
   describe('ownership display', () => {
     beforeEach(async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
     });
 
     it('should show ownership by username when available', async () => {
@@ -560,7 +653,14 @@ describe('pokemonCardSearch', () => {
 
   it('should handle no matches', async () => {
     await repository.createSet('A1', 'Test Set');
-    await repository.createCard('Card 1', 'A1', 1, Rarity.ONE_DIAMOND, []);
+    await repository.createCard({
+      name: 'Card 1',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_DIAMOND,
+      boosterNames: [],
+      isSixPackOnly: false,
+    });
 
     const result = await pokemonCardSearchTool.invoke(
       {
