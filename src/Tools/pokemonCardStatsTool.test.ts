@@ -243,7 +243,7 @@ describe('pokemonCardStats', () => {
       await repository.addCardToCollection(cards[3].id, BigInt(1));
 
       const result = await pokemonCardStatsTool.invoke({}, config);
-      expect(result).toContain('Booster Packs:');
+      expect(result).toContain('Booster Packs');
       expect(result).toMatch(
         /Glurak: ♢–♢♢♢♢ 1\/2 ⋅ p\d+\.\d+% \| ♢–☆ 2\/3 ⋅ p\d+\.\d+% \| ♢–♛ 2\/3 ⋅ p\d+\.\d+%/,
       );

@@ -381,7 +381,9 @@ export class PokemonTcgPocketService {
       return `${owned}+${notNeeded}/${total}`;
     };
 
-    const lines: string[] = ['Booster Packs:'];
+    const lines: string[] = [
+      'Booster Packs (sorted by probability for new cards, descending):',
+    ];
     for (const {
       name,
       diamondOwned,
@@ -450,93 +452,95 @@ export class PokemonTcgPocketService {
           ),
         };
       }),
-      boosters: rawStats.sets.flatMap(({ boosters }) =>
-        boosters.map(({ booster, cards }) => {
-          const cardsWithServiceStatus: CardWithOwnership[] = cards.map(
-            ({ card, ownershipStatus }) => ({
-              card,
-              ownershipStatus,
-            }),
-          );
+      boosters: rawStats.sets
+        .flatMap(({ boosters }) =>
+          boosters.map(({ booster, cards }) => {
+            const cardsWithServiceStatus: CardWithOwnership[] = cards.map(
+              ({ card, ownershipStatus }) => ({
+                card,
+                ownershipStatus,
+              }),
+            );
 
-          const missingCards = cardsWithServiceStatus
-            .filter(
-              ({ ownershipStatus }) =>
-                ownershipStatus !== CardOwnershipStatus.OWNED &&
-                ownershipStatus !== CardOwnershipStatus.NOT_NEEDED,
-            )
-            .map(({ card }) => card);
-          const allCards = cardsWithServiceStatus.map(({ card }) => card);
+            const missingCards = cardsWithServiceStatus
+              .filter(
+                ({ ownershipStatus }) =>
+                  ownershipStatus !== CardOwnershipStatus.OWNED &&
+                  ownershipStatus !== CardOwnershipStatus.NOT_NEEDED,
+              )
+              .map(({ card }) => card);
+            const allCards = cardsWithServiceStatus.map(({ card }) => card);
 
-          const diamondCards = cardsWithServiceStatus.filter(({ card }) =>
-            this.isCardOfRarity(card, [
-              Rarity.ONE_DIAMOND,
-              Rarity.TWO_DIAMONDS,
-              Rarity.THREE_DIAMONDS,
-              Rarity.FOUR_DIAMONDS,
-            ]),
-          );
+            const diamondCards = cardsWithServiceStatus.filter(({ card }) =>
+              this.isCardOfRarity(card, [
+                Rarity.ONE_DIAMOND,
+                Rarity.TWO_DIAMONDS,
+                Rarity.THREE_DIAMONDS,
+                Rarity.FOUR_DIAMONDS,
+              ]),
+            );
 
-          const tradableCards = cardsWithServiceStatus.filter(({ card }) =>
-            this.isCardOfRarity(card, [
-              Rarity.ONE_DIAMOND,
-              Rarity.TWO_DIAMONDS,
-              Rarity.THREE_DIAMONDS,
-              Rarity.FOUR_DIAMONDS,
-              Rarity.ONE_STAR,
-            ]),
-          );
+            const tradableCards = cardsWithServiceStatus.filter(({ card }) =>
+              this.isCardOfRarity(card, [
+                Rarity.ONE_DIAMOND,
+                Rarity.TWO_DIAMONDS,
+                Rarity.THREE_DIAMONDS,
+                Rarity.FOUR_DIAMONDS,
+                Rarity.ONE_STAR,
+              ]),
+            );
 
-          return {
-            name: booster.name,
-            diamondOwned: diamondCards.filter(
-              ({ ownershipStatus }) =>
-                ownershipStatus === CardOwnershipStatus.OWNED,
-            ).length,
-            diamondNotNeeded: diamondCards.filter(
-              ({ ownershipStatus }) =>
-                ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
-            ).length,
-            diamondTotal: diamondCards.length,
-            newDiamondCardProbability:
-              this.probabilityService.calculateNewDiamondCardProbability(
-                allCards,
-                missingCards,
-                booster.hasShinyRarity,
-              ) * 100,
-            tradableOwned: tradableCards.filter(
-              ({ ownershipStatus }) =>
-                ownershipStatus === CardOwnershipStatus.OWNED,
-            ).length,
-            tradableNotNeeded: tradableCards.filter(
-              ({ ownershipStatus }) =>
-                ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
-            ).length,
-            tradableTotal: tradableCards.length,
-            newTradableCardProbability:
-              this.probabilityService.calculateNewTradableCardProbability(
-                allCards,
-                missingCards,
-                booster.hasShinyRarity,
-              ) * 100,
-            allOwned: cardsWithServiceStatus.filter(
-              ({ ownershipStatus }) =>
-                ownershipStatus === CardOwnershipStatus.OWNED,
-            ).length,
-            allNotNeeded: cardsWithServiceStatus.filter(
-              ({ ownershipStatus }) =>
-                ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
-            ).length,
-            allTotal: cardsWithServiceStatus.length,
-            newCardProbability:
-              this.probabilityService.calculateNewCardProbability(
-                allCards,
-                missingCards,
-                booster.hasShinyRarity,
-              ) * 100,
-          };
-        }),
-      ),
+            return {
+              name: booster.name,
+              diamondOwned: diamondCards.filter(
+                ({ ownershipStatus }) =>
+                  ownershipStatus === CardOwnershipStatus.OWNED,
+              ).length,
+              diamondNotNeeded: diamondCards.filter(
+                ({ ownershipStatus }) =>
+                  ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+              ).length,
+              diamondTotal: diamondCards.length,
+              newDiamondCardProbability:
+                this.probabilityService.calculateNewDiamondCardProbability(
+                  allCards,
+                  missingCards,
+                  booster.hasShinyRarity,
+                ) * 100,
+              tradableOwned: tradableCards.filter(
+                ({ ownershipStatus }) =>
+                  ownershipStatus === CardOwnershipStatus.OWNED,
+              ).length,
+              tradableNotNeeded: tradableCards.filter(
+                ({ ownershipStatus }) =>
+                  ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+              ).length,
+              tradableTotal: tradableCards.length,
+              newTradableCardProbability:
+                this.probabilityService.calculateNewTradableCardProbability(
+                  allCards,
+                  missingCards,
+                  booster.hasShinyRarity,
+                ) * 100,
+              allOwned: cardsWithServiceStatus.filter(
+                ({ ownershipStatus }) =>
+                  ownershipStatus === CardOwnershipStatus.OWNED,
+              ).length,
+              allNotNeeded: cardsWithServiceStatus.filter(
+                ({ ownershipStatus }) =>
+                  ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+              ).length,
+              allTotal: cardsWithServiceStatus.length,
+              newCardProbability:
+                this.probabilityService.calculateNewCardProbability(
+                  allCards,
+                  missingCards,
+                  booster.hasShinyRarity,
+                ) * 100,
+            };
+          }),
+        )
+        .sort((a, b) => b.newCardProbability - a.newCardProbability),
     };
   }
 

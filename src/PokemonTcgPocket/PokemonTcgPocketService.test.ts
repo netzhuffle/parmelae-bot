@@ -1016,4 +1016,126 @@ A1:
       expect(boosterStats.newCardProbability).toBe(0);
     });
   });
+
+  describe('getCollectionStats booster sorting', () => {
+    it('should sort boosters by newCardProbability in descending order', async () => {
+      // Set up test data with multiple boosters having different probabilities
+      await repository.createSet('A1', 'Test Set');
+      await repository.createBooster('High Prob Booster', 'A1');
+      await repository.createBooster('Low Prob Booster', 'A1');
+      await repository.createBooster('Zero Prob Booster', 'A1');
+
+      // Create cards for each booster with different ownership patterns
+      // High Prob Booster: 1 missing card out of 2
+      await repository.createCard({
+        name: 'High Prob Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['High Prob Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'High Prob Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['High Prob Booster'],
+        isSixPackOnly: false,
+      });
+
+      // Low Prob Booster: 1 missing card out of 3 (lower probability)
+      await repository.createCard({
+        name: 'Low Prob Card 1',
+        setKey: 'A1',
+        number: 3,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Low Prob Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Low Prob Card 2',
+        setKey: 'A1',
+        number: 4,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Low Prob Booster'],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Low Prob Card 3',
+        setKey: 'A1',
+        number: 5,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Low Prob Booster'],
+        isSixPackOnly: false,
+      });
+
+      // Zero Prob Booster: all cards owned
+      await repository.createCard({
+        name: 'Zero Prob Card 1',
+        setKey: 'A1',
+        number: 6,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Zero Prob Booster'],
+        isSixPackOnly: false,
+      });
+
+      const userId = BigInt(1);
+      const cards = repository.getAllCards();
+
+      // Set up ownership to create different probabilities
+      // High Prob: own 1 out of 2 (higher probability of new card)
+      await repository.addCardToCollection(
+        cards[0].id,
+        userId,
+        OwnershipStatus.OWNED,
+      );
+      // card[1] remains missing
+
+      // Low Prob: own 2 out of 3 (lower probability of new card)
+      await repository.addCardToCollection(
+        cards[2].id,
+        userId,
+        OwnershipStatus.OWNED,
+      );
+      await repository.addCardToCollection(
+        cards[3].id,
+        userId,
+        OwnershipStatus.OWNED,
+      );
+      // card[4] remains missing
+
+      // Zero Prob: own all cards (0% probability)
+      await repository.addCardToCollection(
+        cards[5].id,
+        userId,
+        OwnershipStatus.OWNED,
+      );
+
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        '',
+      );
+
+      const stats = await service.getCollectionStats(userId);
+
+      expect(stats.boosters).toHaveLength(3);
+
+      // Verify boosters are sorted by newCardProbability in descending order
+      expect(stats.boosters[0].name).toBe('High Prob Booster');
+      expect(stats.boosters[1].name).toBe('Low Prob Booster');
+      expect(stats.boosters[2].name).toBe('Zero Prob Booster');
+
+      // Verify actual probabilities are in descending order
+      expect(stats.boosters[0].newCardProbability).toBeGreaterThan(
+        stats.boosters[1].newCardProbability,
+      );
+      expect(stats.boosters[1].newCardProbability).toBeGreaterThan(
+        stats.boosters[2].newCardProbability,
+      );
+      expect(stats.boosters[2].newCardProbability).toBe(0);
+    });
+  });
 });

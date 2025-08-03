@@ -1960,11 +1960,80 @@
             "testStrategy": "Code review and integration tests to ensure compliance with project standards and documentation completeness."
           }
         ]
+      },
+      {
+        "id": 45,
+        "title": "Sort Boosters by Highest New Card Probability Descending",
+        "description": "Implement functionality to sort booster packs so that users see those with the highest probability of containing new cards they do not already own at the top of the list.",
+        "details": "1. Analyze the user's current card collection to identify which cards are already owned.\n2. For each available booster pack, calculate the probability that it contains at least one new card not in the user's collection. This involves:\n   - Using existing probability models for card distribution within booster packs, considering rarity and set composition.\n   - Adjusting probabilities based on the user's owned cards to estimate the likelihood of new cards appearing.\n3. Implement a sorting algorithm that orders booster packs in descending order by their calculated new card probability.\n4. Integrate this sorting logic into the user interface where booster packs are displayed, ensuring real-time updates if the user's collection changes.\n5. Optimize performance by caching probability calculations where appropriate and updating only when relevant data changes.\n6. Follow existing code patterns and services related to card probability calculations, referencing Task 40 for pack probability requirements and Task 44 for card addition logic to ensure consistency.\n7. Ensure the solution is scalable and maintainable, with clear separation of concerns between probability calculation and UI rendering.",
+        "testStrategy": "1. Unit test the probability calculation function with various user collection scenarios to verify correct probability outputs.\n2. Test the sorting function independently to confirm booster packs are ordered correctly by new card probability.\n3. Perform integration testing to ensure the UI reflects the sorted booster list accurately and updates dynamically when the user's collection changes.\n4. Validate performance under typical and heavy load conditions to ensure responsiveness.\n5. Conduct user acceptance testing with sample data to confirm the feature meets user expectations for sorting by new card likelihood.",
+        "status": "done",
+        "dependencies": [
+          40,
+          44
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Analyze User's Current Card Collection",
+            "description": "Identify and catalog all cards currently owned by the user to establish a baseline for new card detection.",
+            "dependencies": [],
+            "details": "Extract user's card collection data from the database or user profile, ensuring accurate identification of owned cards including variants and rarities.",
+            "status": "done",
+            "testStrategy": "Unit test with various user collection datasets to verify correct identification of owned cards."
+          },
+          {
+            "id": 2,
+            "title": "Calculate New Card Probability for Each Booster Pack",
+            "description": "Compute the probability that each booster pack contains at least one card not owned by the user, using existing probability models and adjusting for user ownership.",
+            "dependencies": [
+              "45.1"
+            ],
+            "details": "Utilize established card distribution models considering rarity and set composition; adjust probabilities by excluding cards already owned by the user to estimate likelihood of new cards appearing in each booster pack.",
+            "status": "done",
+            "testStrategy": "Unit test probability calculations with different user collections and booster pack configurations to ensure accuracy."
+          },
+          {
+            "id": 3,
+            "title": "Implement Sorting Algorithm for Booster Packs",
+            "description": "Develop and apply a sorting algorithm that orders booster packs in descending order based on their calculated new card probabilities.",
+            "dependencies": [
+              "45.2"
+            ],
+            "details": "Use efficient sorting methods to rank booster packs so those with the highest probability of containing new cards appear first.",
+            "status": "done",
+            "testStrategy": "Test sorting function independently to confirm correct ordering of booster packs by probability."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Sorting Logic into User Interface",
+            "description": "Embed the sorting functionality into the booster pack display UI, ensuring real-time updates when the user's collection changes.",
+            "dependencies": [
+              "45.3"
+            ],
+            "details": "Modify UI components to reflect sorted booster packs dynamically; listen for collection updates to trigger resorting and UI refresh.",
+            "status": "done",
+            "testStrategy": "Perform integration testing to verify UI updates correctly reflect sorting changes in real time."
+          },
+          {
+            "id": 5,
+            "title": "Optimize Performance and Maintainability",
+            "description": "Enhance performance by caching probability calculations and ensure code follows existing patterns for scalability and maintainability.",
+            "dependencies": [
+              "45.2",
+              "45.4"
+            ],
+            "details": "Implement caching strategies to avoid redundant calculations; adhere to code standards referencing Task 40 and Task 44 for consistency; separate concerns between probability logic and UI rendering.",
+            "status": "done",
+            "testStrategy": "Conduct performance testing to measure caching effectiveness and code reviews to ensure maintainability."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-02T23:11:57.345Z",
+      "updated": "2025-08-03T21:54:38.653Z",
       "description": "Tasks for master context"
     }
   }
