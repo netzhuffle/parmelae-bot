@@ -31,7 +31,7 @@ import {
 } from './texts.js';
 
 /** Card ID regex pattern */
-const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{3})$/;
+const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{1,3})$/;
 
 /** Information about a card ID */
 interface CardIdInfo {
