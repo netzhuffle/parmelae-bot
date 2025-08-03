@@ -135,8 +135,8 @@ describe('pokemonCardRangeAdd', () => {
         config,
       );
 
-      // Should contain single operation message
-      expect(result).toContain('Successfully added card to');
+      // Should contain bulk operation message (even for single card)
+      expect(result).toContain('Successfully added 1 cards to');
       expect(result).toContain('A1-001,Card 1');
     });
 

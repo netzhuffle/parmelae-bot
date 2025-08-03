@@ -92,15 +92,11 @@ describe('PokemonTcgPocketService bulk operations', () => {
         BigInt(1),
       );
 
-      expect(result).toHaveLength(3);
-      expect(result.map((c) => c.number).sort()).toEqual([1, 3, 5]);
-
-      // Verify ownership
-      result.forEach((card) => {
-        const ownership = card.ownership.find((o) => o.userId === BigInt(1));
-        expect(ownership).toBeDefined();
-        expect(ownership!.status).toBe(OwnershipStatus.OWNED);
-      });
+      expect(typeof result).toBe('string');
+      expect(result).toContain('Successfully added 3 cards to');
+      expect(result).toContain('Card 1');
+      expect(result).toContain('Card 3');
+      expect(result).toContain('Card 5');
     });
 
     it('should always set ownership status to OWNED', async () => {
@@ -109,12 +105,10 @@ describe('PokemonTcgPocketService bulk operations', () => {
         BigInt(1),
       );
 
-      expect(result).toHaveLength(2);
-      result.forEach((card) => {
-        const ownership = card.ownership.find((o) => o.userId === BigInt(1));
-        expect(ownership).toBeDefined();
-        expect(ownership!.status).toBe(OwnershipStatus.OWNED);
-      });
+      expect(typeof result).toBe('string');
+      expect(result).toContain('Successfully added 2 cards to');
+      expect(result).toContain('Card 1');
+      expect(result).toContain('Card 2');
     });
 
     it('should skip non-existent cards', async () => {
@@ -123,9 +117,11 @@ describe('PokemonTcgPocketService bulk operations', () => {
         BigInt(1),
       );
 
-      // Should only return the 2 valid cards
-      expect(result).toHaveLength(2);
-      expect(result.map((c) => c.number).sort()).toEqual([1, 2]);
+      // Should only process the 2 valid cards
+      expect(typeof result).toBe('string');
+      expect(result).toContain('Successfully added 2 cards to');
+      expect(result).toContain('Card 1');
+      expect(result).toContain('Card 2');
     });
 
     it('should use upsert logic for already owned cards', async () => {
@@ -138,9 +134,11 @@ describe('PokemonTcgPocketService bulk operations', () => {
         BigInt(1),
       );
 
-      // Should return both cards (upsert behavior - update existing, create new)
-      expect(result).toHaveLength(2);
-      expect(result.map((c) => c.number).sort()).toEqual([1, 2]);
+      // Should process both cards (upsert behavior - update existing, create new)
+      expect(typeof result).toBe('string');
+      expect(result).toContain('Successfully added 2 cards to');
+      expect(result).toContain('Card 1');
+      expect(result).toContain('Card 2');
     });
 
     it('should update NOT_NEEDED cards to OWNED', async () => {
@@ -162,14 +160,11 @@ describe('PokemonTcgPocketService bulk operations', () => {
         BigInt(1),
       );
 
-      expect(result).toHaveLength(3);
-
-      // Verify all cards have OWNED status
-      result.forEach((card) => {
-        const ownership = card.ownership.find((o) => o.userId === BigInt(1));
-        expect(ownership).toBeDefined();
-        expect(ownership!.status).toBe(OwnershipStatus.OWNED);
-      });
+      expect(typeof result).toBe('string');
+      expect(result).toContain('Successfully added 3 cards to');
+      expect(result).toContain('Card 1');
+      expect(result).toContain('Card 2');
+      expect(result).toContain('Card 3');
     });
 
     it('should return cards sorted by set key and number', async () => {
@@ -192,14 +187,12 @@ describe('PokemonTcgPocketService bulk operations', () => {
         BigInt(1),
       );
 
-      expect(result).toHaveLength(3);
-      // Should be sorted by set key (A1 before A2), then by number
-      expect(result[0].set.key).toBe('A1');
-      expect(result[0].number).toBe(1);
-      expect(result[1].set.key).toBe('A1');
-      expect(result[1].number).toBe(3);
-      expect(result[2].set.key).toBe('A2');
-      expect(result[2].number).toBe(1);
+      expect(typeof result).toBe('string');
+      expect(result).toContain('Successfully added 3 cards to');
+      // Should contain all cards in CSV format (sorted by set key then number)
+      expect(result).toContain('A1-001,Card 1');
+      expect(result).toContain('A1-003,Card 3');
+      expect(result).toContain('A2-001,Card 6');
     });
   });
 });

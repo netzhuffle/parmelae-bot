@@ -244,12 +244,26 @@ export class PokemonTcgPocketService {
     return this.repository.getCardIdsInRange(setKey, startNumber, endNumber);
   }
 
-  /** Adds multiple cards to a user's collection in bulk */
+  /** Adds multiple cards to a user's collection in bulk and returns formatted result */
   async addMultipleCardsToCollection(
     cardIds: number[],
     userId: bigint,
-  ): Promise<PokemonCardWithRelations[]> {
-    return this.repository.addMultipleCardsToCollection(cardIds, userId);
+  ): Promise<string> {
+    const addedCards = await this.repository.addMultipleCardsToCollection(
+      cardIds,
+      userId,
+    );
+
+    const displayName = await this.getDisplayName(userId);
+    const header = BULK_OPERATION_HEADER_MESSAGE(
+      'added',
+      addedCards.length,
+      'to',
+      displayName,
+    );
+    const csv = await this.formatCardsAsCsv(addedCards, userId);
+    const stats = await this.getFormattedCollectionStats(userId);
+    return BULK_OPERATION_WARNING_MESSAGE(header, csv, stats);
   }
 
   /** Synchronizes the database with the YAML source file. */

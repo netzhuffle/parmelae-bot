@@ -64,14 +64,8 @@ export const pokemonCardRangeAddTool = tool(
         return `Found only ${cardIds.length} of ${expectedCount} expected cards in range ${setKey}-${startNumber.toString().padStart(3, '0')} to ${setKey}-${endNumber.toString().padStart(3, '0')}. ${missingCount} cards are missing from this range. Please verify the range contains valid card numbers.`;
       }
 
-      // Step 4: Bulk add all cards using upsert logic (create missing, update NOT_NEEDED→OWNED)
-      const addedCards = await service.addMultipleCardsToCollection(
-        cardIds,
-        userId,
-      );
-
-      // Step 5: Return comprehensive feedback with collection statistics
-      return await service.processCards(addedCards, userId, false, true);
+      // Step 4: Bulk add all cards using efficient upsert and return formatted result
+      return await service.addMultipleCardsToCollection(cardIds, userId);
     } catch (error) {
       return `Error adding cards from range ${setKey}-${startNumber.toString().padStart(3, '0')} to ${setKey}-${endNumber.toString().padStart(3, '0')}: ${error instanceof Error ? error.message : 'Unknown error occurred'}`;
     }
