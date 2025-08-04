@@ -1,19 +1,31 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "rootDir": "src",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "target": "ES2022",
+    // Environment setup & latest features
+    "lib": ["ESNext"],
+    "target": "ESNext", 
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "allowJs": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    //"verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    // Best practices
     "strict": true,
-    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    //"noUncheckedIndexedAccess": true,
+    //"noImplicitOverride": true,
+
+    // Project specific
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "skipLibCheck": true
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*"

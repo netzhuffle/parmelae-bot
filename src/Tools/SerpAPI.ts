@@ -15,10 +15,6 @@
 
 import { Tool } from '@langchain/core/tools';
 
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 // Copied over from `serpapi` package
 interface BaseParameters {
   /**
@@ -301,7 +297,7 @@ function buildUrl<P extends UrlParameters>(
     .filter(([_, value]) => value !== undefined)
     .map(([key, value]) => [key, `${value}`]);
   const searchParams = new URLSearchParams(nonUndefinedParams);
-  return `https://serpapi.com/${path}?${searchParams}`;
+  return `https://serpapi.com/${path}?${searchParams.toString()}`;
 }
 
 /**
@@ -350,7 +346,21 @@ export class SerpAPI extends Tool {
       },
     );
 
-    const res = await resp.json();
+    const res = (await resp.json()) as {
+      error?: string;
+      organic_results?: { title: string; link: string }[];
+      answer_box?: {
+        answer?: string;
+        snippet?: string;
+        snippet_highlighted_words?: string[];
+      };
+      sports_results?: {
+        game_spotlight?: string;
+      };
+      knowledge_graph?: {
+        description?: string;
+      };
+    };
 
     if (res.error) {
       throw new Error(`Got error from serpAPI: ${res.error}`);
@@ -383,7 +393,7 @@ export class SerpAPI extends Tool {
       return `${res.knowledge_graph.description}\n${links}`;
     }
 
-    if (res.organic_results.length) {
+    if (res.organic_results?.length) {
       return links;
     }
 

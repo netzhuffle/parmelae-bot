@@ -1,15 +1,11 @@
 {
   "private": true,
   "type": "module",
-  "main": "dist/index.js",
-  "engines": {
-    "node": ">=22.0.0"
-  },
   "scripts": {
     "update": "bunx npm-check-updates --interactive --format group --packageManager bun",
     "format": "prettier --write src",
     "schema-format": "prisma format",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc",
     "lint": "eslint src",
     "validate-yaml": "yaml-validator resources/*.yaml",
     "test": "bun test src",

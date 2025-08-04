@@ -54,7 +54,8 @@ jobs:
       - name: Start bot (PM2)
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 start ecosystem.config.js'
+        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 start ecosystem.config.cjs'
 
       - name: Remove SSH
+        if: always()
         run: rm -rf ~/.ssh
