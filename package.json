@@ -58,7 +58,7 @@
     "npm-check-updates": "^18.0.2",
     "prettier": "^3.6.2",
     "prisma": "^6.13.0",
-    "task-master-ai": "^0.22.0",
+    "task-master-ai": "^0.23.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
