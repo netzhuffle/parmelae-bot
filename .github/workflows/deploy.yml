@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build
-        run: bun run build
+      - name: Run checks (type check, lint, test)
+        run: bun run checks
 
       - name: Remove dev dependencies
         run: bun run install-prod
@@ -36,20 +36,25 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
 
-      - name: Stop
+      - name: Stop bot (PM2)
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'forever stop /home/jannis/parmelae-bot/dist/index.js || true'
+        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 stop parmelae-bot || true'
 
-      - name: Deploy
+      - name: Deploy files
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: rsync -chilOrz --stats --delete --exclude .git --exclude .gitignore --exclude prisma/sqlite.db --exclude .env --exclude .cursor --exclude .devcontainer --exclude .github --exclude .taskmaster --exclude .vscode --include node_modules --include dist ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
+        run: rsync -chilOrz --stats --delete --exclude .git --exclude .gitignore --exclude prisma/sqlite.db --exclude .env --exclude .cursor --exclude .devcontainer --exclude .github --exclude .taskmaster --exclude .vscode ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
 
-      - name: Start
+      - name: Run database migrations
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot/ && npm run migrate-prod && forever start --workingDir /home/jannis/parmelae-bot/ /home/jannis/parmelae-bot/dist/index.js'
+        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && bun run migrate-prod'
+
+      - name: Start bot (PM2)
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 start ecosystem.config.js'
 
       - name: Remove SSH
         run: rm -rf ~/.ssh

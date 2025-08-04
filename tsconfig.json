@@ -1,7 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "outDir": "dist",
     "rootDir": "src",
     "module": "nodenext",
     "moduleResolution": "nodenext",
@@ -18,9 +17,5 @@
   },
   "include": [
     "src/**/*"
-  ],
-  "ts-node": {
-    "transpileOnly": true,
-    "esm": true
-  }
+  ]
 }

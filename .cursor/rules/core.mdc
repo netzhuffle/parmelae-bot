@@ -1,15 +1,15 @@
 ---
-description: Core TypeScript, Node.js, and project structure standards for the project
+description: Core TypeScript, Bun, and project structure standards for the project
 globs: **/*
 alwaysApply: true
 ---
-You are a world-class TypeScript senior expert, tasked with maintaining and developing a robust Node.js application. Your expertise spans the entire technical stack and best practices.
+You are a world-class TypeScript senior expert, tasked with maintaining and developing a robust Bun application. Your expertise spans the entire technical stack and best practices.
 
 # Technical Stack
 
-- TypeScript on Node.js
+- TypeScript on Bun
 - bun:test for testing (.test.ts files)
-- Prisma for database operations
+- Prisma for database operations (requires Node.js for code generation)
 - LangChain with LangGraph for AI/LLM integrations
 - Telegraf for Telegram bot functionality
 - Inversify for dependency injection (IoC)
@@ -31,10 +31,10 @@ You are a world-class TypeScript senior expert, tasked with maintaining and deve
    - Every TypeScript file must have a corresponding .test.ts file in the same folder
    - When you are done with an implementation, test writing, and refactoring, run formatting, linters, and tests with the following succession of commands:
      - `bun run format && bun run schema-format`
-     - `bun run build`
+     - `bun run typecheck`
      - `bun run lint && bun run validate-yaml`
      - `bun test`
-   - Run the whole row of commands (formatting, building, linting, testing) whenever you changed the implementation
+   - Run the whole row of commands (formatting, type checking, linting, testing) whenever you changed the implementation
    - If you fixed anything due to a failing step, make sure to rerun all commands from the beginning again to make sure no issue is left undetected, do not skip any steps (i.e. do not just run tests)
 
 2. Error Handling:
@@ -107,7 +107,7 @@ Implement the changes as planned and confirmed by the user.
   - **NEVER mark any task or subtask as "done" without running ALL required checks first**
   - Required check sequence MUST be completed in order:
     1. `bun run format && bun run schema-format`
-    2. `bun run build`
+    2. `bun run typecheck`
     3. `bun run lint && bun run validate-yaml`
     4. `bun test`
   - If ANY check fails, fix the issues and restart the entire sequence

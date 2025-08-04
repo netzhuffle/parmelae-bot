@@ -44,8 +44,8 @@ src/
 
 ### Prerequisites
 
-- **Node.js 22** (LTS recommended) - for running the application
-- **Bun** - for package management and tests (use version from .bun-version file)
+- **Bun** - for runtime, package management, and tests (use version from .bun-version file)
+- **Node.js** - required by Prisma for code generation (any recent version)
 - **Telegram Bot Token** from [@BotFather](https://t.me/BotFather)
 - **OpenAI API Key** for AI features
 
@@ -96,9 +96,9 @@ src/
 - `bun run run-dev` - Start development server with hot reload
 - `bun run lint` - Run linter
 - `bun run format` - Format code
-- `bun run build` - Verify TypeScript build (type checking)
+- `bun run typecheck` - TypeScript type checking
 - `bun test` - Run test suite
-- `bun run checks` - Run all quality checks (format, build, lint, test)
+- `bun run checks` - Run all quality checks (format, typecheck, lint, test)
 - `bun run migrate` - Run database migrations
 - `bun run prisma-studio` - Open Prisma Studio for database management
 
@@ -152,8 +152,8 @@ The bot includes various AI-powered tools:
 ### Build and Deploy
 
 ```bash
-# Build the application
-bun run build
+# Run quality checks (type checking, linting, tests)
+bun run checks
 
 # Install production dependencies only
 bun run install-prod
@@ -162,11 +162,12 @@ bun run install-prod
 bun run migrate-prod
 
 # Start the application
-node dist/index.js
+bun src/index.ts
 ```
 
 ### Environment Considerations
 
+- **Process Management**: Use your preferred process manager (PM2, systemd, Docker, etc.)
 - **Database**: SQLite for simplicity, easily replaceable with PostgreSQL
 - **Monitoring**: Helicone integration for API usage tracking
 - **Error Handling**: Sentry integration available for error tracking
