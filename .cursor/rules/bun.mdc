@@ -6,9 +6,7 @@ alwaysApply: false
 
 # Bun Development Patterns
 
-**Project Status**: Currently using **Bun for package management** with **Node.js runtime**. Full Bun runtime migration planned for future.
-
-## Package Management with Bun
+## Runtime & Package Management
 
 ### **Installation Commands**
 ```bash
@@ -22,12 +20,15 @@ bun run install-prod  # Equivalent to: bun install --production --frozen-lockfil
 bunx npm-check-updates --interactive
 ```
 
-## Compatibility Guidelines
+### **Development & Production Execution**
+```bash
+# ✅ DO: Direct TypeScript execution with Bun
+bun src/index.ts
 
-### **Runtime Compatibility**
-- **Current**: Bun package management + Node.js runtime
-- **Scripts**: Use `bun run` for package.json scripts
-- **Execution**: Use `node` for application runtime
+# ✅ DO: Use bun run for package.json scripts
+bun run typecheck
+bun run checks
+```
 
 
 See [testing.mdc](mdc:.cursor/rules/testing.mdc) for Bun testing patterns and [core.mdc](mdc:.cursor/rules/core.mdc) for general development workflow integration.
