@@ -3,6 +3,7 @@ import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity, OwnershipStatus } from '@prisma/client';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+import { createBunFileFake } from '../Fakes/BunFileFake.js';
 
 describe('PokemonTcgPocketService', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -30,7 +31,7 @@ TEST:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
 
         try {
@@ -87,7 +88,7 @@ TEST:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -128,7 +129,7 @@ TEST-SET:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
 
         try {
@@ -153,7 +154,7 @@ TEST:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
 
         try {
@@ -182,7 +183,7 @@ TEST:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
 
         try {
@@ -213,7 +214,7 @@ TEST:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -254,7 +255,7 @@ TEST:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -298,7 +299,7 @@ TEST:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -357,7 +358,7 @@ SET2:
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          yaml,
+          createBunFileFake(yaml),
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -428,7 +429,7 @@ TEST:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        yaml,
+        createBunFileFake(yaml),
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -482,7 +483,7 @@ TEST:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        yaml,
+        createBunFileFake(yaml),
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -543,7 +544,7 @@ TEST:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        yaml,
+        createBunFileFake(yaml),
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -591,7 +592,7 @@ TEST:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        yaml,
+        createBunFileFake(yaml),
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -649,7 +650,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        yaml,
+        createBunFileFake(yaml),
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -711,7 +712,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        yaml,
+        createBunFileFake(yaml),
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -764,7 +765,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        yaml,
+        createBunFileFake(yaml),
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -809,7 +810,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        '',
+        createBunFileFake(''),
       );
       const searchCardsSpy = spyOn(repository, 'searchCards');
 
@@ -827,7 +828,7 @@ A1:
       const service = new PokemonTcgPocketService(
         new PokemonTcgPocketProbabilityService(),
         repository,
-        '',
+        createBunFileFake(''),
       );
 
       // Test with all rarity types
@@ -848,7 +849,7 @@ A1:
       const service = new PokemonTcgPocketService(
         new PokemonTcgPocketProbabilityService(),
         repository,
-        '',
+        createBunFileFake(''),
       );
 
       // Test with some rarities having 0 owned cards
@@ -869,7 +870,7 @@ A1:
       const service = new PokemonTcgPocketService(
         new PokemonTcgPocketProbabilityService(),
         repository,
-        '',
+        createBunFileFake(''),
       );
 
       // Test with only promo cards
@@ -939,7 +940,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        '',
+        createBunFileFake(''),
       );
 
       const stats = await service.getCollectionStats(userId);
@@ -1000,7 +1001,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        '',
+        createBunFileFake(''),
       );
 
       const stats = await service.getCollectionStats(userId);
@@ -1116,7 +1117,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        '',
+        createBunFileFake(''),
       );
 
       const stats = await service.getCollectionStats(userId);

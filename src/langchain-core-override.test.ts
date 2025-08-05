@@ -1,13 +1,13 @@
-import { readFileSync } from 'fs';
 import { describe, test, expect } from 'bun:test';
 import packageJson from '../package.json' with { type: 'json' };
 
 describe('LangChain Core Override Validation', () => {
-  test('should ensure @langchain/core override version matches actually installed version', () => {
+  test('should ensure @langchain/core override version matches actually installed version', async () => {
     const overrideVersion = packageJson.overrides?.['@langchain/core'];
 
     // Read bun.lock as text since it's JSONC (JSON with Comments), not pure JSON
-    const bunLockContent = readFileSync('bun.lock', 'utf8');
+    const bunLockFile = Bun.file('bun.lock');
+    const bunLockContent = await bunLockFile.text();
 
     // Look for the @langchain/core package entry in bun.lock
     // Format is: "@langchain/core": ["@langchain/core@0.3.66", "", {...}, "sha512-..."]

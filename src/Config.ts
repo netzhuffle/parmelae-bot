@@ -1,4 +1,3 @@
-import * as dotenv from 'dotenv';
 import assert from 'assert';
 import { injectable } from 'inversify';
 import { GptModel, GptModels } from './GptModelsProvider.js';
@@ -49,48 +48,34 @@ export class Config {
   public readonly newCommitAnnouncementChats: readonly bigint[];
 
   constructor() {
-    dotenv.config();
+    assert(Bun.env.USERNAME, 'You must define USERNAME in .env');
+    this.username = Bun.env.USERNAME;
 
-    assert(process.env.USERNAME, 'You must define USERNAME in .env');
-    this.username = process.env.USERNAME;
+    assert(Bun.env.TELEGRAM_TOKEN, 'You must define TELEGRAM_TOKEN in .env');
+    this.telegramToken = Bun.env.TELEGRAM_TOKEN;
 
-    assert(
-      process.env.TELEGRAM_TOKEN,
-      'You must define TELEGRAM_TOKEN in .env',
-    );
-    this.telegramToken = process.env.TELEGRAM_TOKEN;
+    assert(Bun.env.OPENAI_API_KEY, 'You must define OPENAI_API_KEY in .env');
+    this.openAiKey = Bun.env.OPENAI_API_KEY;
 
     assert(
-      process.env.OPENAI_API_KEY,
-      'You must define OPENAI_API_KEY in .env',
-    );
-    this.openAiKey = process.env.OPENAI_API_KEY;
-
-    assert(
-      process.env.HELICONE_API_KEY,
+      Bun.env.HELICONE_API_KEY,
       'You must define HELICONE_API_KEY in .env',
     );
-    this.heliconeApiKey = process.env.HELICONE_API_KEY;
+    this.heliconeApiKey = Bun.env.HELICONE_API_KEY;
 
-    this.sentryDsn = process.env.SENTRY_DSN ?? null;
+    this.sentryDsn = Bun.env.SENTRY_DSN ?? null;
 
     assert(
-      process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+      Bun.env.GITHUB_PERSONAL_ACCESS_TOKEN,
       'You must define GIT_HUB_PERSONAL_ACCESS_TOKEN in.env',
     );
-    this.gitHubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
+    this.gitHubPersonalAccessToken = Bun.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 
-    assert(
-      process.env.SERPAPI_API_KEY,
-      'You must define SERPAPI_API_KEY in.env',
-    );
-    this.serpApiApiKey = process.env.SERPAPI_API_KEY;
+    assert(Bun.env.SERPAPI_API_KEY, 'You must define SERPAPI_API_KEY in.env');
+    this.serpApiApiKey = Bun.env.SERPAPI_API_KEY;
 
-    assert(
-      process.env.CHAT_ALLOWLIST,
-      'You must define CHAT_ALLOWLIST in .env',
-    );
-    const chatAllowlistStrings = process.env.CHAT_ALLOWLIST.split(',');
+    assert(Bun.env.CHAT_ALLOWLIST, 'You must define CHAT_ALLOWLIST in .env');
+    const chatAllowlistStrings = Bun.env.CHAT_ALLOWLIST.split(',');
     this.chatAllowlist = chatAllowlistStrings.map((n) => {
       try {
         return BigInt(n);
@@ -100,11 +85,11 @@ export class Config {
     });
 
     assert(
-      process.env.NEW_COMMITS_ANNOUNCEMENT_CHATS,
+      Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS,
       'You must define NEW_COMMIT_ANNOUNCEMENT_CHATS in .env',
     );
     const newCommitAnnouncementChatStrings =
-      process.env.NEW_COMMITS_ANNOUNCEMENT_CHATS.split(',');
+      Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS.split(',');
     this.newCommitAnnouncementChats = newCommitAnnouncementChatStrings.map(
       (chat) => {
         try {

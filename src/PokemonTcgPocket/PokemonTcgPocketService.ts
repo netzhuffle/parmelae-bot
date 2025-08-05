@@ -1,6 +1,7 @@
 import { injectable, inject } from 'inversify';
 import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
 import { load } from 'js-yaml';
+import type { BunFile } from 'bun';
 import {
   Rarity,
   PokemonSet,
@@ -201,7 +202,7 @@ export class PokemonTcgPocketService {
   constructor(
     private readonly probabilityService: PokemonTcgPocketProbabilityService,
     private readonly repository: PokemonTcgPocketRepository,
-    @inject(POKEMON_TCGP_YAML_SYMBOL) private readonly yamlContent: string,
+    @inject(POKEMON_TCGP_YAML_SYMBOL) private readonly yamlFile: BunFile,
   ) {}
 
   /** Search for cards using various filters */
@@ -268,7 +269,8 @@ export class PokemonTcgPocketService {
 
   /** Synchronizes the database with the YAML source file. */
   async synchronizeCardDatabaseWithYamlSource(): Promise<void> {
-    const sets = load(this.yamlContent) as Sets;
+    const yamlContent = await this.yamlFile.text();
+    const sets = load(yamlContent) as Sets;
 
     for (const [setKey, setData] of Object.entries(sets)) {
       await this.synchronizeSet(setKey, setData);

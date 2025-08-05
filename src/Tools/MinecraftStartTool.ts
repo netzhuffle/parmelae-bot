@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { $ } from 'bun';
 import { injectable } from 'inversify';
 import { Tool } from '@langchain/core/tools';
 
@@ -9,18 +9,15 @@ export class MinecraftStartTool extends Tool {
   description =
     'Starts the minecraft server. Gives back the console output. Input should be an empty string.';
 
-  protected _call(): Promise<string> {
-    return new Promise<string>((resolve) => {
-      exec(
-        '/home/jannis/parmelae-bot/cmd/startminecraft',
-        (error, stdout, stderr) => {
-          if (error) {
-            resolve('Error: ' + stderr.trim());
-          } else {
-            resolve(stdout.trim());
-          }
-        },
-      );
-    });
+  protected async _call(): Promise<string> {
+    try {
+      const result =
+        await $`/home/jannis/parmelae-bot/cmd/startminecraft`.text();
+      return result.trim();
+    } catch (error) {
+      const stderr =
+        (error as { stderr?: string })?.stderr?.trim() ?? 'Unknown error';
+      return `Error: ${stderr}`;
+    }
   }
 }

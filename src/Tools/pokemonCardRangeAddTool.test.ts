@@ -4,6 +4,7 @@ import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/Pokemo
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 import { pokemonCardRangeAddTool } from './pokemonCardRangeAddTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
+import { createBunFileFake } from '../Fakes/BunFileFake.js';
 import { OwnershipStatus } from '@prisma/client';
 
 describe('pokemonCardRangeAdd', () => {
@@ -19,7 +20,7 @@ describe('pokemonCardRangeAdd', () => {
       pokemonTcgPocketService: new PokemonTcgPocketService(
         probabilityService,
         repository,
-        '',
+        createBunFileFake(''),
       ),
     });
 

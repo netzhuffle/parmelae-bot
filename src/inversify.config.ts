@@ -8,7 +8,6 @@ import { OpenAI } from 'openai';
 import { PrismaClient } from '@prisma/client';
 import { Config } from './Config.js';
 import { Telegraf } from 'telegraf';
-import { readFileSync } from 'fs';
 import { POKEMON_TCGP_YAML_SYMBOL } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 
 const container = new Container({
@@ -16,9 +15,9 @@ const container = new Container({
   autobind: true,
 });
 
-// Bind Pokemon TCG Pocket YAML content
+// Bind Pokemon TCG Pocket YAML file
 container.bind(POKEMON_TCGP_YAML_SYMBOL).toDynamicValue(() => {
-  return readFileSync('resources/tcgpcards.yaml', 'utf-8');
+  return Bun.file('resources/tcgpcards.yaml');
 });
 
 container.bind(GptModelsProvider).toDynamicValue(

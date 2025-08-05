@@ -3,6 +3,7 @@ import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { OwnershipStatus } from '@prisma/client';
+import { createBunFileFake } from '../Fakes/BunFileFake.js';
 
 describe('PokemonTcgPocketService bulk operations', () => {
   let service: PokemonTcgPocketService;
@@ -12,7 +13,11 @@ describe('PokemonTcgPocketService bulk operations', () => {
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
     probabilityService = new PokemonTcgPocketProbabilityService();
-    service = new PokemonTcgPocketService(probabilityService, repository, '');
+    service = new PokemonTcgPocketService(
+      probabilityService,
+      repository,
+      createBunFileFake(''),
+    );
   });
 
   describe('getCardIdsInRange', () => {

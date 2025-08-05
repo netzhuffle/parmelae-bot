@@ -7,6 +7,7 @@ import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 import { ToolContext } from '../ChatGptAgentService.js';
 import { createTestToolConfig } from '../ChatGptAgentService.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
+import { createBunFileFake } from '../Fakes/BunFileFake.js';
 
 describe('pokemonCardSearch', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -17,7 +18,7 @@ describe('pokemonCardSearch', () => {
     const service = new PokemonTcgPocketService(
       probabilityService,
       repository as unknown as PokemonTcgPocketRepository,
-      '',
+      createBunFileFake(''),
     );
     config = createTestToolConfig({
       userId: BigInt(1),

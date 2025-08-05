@@ -1,5 +1,4 @@
 import { describe, it, beforeAll, expect } from 'bun:test';
-import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
 import {
   Card,
@@ -30,8 +29,9 @@ describe('tcgpcards.yaml', () => {
   let yamlContent: string;
   let sets: Sets;
 
-  beforeAll(() => {
-    yamlContent = readFileSync('resources/tcgpcards.yaml', 'utf-8');
+  beforeAll(async () => {
+    const yamlFile = Bun.file('resources/tcgpcards.yaml');
+    yamlContent = await yamlFile.text();
     sets = load(yamlContent) as Sets;
   });
 

@@ -5,6 +5,7 @@ import { Rarity, OwnershipStatus } from '@prisma/client';
 import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
+import { createBunFileFake } from '../Fakes/BunFileFake.js';
 
 describe('pokemonCardStats', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -16,7 +17,7 @@ describe('pokemonCardStats', () => {
       pokemonTcgPocketService: new PokemonTcgPocketService(
         new PokemonTcgPocketProbabilityService(),
         repository,
-        '',
+        createBunFileFake(''),
       ),
     });
   });
