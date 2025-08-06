@@ -41,13 +41,13 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           echo "Creating pre-deployment backup (if scripts exist)..."
-          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && if [ -f scripts/backup/backup-database.ts ]; then bun scripts/backup/backup-database.ts; fi'
+          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && if test -f scripts/backup/backup-database.ts; bun scripts/backup/backup-database.ts; end'
           echo "✅ Pre-deployment backup completed"
 
       - name: Stop bot (PM2)
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 stop parmelae-bot || true'
+        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 stop parmelae-bot; or true'
 
       - name: Deploy files
         env:
