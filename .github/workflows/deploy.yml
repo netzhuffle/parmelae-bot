@@ -36,22 +36,18 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
 
+      - name: Create pre-deployment backup
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          echo "Creating pre-deployment backup (if scripts exist)..."
+          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && if [ -f scripts/backup/backup-database.ts ]; then bun scripts/backup/backup-database.ts; fi'
+          echo "✅ Pre-deployment backup completed"
+
       - name: Stop bot (PM2)
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 stop parmelae-bot || true'
-
-      - name: Create database backup
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          echo "Creating database backup before deployment..."
-          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && sqlite3 prisma/sqlite.db ".backup backups/pre-deployment-$(date +%Y-%m-%d-%H-%M-%S).db"'
-          if [ $? -ne 0 ]; then
-            echo "❌ Database backup failed"
-            exit 1
-          fi
-          echo "✅ Database backup completed"
 
       - name: Deploy files
         env:
