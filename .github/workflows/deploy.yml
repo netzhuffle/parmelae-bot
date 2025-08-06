@@ -36,17 +36,27 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
 
+      - name: Stop bot (PM2)
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 stop parmelae-bot || true'
+
       - name: Create database backup
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          echo "Ensuring backup directory exists and creating database backup..."
-          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && bun scripts/backup/backup-database.ts'
+          echo "Creating database backup before deployment..."
+          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && sqlite3 prisma/sqlite.db ".backup backups/pre-deployment-$(date +%Y-%m-%d-%H-%M-%S).db"'
           if [ $? -ne 0 ]; then
             echo "❌ Database backup failed"
             exit 1
           fi
           echo "✅ Database backup completed"
+
+      - name: Deploy files
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: rsync -chilOrz --stats --delete --exclude .git --exclude .gitignore --exclude prisma/sqlite.db --exclude .env --exclude .cursor --exclude .devcontainer --exclude .github --exclude .taskmaster --exclude .vscode --exclude backups ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
 
       - name: Cleanup old backups
         env:
@@ -55,16 +65,6 @@ jobs:
           echo "Cleaning up old backups..."
           ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && bun scripts/backup/cleanup-backups.ts'
           echo "✅ Backup cleanup completed"
-
-      - name: Stop bot (PM2)
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 stop parmelae-bot || true'
-
-      - name: Deploy files
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: rsync -chilOrz --stats --delete --exclude .git --exclude .gitignore --exclude prisma/sqlite.db --exclude .env --exclude .cursor --exclude .devcontainer --exclude .github --exclude .taskmaster --exclude .vscode --exclude backups ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
 
       - name: Run database migrations
         env:
