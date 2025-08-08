@@ -38,13 +38,13 @@ Example: `sqlite-backup-2024-01-15-14-30-45.db`
 The backup process is integrated into the deployment workflow:
 
 1. **SSH Setup** - Establishes secure connection to production server
-2. **Database Backup** - Creates backup using `better-sqlite3` safe backup method
+2. **Database Backup** - Creates backup using `sqlite3` CLI safe backup method
 3. **Backup Cleanup** - Removes old backups, keeping only 5 most recent
 4. **Deployment** - Proceeds with application deployment
 
 ### Backup Script Features
 
-- **Safe SQLite backup** using `better-sqlite3` `.backup()` method
+- **Safe SQLite backup** using `sqlite3` CLI `.backup` command
 - **Atomic operations** to prevent corruption during live database access
 - **Integrity verification** after backup creation
 - **Comprehensive error handling** with detailed logging

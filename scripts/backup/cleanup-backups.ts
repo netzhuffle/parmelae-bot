@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 
+import { $ } from 'bun';
 import { join } from 'path';
 
 // Configuration
@@ -21,7 +22,7 @@ async function getBackupFiles(): Promise<BackupFile[]> {
   try {
     // Use Bun's shell to list files with safety check
     const result =
-      await Bun.$`find ${BACKUP_DIR} -name "${BACKUP_PREFIX}*.db" -type f`.text();
+      await $`find ${BACKUP_DIR} -name "${BACKUP_PREFIX}*.db" -type f`.text();
     const files = result.trim().split('\n').filter(Boolean);
 
     // Safety check: Ensure we're only working with backup files
@@ -93,7 +94,7 @@ async function cleanupBackups(): Promise<void> {
 
     const deletePromises = filesToDelete.map(async (file) => {
       try {
-        await Bun.$`rm -f ${file.path}`.quiet();
+        await $`rm -f ${file.path}`.quiet();
         console.log(`🗑️  Deleted: ${file.name} (${formatFileSize(file.size)})`);
         return { success: true, size: file.size, name: file.name };
       } catch (error) {

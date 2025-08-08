@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import Database from 'better-sqlite3';
+import { $ } from 'bun';
 import { join } from 'path';
 import { createInterface } from 'readline';
 
@@ -23,7 +23,7 @@ async function getAvailableBackups(): Promise<BackupFile[]> {
   try {
     // Use Bun's shell to list files
     const result =
-      await Bun.$`find ${BACKUP_DIR} -name "${BACKUP_PREFIX}*.db" -type f`.text();
+      await $`find ${BACKUP_DIR} -name "${BACKUP_PREFIX}*.db" -type f`.text();
     const files = result.trim().split('\n').filter(Boolean);
 
     const fileStats = await Promise.all(
@@ -57,20 +57,17 @@ async function getAvailableBackups(): Promise<BackupFile[]> {
  */
 function verifyBackup(backupPath: string): boolean {
   try {
-    const db = new Database(backupPath, { readonly: true });
-
-    // Check if database can be opened and has tables
-    const tables = db
-      .prepare("SELECT name FROM sqlite_master WHERE type='table'")
-      .all();
-    db.close();
-
-    if (tables.length === 0) {
-      throw new Error('Backup file contains no tables');
+    // Verify integrity using sqlite3 CLI
+    const integrity = Bun.spawnSync({
+      cmd: ['sqlite3', '-readonly', backupPath, 'PRAGMA integrity_check;'],
+      stdout: 'pipe',
+      stderr: 'pipe',
+    });
+    const out = new TextDecoder().decode(integrity.stdout).trim();
+    if (out !== 'ok') {
+      throw new Error(`Integrity check failed: ${out}`);
     }
-
     console.log(`✅ Backup verification passed`);
-    console.log(`📊 Tables found: ${tables.length}`);
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -93,7 +90,7 @@ async function backupCurrentDatabase() {
     const dbFile = Bun.file(DB_PATH);
     if (await dbFile.exists()) {
       console.log(`💾 Creating backup of current database...`);
-      await Bun.$`cp ${DB_PATH} ${currentBackupPath}`.quiet();
+      await $`cp ${DB_PATH} ${currentBackupPath}`.quiet();
       console.log(`✅ Current database backed up to: ${currentBackupPath}`);
       return currentBackupPath;
     } else {
@@ -126,7 +123,7 @@ async function restoreDatabase(backupPath: string): Promise<boolean> {
 
     // Perform restoration
     console.log(`🔄 Restoring database...`);
-    await Bun.$`cp ${backupPath} ${DB_PATH}`.quiet();
+    await $`cp ${backupPath} ${DB_PATH}`.quiet();
 
     // Verify restoration
     console.log(`✅ Verifying restoration...`);

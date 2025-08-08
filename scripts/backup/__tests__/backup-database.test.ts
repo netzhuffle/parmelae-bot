@@ -45,7 +45,10 @@ describe('Backup Database Script', () => {
       // Remove directory if it exists
       try {
         if (existsSync(testDir)) {
-          await Bun.$`rm -rf ${testDir}`.quiet();
+          // Use rm via shell is not necessary here; Node fs is enough in tests
+          // But keep Bun.$ for parity and to avoid platform differences
+          const { $ } = await import('bun');
+          await $`rm -rf ${testDir}`.quiet();
         }
       } catch {
         // Ignore errors

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import Database from 'better-sqlite3';
+import { $ } from 'bun';
 import { join } from 'path';
 
 // Configuration
@@ -30,7 +30,7 @@ export async function ensureBackupDirectory(
   const dirExists = await Bun.file(dir).exists();
   if (!dirExists) {
     console.log(`Creating backup directory: ${dir}`);
-    await Bun.$`mkdir -p ${dir}`;
+    await $`mkdir -p ${dir}`;
   }
 }
 
@@ -52,47 +52,20 @@ async function createBackup(): Promise<string> {
     throw new Error(`Source database not found: ${DB_PATH}`);
   }
 
-  let sourceDb = null;
-
   try {
-    // Open source database
-    console.log('Opening source database...');
-    sourceDb = new Database(DB_PATH, { readonly: true });
-
-    // Perform backup using better-sqlite3's backup method
+    // Perform backup using sqlite3 CLI
     console.log('Performing backup...');
-    await sourceDb.backup(backupPath);
+    const backupCmd = `.backup '${backupPath}'`;
+    await $`sqlite3 -cmd ${backupCmd} ${DB_PATH} ".quit"`.quiet();
 
-    // Verify backup integrity
+    // Verify backup integrity using sqlite3 CLI
     console.log('Verifying backup...');
-    const backupTest = new Database(backupPath, { readonly: true });
-
-    try {
-      // Check tables exist
-      const tables = backupTest
-        .prepare("SELECT name FROM sqlite_master WHERE type='table'")
-        .all();
-
-      if (tables.length === 0) {
-        throw new Error('Backup verification failed: No tables found');
-      }
-
-      // Verify database integrity
-      const integrityCheck = backupTest
-        .prepare('PRAGMA integrity_check')
-        .get() as { integrity_check: string };
-      if (integrityCheck.integrity_check !== 'ok') {
-        throw new Error(
-          `Backup verification failed: ${integrityCheck.integrity_check}`,
-        );
-      }
-
-      console.log(
-        `✅ Backup verification passed - ${tables.length} tables verified`,
-      );
-    } finally {
-      backupTest.close();
+    const integrity =
+      await $`sqlite3 -readonly ${backupPath} "PRAGMA integrity_check;"`.text();
+    if (integrity.trim() !== 'ok') {
+      throw new Error(`Backup verification failed: ${integrity.trim()}`);
     }
+    console.log('✅ Backup verification passed');
 
     // Get backup file size
     const backupFile = Bun.file(backupPath);
@@ -118,12 +91,12 @@ async function createBackup(): Promise<string> {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('❌ Backup failed:', errorMessage);
 
-    // Clean up failed backup file (no backup database connection to close)
+    // Clean up failed backup file (no DB handle to close)
 
     try {
       const backupFile = Bun.file(backupPath);
       if (await backupFile.exists()) {
-        await Bun.$`rm -f ${backupPath}`.quiet();
+        await $`rm -f ${backupPath}`.quiet();
         console.log('🧹 Cleaned up failed backup file');
       }
     } catch {
@@ -131,16 +104,6 @@ async function createBackup(): Promise<string> {
     }
 
     throw error;
-  } finally {
-    // Clean up database connections safely
-    if (sourceDb) {
-      try {
-        sourceDb.close();
-      } catch {
-        console.warn('⚠️  Warning: Failed to close source database connection');
-      }
-    }
-    // No backup database connection to close since we use backup() method
   }
 }
 
