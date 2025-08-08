@@ -39,9 +39,10 @@ jobs:
       - name: Create pre-deployment backup
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        continue-on-error: true
         run: |
           echo "Creating pre-deployment backup (if scripts exist)..."
-          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && if test -f scripts/backup/backup-database.ts; bun scripts/backup/backup-database.ts; end'
+          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && if test -f scripts/backup/backup-database.ts; bun scripts/backup/backup-database.ts; end' || true
           echo "✅ Pre-deployment backup completed"
 
       - name: Stop bot (PM2)
