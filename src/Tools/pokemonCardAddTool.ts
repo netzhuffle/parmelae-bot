@@ -146,10 +146,14 @@ export const pokemonCardAddTool = tool(
       }
     } else {
       // For add operation, check if user doesn't own the cards or they have a different status
-      const anyOwned = cards.some((card) =>
-        card.ownership.some((ownership) => ownership.userId === userId),
+      const alreadyOwned = cards.some((card) =>
+        card.ownership.some(
+          (ownership) =>
+            ownership.userId === userId &&
+            ownership.status === OwnershipStatus.OWNED,
+        ),
       );
-      if (anyOwned) {
+      if (alreadyOwned) {
         return NO_MATCHING_MISSING_CARDS_MESSAGE(displayName, cardDetails);
       }
     }

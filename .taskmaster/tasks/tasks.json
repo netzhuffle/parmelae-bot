@@ -2418,11 +2418,57 @@
         "dependencies": [],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 55,
+        "title": "Fix pokemonCardAddTool to Upgrade NOT_NEEDED to OWNED Status",
+        "description": "Fix a bug in pokemonCardAddTool where cards with NOT_NEEDED status cannot be upgraded to OWNED status due to an early ownership check that incorrectly blocks the operation.",
+        "details": "This task addresses a bug in the Pokemon card collection management system where users cannot upgrade cards from NOT_NEEDED to OWNED status using the pokemonCardAddTool.\n\nCurrent implementation issues:\n1. In `src/Tools/pokemonCardAddTool.ts`, the tool performs an early check that blocks the operation if a user has ANY ownership status for a card (including NOT_NEEDED).\n2. The repository's `addMultipleCardsToCollection()` correctly upserts to OWNED status, but `addCardToCollection()` creates a new ownership record without updating existing ones.\n3. The tool never reaches the `processCards` function for NOT_NEEDED cards due to the early blocking check.\n\nImplementation steps:\n1. Modify the ownership check in pokemonCardAddTool.ts to only block when the card status is specifically OWNED:\n   ```typescript\n   // Change from checking if any ownership exists to checking if OWNED status exists\n   const existingOwnerships = await this.repository.getCardOwnerships(userId, [cardId]);\n   const alreadyOwned = existingOwnerships.some(ownership => \n     ownership.cardId === cardId && ownership.status === 'OWNED'\n   );\n   \n   if (alreadyOwned) {\n     return NO_MATCHING_MISSING_CARDS_MESSAGE;\n   }\n   ```\n\n2. Update the repository's `addCardToCollection()` method to upsert the ownership record:\n   ```typescript\n   // Modify to upsert instead of just insert\n   async addCardToCollection(userId: number, cardId: string, status: OwnershipStatus = 'OWNED'): Promise<void> {\n     await this.db.cardOwnership.upsert({\n       where: {\n         userId_cardId: {\n           userId,\n           cardId\n         }\n       },\n       update: {\n         status\n       },\n       create: {\n         userId,\n         cardId,\n         status\n       }\n     });\n   }\n   ```\n\n3. Ensure the tool's success message correctly reflects the upgrade operation when changing from NOT_NEEDED to OWNED.\n\n4. Update any related documentation to clarify that NOT_NEEDED status can be upgraded to OWNED using the add tool.",
+        "testStrategy": "1. Unit Testing:\n   - Add test cases to `src/Tools/pokemonCardAddTool.test.ts` to verify the fix:\n     ```typescript\n     it('should upgrade NOT_NEEDED to OWNED when adding a card', async () => {\n       // Setup: Create mock repository with a NOT_NEEDED card\n       const mockRepository = createMockRepository({\n         getCardOwnerships: async () => [{\n           userId: 123,\n           cardId: 'test-card-1',\n           status: 'NOT_NEEDED'\n         }],\n         // Mock other required methods\n       });\n       \n       const tool = new PokemonCardAddTool(mockRepository);\n       \n       // Execute\n       const result = await tool.execute({\n         userId: 123,\n         cardIds: ['test-card-1']\n       });\n       \n       // Verify\n       expect(mockRepository.addCardToCollection).toHaveBeenCalledWith(\n         123, 'test-card-1', 'OWNED'\n       );\n       expect(result).toContain('Added 1 card');\n     });\n     \n     it('should block adding already OWNED cards', async () => {\n       // Setup: Create mock repository with an OWNED card\n       const mockRepository = createMockRepository({\n         getCardOwnerships: async () => [{\n           userId: 123,\n           cardId: 'test-card-1',\n           status: 'OWNED'\n         }],\n         // Mock other required methods\n       });\n       \n       const tool = new PokemonCardAddTool(mockRepository);\n       \n       // Execute\n       const result = await tool.execute({\n         userId: 123,\n         cardIds: ['test-card-1']\n       });\n       \n       // Verify\n       expect(result).toBe(NO_MATCHING_MISSING_CARDS_MESSAGE);\n       expect(mockRepository.addCardToCollection).not.toHaveBeenCalled();\n     });\n     ```\n\n2. Integration Testing:\n   - Test the complete flow from user input to database update:\n     - Verify that a card with NOT_NEEDED status is correctly updated to OWNED in the database\n     - Confirm the correct success message is returned to the user\n\n3. Regression Testing:\n   - Verify that existing functionality still works:\n     - Adding cards that don't exist in the collection\n     - Blocking addition of already OWNED cards\n     - Bulk add operations\n\n4. Run full checks as specified:\n   - Format: `npm run format`\n   - Schema-format: `npm run schema-format`\n   - Typecheck: `npm run typecheck`\n   - Lint: `npm run lint`\n   - YAML validate: `npm run yaml:validate`\n   - Tests: `npm run test`",
+        "status": "done",
+        "dependencies": [
+          53
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Modify ownership check in pokemonCardAddTool.ts",
+            "description": "Update the early ownership check in pokemonCardAddTool.ts to only block the operation when the card status is specifically OWNED, allowing NOT_NEEDED cards to be upgraded.",
+            "dependencies": [],
+            "details": "In src/Tools/pokemonCardAddTool.ts, locate the ownership check logic and modify it to specifically check for OWNED status instead of any ownership status:\n\n```typescript\n// Change from checking if any ownership exists to checking if OWNED status exists\nconst existingOwnerships = await this.repository.getCardOwnerships(userId, [cardId]);\nconst alreadyOwned = existingOwnerships.some(ownership => \n  ownership.cardId === cardId && ownership.status === 'OWNED'\n);\n\nif (alreadyOwned) {\n  return NO_MATCHING_MISSING_CARDS_MESSAGE;\n}\n```\n\nAlso update any related success messages to correctly reflect the upgrade operation when changing from NOT_NEEDED to OWNED.\n<info added on 2025-08-08T20:06:27.733Z>\nIn the `src/PokemonTcgPocket/Repositories/PokemonTcgPocketRepository.ts` file, update the `addCardToCollection` method to use upsert instead of create:\n\n```typescript\nasync addCardToCollection(cardId: number, userId: bigint, status: OwnershipStatus = OwnershipStatus.OWNED): Promise<PokemonCardWithRelations> {\n  await this.prisma.pokemonCardOwnership.upsert({\n    where: { cardId_userId: { cardId, userId } },\n    update: { status },\n    create: { cardId, userId, status },\n  });\n\n  return this.prisma.pokemonCard.findUniqueOrThrow({\n    where: { id: cardId },\n    include: {\n      set: true,\n      boosters: true,\n      ownership: {\n        include: { user: true },\n      },\n    },\n  });\n}\n```\n\nThis change aligns the single card addition behavior with the bulk addition method, allowing NOT_NEEDED status to be upgraded to OWNED without unique constraint errors. The method now first upserts the ownership record and then fetches the complete card data with all relations.\n</info added on 2025-08-08T20:06:27.733Z>",
+            "status": "done",
+            "testStrategy": "Create unit tests in src/Tools/pokemonCardAddTool.test.ts that verify:\n1. A card with NOT_NEEDED status can be upgraded to OWNED\n2. A card with OWNED status cannot be added again\n3. The correct success message is returned when upgrading from NOT_NEEDED to OWNED"
+          },
+          {
+            "id": 2,
+            "title": "Update repository's addCardToCollection method to upsert",
+            "description": "Modify the repository's addCardToCollection method to upsert ownership records instead of just inserting them, aligning its behavior with the addMultipleCardsToCollection method.",
+            "dependencies": [
+              "55.1"
+            ],
+            "details": "Update the repository's addCardToCollection method to use Prisma's upsert operation instead of create:\n\n```typescript\nasync addCardToCollection(userId: number, cardId: string, status: OwnershipStatus = 'OWNED'): Promise<void> {\n  await this.db.cardOwnership.upsert({\n    where: {\n      userId_cardId: {\n        userId,\n        cardId\n      }\n    },\n    update: {\n      status\n    },\n    create: {\n      userId,\n      cardId,\n      status\n    }\n  });\n}\n```\n\nThis ensures that existing NOT_NEEDED records can be properly upgraded to OWNED status.",
+            "status": "done",
+            "testStrategy": "Create repository unit tests that verify:\n1. Adding a card with no previous ownership creates a new OWNED record\n2. Adding a card with previous NOT_NEEDED status updates it to OWNED\n3. The behavior matches addMultipleCardsToCollection for single card operations"
+          },
+          {
+            "id": 3,
+            "title": "Implement integration tests and update documentation",
+            "description": "Create comprehensive integration tests to validate the fix and update any related documentation to clarify that NOT_NEEDED status can be upgraded to OWNED using the add tool.",
+            "dependencies": [
+              "55.1",
+              "55.2"
+            ],
+            "details": "1. Create integration tests that verify the end-to-end functionality:\n\n```typescript\nit('should allow upgrading NOT_NEEDED cards to OWNED through the tool', async () => {\n  // Setup: Create a card with NOT_NEEDED status\n  await repository.addCardToCollection(testUserId, testCardId, 'NOT_NEEDED');\n  \n  // Execute: Run the add tool on the same card\n  const result = await pokemonCardAddTool.execute({\n    userId: testUserId,\n    cardIds: [testCardId]\n  });\n  \n  // Verify: Card status should now be OWNED\n  const ownerships = await repository.getCardOwnerships(testUserId, [testCardId]);\n  expect(ownerships[0].status).toBe('OWNED');\n  expect(result).toContain('successfully added');\n});\n```\n\n2. Update user-facing documentation to clarify that the add tool can upgrade NOT_NEEDED cards to OWNED status.\n\n3. Update developer documentation to explain the ownership status transition rules.",
+            "status": "done",
+            "testStrategy": "1. Run integration tests with actual database interactions to verify the complete flow\n2. Test edge cases such as:\n   - Upgrading multiple cards with mixed statuses\n   - Handling invalid card IDs alongside valid ones\n3. Verify documentation accuracy through peer review"
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-08T19:42:15.864Z",
+      "updated": "2025-08-08T20:47:10.926Z",
       "description": "Tasks for master context"
     }
   }

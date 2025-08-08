@@ -311,16 +311,27 @@ export class PokemonTcgPocketRepository {
     status: OwnershipStatus = OwnershipStatus.OWNED,
   ): Promise<PokemonCardWithRelations> {
     try {
-      return this.prisma.pokemonCard.update({
-        where: { id: cardId },
-        data: {
-          ownership: {
-            create: {
-              userId,
-              status,
-            },
+      // Upsert ownership to allow upgrading NOT_NEEDED to OWNED and avoid unique violations
+      await this.prisma.pokemonCardOwnership.upsert({
+        where: {
+          cardId_userId: {
+            cardId,
+            userId,
           },
         },
+        update: {
+          status,
+        },
+        create: {
+          cardId,
+          userId,
+          status,
+        },
+      });
+
+      // Then return the updated card with relations
+      return this.prisma.pokemonCard.findUniqueOrThrow({
+        where: { id: cardId },
         include: {
           set: true,
           boosters: true,
