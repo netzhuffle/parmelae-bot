@@ -5,9 +5,9 @@ import { OpenAIEmbeddings } from '@langchain/openai';
 /** Enum of GPT language models to use. */
 export const GptModels = {
   /** Cheap model to use in most cases. Needs text & image inputs, text outputs, function calling. */
-  Cheap: 'gpt-4.1-mini',
+  Cheap: 'gpt-5-mini',
   /** Advanced model to use when asked explicitly. Needs text & image inputs, text outputs, function calling. */
-  Advanced: 'gpt-4.1',
+  Advanced: 'gpt-5',
 } as const;
 
 /** Possible GPT language model names. */

@@ -2101,11 +2101,80 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 51,
+        "title": "Upgrade LLM Models to OpenAI GPT-5 with Minimal Reasoning Configuration",
+        "description": "Update all LLM model configurations throughout the application to use OpenAI's latest GPT-5 models with gpt-5 as primary and gpt-5-mini as secondary/research model, configuring reasoning_effort to minimal for both models.",
+        "details": "1. **Update Taskmaster Model Configuration:**\n   - Modify the main model configuration files to set primary model to `gpt-5` and secondary/research model to `gpt-5-mini`\n   - Add `reasoning_effort: \"minimal\"` parameter to both model configurations\n   - Update any model selection logic or fallback mechanisms to use the new model hierarchy\n\n2. **Update LangChain/LangGraph Integration:**\n   - Modify LangChain ChatOpenAI instances to use the new model names\n   - Update any LangGraph agent configurations that specify model parameters\n   - Ensure all chain configurations and agent workflows use the updated models\n   - Update temperature, max_tokens, and other parameters as needed for GPT-5 compatibility\n\n3. **Update Direct OpenAI SDK Calls:**\n   - Scan codebase for direct OpenAI API calls and update model parameters\n   - Modify request payloads to include `reasoning_effort: \"minimal\"` where applicable\n   - Update any hardcoded model references in service classes or utility functions\n   - Ensure compatibility with current OpenAI SDK version and upgrade if necessary\n\n4. **Verify OpenAI SDK Compatibility:**\n   - Check current OpenAI SDK version supports GPT-5 models and reasoning_effort parameter\n   - Update SDK version if needed and adjust import statements\n   - Test API request/response format compatibility with new models\n   - Update error handling for any new response formats or error codes\n\n5. **Configuration Management:**\n   - Update environment variables and configuration files\n   - Ensure model configurations are properly injected through dependency injection\n   - Update any model-specific prompt templates or system messages for GPT-5 optimization\n<info added on 2025-08-08T15:32:05.189Z>\n**SCOPE UPDATE - Taskmaster Research Model Exclusion:**\n\n6. **Preserve Taskmaster Research Model Configuration:**\n   - DO NOT modify `.taskmaster/config.json` → `models.research` (keep existing Perplexity Sonar configuration)\n   - Only update Taskmaster main model to `gpt-5` if desired, but leave research model untouched\n   - Ensure any model selection logic respects the preserved research model configuration\n\n7. **Updated Application Model Mapping:**\n   - Map cheap/default application usage to `gpt-5-mini` instead of `gpt-5-mini` as research model\n   - Map advanced application usage to `gpt-5`\n   - Preserve existing embeddings model (`text-embedding-3-small`) without changes\n   - Keep Helicone configuration unchanged\n\n8. **Reasoning Parameter Configuration Priority:**\n   - Use `reasoning: { effort: 'low' }` parameter format as preferred option for our stack\n   - Fall back to `reasoning_effort: 'minimal'` only if the SDK requires this specific format\n   - Test both parameter formats to determine which is supported by current OpenAI SDK version\n   - Document the chosen parameter format in configuration comments\n\n9. **Selective Configuration Updates:**\n   - Focus model updates only on application-level LLM usage, not Taskmaster research workflows\n   - Update test cases to reflect the preserved research model and new application model mappings\n   - Update documentation to clarify which models are changed vs. preserved in this migration\n</info added on 2025-08-08T15:32:05.189Z>",
+        "testStrategy": "1. **Unit Testing:**\n   - Create unit tests to verify model configuration loading returns correct GPT-5 model names\n   - Test that reasoning_effort parameter is properly included in API requests\n   - Mock OpenAI API responses to test new model integration without actual API calls\n   - Verify dependency injection properly provides updated model configurations\n\n2. **Integration Testing:**\n   - Test actual OpenAI API calls with GPT-5 models to ensure successful responses\n   - Verify LangChain integration works correctly with new model configurations\n   - Test both primary (gpt-5) and secondary (gpt-5-mini) model usage scenarios\n   - Validate that reasoning_effort parameter is accepted and processed correctly\n\n3. **End-to-End Testing:**\n   - Run complete workflows that utilize LLM capabilities to ensure functionality is preserved\n   - Test Pokemon TCG analysis, image generation requests, and any other AI-powered features\n   - Verify performance and response quality with new models meets or exceeds previous performance\n   - Test error handling and fallback scenarios with new model configurations\n\n4. **Documentation and Validation:**\n   - Update API documentation to reflect new model usage\n   - Create migration guide documenting changes from previous models\n   - Validate all configuration files and environment variable documentation\n   - Test deployment process with new model configurations",
+        "status": "done",
+        "dependencies": [
+          3,
+          7
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Update OpenAI SDK and Verify GPT-5 Model Support",
+            "description": "Ensure the OpenAI SDK version supports GPT-5 models and the reasoning parameter configuration. Test parameter format compatibility to determine whether to use 'reasoning: { effort: 'low' }' or 'reasoning_effort: 'minimal'.",
+            "dependencies": [],
+            "details": "1. Check current OpenAI SDK version in package.json and upgrade to latest version if needed. 2. Create a test script to verify GPT-5 and GPT-5-mini model availability. 3. Test both reasoning parameter formats ('reasoning: { effort: 'low' }' and 'reasoning_effort: 'minimal') to determine which is supported. 4. Document the chosen parameter format for use in subsequent subtasks. 5. Update any import statements if SDK version changes.",
+            "status": "done",
+            "testStrategy": "Create integration tests that make actual API calls to verify model availability and parameter format support. Mock tests for CI/CD pipeline to avoid API costs."
+          },
+          {
+            "id": 2,
+            "title": "Update Application Model Configuration Files",
+            "description": "Update all application-level model configuration files to use GPT-5 models with minimal reasoning configuration, while preserving Taskmaster research model settings.",
+            "dependencies": [
+              "51.1"
+            ],
+            "details": "1. Locate and update application model configuration files (excluding .taskmaster/config.json). 2. Set cheap/default model to 'gpt-5-mini' and advanced model to 'gpt-5'. 3. Add the determined reasoning parameter format from subtask 51.1 to both model configurations. 4. Preserve existing embeddings model ('text-embedding-3-small') and Helicone configuration. 5. Ensure .taskmaster/config.json → models.research remains unchanged (keep Perplexity Sonar). 6. Update any model selection logic or fallback mechanisms to use the new model hierarchy.",
+            "status": "done",
+            "testStrategy": "Unit tests to verify configuration loading returns correct model names and parameters. Integration tests to ensure model selection logic works correctly."
+          },
+          {
+            "id": 3,
+            "title": "Update LangChain/LangGraph Integration",
+            "description": "Modify all LangChain ChatOpenAI instances and LangGraph agent configurations to use the new GPT-5 models with minimal reasoning configuration.",
+            "dependencies": [
+              "51.2"
+            ],
+            "details": "1. Scan codebase for LangChain ChatOpenAI instances and update model parameters to use 'gpt-5' or 'gpt-5-mini' based on usage context. 2. Update LangGraph agent configurations that specify model parameters. 3. Add the reasoning parameter (format determined in subtask 51.1) to all relevant configurations. 4. Ensure all chain configurations and agent workflows use the updated models. 5. Update temperature, max_tokens, and other parameters as needed for GPT-5 compatibility. 6. Verify dependency injection properly provides the new model configurations.",
+            "status": "done",
+            "testStrategy": "Unit tests for individual LangChain components with mocked OpenAI responses. Integration tests for complete agent workflows to ensure end-to-end functionality."
+          },
+          {
+            "id": 4,
+            "title": "Update Direct OpenAI SDK Calls and Service Classes",
+            "description": "Scan and update all direct OpenAI API calls throughout the codebase to use GPT-5 models with minimal reasoning configuration.",
+            "dependencies": [
+              "51.2"
+            ],
+            "details": "1. Perform codebase scan for direct OpenAI API calls in service classes and utility functions. 2. Update model parameters in request payloads to use 'gpt-5' or 'gpt-5-mini' based on usage context. 3. Add the reasoning parameter to all applicable API calls. 4. Update any hardcoded model references. 5. Ensure error handling accommodates any new response formats or error codes from GPT-5 models. 6. Update any model-specific prompt templates or system messages for GPT-5 optimization.",
+            "status": "done",
+            "testStrategy": "Unit tests with mocked OpenAI API responses to verify correct parameter passing. Integration tests with actual API calls for critical paths."
+          },
+          {
+            "id": 5,
+            "title": "Update Tests, Documentation, and Run Full Validation",
+            "description": "Update all test cases and documentation to reflect the new model configuration, then run comprehensive validation to ensure the migration is complete and functional.",
+            "dependencies": [
+              "51.3",
+              "51.4"
+            ],
+            "details": "1. Update test cases to reflect the new GPT-5 model mappings and preserved research model configuration. 2. Update documentation to clarify which models were changed vs. preserved in this migration. 3. Update any test mocks or fixtures that reference old model names. 4. Run full validation suite: format, schema-format, typecheck, lint, validate-yaml, and all tests. 5. Verify that application functionality works end-to-end with the new model configuration. 6. Document the reasoning parameter format choice and configuration patterns for future reference.",
+            "status": "done",
+            "testStrategy": "Execute complete test suite including unit tests, integration tests, and end-to-end tests. Perform manual testing of key application workflows to ensure GPT-5 models function correctly with minimal reasoning configuration."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-06T21:16:23.900Z",
+      "updated": "2025-08-08T16:12:14.978Z",
       "description": "Tasks for master context"
     }
   }

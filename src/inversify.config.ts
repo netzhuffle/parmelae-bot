@@ -25,6 +25,7 @@ container.bind(GptModelsProvider).toDynamicValue(
     new GptModelsProvider({
       cheap: new ChatOpenAI({
         model: GptModels.Cheap,
+        reasoning: { effort: 'low' },
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
@@ -35,6 +36,7 @@ container.bind(GptModelsProvider).toDynamicValue(
       cheapStrict: new ChatOpenAI({
         model: GptModels.Cheap,
         temperature: 0,
+        reasoning: { effort: 'low' },
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
@@ -44,6 +46,7 @@ container.bind(GptModelsProvider).toDynamicValue(
       }),
       advanced: new ChatOpenAI({
         model: GptModels.Advanced,
+        reasoning: { effort: 'low' },
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
@@ -54,6 +57,7 @@ container.bind(GptModelsProvider).toDynamicValue(
       advancedStrict: new ChatOpenAI({
         model: GptModels.Advanced,
         temperature: 0,
+        reasoning: { effort: 'low' },
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
