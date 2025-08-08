@@ -216,6 +216,19 @@ describe('tcgpcards.yaml', () => {
         });
       });
     });
+
+    it('should restrict isSixPackOnly cards to ☆ or ♢♢♢ rarities', () => {
+      Object.values(sets).forEach((setData: SetData) => {
+        Object.values(setData.cards).forEach((card: Card) => {
+          if (card.isSixPackOnly === true) {
+            // Rarity must be exactly ☆ or ♢♢♢
+            expect(card.rarity).toBeDefined();
+            const allowed = new Set(['☆', '♢♢♢']);
+            expect(allowed.has(card.rarity!)).toBe(true);
+          }
+        });
+      });
+    });
   });
 
   describe('Service and YAML consistency', () => {

@@ -1735,12 +1735,94 @@
         "id": 40,
         "title": "Gather Requirements for 6-Card Pack Probability Calculations",
         "description": "Collect detailed requirements from stakeholders about 6-card pack mechanics, structure, and probability distributions to enable proper implementation of the PokemonTcgPocketProbabilityService updates.",
-        "details": "This requirements gathering task is essential before implementing 6-card pack support in the PokemonTcgPocketProbabilityService. The current service assumes all packs have exactly 5 cards, but the new `hasSixPacks` field requires understanding the mechanics of variable pack sizes.\n\n**Key Requirements to Gather:**\n\n1. **Pack Structure Definition:**\n   - Document the exact card structure for 6-card packs (guaranteed slots vs distributed slots)\n   - Clarify if ONE_DIAMOND guaranteed slots still exist in 6-card packs\n   - Define rarity distributions for each slot position in 6-card packs\n   - Determine if additional cards come from the same pool or have different distributions\n\n2. **Pack Type Probability Matrix:**\n   - For boosters with `hasSixPacks=true`, determine if they contain only 6-card packs or a mix of 5-card and 6-card packs\n   - If mixed, establish the probability distribution between 5-card and 6-card packs\n   - Clarify god pack behavior: do they remain 5-card or also become 6-card packs?\n   - Define any special conditions or triggers for 6-card pack generation\n\n3. **Card Selection and Rarity Logic:**\n   - Understand how `isSixPackOnly` cards integrate with the new pack structure\n   - Determine if 6-card packs have different base rarity distributions than 5-card packs\n   - Clarify if the additional card(s) in 6-card packs follow existing rarity rules or have special distributions\n\n4. **Integration Requirements:**\n   - Define how the service should detect pack size (automatic based on `booster.hasSixPacks` or configurable)\n   - Establish backward compatibility requirements for existing 5-card pack calculations\n   - Determine if new API methods are needed or if existing `calculateNewCardProbability` methods should be extended\n\n**Deliverables:**\n- Comprehensive requirements document with pack structure specifications\n- Probability distribution tables for all pack types and sizes\n- Integration specification for service updates\n- Test scenarios covering all pack size combinations",
+        "details": "This requirements gathering task is essential before implementing 6-card pack support in the PokemonTcgPocketProbabilityService. The current service assumes all packs have exactly 5 cards, but the new `hasSixPacks` field requires understanding the mechanics of variable pack sizes.\n\n**Key Requirements to Gather:**\n\n1. **Pack Structure Definition:**\n   - Document the exact card structure for 6-card packs (guaranteed slots vs distributed slots)\n   - Clarify if ONE_DIAMOND guaranteed slots still exist in 6-card packs\n   - Define rarity distributions for each slot position in 6-card packs\n   - Determine if additional cards come from the same pool or have different distributions\n\n2. **Pack Type Probability Matrix:**\n   - For boosters with `hasSixPacks=true`, determine if they contain only 6-card packs or a mix of 5-card and 6-card packs\n   - If mixed, establish the probability distribution between 5-card and 6-card packs\n   - Clarify god pack behavior: do they remain 5-card or also become 6-card packs?\n   - Define any special conditions or triggers for 6-card pack generation\n\n3. **Card Selection and Rarity Logic:**\n   - Understand how `isSixPackOnly` cards integrate with the new pack structure\n   - Determine if 6-card packs have different base rarity distributions than 5-card packs\n   - Clarify if the additional card(s) in 6-card packs follow existing rarity rules or have special distributions\n\n4. **Integration Requirements:**\n   - Define how the service should detect pack size (automatic based on `booster.hasSixPacks` or configurable)\n   - Establish backward compatibility requirements for existing 5-card pack calculations\n   - Determine if new API methods are needed or if existing `calculateNewCardProbability` methods should be extended\n\n**Deliverables:**\n- Comprehensive requirements document with pack structure specifications\n- Probability distribution tables for all pack types and sizes\n- Integration specification for service updates\n- Test scenarios covering all pack size combinations\n<info added on 2025-08-08T17:30:07.293Z>\n**Documentation Status Update**\n\nA comprehensive requirements document has been created at `.taskmaster/docs/6-card-pack-requirements.md` containing the following specifications:\n\n- Complete definitions of 5-card packs, 6-card packs, and god packs\n- Pack-type probability distributions:\n  - For boosters without hasSixPacks: 5-card packs (99.95%), god packs (0.05%)\n  - For boosters with hasSixPacks: 5-card packs (91.62%), 6-card packs (8.33%), god packs (0.05%)\n- Slot 6 behavior specifications:\n  - Limited to isSixPackOnly cards only\n  - Rarity distribution: 1★ (12.9%), 3◆ (87.1%)\n- Confirmation that isSixPackOnly cards are excluded from slots 1-5 and all god packs\n- Ho-oh example with detailed slot 6 probability breakdown (12.9% for Magby 1★, 29.033% each for three 3◆ cards)\n\nOutstanding questions requiring stakeholder confirmation:\n1. Are duplicate/collation rules unchanged for 6-card packs?\n2. Is there an even probability split across multiple isSixPackOnly cards of the same rarity?\n3. What is the complete list of boosters with `hasSixPacks=true`?\n</info added on 2025-08-08T17:30:07.293Z>",
         "testStrategy": "1. **Requirements Validation:**\n   - Review gathered requirements with multiple stakeholders to ensure completeness and accuracy\n   - Create visual diagrams showing pack structures and probability flows for validation\n   - Verify that all edge cases and special scenarios are documented\n\n2. **Consistency Verification:**\n   - Cross-reference 6-card pack requirements with existing 5-card pack logic to identify conflicts\n   - Validate that probability distributions sum to 100% for all pack types\n   - Ensure `isSixPackOnly` card behavior is clearly defined and testable\n\n3. **Implementation Readiness Check:**\n   - Confirm that all technical questions needed for PokemonTcgPocketProbabilityService updates are answered\n   - Verify that requirements provide sufficient detail for extending PACK_CONFIG and probability calculation methods\n   - Ensure test scenarios are comprehensive enough to validate the implementation\n\n4. **Stakeholder Sign-off:**\n   - Obtain formal approval from product owners and technical leads on the documented requirements\n   - Confirm that the requirements align with business objectives and technical constraints",
-        "status": "pending",
+        "status": "done",
         "dependencies": [],
         "priority": "medium",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Clarify terminology and scope",
+            "description": "Define terminology (5-card vs 6-card packs), boosters covered by the change, and backward compatibility expectations for existing consumers.",
+            "details": "<info added on 2025-08-08T17:29:07.251Z>\nDefinitions & Scope:\n\n- Boosters with hasSixPacks support 6-card packs; boosters without this flag remain 5-card only\n- Backward compatibility is maintained for boosters without hasSixPacks\n- Terminology:\n  - 5-card pack: Standard pack with 5 cards\n  - 6-card pack: Extended pack with 6 cards (only available in boosters with hasSixPacks)\n  - God pack: Pack containing at least one ★ card and no isSixPackOnly cards\n  - isSixPackOnly behavior: Cards with this flag can only appear in slot 6 of 6-card packs\n</info added on 2025-08-08T17:29:07.251Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          },
+          {
+            "id": 2,
+            "title": "Define 6-card pack structure",
+            "description": "Map the exact 6-card slot structure: guaranteed vs distributed slots, slot order, duplicate-prevention/collation rules, and any regional deviations.",
+            "details": "<info added on 2025-08-08T17:29:11.121Z>\nPack Structure Documentation:\n\n5-card packs:\n- 3 cards guaranteed to be 1◆ (one diamond) rarity\n- 2 cards of higher rarity\n- No cards with isSixPackOnly flag\n\n6-card packs:\n- Slots 1-5 follow identical structure to 5-card packs (excluding isSixPackOnly cards)\n- Slot 6 must contain a card with isSixPackOnly flag\n- Slot 6 rarity is limited to either 1★ (one star) or 3◆ (three diamond)\n\nGod packs:\n- Contain 5 cards\n- All cards must be 1★ (one star) rarity or higher\n- No cards with isSixPackOnly flag\n</info added on 2025-08-08T17:29:11.121Z>\n<info added on 2025-08-08T17:46:00.755Z>\nDuplicate/Collation Rules:\n- No deduplication within a pack (cards can appear multiple times in the same pack)\n- This matches the current implementation behavior\n</info added on 2025-08-08T17:46:00.755Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          },
+          {
+            "id": 3,
+            "title": "Pack-type probability matrix",
+            "description": "Decide whether boosters with hasSixPacks contain only 6-card packs or a mix; if mixed, provide percentage distribution. Include god pack behavior.",
+            "details": "<info added on 2025-08-08T17:29:13.675Z>\nPack Type Probability Distribution:\n\nWithout hasSixPacks:\n- 5-card packs: 99.95%\n- God packs: 0.05%\n\nWith hasSixPacks:\n- 5-card packs: 91.62%\n- 6-card packs: 8.33%\n- God packs: 0.05%\n\nImportant notes:\n- God packs always contain 5 cards\n- God packs never include cards marked as isSixPackOnly\n</info added on 2025-08-08T17:29:13.675Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          },
+          {
+            "id": 4,
+            "title": "Rarity distributions per slot",
+            "description": "Provide rarity distribution tables for each slot in 6-card packs. Clarify whether ONE_DIAMOND or other guarantees persist or change.",
+            "details": "<info added on 2025-08-08T17:29:17.340Z>\nRarity distributions for 6-card packs:\n\nSlots 1-5: Maintain the same rarity distributions as the existing 5-card packs. Cards with the \"isSixPackOnly\" flag are excluded from these slots.\n\nSlot 6 (new slot):\n- 1★ (Common): 12.9%\n- 3◆ (Rare Diamond): 87.1%\n- Only cards flagged as \"isSixPackOnly\" are eligible to appear in this slot\n- Within each rarity tier, cards have equal probability of appearing unless specifically weighted otherwise\n</info added on 2025-08-08T17:29:17.340Z>\n<info added on 2025-08-08T17:46:09.171Z>\nConfirmation: The distribution of isSixPackOnly cards within the same rarity tier in slot 6 follows a uniform distribution pattern. All cards of the same rarity have equal probability of appearing, with no special weighting applied to any individual card. This ensures a balanced representation of all available cards within each rarity category (Common 1★ and Rare Diamond 3◆) for the sixth slot position.\n</info added on 2025-08-08T17:46:09.171Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          },
+          {
+            "id": 5,
+            "title": "`isSixPackOnly` behavior",
+            "description": "Define how isSixPackOnly cards are selected and which slots they can occupy in 6-card packs.",
+            "details": "<info added on 2025-08-08T17:29:20.045Z>\nCards with the isSixPackOnly property have the following behavior:\n- Only appear in 6-card packs\n- Can only be found in slot 6 (the final slot)\n- Never appear in 5-card packs\n- Never appear in god packs\n- Restricted to specific rarities: only 1★ (one-star) and 3◆ (three-diamond) cards can have this property\n</info added on 2025-08-08T17:29:20.045Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          },
+          {
+            "id": 6,
+            "title": "Integration and API surface",
+            "description": "Specify detection logic (e.g., booster.hasSixPacks), whether to extend existing methods or add new ones, and migration/back-compat notes.",
+            "details": "<info added on 2025-08-08T17:29:26.936Z>\nThe integration approach will use the `booster.hasSixPacks` property as the primary detection mechanism for identifying boosters that require 6-card pack probability calculations. The system should maintain the existing 5-card logic for boosters where `hasSixPacks` is false or undefined, ensuring backward compatibility with existing data.\n\nFor boosters with `hasSixPacks` set to true, the system should branch logic based on pack type and apply appropriate slot-specific calculations, with special handling for the sixth slot. The implementation should prioritize extending existing probability calculation methods rather than creating entirely new API endpoints or methods.\n\nKey implementation requirements:\n- Extend current probability methods to check for `hasSixPacks` property\n- Maintain full backward compatibility for existing 5-card pack calculations\n- Apply pack-type specific slot logic when handling 6-card packs\n- Implement special handling for the sixth slot based on pack structure requirements\n- Document any minor API changes for consumers of the probability service\n</info added on 2025-08-08T17:29:26.936Z>\n<info added on 2025-08-08T17:46:28.331Z>\nData source implementation note: The system will retrieve the list of boosters with `hasSixPacks=true` from the database at implementation time. This dynamic retrieval ensures that as new booster sets are added to the database with the six-pack property, they will automatically be processed using the appropriate probability calculation logic without requiring code changes.\n</info added on 2025-08-08T17:46:28.331Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          },
+          {
+            "id": 7,
+            "title": "Probability tables and examples",
+            "description": "Provide finalized probability tables and at least two fully worked examples ensuring totals sum to 100%.",
+            "details": "<info added on 2025-08-08T17:29:30.006Z>\nSlot 6 in 6-card packs:\n- 12.9% chance of 1★ (Magby 1★)\n- 87.1% chance of 3◆ split evenly across:\n  - Magby 3◆ (≈29.033%)\n  - Kussilla 3◆ (≈29.033%)\n  - Rabauz 3◆ (≈29.033%)\n\nHo-oh Example:\nFor the 6th slot in a 6-card pack, the probability distribution follows the pattern above with specific Pokémon assigned to each rarity tier.\n</info added on 2025-08-08T17:29:30.006Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          },
+          {
+            "id": 8,
+            "title": "Test scenarios",
+            "description": "List unit and integration test scenarios, including edge cases for 5 vs 6-card packs and god packs.",
+            "details": "<info added on 2025-08-08T17:55:17.922Z>\n# Test Scenarios for 6-Card Pack Probability Calculations\n\n## Pack Type Configuration Tests\n- Verify behavior when hasSixPacks=true vs hasSixPacks=false\n- Confirm 5-card pack behavior remains unchanged when hasSixPacks=false\n- Test transitions between pack types within the same set\n\n## 6-Card Slot Logic\n- Validate slot-6 rarity distribution (12.9% 1★, 87.1% 3◆)\n- Confirm uniform distribution within each rarity pool for slot-6\n- Test slot-6 behavior with various card pool sizes\n- Verify interaction between slot-6 and slots 1-5\n\n## Regression Tests\n- Ensure 5-card pack probabilities remain identical to previous implementation\n- Verify god pack behavior remains unchanged\n- Confirm god pack exclusions work correctly with 6-card packs\n\n## Exclusion Rules\n- Test isSixPackOnly flag for cards that should only appear in 6-card packs\n- Verify cards with isSixPackOnly=true never appear in 5-card packs\n- Test interaction between isSixPackOnly and other exclusion rules\n\n## Validation Examples\n- Reproduce Ho-oh example calculations and verify probability matches\n- Create test cases with known probability outcomes for verification\n\n## Edge Cases\n- Test behavior when slot-6 pool is empty\n- Verify handling when only a single rarity is present in slot-6 pool\n- Test maximum and minimum card pool sizes for each slot\n\n## Method-Specific Filters\n- Verify diamond card filtering works correctly with 6-card packs\n- Test tradable card filtering with 6-card packs\n- Confirm interaction between multiple filters\n\n## Probability Integrity\n- Verify all probabilities sum to 100% for each pack type\n- Test probability distribution accuracy across large sample sizes\n- Validate probability calculations against manual calculations\n</info added on 2025-08-08T17:55:17.922Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          },
+          {
+            "id": 9,
+            "title": "Stakeholder review and sign-off",
+            "description": "Identify approvers, schedule review, and record sign-off details.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 40
+          }
+        ]
       },
       {
         "id": 41,
@@ -2230,11 +2312,106 @@
         "details": "1. **Research Telegram Caption Limits:**\n   - Identify the exact character limit for Telegram photo captions (currently 1024 characters)\n   - Document how markdown formatting affects character counting\n\n2. **Update Caption Generation Logic:**\n   - Modify `src/Tools/dallETool.ts` and/or `src/DallEService.ts` to implement caption length checking\n   - Create a utility function that safely truncates captions to respect Telegram limits:\n     ```typescript\n     function safeTruncateCaption(caption: string, maxLength = 1024): string {\n       if (caption.length <= maxLength) return caption;\n       return caption.substring(0, maxLength - 3) + '...';\n     }\n     ```\n   - Ensure markdown formatting remains valid after truncation (don't cut in the middle of formatting tags)\n\n3. **Implement Split Message Fallback:**\n   - When captions exceed limits, implement logic to:\n     a) Send the image with a truncated caption\n     b) Follow up with a separate text message containing the full caption\n     ```typescript\n     async function sendDallEResponse(ctx, imageBuffer, caption) {\n       try {\n         // First attempt: Try with truncated caption\n         const truncatedCaption = safeTruncateCaption(caption);\n         await ctx.replyWithPhoto({ source: imageBuffer }, { caption: truncatedCaption, parse_mode: 'MarkdownV2' });\n         \n         // If truncation occurred, send full text as follow-up\n         if (truncatedCaption.length < caption.length) {\n           await ctx.reply(`Full prompt: ${caption}`, { parse_mode: 'MarkdownV2' });\n           logger.info('DALL·E caption truncated, sent as separate message');\n         }\n       } catch (error) {\n         // Fallback for any other issues\n         if (error.message.includes('message caption is too long')) {\n           await ctx.replyWithPhoto({ source: imageBuffer });\n           await ctx.reply(`Generated image prompt: ${caption}`, { parse_mode: 'MarkdownV2' });\n           logger.warn('DALL·E caption exceeded limits, sent as separate message');\n         } else {\n           throw error; // Re-throw if it's a different error\n         }\n       }\n     }\n     ```\n\n4. **Add Logging and Observability:**\n   - Implement logging when caption truncation occurs\n   - Track metrics on how often truncation happens\n   - Add debug logs showing original and truncated caption lengths\n\n5. **Update Error Handling:**\n   - Add specific error handling for the \"message caption is too long\" error\n   - Implement retry logic that falls back to sending the image without a caption followed by a text message\n\n6. **Refactor for Testability:**\n   - Extract caption handling logic into separate, testable functions\n   - Ensure the implementation works with both direct Telegraf usage and any wrapper classes",
         "testStrategy": "1. **Unit Tests:**\n   - Add tests in `src/Tools/dallETool.test.ts` covering:\n     - Test caption under limit (verify no changes made)\n     - Test caption at exact limit (verify no truncation)\n     - Test caption slightly over limit (verify proper truncation with ellipsis)\n     - Test caption significantly over limit (verify truncation and follow-up message)\n     - Test caption with markdown formatting (verify formatting remains valid after truncation)\n     - Test error handling when Telegram API returns \"caption too long\" error\n\n2. **Mock Testing:**\n   - Create mock for Telegraf's `sendPhoto` method to simulate successful sends and errors\n   - Test the retry path by forcing the mock to reject with a \"message caption is too long\" error\n   - Verify that the fallback correctly sends the image without caption followed by text\n\n3. **Integration Testing:**\n   - Create a test script using Bun that sends DALL·E images with various caption lengths\n   - Verify actual Telegram behavior with real API calls in a test environment\n   - Test with real markdown formatting to ensure it remains intact\n\n4. **Regression Testing:**\n   - Run existing DALL·E tests to ensure no functionality is broken\n   - Verify that normal image generation and sending still works as expected\n   - Check that error handling for other types of errors still functions correctly\n\n5. **Manual Testing:**\n   - Test with extremely long prompts (2000+ characters)\n   - Verify user experience with split messages (image + follow-up text)\n   - Test with various types of markdown formatting in captions",
         "subtasks": []
+      },
+      {
+        "id": 53,
+        "title": "Implement 6-Card Pack Probability Calculations",
+        "description": "Extend PokemonTcgPocketProbabilityService to support 6-card packs using the defined pack-type probabilities and slot-6 rules, while preserving existing 5-card and god pack behavior.",
+        "details": "Implement logic to:\n- Detect boosters with `hasSixPacks` and select pack type by probabilities (noSix: 5=99.95%, god=0.05%; hasSix: 5=91.62%, god=0.05%, 6=8.33%).\n- For 6-card packs: apply existing 5-card logic to slots 1–5 and add slot 6 drawing only from `isSixPackOnly` cards with rarity distribution 1★=12.9%, 3◆=87.1% (uniform split within same rarity).\n- Exclude `isSixPackOnly` from slots 1–5 and all god packs.\n- No deduplication changes (same as current behavior).\n- Retrieve list of boosters with `hasSixPacks=true` and `isSixPackOnly` cards from DB.\n- Maintain backward compatibility for boosters without `hasSixPacks`.\nReferences: `.taskmaster/docs/6-card-pack-requirements.md`.\n<info added on 2025-08-08T17:55:48.040Z>\n## Implementation Plan\n\n1) Data plumbing\n- Query boosters with `hasSixPacks=true` from DB where needed. Ensure services pass `hasSixPacks` to probability logic.\n- Ensure `PokemonCard.isSixPackOnly` is already available (from Task 38) and included in boosterCards/missingCards sets.\n\n2) API surface & back-compat\n- Keep public methods stable: `calculateNewCardProbability`, `calculateNewDiamondCardProbability`, `calculateNewTradableCardProbability`.\n- Introduce internal branching based on `hasSixPacks` only (no new public APIs).\n\n3) Pack-type weighting\n- Implement new combinator to support three-way weighting when `hasSixPacks=true`:\n  - 5-card (normal): 91.62%\n  - god pack: 0.05%\n  - 6-card: 8.33%\n- Preserve existing two-way weighting for boosters without `hasSixPacks`.\n\n4) 6-pack core logic\n- Slots 1–5: reuse existing normal-pack computation with `NormalPackProbabilityStrategy`/`ShinyPackProbabilityStrategy` and guaranteed 1◆ logic; ensure `isSixPackOnly` are excluded in rarity filters.\n- Slot 6: compute new-card probability using two-tier rarity mix: P(1★)=0.129, P(3◆)=0.871. Within each rarity, probability = missing/total among `isSixPackOnly` of that rarity. Combine tiers weighted by their probabilities.\n- Probability no-new in 6-pack = (no-new in slots 1–5) × (no-new in slot 6). Six-pack chance = 1 − that.\n\n5) God pack exclusions\n- Ensure `isSixPackOnly` cards are excluded from god pack pools.\n\n6) Helper methods (private)\n- `computeSixPackChance(…)` similar shape to `computeNormalPackChance` but adds slot-6 step.\n- `filterSixPackSlot6Pools(…)` returning {allSixOnly1Star, missingSixOnly1Star, allSixOnly3Diam, missingSixOnly3Diam}.\n- `combineThreeWayPackProbabilities(normal, god, six, hasSixPacks)` that selects 2-way or 3-way combine.\n\n7) Tests\n- Unit tests for pack-type weighting (two-way vs three-way), slot-6 distribution math, uniform split, and method-specific filters.\n- Integration tests for Ho-oh example and regression of 5-card & god pack behaviors.\n\n8) Performance & Safety\n- Avoid additional passes over arrays; reuse existing filtered arrays where possible.\n- Add narrow, descriptive helper functions; keep public API unchanged; maintain readability.\n\n9) Docs & tasks\n- Maintain `.taskmaster/docs/6-card-pack-requirements.md` alignment.\n- Close subtasks upon implementation & checks.\n</info added on 2025-08-08T17:55:48.040Z>",
+        "testStrategy": "- Unit tests for pack-type selection probabilities with and without `hasSixPacks`.\n- Unit tests for slot-6 rarity distribution and uniform split among same-rarity `isSixPackOnly`.\n- Integration tests with sample boosters and `isSixPackOnly` datasets (e.g., Ho-oh example) ensuring exclusion rules and totals = 100%.\n- Regression tests to confirm existing 5-card and god pack logic unchanged.",
+        "status": "done",
+        "dependencies": [
+          40
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design private helpers and method signatures for six-pack support",
+            "description": "Define private helpers and exact TypeScript signatures for six-pack logic, including pack weighting (2-way vs 3-way), slot-6 calculation, exclusion handling, and integration points. No code changes yet.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          },
+          {
+            "id": 2,
+            "title": "Implement pack-type weighting and branching",
+            "description": "Add three-way weighting when `hasSixPacks=true` (91.62% normal, 0.05% god, 8.33% six) and preserve two-way weighting otherwise. Integrate branching without altering public APIs.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          },
+          {
+            "id": 3,
+            "title": "Implement isSixPackOnly exclusions",
+            "description": "Ensure `isSixPackOnly` cards are excluded from slots 1–5 and from all god packs. Adjust filtering in rarity and pool computations accordingly.",
+            "details": "<info added on 2025-08-08T18:45:16.624Z>\nImplemented exclusion logic for `isSixPackOnly` cards in two key functions:\n\n1. Updated `isGodPackCard` function to exclude cards marked with `isSixPackOnly` flag, ensuring these cards never appear in god packs.\n\n2. Modified `probabilityOfNewCardInRarity` function to filter out `isSixPackOnly` cards when calculating probabilities for slots 1 through 5, while still allowing them to appear in slot 6.\n\nAll code changes have been verified with format checks, type checking, linting, and unit tests, all of which passed successfully.\n</info added on 2025-08-08T18:45:16.624Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          },
+          {
+            "id": 4,
+            "title": "Implement slot-6 probability logic for six-pack",
+            "description": "Compute slot-6 new-card probability using rarity distribution (1★=12.9%, 3◆=87.1%) and uniform split among `isSixPackOnly` cards within each rarity.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          },
+          {
+            "id": 5,
+            "title": "Integrate six-pack chance into public calculation flow",
+            "description": "Integrate six-pack computations into existing public methods (`calculateNewCardProbability*`) without changing signatures. Derive `hasSixPacks` internally from card pools.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          },
+          {
+            "id": 6,
+            "title": "Unit tests: weighting, slot-6 distribution, exclusions",
+            "description": "Add unit tests for pack-type weighting (2-way vs 3-way), slot-6 rarity and uniform split, and `isSixPackOnly` exclusion logic.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          },
+          {
+            "id": 7,
+            "title": "Integration tests: Ho-oh and regressions",
+            "description": "Add integration tests to validate Ho-oh example probabilities and regressions for 5-card and god pack behavior.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          },
+          {
+            "id": 8,
+            "title": "Performance and refactor pass",
+            "description": "Review loops and filtering to minimize extra passes; refactor helpers for readability without altering public API.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          },
+          {
+            "id": 9,
+            "title": "Documentation alignment and cleanup",
+            "description": "Update `.taskmaster/docs/6-card-pack-requirements.md` references if needed and ensure comments/types reflect final implementation.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 53
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-08T16:41:07.580Z",
+      "updated": "2025-08-08T19:39:55.658Z",
       "description": "Tasks for master context"
     }
   }

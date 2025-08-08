@@ -549,6 +549,153 @@ describe('PokemonTcgPocketProbabilityService', () => {
       expect(probability).toBeGreaterThan(normalPackProbability);
     });
   });
+
+  describe('Six-pack support', () => {
+    function sixOnlyCard(id: number, rarity: Rarity): PokemonCardWithRelations {
+      return {
+        id,
+        name: `SixOnly ${id}`,
+        setId: 1,
+        number: id,
+        rarity,
+        isSixPackOnly: true,
+        boosters: [],
+        ownership: [],
+        set: { id: 1, key: 'TEST', name: 'Test Set' } as PokemonSet,
+      } as PokemonCardWithRelations;
+    }
+
+    it('excludes isSixPackOnly from slots 1–5 and god packs; six-pack only contributes when only six-only cards are missing', () => {
+      const boosterCards: PokemonCard[] = [
+        // Non-six-only cards to populate normal/god pools
+        createCard(Rarity.ONE_DIAMOND),
+        createCard(Rarity.TWO_DIAMONDS),
+        createCard(Rarity.THREE_DIAMONDS),
+        createCard(Rarity.ONE_STAR),
+        // Six-pack-only pools
+        sixOnlyCard(1001, Rarity.ONE_STAR),
+        sixOnlyCard(1002, Rarity.THREE_DIAMONDS),
+      ];
+
+      // Missing only the six-only cards
+      const missingCards: PokemonCard[] = [
+        sixOnlyCard(1001, Rarity.ONE_STAR),
+        sixOnlyCard(1002, Rarity.THREE_DIAMONDS),
+      ];
+
+      const p = service.calculateNewCardProbability(
+        boosterCards,
+        missingCards,
+        false,
+      );
+
+      // With only six-only missing, normal (slots 1–5) and god pack contribute 0.
+      // Probability should equal six-pack weight * P(new in 6th slot)
+      // P(new in 6th) = 0.129 * (1/1) + 0.871 * (1/1) = 1
+      // Total ~= 0.0833
+      expect(p).toBeCloseTo(0.0833, 3);
+    });
+
+    it('slot-6 rarity distribution uses uniform split within same rarity', () => {
+      const boosterCards: PokemonCard[] = [
+        // Non-six-only noise
+        createCard(Rarity.ONE_DIAMOND),
+        // Three 3◆ six-only cards
+        sixOnlyCard(2001, Rarity.THREE_DIAMONDS),
+        sixOnlyCard(2002, Rarity.THREE_DIAMONDS),
+        sixOnlyCard(2003, Rarity.THREE_DIAMONDS),
+      ];
+
+      // Only one of the 3◆ six-only is missing
+      const missingCards: PokemonCard[] = [
+        sixOnlyCard(2001, Rarity.THREE_DIAMONDS),
+      ];
+
+      const p = service.calculateNewCardProbability(
+        boosterCards,
+        missingCards,
+        false,
+      );
+
+      // Isolate slot-6 by having no missing non-six-only → slots 1–5 contribute 0; god 0
+      // P(new in 6th) = 0.129 * 0 + 0.871 * (1/3)
+      const expectedPSixth = 0.871 * (1 / 3);
+      const expected = 0.0833 * expectedPSixth;
+      expect(p).toBeCloseTo(expected, 4);
+    });
+
+    it('Ho-oh example: 1★ Magby and three 3◆ cards missing → six-pack branch equals weight', () => {
+      const boosterCards: PokemonCard[] = [
+        // Non-six-only noise
+        createCard(Rarity.ONE_DIAMOND),
+        // isSixPackOnly pools per example
+        sixOnlyCard(3001, Rarity.ONE_STAR), // Magby (1★)
+        sixOnlyCard(3002, Rarity.THREE_DIAMONDS), // Magby 3◆
+        sixOnlyCard(3003, Rarity.THREE_DIAMONDS), // Kussilla 3◆
+        sixOnlyCard(3004, Rarity.THREE_DIAMONDS), // Rabauz 3◆
+      ];
+      const missingCards: PokemonCard[] = [
+        sixOnlyCard(3001, Rarity.ONE_STAR),
+        sixOnlyCard(3002, Rarity.THREE_DIAMONDS),
+        sixOnlyCard(3003, Rarity.THREE_DIAMONDS),
+        sixOnlyCard(3004, Rarity.THREE_DIAMONDS),
+      ];
+
+      const p = service.calculateNewCardProbability(
+        boosterCards,
+        missingCards,
+        false,
+      );
+
+      // P(new in 6th) = 0.129*(1) + 0.871*(3/3) = 1 → total ~= six-pack weight 0.0833
+      expect(p).toBeCloseTo(0.0833, 3);
+    });
+
+    it('excludes sixPackOnly from slots 1–5: only 3◆ six-only missing → normal and god contribute 0', () => {
+      const boosterCards: PokemonCard[] = [
+        // Provide at least one non-six-only ONE_DIAMOND so booster isn’t empty, but missing none
+        createCard(Rarity.ONE_DIAMOND),
+        // Only THREE_DIAMONDS available are six-pack-only
+        sixOnlyCard(4001, Rarity.THREE_DIAMONDS),
+      ];
+      const missingCards: PokemonCard[] = [
+        sixOnlyCard(4001, Rarity.THREE_DIAMONDS),
+      ];
+
+      const p = service.calculateNewCardProbability(
+        boosterCards,
+        missingCards,
+        false,
+      );
+
+      // Normal (slots 1–5) should exclude the 3◆ six-only → contributes 0
+      // God pack should exclude six-only as well → contributes 0
+      // Final probability = six-pack weight × P(new in 6th) = 0.0833 × 0.871
+      const expected = 0.0833 * 0.871;
+      expect(p).toBeCloseTo(expected, 4);
+    });
+
+    it('excludes sixPackOnly from god packs: only 1★ six-only missing → no god contribution', () => {
+      const boosterCards: PokemonCard[] = [
+        // Provide non-six-only ONE_DIAMOND noise
+        createCard(Rarity.ONE_DIAMOND),
+        // Only ONE_STAR available is six-pack-only
+        sixOnlyCard(5001, Rarity.ONE_STAR),
+      ];
+      const missingCards: PokemonCard[] = [sixOnlyCard(5001, Rarity.ONE_STAR)];
+
+      const p = service.calculateNewCardProbability(
+        boosterCards,
+        missingCards,
+        false,
+      );
+
+      // God pack excludes six-only 1★, normal (slots 1–5) excludes six-only as well
+      // Final probability = six-pack weight × P(new in 6th) = 0.0833 × 0.129
+      const expected = 0.0833 * 0.129;
+      expect(p).toBeCloseTo(expected, 4);
+    });
+  });
 });
 
 /** Creates a set of test cards with various rarities */

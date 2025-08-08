@@ -24,6 +24,19 @@ export const PACK_CONFIG: PackConfiguration = {
   GUARANTEED_ONE_DIAMOND_CARDS: 3,
 } as const;
 
+/** Weights for boosters that support six-card packs */
+const SIX_PACK_WEIGHTS = {
+  NORMAL_PACK_PROBABILITY: 0.9162,
+  GOD_PACK_PROBABILITY: 0.0005,
+  SIX_PACK_PROBABILITY: 0.0833,
+} as const;
+
+/** Rarity distribution for the 6th card in six-card packs */
+const SIX_PACK_SLOT6_RARITY_WEIGHTS = {
+  ONE_STAR: 0.129,
+  THREE_DIAMONDS: 0.871,
+} as const;
+
 /** Set of rarities that can appear in god packs */
 const GOD_PACK_RARITIES = new Set<Rarity>([
   Rarity.ONE_STAR,
@@ -34,7 +47,15 @@ const GOD_PACK_RARITIES = new Set<Rarity>([
   Rarity.CROWN,
 ]);
 
-/** Service for calculating Pokemon TCG Pocket card probabilities */
+/**
+ * Service for calculating Pokemon TCG Pocket card probabilities.
+ *
+ * High-level flow:
+ * - Determine pack type weights (normal/god, or normal/god/six when six-packs exist)
+ * - Compute probability of no new card in the first five slots (shared for normal and six-packs)
+ * - For six-packs, compute sixth-slot probability from isSixPackOnly pools
+ * - Combine branch probabilities with their weights
+ */
 @injectable()
 export class PokemonTcgPocketProbabilityService {
   /** Set of diamond rarities */
@@ -136,8 +157,29 @@ export class PokemonTcgPocketProbabilityService {
       filteredBoosterCards,
       filteredMissingCards,
     );
+    const hasSixPacks = this.isSixPackBooster(boosterCards);
+    if (!hasSixPacks) {
+      return this.combinePackProbabilities(normalPackChance, godPackChance);
+    }
 
-    return this.combinePackProbabilities(normalPackChance, godPackChance);
+    const sixPackChance = this.computeSixPackChance(
+      filteredBoosterCards,
+      filteredMissingCards,
+      hasShinyRarity,
+    );
+    return this.combinePackProbabilities3(
+      normalPackChance,
+      godPackChance,
+      sixPackChance,
+    );
+  }
+
+  /**
+   * Determines whether a booster supports six-card packs by checking for cards
+   * flagged with `isSixPackOnly`. Used for branching into three-way weighting.
+   */
+  private isSixPackBooster(boosterCards: PokemonCard[]): boolean {
+    return boosterCards.some((card) => card.isSixPackOnly === true);
   }
 
   /**
@@ -147,10 +189,56 @@ export class PokemonTcgPocketProbabilityService {
     normalPackChance: number,
     godPackChance: number,
   ): number {
-    return (
-      PACK_CONFIG.NORMAL_PACK_PROBABILITY * normalPackChance +
-      PACK_CONFIG.GOD_PACK_PROBABILITY * godPackChance
+    return this.combinePackProbabilitiesFrom(
+      {
+        NORMAL_PACK_PROBABILITY: PACK_CONFIG.NORMAL_PACK_PROBABILITY,
+        GOD_PACK_PROBABILITY: PACK_CONFIG.GOD_PACK_PROBABILITY,
+      },
+      { normal: normalPackChance, god: godPackChance },
     );
+  }
+
+  /**
+   * Combines probabilities from normal, god, and six-card packs using six-pack weights
+   * Only used when boosters support six-card packs
+   */
+  private combinePackProbabilities3(
+    normalPackChance: number,
+    godPackChance: number,
+    sixPackChance: number,
+  ): number {
+    return this.combinePackProbabilitiesFrom(
+      {
+        NORMAL_PACK_PROBABILITY: SIX_PACK_WEIGHTS.NORMAL_PACK_PROBABILITY,
+        GOD_PACK_PROBABILITY: SIX_PACK_WEIGHTS.GOD_PACK_PROBABILITY,
+        SIX_PACK_PROBABILITY: SIX_PACK_WEIGHTS.SIX_PACK_PROBABILITY,
+      },
+      { normal: normalPackChance, god: godPackChance, six: sixPackChance },
+    );
+  }
+
+  /**
+   * Generic combinator for weighted pack probability parts
+   */
+  private combinePackProbabilitiesFrom(
+    weights: {
+      readonly NORMAL_PACK_PROBABILITY: number;
+      readonly GOD_PACK_PROBABILITY: number;
+      readonly SIX_PACK_PROBABILITY?: number;
+    },
+    parts: {
+      readonly normal: number;
+      readonly god: number;
+      readonly six?: number;
+    },
+  ): number {
+    const base =
+      weights.NORMAL_PACK_PROBABILITY * parts.normal +
+      weights.GOD_PACK_PROBABILITY * parts.god;
+    if (weights.SIX_PACK_PROBABILITY !== undefined && parts.six !== undefined) {
+      return base + weights.SIX_PACK_PROBABILITY * parts.six;
+    }
+    return base;
   }
 
   /**
@@ -165,18 +253,19 @@ export class PokemonTcgPocketProbabilityService {
     missingCards: PokemonCard[],
     hasShinyRarity: boolean,
   ): number {
-    const probabilityNoNewCard = this.computeProbabilityNoNewCardInNormalPack(
-      boosterCards,
-      missingCards,
-      hasShinyRarity,
-    );
+    const probabilityNoNewCard =
+      this.computeProbabilityNoNewCardInFirstFiveSlots(
+        boosterCards,
+        missingCards,
+        hasShinyRarity,
+      );
     return 1.0 - probabilityNoNewCard;
   }
 
   /**
-   * Computes the probability of getting no new cards in a normal pack
+   * Computes the probability of getting no new cards in the first five slots
    */
-  private computeProbabilityNoNewCardInNormalPack(
+  private computeProbabilityNoNewCardInFirstFiveSlots(
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
     hasShinyRarity: boolean,
@@ -194,7 +283,7 @@ export class PokemonTcgPocketProbabilityService {
     // Fourth slot uses CARD4_RARITY_DISTRIBUTION
     const pNoNewSlot4 =
       1.0 -
-      this.computeNewCardProbabilityForDistribution(
+      this.computeNewCardProbabilityAcrossRarities(
         strategy.getCard4Distribution(),
         boosterCards,
         missingCards,
@@ -204,7 +293,7 @@ export class PokemonTcgPocketProbabilityService {
     // Fifth slot uses CARD5_RARITY_DISTRIBUTION
     const pNoNewSlot5 =
       1.0 -
-      this.computeNewCardProbabilityForDistribution(
+      this.computeNewCardProbabilityAcrossRarities(
         strategy.getCard5Distribution(),
         boosterCards,
         missingCards,
@@ -288,13 +377,17 @@ export class PokemonTcgPocketProbabilityService {
    * Checks if a card is eligible for god packs
    */
   private isGodPackCard(card: PokemonCard): boolean {
-    return card.rarity !== null && GOD_PACK_RARITIES.has(card.rarity);
+    return (
+      card.rarity !== null &&
+      GOD_PACK_RARITIES.has(card.rarity) &&
+      !card.isSixPackOnly
+    );
   }
 
   /**
    * Calculates the probability of getting a new card for a slot with multiple possible rarities
    */
-  private computeNewCardProbabilityForDistribution(
+  private computeNewCardProbabilityAcrossRarities(
     distribution: Map<Rarity, number>,
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
@@ -314,6 +407,72 @@ export class PokemonTcgPocketProbabilityService {
   }
 
   /**
+   * Calculates the probability of getting at least one new card in a six-card pack.
+   * Slots 1–5 follow the normal pack logic; the 6th slot uses the isSixPackOnly pools
+   * with rarity distribution: 1★ = 12.9%, 3◆ = 87.1%.
+   */
+  private computeSixPackChance(
+    boosterCards: PokemonCard[],
+    missingCards: PokemonCard[],
+    hasShinyRarity: boolean,
+  ): number {
+    // Probability of no new card in slots 1–5 (identical to normal pack)
+    const pNoNewSlots1to5 = this.computeProbabilityNoNewCardInFirstFiveSlots(
+      boosterCards,
+      missingCards,
+      hasShinyRarity,
+    );
+
+    // Probability of a new card in slot 6 from isSixPackOnly pools
+    const pNewInSixth = this.computeNewCardProbabilityInSixthSlot(
+      boosterCards,
+      missingCards,
+    );
+
+    const pNoNewInSixPack = pNoNewSlots1to5 * (1.0 - pNewInSixth);
+    return 1.0 - pNoNewInSixPack;
+  }
+
+  /**
+   * Computes probability of a new card in the sixth slot of a six-card pack.
+   * Only cards with isSixPackOnly are eligible. Rarity distribution:
+   * P(1★) = 0.129, P(3◆) = 0.871. Within a rarity tier, uniform split.
+   */
+  private computeNewCardProbabilityInSixthSlot(
+    boosterCards: PokemonCard[],
+    missingCards: PokemonCard[],
+  ): number {
+    const all1Star = boosterCards.filter(
+      (c) => c.isSixPackOnly && c.rarity === Rarity.ONE_STAR,
+    );
+    const missing1Star = missingCards.filter(
+      (c) => c.isSixPackOnly && c.rarity === Rarity.ONE_STAR,
+    );
+
+    const all3Diamonds = boosterCards.filter(
+      (c) => c.isSixPackOnly && c.rarity === Rarity.THREE_DIAMONDS,
+    );
+    const missing3Diamonds = missingCards.filter(
+      (c) => c.isSixPackOnly && c.rarity === Rarity.THREE_DIAMONDS,
+    );
+
+    let probabilityNewCard = 0.0;
+
+    if (all1Star.length > 0) {
+      probabilityNewCard +=
+        SIX_PACK_SLOT6_RARITY_WEIGHTS.ONE_STAR *
+        (missing1Star.length / all1Star.length);
+    }
+    if (all3Diamonds.length > 0) {
+      probabilityNewCard +=
+        SIX_PACK_SLOT6_RARITY_WEIGHTS.THREE_DIAMONDS *
+        (missing3Diamonds.length / all3Diamonds.length);
+    }
+
+    return probabilityNewCard;
+  }
+
+  /**
    * Calculates the probability of getting a new card of a specific rarity.
    * This is the number of missing cards of that rarity divided by the total
    * number of cards of that rarity in the booster.
@@ -323,9 +482,12 @@ export class PokemonTcgPocketProbabilityService {
     boosterCards: PokemonCard[],
     missingCards: PokemonCard[],
   ): number {
-    const cardsInRarity = boosterCards.filter((card) => card.rarity === rarity);
+    // Treat isSixPackOnly cards as non-existent for slots 1–5 and god packs
+    const cardsInRarity = boosterCards.filter(
+      (card) => card.rarity === rarity && !card.isSixPackOnly,
+    );
     const missingCardsInRarity = missingCards.filter(
-      (card) => card.rarity === rarity,
+      (card) => card.rarity === rarity && !card.isSixPackOnly,
     );
 
     if (cardsInRarity.length === 0) {
