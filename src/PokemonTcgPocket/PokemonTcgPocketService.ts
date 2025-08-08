@@ -289,7 +289,7 @@ export class PokemonTcgPocketService {
     userId?: bigint,
   ): Promise<string> {
     const displayName = userId ? await this.getDisplayName(userId) : 'Owned';
-    const header = `ID,Name,Rarity,Set,Boosters,Owned by ${displayName}`;
+    const header = `ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by ${displayName}`;
     const csvLines = await Promise.all(
       cards.map((card) => this.formatCardAsCsv(card, userId)),
     );
@@ -318,7 +318,13 @@ export class PokemonTcgPocketService {
     }
 
     const raritySymbol = card.rarity ? RARITY_REVERSE_MAP[card.rarity] : '';
-    return `${card.set.key}-${card.number.toString().padStart(3, '0')},${card.name},${raritySymbol},${card.set.name},${boosterNames},${ownershipStatus}`;
+    const sixPackOnly = card.isSixPackOnly ? 'Yes' : 'No';
+    return `${card.set.key}-${card.number
+      .toString()
+      .padStart(
+        3,
+        '0',
+      )},${card.name},${raritySymbol},${card.set.name},${boosterNames},${sixPackOnly},${ownershipStatus}`;
   }
 
   /** Gets formatted collection statistics for a user */

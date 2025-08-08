@@ -55,7 +55,37 @@ describe('pokemonCardSearch', () => {
     );
 
     expect(result).toBe(
-      'ID,Name,Rarity,Set,Boosters,Owned by @test1\nA1-001,Test Card,♢,Test Set,Glurak,No',
+      'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1\nA1-001,Test Card,♢,Test Set,Glurak,No,No',
+    );
+    expect(repository.searchCards).toHaveBeenCalledWith({});
+  });
+
+  it('should set SixPackOnly=Yes for six-pack-only cards and keep column order', async () => {
+    await repository.createSet('A1', 'Test Set');
+    await repository.createBooster('Glurak', 'A1');
+    await repository.createCard({
+      name: 'Six Only Card',
+      setKey: 'A1',
+      number: 1,
+      rarity: Rarity.ONE_STAR,
+      boosterNames: ['Glurak'],
+      isSixPackOnly: true,
+    });
+
+    const result = await pokemonCardSearchTool.invoke(
+      {
+        card: null,
+        setKey: null,
+        booster: null,
+        rarity: null,
+        ownershipFilter: null,
+      },
+      config,
+    );
+
+    // Validate exact header and row including column order and SixPackOnly flag
+    expect(result).toBe(
+      'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1\nA1-001,Six Only Card,☆,Test Set,Glurak,Yes,No',
     );
     expect(repository.searchCards).toHaveBeenCalledWith({});
   });
@@ -122,7 +152,9 @@ describe('pokemonCardSearch', () => {
     const lines = result.split('\n');
     // Header + 20 cards + empty line + message
     expect(lines).toHaveLength(23);
-    expect(lines[0]).toBe('ID,Name,Rarity,Set,Boosters,Owned by @test1');
+    expect(lines[0]).toBe(
+      'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+    );
     expect(lines[lines.length - 1]).toBe(
       'Limited list above to first 20 cards to save token usage. Tell the user there are 5 additional cards matching the search query (25 total).',
     );
@@ -314,7 +346,7 @@ describe('pokemonCardSearch', () => {
       .find((line) => line.includes('Card 1'))!;
     const columns = cardLine.split(',');
     expect(columns[4]).toBe(''); // Boosters column should be empty
-    expect(columns[5]).toBe('No'); // Ownership column should be No
+    expect(columns[6]).toBe('No'); // Ownership column should be No
     expect(repository.searchCards).toHaveBeenCalledWith({});
   });
 
@@ -347,7 +379,7 @@ describe('pokemonCardSearch', () => {
       .find((line) => line.includes('Card 1'))!;
     const columns = cardLine.split(',');
     expect(columns[2]).toBe(''); // Rarity column should be empty
-    expect(columns[5]).toBe('No'); // Ownership column should be No
+    expect(columns[6]).toBe('No'); // Ownership column should be No
     expect(repository.searchCards).toHaveBeenCalledWith({});
   });
 

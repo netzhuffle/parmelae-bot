@@ -2407,11 +2407,22 @@
             "parentTaskId": 53
           }
         ]
+      },
+      {
+        "id": 54,
+        "title": "Indicate six-pack-only cards in CSV outputs",
+        "description": "Update `PokemonTcgPocketService` CSV generation to clearly mark cards that are exclusive to six-card packs, so users can see this constraint in exported lists.",
+        "details": "Scope:\n- Modify `formatCardAsCsv` (and `formatCardsAsCsv` header if needed) in `src/PokemonTcgPocket/PokemonTcgPocketService.ts` to include a column or inline marker for `isSixPackOnly` cards.\n- Ensure markers are human-friendly (e.g., new column `SixPackOnly` with Yes/No, or inline note `(6-pack only)`).\n- Keep backward compatibility where possible (consider adding a new trailing column to minimize breaking changes).\n- Update any consumer or tests impacted by CSV shape.\n\nTest Strategy:\n- Unit tests verifying CSV header contains the new column and rows correctly reflect `isSixPackOnly` flag.\n- Integration-style tests in `PokemonTcgPocketService.test.ts` that exercise CSV generation paths used by bulk/single operations.\n- Ensure all validation/linting passes.",
+        "testStrategy": "",
+        "status": "in-progress",
+        "dependencies": [],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-08T19:39:55.658Z",
+      "updated": "2025-08-08T19:42:15.864Z",
       "description": "Tasks for master context"
     }
   }

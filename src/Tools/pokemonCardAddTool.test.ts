@@ -54,8 +54,10 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('added card to @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,Yes');
     });
 
     it('should add a single card to collection using card name', async () => {
@@ -82,8 +84,10 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('added card to @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,Yes');
     });
 
     it('should refuse to add if multiple matches found', async () => {
@@ -156,9 +160,11 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('added 2 cards to @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
-      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,Yes');
-      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,Yes');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,No,Yes');
+      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No,Yes');
     });
 
     it('should not add already owned cards', async () => {
@@ -186,7 +192,7 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('@test1 already owns them');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,Yes');
       expect(result).toContain('no card was added');
     });
 
@@ -215,9 +221,11 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('added card to @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
       expect(result).toContain(
-        'A1-001,Test Card,♢,Test Set,,No (marked as not needed)',
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain(
+        'A1-001,Test Card,♢,Test Set,,No,No (marked as not needed)',
       );
 
       // Verify the card was marked with NOT_NEEDED status
@@ -288,8 +296,10 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('removed card from @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,No');
     });
 
     it('should refuse to remove if multiple matches found', async () => {
@@ -328,8 +338,8 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain(
         'Multiple matches found. Please ask the user to specify which of these cards they mean. Then call this tool again and provide its card ID:',
       );
-      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,Yes');
-      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,Yes');
+      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,No,Yes');
+      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No,Yes');
       const cards = await repository.searchCards({
         userId: BigInt(1),
       });
@@ -373,7 +383,9 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('removed 2 cards from @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
     });
 
     it('should not remove unowned cards', async () => {
@@ -448,7 +460,7 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('@test1 already owns them');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,Yes');
       expect(result).toContain('no card was added');
     });
 
@@ -507,7 +519,7 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('Test2 already owns them');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,Yes');
       expect(result).toContain('no card was added');
     });
 
@@ -569,8 +581,10 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('added card to @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,Yes');
     });
 
     it('should show first name when username not available', async () => {
@@ -599,8 +613,10 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('added card to Test2');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,Yes');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by Test2',
+      );
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,Yes');
     });
 
     it('should show first name in bulk operation messages when username not available', async () => {
@@ -637,9 +653,11 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('added 2 cards to Test2');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
-      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,Yes');
-      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,Yes');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by Test2',
+      );
+      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,No,Yes');
+      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No,Yes');
     });
 
     it('should show first name in remove error messages when username not available', async () => {
@@ -669,8 +687,10 @@ describe('pokemonCardAdd', () => {
 
       expect(result).toContain('No matching cards found in Test2');
       expect(result).toContain('The cards exist');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
-      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by Test2',
+      );
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,No,No');
     });
 
     it('should show first name in bulk remove messages when username not available', async () => {
@@ -709,9 +729,11 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('removed 2 cards from Test2');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by Test2');
-      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,No');
-      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by Test2',
+      );
+      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,No,No');
+      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No,No');
     });
   });
 
@@ -841,9 +863,11 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('added 2 cards to @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
-      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,Yes');
-      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,Yes');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,No,Yes');
+      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No,Yes');
     });
 
     it('should include collection stats after removing multiple cards', async () => {
@@ -880,9 +904,11 @@ describe('pokemonCardAdd', () => {
       );
 
       expect(result).toContain('removed 2 cards from @test1');
-      expect(result).toContain('ID,Name,Rarity,Set,Boosters,Owned by @test1');
-      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,No');
-      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,No,No');
+      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,No,No');
     });
   });
 
