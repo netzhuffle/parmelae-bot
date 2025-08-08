@@ -53,7 +53,18 @@ jobs:
       - name: Deploy files
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: rsync -chilOrz --stats --delete --exclude .git --exclude .gitignore --exclude prisma/sqlite.db --exclude .env --exclude .cursor --exclude .devcontainer --exclude .github --exclude .taskmaster --exclude .vscode --exclude backups ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
+        run: rsync -chilOrz --stats --delete --force \
+          --exclude '/.git' \
+          --exclude '/.gitignore' \
+          --exclude '/.env' \
+          --exclude '/.cursor' \
+          --exclude '/.devcontainer' \
+          --exclude '/.github' \
+          --exclude '/.taskmaster' \
+          --exclude '/.vscode' \
+          --exclude '/backups' \
+          --exclude 'prisma/sqlite.db' \
+          ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
 
       - name: Cleanup old backups
         env:
