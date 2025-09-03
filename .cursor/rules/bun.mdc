@@ -17,7 +17,7 @@ bun install
 bun run install-prod  # Equivalent to: bun install --production --frozen-lockfile
 
 # ✅ DO: Use bunx instead of npx
-bunx npm-check-updates --interactive
+bunx task-master
 ```
 
 ### **Development & Production Execution**
