@@ -23,6 +23,7 @@
     "@langchain/openai": "^0.6.11",
     "@prisma/client": "^6.15.0",
     "@sentry/node": "^10.8.0",
+    "cheerio": "^1.1.2",
     "hnswlib-node": "^3.0.0",
     "inversify": "^7.9.1",
     "inversify-inject-decorators": "^3.1.0",
