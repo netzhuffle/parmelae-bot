@@ -1,11 +1,13 @@
 import { describe, beforeEach, it, afterEach, expect } from 'bun:test';
-import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
+import {
+  PokemonTcgPocketService,
+  Sets,
+} from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity, OwnershipStatus } from '@prisma/client';
 import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
-import { createBunFileFake } from '../Fakes/BunFileFake.js';
 
 describe('pokemonCardStats', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -17,7 +19,7 @@ describe('pokemonCardStats', () => {
       pokemonTcgPocketService: new PokemonTcgPocketService(
         new PokemonTcgPocketProbabilityService(),
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       ),
     });
   });

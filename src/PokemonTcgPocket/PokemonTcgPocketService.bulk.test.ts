@@ -1,9 +1,8 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
+import { PokemonTcgPocketService, Sets } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { OwnershipStatus } from '@prisma/client';
-import { createBunFileFake } from '../Fakes/BunFileFake.js';
 
 describe('PokemonTcgPocketService bulk operations', () => {
   let service: PokemonTcgPocketService;
@@ -16,7 +15,7 @@ describe('PokemonTcgPocketService bulk operations', () => {
     service = new PokemonTcgPocketService(
       probabilityService,
       repository,
-      createBunFileFake(''),
+      {} as Sets,
     );
   });
 

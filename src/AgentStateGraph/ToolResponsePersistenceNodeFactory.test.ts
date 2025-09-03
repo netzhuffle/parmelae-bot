@@ -22,9 +22,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
   let node: (state: typeof StateAnnotation.State) => Promise<object>;
 
   beforeEach(() => {
-    // Clear mock calls manually since we're using separate mock references
-    mockUpdateToolCalls.mockClear();
-    mockStore.mockClear();
+    mock.clearAllMocks();
     factory = new ToolResponsePersistenceNodeFactory(
       mockMessageRepository,
       mockToolMessageRepository,

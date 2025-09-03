@@ -1,9 +1,13 @@
 import { describe, beforeEach, it, afterEach, expect, spyOn } from 'bun:test';
-import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
+import {
+  PokemonTcgPocketService,
+  Sets,
+  Card,
+} from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { Rarity, OwnershipStatus } from '@prisma/client';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
-import { createBunFileFake } from '../Fakes/BunFileFake.js';
+import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 
 describe('PokemonTcgPocketService', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -19,19 +23,19 @@ describe('PokemonTcgPocketService', () => {
   describe('YAML validation', () => {
     describe('rarity validation', () => {
       it('rejects cards with invalid rarity symbols', async () => {
-        const yaml = `
-TEST:
-  name: Test Set
-  cards:
-    1:
-      name: Test Card
-      rarity: INVALID
-`;
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            cards: {
+              1: { name: 'Test Card', rarity: 'INVALID' },
+            },
+          },
+        };
         const probabilityService = new PokemonTcgPocketProbabilityService();
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          createBunFileFake(yaml),
+          setsData,
         );
 
         try {
@@ -44,51 +48,30 @@ TEST:
       });
 
       it('accepts cards with all valid rarity symbols', async () => {
-        const yaml = `
-TEST:
-  name: Test Set
-  cards:
-    1:
-      name: One Diamond
-      rarity: ♢
-    2:
-      name: Two Diamonds
-      rarity: ♢♢
-    3:
-      name: Three Diamonds
-      rarity: ♢♢♢
-    4:
-      name: Four Diamonds
-      rarity: ♢♢♢♢
-    5:
-      name: One Star
-      rarity: ☆
-    6:
-      name: Two Stars
-      rarity: ☆☆
-    7:
-      name: Three Stars
-      rarity: ☆☆☆
-    8:
-      name: Four Stars
-      rarity: ☆☆☆☆
-    9:
-      name: One Shiny
-      rarity: ✸
-    10:
-      name: Two Shiny
-      rarity: ✸✸
-    11:
-      name: Crown
-      rarity: ♛
-    12:
-      name: No Rarity
-`;
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            cards: {
+              1: { name: 'One Diamond', rarity: '♢' },
+              2: { name: 'Two Diamonds', rarity: '♢♢' },
+              3: { name: 'Three Diamonds', rarity: '♢♢♢' },
+              4: { name: 'Four Diamonds', rarity: '♢♢♢♢' },
+              5: { name: 'One Star', rarity: '☆' },
+              6: { name: 'Two Stars', rarity: '☆☆' },
+              7: { name: 'Three Stars', rarity: '☆☆☆' },
+              8: { name: 'Four Stars', rarity: '☆☆☆☆' },
+              9: { name: 'One Shiny', rarity: '✸' },
+              10: { name: 'Two Shiny', rarity: '✸✸' },
+              11: { name: 'Crown', rarity: '♛' },
+              12: { name: 'No Rarity' },
+            },
+          },
+        };
         const probabilityService = new PokemonTcgPocketProbabilityService();
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          createBunFileFake(yaml),
+          setsData,
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -113,77 +96,53 @@ TEST:
     });
 
     describe('card number validation', () => {
-      it('rejects duplicate card numbers within a set', async () => {
-        const yaml = `
-TEST-SET:
-  name: Test Set
-  cards:
-    1:
-      name: Card One
-      rarity: ♢
-    1:
-      name: Another Card One
-      rarity: ♢`;
-
-        const probabilityService = new PokemonTcgPocketProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          createBunFileFake(yaml),
-        );
-
-        try {
-          await service.synchronizeCardDatabaseWithYamlSource();
-          expect.unreachable('Expected promise to reject');
-        } catch (error) {
-          expect(error).toBeInstanceOf(Error);
-          expect((error as Error).message).toContain('duplicated mapping key');
-        }
-      });
-
       it('rejects non-integer card numbers', async () => {
-        const yaml = `
-TEST:
-  name: Test Set
-  cards:
-    abc:
-      name: Invalid Number Card
-      rarity: ♢
-`;
+        // Create a Sets object with invalid card number by constructing it dynamically
+        const invalidCards: Record<string, Card> = {
+          'not-a-number': { name: 'Invalid Card', rarity: '♢' },
+        };
+        const setsData: Sets = {
+          'TEST-SET': {
+            name: 'Test Set',
+            cards: invalidCards as Record<number, Card>,
+          },
+        };
+
         const probabilityService = new PokemonTcgPocketProbabilityService();
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          createBunFileFake(yaml),
+          setsData,
         );
 
         try {
           await service.synchronizeCardDatabaseWithYamlSource();
-          expect.unreachable('Expected promise to reject');
+          expect.unreachable(
+            'Should have thrown PokemonTcgPocketInvalidCardNumberError',
+          );
         } catch (error) {
-          expect(error).toBeInstanceOf(Error);
-          expect((error as Error).message).toContain('Invalid card number');
+          expect(error).toBeInstanceOf(PokemonTcgPocketInvalidCardNumberError);
+          expect((error as Error).message).toContain('not-a-number');
         }
       });
     });
 
     describe('booster validation', () => {
       it('rejects cards referencing non-existent boosters', async () => {
-        const yaml = `
-TEST:
-  name: Test Set
-  boosters:
-    - Booster1
-  cards:
-    1:
-      name: Test Card
-      boosters: NonExistentBooster
-`;
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            boosters: ['Booster1'],
+            cards: {
+              1: { name: 'Test Card', boosters: 'NonExistentBooster' },
+            },
+          },
+        };
         const probabilityService = new PokemonTcgPocketProbabilityService();
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          createBunFileFake(yaml),
+          setsData,
         );
 
         try {
@@ -202,19 +161,19 @@ TEST:
   describe('Set configuration', () => {
     describe('single set', () => {
       it('creates default booster when no boosters are specified', async () => {
-        const yaml = `
-TEST:
-  name: Test Set
-  cards:
-    1:
-      name: Test Card
-      rarity: ♢
-`;
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            cards: {
+              1: { name: 'Test Card', rarity: '♢' },
+            },
+          },
+        };
         const probabilityService = new PokemonTcgPocketProbabilityService();
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          createBunFileFake(yaml),
+          setsData,
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -239,23 +198,21 @@ TEST:
       });
 
       it('creates no boosters when boosters is null', async () => {
-        const yaml = `
-TEST:
-  name: Test Set
-  boosters: ~
-  cards:
-    1:
-      name: Card One
-      rarity: ♢
-    2:
-      name: Card Two
-      rarity: ♢♢
-`;
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            boosters: null,
+            cards: {
+              1: { name: 'Card One', rarity: '♢' },
+              2: { name: 'Card Two', rarity: '♢♢' },
+            },
+          },
+        };
         const probabilityService = new PokemonTcgPocketProbabilityService();
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          createBunFileFake(yaml),
+          setsData,
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -277,29 +234,25 @@ TEST:
       });
 
       it('creates specified boosters and assigns cards correctly', async () => {
-        const yaml = `
-TEST:
-  name: Test Set
-  boosters:
-    - Booster1
-    - Booster2
-  cards:
-    1:
-      name: Test Card 1
-      rarity: ♢
-      boosters: Booster1
-    2:
-      name: Test Card 2
-      rarity: ♢♢
-      boosters: 
-        - Booster1
-        - Booster2
-`;
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            boosters: ['Booster1', 'Booster2'],
+            cards: {
+              1: { name: 'Test Card 1', rarity: '♢', boosters: 'Booster1' },
+              2: {
+                name: 'Test Card 2',
+                rarity: '♢♢',
+                boosters: ['Booster1', 'Booster2'],
+              },
+            },
+          },
+        };
         const probabilityService = new PokemonTcgPocketProbabilityService();
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          createBunFileFake(yaml),
+          setsData,
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -338,27 +291,26 @@ TEST:
 
     describe('multiple sets', () => {
       it('handles multiple sets with different booster configurations', async () => {
-        const yaml = `
-SET1:
-  name: First Set
-  cards:
-    1:
-      name: First Set Card
-      rarity: ♢
-SET2:
-  name: Second Set
-  boosters:
-    - Booster1
-  cards:
-    1:
-      name: Second Set Card
-      rarity: ♢♢
-`;
+        const setsData: Sets = {
+          SET1: {
+            name: 'First Set',
+            cards: {
+              1: { name: 'First Set Card', rarity: '♢' },
+            },
+          },
+          SET2: {
+            name: 'Second Set',
+            boosters: ['Booster1'],
+            cards: {
+              1: { name: 'Second Set Card', rarity: '♢♢' },
+            },
+          },
+        };
         const probabilityService = new PokemonTcgPocketProbabilityService();
         const service = new PokemonTcgPocketService(
           probabilityService,
           repository,
-          createBunFileFake(yaml),
+          setsData,
         );
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -409,27 +361,25 @@ SET2:
 
   describe('Card booster assignment', () => {
     it('assigns cards to all boosters when no boosters specified', async () => {
-      const yaml = `
-TEST:
-  name: Test Set
-  boosters:
-    - Booster1
-    - Booster2
-    - Booster3
-  cards:
-    1:
-      name: Card In All Boosters
-      rarity: ♢
-    2:
-      name: Card In Specific Booster
-      rarity: ♢
-      boosters: Booster1
-`;
+      const setsData: Sets = {
+        TEST: {
+          name: 'Test Set',
+          boosters: ['Booster1', 'Booster2', 'Booster3'],
+          cards: {
+            1: { name: 'Card In All Boosters', rarity: '♢' },
+            2: {
+              name: 'Card In Specific Booster',
+              rarity: '♢',
+              boosters: 'Booster1',
+            },
+          },
+        },
+      };
       const probabilityService = new PokemonTcgPocketProbabilityService();
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(yaml),
+        setsData,
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -463,27 +413,25 @@ TEST:
     });
 
     it('handles cards with null boosters in a set with boosters', async () => {
-      const yaml = `
-TEST:
-  name: Test Set
-  boosters:
-    - Booster1
-    - Booster2
-  cards:
-    1:
-      name: Card With Boosters
-      rarity: ♢
-      boosters: Booster1
-    2:
-      name: Card Without Boosters
-      rarity: ♢
-      boosters: ~
-`;
+      const setsData: Sets = {
+        TEST: {
+          name: 'Test Set',
+          boosters: ['Booster1', 'Booster2'],
+          cards: {
+            1: {
+              name: 'Card With Boosters',
+              rarity: '♢',
+              boosters: 'Booster1',
+            },
+            2: { name: 'Card Without Boosters', rarity: '♢', boosters: null },
+          },
+        },
+      };
       const probabilityService = new PokemonTcgPocketProbabilityService();
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(yaml),
+        setsData,
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -520,31 +468,26 @@ TEST:
 
   describe('Booster shiny rarity', () => {
     it('sets hasShinyRarity to true for boosters containing shiny cards', async () => {
-      const yaml = `
-TEST:
-  name: Test Set
-  boosters:
-    - Booster1
-    - Booster2
-  cards:
-    1:
-      name: Regular Card
-      rarity: ♢
-      boosters: Booster1
-    2:
-      name: Shiny Card
-      rarity: ✸
-      boosters: Booster2
-    3:
-      name: Double Shiny Card
-      rarity: ✸✸
-      boosters: Booster2
-`;
+      const setsData: Sets = {
+        TEST: {
+          name: 'Test Set',
+          boosters: ['Booster1', 'Booster2'],
+          cards: {
+            1: { name: 'Regular Card', rarity: '♢', boosters: 'Booster1' },
+            2: { name: 'Shiny Card', rarity: '✸', boosters: 'Booster2' },
+            3: {
+              name: 'Double Shiny Card',
+              rarity: '✸✸',
+              boosters: 'Booster2',
+            },
+          },
+        },
+      };
       const probabilityService = new PokemonTcgPocketProbabilityService();
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(yaml),
+        setsData,
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -566,33 +509,30 @@ TEST:
     });
 
     it('sets hasShinyRarity to true for boosters containing shiny cards when cards are in multiple boosters', async () => {
-      const yaml = `
-TEST:
-  name: Test Set
-  boosters:
-    - Booster1
-    - Booster2
-    - Booster3
-  cards:
-    1:
-      name: Regular Card
-      rarity: ♢
-    2:
-      name: Shiny Card
-      rarity: ✸
-      boosters:
-        - Booster1
-        - Booster2
-    3:
-      name: Double Shiny Card
-      rarity: ✸✸
-      boosters: Booster2
-`;
+      const setsData: Sets = {
+        TEST: {
+          name: 'Test Set',
+          boosters: ['Booster1', 'Booster2', 'Booster3'],
+          cards: {
+            1: { name: 'Regular Card', rarity: '♢' },
+            2: {
+              name: 'Shiny Card',
+              rarity: '✸',
+              boosters: ['Booster1', 'Booster2'],
+            },
+            3: {
+              name: 'Double Shiny Card',
+              rarity: '✸✸',
+              boosters: 'Booster2',
+            },
+          },
+        },
+      };
       const probabilityService = new PokemonTcgPocketProbabilityService();
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(yaml),
+        setsData,
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -620,37 +560,35 @@ TEST:
 
   describe('Booster six-pack availability', () => {
     it('should set hasSixPacks to true for boosters containing six-pack-only cards', async () => {
-      const yaml = `
-A1:
-  name: Test Set
-  boosters:
-    - Booster1
-    - Booster2
-    - Booster3
-  cards:
-    1:
-      name: Regular Card
-      rarity: ♢
-      boosters:
-        - Booster1
-        - Booster3
-    2:
-      name: Six Pack Only Card
-      rarity: ♢♢
-      isSixPackOnly: true
-      boosters:
-        - Booster1
-        - Booster2
-    3:
-      name: Another Regular Card
-      rarity: ♢♢♢
-      boosters: Booster3
-`;
+      const setsData: Sets = {
+        A1: {
+          name: 'Test Set',
+          boosters: ['Booster1', 'Booster2', 'Booster3'],
+          cards: {
+            1: {
+              name: 'Regular Card',
+              rarity: '♢',
+              boosters: ['Booster1', 'Booster3'],
+            },
+            2: {
+              name: 'Six Pack Only Card',
+              rarity: '♢♢',
+              isSixPackOnly: true,
+              boosters: ['Booster1', 'Booster2'],
+            },
+            3: {
+              name: 'Another Regular Card',
+              rarity: '♢♢♢',
+              boosters: 'Booster3',
+            },
+          },
+        },
+      };
       const probabilityService = new PokemonTcgPocketProbabilityService();
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(yaml),
+        setsData,
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -687,32 +625,32 @@ A1:
     });
 
     it('should set hasSixPacks to true for boosters containing six-pack-only cards when cards are in multiple boosters', async () => {
-      const yaml = `
-A1:
-  name: Test Set
-  boosters:
-    - Booster1
-    - Booster2
-  cards:
-    1:
-      name: Regular Card
-      rarity: ♢
-    2:
-      name: Six Pack Only Card
-      rarity: ♢♢
-      isSixPackOnly: true
-      boosters: Booster1
-    3:
-      name: Another Six Pack Only Card
-      rarity: ♢♢♢
-      isSixPackOnly: true
-      boosters: Booster2
-`;
+      const setsData: Sets = {
+        A1: {
+          name: 'Test Set',
+          boosters: ['Booster1', 'Booster2'],
+          cards: {
+            1: { name: 'Regular Card', rarity: '♢' },
+            2: {
+              name: 'Six Pack Only Card',
+              rarity: '♢♢',
+              isSixPackOnly: true,
+              boosters: 'Booster1',
+            },
+            3: {
+              name: 'Another Six Pack Only Card',
+              rarity: '♢♢♢',
+              isSixPackOnly: true,
+              boosters: 'Booster2',
+            },
+          },
+        },
+      };
       const probabilityService = new PokemonTcgPocketProbabilityService();
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(yaml),
+        setsData,
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -744,28 +682,22 @@ A1:
     });
 
     it('should set hasSixPacks to false for all boosters when no six-pack-only cards exist', async () => {
-      const yaml = `
-A1:
-  name: Test Set
-  boosters:
-    - Booster1
-    - Booster2
-  cards:
-    1:
-      name: Regular Card 1
-      rarity: ♢
-    2:
-      name: Regular Card 2
-      rarity: ♢♢
-    3:
-      name: Regular Card 3
-      rarity: ♢♢♢
-`;
+      const setsData: Sets = {
+        A1: {
+          name: 'Test Set',
+          boosters: ['Booster1', 'Booster2'],
+          cards: {
+            1: { name: 'Regular Card 1', rarity: '♢' },
+            2: { name: 'Regular Card 2', rarity: '♢♢' },
+            3: { name: 'Regular Card 3', rarity: '♢♢♢' },
+          },
+        },
+      };
       const probabilityService = new PokemonTcgPocketProbabilityService();
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(yaml),
+        setsData,
       );
       await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -810,7 +742,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       );
       const searchCardsSpy = spyOn(repository, 'searchCards');
 
@@ -828,7 +760,7 @@ A1:
       const service = new PokemonTcgPocketService(
         new PokemonTcgPocketProbabilityService(),
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       );
 
       // Test with all rarity types
@@ -849,7 +781,7 @@ A1:
       const service = new PokemonTcgPocketService(
         new PokemonTcgPocketProbabilityService(),
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       );
 
       // Test with some rarities having 0 owned cards
@@ -870,7 +802,7 @@ A1:
       const service = new PokemonTcgPocketService(
         new PokemonTcgPocketProbabilityService(),
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       );
 
       // Test with only promo cards
@@ -940,7 +872,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       );
 
       const stats = await service.getCollectionStats(userId);
@@ -1001,7 +933,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       );
 
       const stats = await service.getCollectionStats(userId);
@@ -1117,7 +1049,7 @@ A1:
       const service = new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       );
 
       const stats = await service.getCollectionStats(userId);

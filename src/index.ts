@@ -16,5 +16,5 @@ if (config.sentryDsn) {
   });
 }
 
-const bot = container.get(Bot);
+const bot = await container.getAsync(Bot);
 bot.start();

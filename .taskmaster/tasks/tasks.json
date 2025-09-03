@@ -2414,7 +2414,7 @@
         "description": "Update `PokemonTcgPocketService` CSV generation to clearly mark cards that are exclusive to six-card packs, so users can see this constraint in exported lists.",
         "details": "Scope:\n- Modify `formatCardAsCsv` (and `formatCardsAsCsv` header if needed) in `src/PokemonTcgPocket/PokemonTcgPocketService.ts` to include a column or inline marker for `isSixPackOnly` cards.\n- Ensure markers are human-friendly (e.g., new column `SixPackOnly` with Yes/No, or inline note `(6-pack only)`).\n- Keep backward compatibility where possible (consider adding a new trailing column to minimize breaking changes).\n- Update any consumer or tests impacted by CSV shape.\n\nTest Strategy:\n- Unit tests verifying CSV header contains the new column and rows correctly reflect `isSixPackOnly` flag.\n- Integration-style tests in `PokemonTcgPocketService.test.ts` that exercise CSV generation paths used by bulk/single operations.\n- Ensure all validation/linting passes.",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [],
         "priority": "medium",
         "subtasks": []
@@ -2464,11 +2464,139 @@
             "testStrategy": "1. Run integration tests with actual database interactions to verify the complete flow\n2. Test edge cases such as:\n   - Upgrading multiple cards with mixed statuses\n   - Handling invalid card IDs alongside valid ones\n3. Verify documentation accuracy through peer review"
           }
         ]
+      },
+      {
+        "id": 56,
+        "title": "Upgrade Test Suite to Utilize Bun 1.2.20 Testing Enhancements",
+        "description": "Refactor existing test files, especially AgentStateGraph tests and other mock-utilizing tests, to leverage Bun 1.2.20's improved testing APIs including mock.clearAllMocks(), expectTypeOf assertions, and new return value matchers.",
+        "details": "1. **Upgrade Mock Clearing:** Replace all manual mock clearing code in test files with the new `mock.clearAllMocks()` method provided by Bun 1.2.20 to simplify and standardize mock reset behavior.\n\n2. **Add TypeScript Type Assertions:** Integrate `expectTypeOf` assertions in TypeScript test files to validate static types at runtime, improving type safety and test robustness.\n\n3. **Implement New Return Value Matchers:** Update relevant tests to use Bun's new matchers `toHaveReturnedWith`, `toHaveLastReturnedWith`, and `toHaveNthReturnedWith` for more precise assertions on mock function return values.\n\n4. **Focus Areas:** Prioritize refactoring in AgentStateGraph test files and other test files that heavily use mocks to maximize impact.\n\n5. **Code Review and Consistency:** Ensure all test files follow consistent patterns for mocking and assertions according to Bun 1.2.20 best practices.\n\n6. **Documentation:** Update test documentation and comments to reflect the new testing APIs and patterns.\n\n7. **Dependencies:** Confirm Bun 1.2.20 is installed and configured correctly in the project environment before refactoring.",
+        "testStrategy": "1. **Run Full Test Suite:** Execute all tests using Bun:test to verify that tests pass without errors after refactoring.\n\n2. **Mock Behavior Verification:** Specifically test that `mock.clearAllMocks()` correctly resets mocks by verifying no residual mock state between tests.\n\n3. **Type Assertion Validation:** Confirm that `expectTypeOf` assertions correctly fail on incorrect types and pass on correct types by adding controlled test cases.\n\n4. **Return Value Matcher Tests:** Validate that `toHaveReturnedWith`, `toHaveLastReturnedWith`, and `toHaveNthReturnedWith` matchers behave as expected by creating targeted mock function tests.\n\n5. **Regression Testing:** Compare test coverage and results before and after the upgrade to ensure no regressions.\n\n6. **Code Review:** Conduct peer review focusing on correct usage of new APIs and adherence to Bun 1.2.20 testing conventions.",
+        "status": "done",
+        "dependencies": [
+          36
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Bun 1.2.20 Installation and Configuration",
+            "description": "Ensure that Bun version 1.2.20 is correctly installed and configured in the project environment before starting any test suite refactoring.",
+            "dependencies": [],
+            "details": "Check the current Bun version using CLI commands and update or install Bun 1.2.20 if necessary. Confirm that the project dependencies and environment settings support Bun 1.2.20 features.",
+            "status": "done",
+            "testStrategy": "Run `bun --version` and execute a simple test using bun:test to verify the environment is properly set up."
+          },
+          {
+            "id": 2,
+            "title": "Refactor Mock Clearing to Use mock.clearAllMocks()",
+            "description": "Replace all manual mock clearing code in test files with Bun 1.2.20's new `mock.clearAllMocks()` method to standardize and simplify mock reset behavior.",
+            "dependencies": [
+              "56.1"
+            ],
+            "details": "Identify all test files, especially those with mocks, and refactor them to remove manual mock clearing logic. Replace with calls to `mock.clearAllMocks()` as per Bun 1.2.20 API.",
+            "status": "done",
+            "testStrategy": "Run the full test suite to ensure mocks are properly reset between tests and no residual mock state remains."
+          },
+          {
+            "id": 3,
+            "title": "Integrate expectTypeOf Assertions in TypeScript Tests",
+            "description": "Add `expectTypeOf` assertions in TypeScript test files to validate static types at runtime, enhancing type safety and test robustness.",
+            "dependencies": [
+              "56.1"
+            ],
+            "details": "Review TypeScript test files and insert `expectTypeOf` assertions where appropriate to check types of variables, function returns, and mocks according to Bun 1.2.20 testing enhancements.",
+            "status": "done",
+            "testStrategy": "Verify that type assertions correctly fail on type mismatches and pass when types are correct by running the test suite."
+          },
+          {
+            "id": 4,
+            "title": "Update Tests to Use New Return Value Matchers",
+            "description": "Refactor relevant tests to utilize Bun's new matchers `toHaveReturnedWith`, `toHaveLastReturnedWith`, and `toHaveNthReturnedWith` for precise assertions on mock function return values.",
+            "dependencies": [
+              "56.2"
+            ],
+            "details": "Locate tests that assert mock return values and replace existing assertions with the new Bun 1.2.20 return value matchers to improve clarity and accuracy.",
+            "status": "done",
+            "testStrategy": "Run tests to confirm that the new matchers correctly validate mock return values and that no regressions occur."
+          },
+          {
+            "id": 5,
+            "title": "Conduct Code Review and Update Documentation",
+            "description": "Perform a comprehensive code review to ensure consistent use of Bun 1.2.20 testing APIs across all test files and update test documentation and comments to reflect new testing patterns.",
+            "dependencies": [
+              "56.3",
+              "56.4"
+            ],
+            "details": "Review all modified test files for adherence to Bun 1.2.20 best practices, consistency in mocking and assertions, and update inline comments and external documentation accordingly.",
+            "status": "done",
+            "testStrategy": "Peer review and static analysis to verify consistency; validate documentation accuracy by cross-referencing with implemented code changes."
+          }
+        ]
+      },
+      {
+        "id": 57,
+        "title": "Migrate YAML Parsing from js-yaml to Bun Native YAML Support",
+        "description": "Replace all usages of the js-yaml library with Bun's native YAML import capabilities in the PokemonTcgPocketService.ts and tcgpcards.yaml.test.ts files, and remove js-yaml dependencies from the project. Use Bun's native dynamic import capability to load YAML files on-demand for better performance.",
+        "status": "done",
+        "dependencies": [
+          41,
+          42
+        ],
+        "priority": "medium",
+        "details": "1. Identify and remove all imports of js-yaml in PokemonTcgPocketService.ts and tcgpcards.yaml.test.ts.\n2. Update the POKEMON_TCGP_YAML_SYMBOL binding in inversify.config.ts to return a Promise that resolves to the parsed YAML content using dynamic import instead of returning a Bun.file instance.\n3. Modify the synchronizeCardDatabaseWithYamlSource method in PokemonTcgPocketService.ts to work with the Promise-based YAML loading, eliminating the need for runtime YAML parsing.\n4. Remove the js-yaml dependency from the package.json dependencies section and remove @types/js-yaml from devDependencies.\n5. Ensure that the new dynamic YAML import maintains all existing functionality and data integrity while providing on-demand loading.\n6. Test the changes locally to confirm that YAML parsing behaves identically but benefits from Bun's native performance improvements and lazy loading.\n7. Update any relevant documentation or comments to reflect the migration to Bun's native dynamic YAML import support.\n\nConsiderations:\n- Dynamic imports provide better performance by loading the large YAML file only when needed.\n- The YAML content will be available as a parsed JavaScript object when the Promise resolves.\n- Verify compatibility of dynamic YAML imports with all YAML features currently used.\n- Maintain code readability and consistency with existing code style.\n- Coordinate with the Bun runtime migration tasks to ensure environment compatibility.\n- Handle Promise-based loading appropriately in service methods.",
+        "testStrategy": "1. Unit Tests:\n   - Run existing unit tests in tcgpcards.yaml.test.ts to verify all YAML parsing tests pass with Promise-based loading.\n   - Add new tests if necessary to cover edge cases specific to Bun's dynamic YAML import behavior.\n2. Integration Tests:\n   - Execute integration tests involving synchronizeCardDatabaseWithYamlSource to confirm database synchronization works as expected with Promise-based YAML loading.\n3. Regression Testing:\n   - Confirm no regressions in functionality by comparing outputs before and after migration.\n4. Dependency Verification:\n   - Verify that js-yaml and @types/js-yaml are fully removed from node_modules after running bun install.\n5. Performance Validation:\n   - Benchmark YAML loading performance and memory usage to confirm improvements from on-demand loading.\n6. CI/CD Pipeline:\n   - Ensure the CI/CD pipeline runs successfully with the updated dependencies and code changes.\n7. Promise Handling:\n   - Test that dynamic YAML imports work correctly in both development and production builds and handle Promise resolution properly.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Update inversify.config.ts YAML binding to use dynamic import Promise",
+            "description": "Modify the POKEMON_TCGP_YAML_SYMBOL binding in inversify.config.ts to return a Promise that resolves to the parsed YAML content using dynamic import for on-demand loading",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Remove js-yaml imports and dependencies",
+            "description": "Remove all imports of js-yaml from PokemonTcgPocketService.ts and tcgpcards.yaml.test.ts, and remove js-yaml and @types/js-yaml from package.json",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Update synchronizeCardDatabaseWithYamlSource for Promise-based loading",
+            "description": "Update the synchronizeCardDatabaseWithYamlSource method in PokemonTcgPocketService.ts to handle Promise-based YAML loading and work with pre-parsed YAML content",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Update test files for dynamic YAML import",
+            "description": "Modify tcgpcards.yaml.test.ts to work with Bun's native dynamic YAML import instead of js-yaml parsing, handling Promise-based loading",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Verify functionality and run tests with Promise handling",
+            "description": "Run all existing tests to ensure the migration maintains functionality with Promise-based loading and add any necessary tests for Bun's dynamic YAML import behavior",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-08-08T20:47:10.926Z",
+      "updated": "2025-09-03T12:54:36.276Z",
       "description": "Tasks for master context"
     }
   }

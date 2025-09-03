@@ -26,7 +26,6 @@
     "hnswlib-node": "^3.0.0",
     "inversify": "^7.9.1",
     "inversify-inject-decorators": "^3.1.0",
-    "js-yaml": "^4.1.0",
     "langchain": "^0.3.32",
     "octokit": "^5.0.3",
     "openai": "^4.104.0",
@@ -36,8 +35,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
-    "@types/bun": "1.2.19",
-    "@types/js-yaml": "^4.0.9",
+    "@types/bun": "1.2.21",
     "@types/node": "^24.3.0",
     "eslint": "^9.34.0",
     "eslint-plugin-promise": "^7.2.1",

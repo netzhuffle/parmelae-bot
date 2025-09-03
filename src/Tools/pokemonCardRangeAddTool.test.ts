@@ -1,10 +1,12 @@
 import { describe, beforeEach, it, afterEach, expect } from 'bun:test';
-import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
+import {
+  PokemonTcgPocketService,
+  Sets,
+} from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 import { pokemonCardRangeAddTool } from './pokemonCardRangeAddTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
-import { createBunFileFake } from '../Fakes/BunFileFake.js';
 import { OwnershipStatus } from '@prisma/client';
 
 describe('pokemonCardRangeAdd', () => {
@@ -20,7 +22,7 @@ describe('pokemonCardRangeAdd', () => {
       pokemonTcgPocketService: new PokemonTcgPocketService(
         probabilityService,
         repository,
-        createBunFileFake(''),
+        {} as Sets,
       ),
     });
 

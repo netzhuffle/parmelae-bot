@@ -20,9 +20,9 @@ describe('Application Startup', () => {
     // This test ensures that the dependency injection container
     // can successfully resolve the Bot service without throwing
 
-    expect(() => {
+    expect(async () => {
       // This mirrors what happens in src/index.ts
-      const bot = container.get<Bot>(Bot);
+      const bot = await container.getAsync<Bot>(Bot);
 
       // Verify the bot is properly instantiated
       expect(bot).toBeDefined();

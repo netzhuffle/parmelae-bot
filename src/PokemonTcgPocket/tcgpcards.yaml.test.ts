@@ -1,5 +1,4 @@
 import { describe, it, beforeAll, expect } from 'bun:test';
-import { load } from 'js-yaml';
 import {
   Card,
   SetData,
@@ -9,6 +8,10 @@ import {
   BOOSTER_VALUES,
   SetKey,
 } from './PokemonTcgPocketService.js';
+
+interface YamlImportResult {
+  default: Sets;
+}
 
 /** Maps rarity symbols to database enum values */
 const VALID_RARITY_SYMBOLS = new Set([
@@ -26,18 +29,20 @@ const VALID_RARITY_SYMBOLS = new Set([
 ]);
 
 describe('tcgpcards.yaml', () => {
-  let yamlContent: string;
   let sets: Sets;
 
   beforeAll(async () => {
-    const yamlFile = Bun.file('resources/tcgpcards.yaml');
-    yamlContent = await yamlFile.text();
-    sets = load(yamlContent) as Sets;
+    const result = (await import(
+      '../../resources/tcgpcards.yaml'
+    )) as YamlImportResult;
+    sets = result.default;
   });
 
   describe('File structure', () => {
     it('should be valid YAML', () => {
-      expect(() => load(yamlContent)).not.toThrow();
+      // YAML is already parsed by Bun's native import, so if we got here it was valid
+      expect(sets).toBeDefined();
+      expect(typeof sets).toBe('object');
     });
   });
 
