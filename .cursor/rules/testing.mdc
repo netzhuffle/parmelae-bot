@@ -21,7 +21,7 @@ alwaysApply: false
 import { describe, beforeEach, it, expect } from 'bun:test';
 
 // ✅ DO: Import additional functions as needed
-import { describe, beforeAll, afterAll, beforeEach, afterEach, it, test, expect, mock, spyOn, jest } from 'bun:test';
+import { describe, beforeAll, afterAll, beforeEach, afterEach, it, test, expect, mock, spyOn } from 'bun:test';
 ```
 
 ## Test Structure
