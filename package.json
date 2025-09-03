@@ -10,7 +10,7 @@
     "test": "bun test src scripts",
     "checks": "bun run format && bun run schema-format && bun run typecheck && bun run lint && bun run validate-yaml && bun test",
     "migrate": "prisma migrate dev",
-    "tasklist": "task-master list --status=pending,in-progress,review,deferred --with-subtasks",
+    "tasks": "task-master list --status=pending,in-progress,review,deferred --with-subtasks",
     "run-dev": "bun src/index.ts",
     "prisma-studio": "prisma studio",
     "install-prod": "bun install --production --frozen-lockfile",
