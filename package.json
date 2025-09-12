@@ -17,17 +17,17 @@
     "migrate-prod": "prisma migrate deploy"
   },
   "dependencies": {
-    "@langchain/community": "^0.3.54",
-    "@langchain/core": "0.3.73",
+    "@langchain/community": "^0.3.55",
+    "@langchain/core": "0.3.75",
     "@langchain/langgraph": "^0.4.9",
     "@langchain/openai": "^0.6.11",
-    "@prisma/client": "^6.15.0",
-    "@sentry/node": "^10.8.0",
+    "@prisma/client": "^6.16.1",
+    "@sentry/node": "^10.11.0",
     "cheerio": "^1.1.2",
     "hnswlib-node": "^3.0.0",
     "inversify": "^7.9.1",
     "inversify-inject-decorators": "^3.1.0",
-    "langchain": "^0.3.32",
+    "langchain": "^0.3.33",
     "octokit": "^5.0.3",
     "openai": "^4.104.0",
     "reflect-metadata": "^0.2.2",
@@ -35,19 +35,19 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@eslint/js": "^9.34.0",
+    "@eslint/js": "^9.35.0",
     "@types/bun": "1.2.21",
-    "@types/node": "^24.3.0",
-    "eslint": "^9.34.0",
+    "@types/node": "^24.3.2",
+    "eslint": "^9.35.0",
     "eslint-plugin-promise": "^7.2.1",
     "prettier": "^3.6.2",
-    "prisma": "^6.15.0",
-    "task-master-ai": "^0.25.1",
+    "prisma": "^6.16.1",
+    "task-master-ai": "^0.26.0",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.42.0",
+    "typescript-eslint": "^8.43.0",
     "yaml-validator": "^5.1.0"
   },
   "overrides": {
-    "@langchain/core": "0.3.73"
+    "@langchain/core": "0.3.75"
   }
 }
