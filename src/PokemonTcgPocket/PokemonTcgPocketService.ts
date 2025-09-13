@@ -57,6 +57,7 @@ export const SET_KEY_VALUES = [
   'A3a',
   'A3b',
   'A4',
+  'A4a',
   'PROMO-A',
 ] as const;
 
@@ -74,6 +75,7 @@ export const SET_KEY_NAMES: Record<SetKey, string> = {
   A3a: 'Dimensionale Krise',
   A3b: 'Evoli-Hain',
   A4: 'Weisheit von Meer und Himmel',
+  A4a: 'Verborgene Quelle',
   'PROMO-A': 'Promo-A',
 };
 
@@ -93,6 +95,7 @@ export const BOOSTER_VALUES = [
   'Evoli-Hain',
   'Ho-Oh',
   'Lugia',
+  'Verborgene Quelle',
 ] as const;
 
 /** Booster type */

@@ -5816,6 +5816,324 @@ A4:
       boosters:
         - Ho-Oh
         - Lugia
+A4a:
+  name: Verborgene Quelle
+  cards:
+    1:
+      name: Hoppspross
+      rarity: ♢
+    2:
+      name: Hubelupf
+      rarity: ♢♢
+    3:
+      name: Papungha ex
+      rarity: ♢♢♢♢
+    4:
+      name: Sonnkern
+      rarity: ♢
+    5:
+      name: Sonnflora
+      rarity: ♢♢
+    6:
+      name: Celebi
+      rarity: ♢♢♢
+    7:
+      name: Fermicula
+      rarity: ♢
+    8:
+      name: Schneckmag
+      rarity: ♢
+    9:
+      name: Magcargo
+      rarity: ♢♢
+    10:
+      name: Entei ex
+      rarity: ♢♢♢♢
+    11:
+      name: Dartignis
+      rarity: ♢
+    12:
+      name: Fiaro
+      rarity: ♢♢
+    13:
+      name: Quapsel
+      rarity: ♢
+    14:
+      name: Quaputzi
+      rarity: ♢♢
+    15:
+      name: Tentacha
+      rarity: ♢
+    16:
+      name: Tentoxa
+      rarity: ♢♢
+    17:
+      name: Flegmon
+      rarity: ♢
+    18:
+      name: Laschoking
+      rarity: ♢♢
+    19:
+      name: Rossana
+      rarity: ♢
+    20:
+      name: Suicune ex
+      rarity: ♢♢♢♢
+    21:
+      name: Barschwa
+      rarity: ♢
+    22:
+      name: Milotic
+      rarity: ♢♢♢
+    23:
+      name: Mantirps
+      rarity: ♢♢♢
+    24:
+      name: Frigometri
+      rarity: ♢
+    25:
+      name: Raikou ex
+      rarity: ♢♢♢♢
+    26:
+      name: Zapplardin
+      rarity: ♢
+    27:
+      name: Zapplalek
+      rarity: ♢
+    28:
+      name: Zapplarang
+      rarity: ♢♢
+    29:
+      name: Flunschlik
+      rarity: ♢
+    30:
+      name: Voldi
+      rarity: ♢
+    31:
+      name: Bellektro
+      rarity: ♢♢♢
+    32:
+      name: Traunfugil
+      rarity: ♢
+    33:
+      name: Traunmagil
+      rarity: ♢♢
+    34:
+      name: Galar-Corasonn
+      rarity: ♢
+    35:
+      name: Galar-Gorgasonn
+      rarity: ♢♢♢
+    36:
+      name: Latias
+      rarity: ♢♢♢
+    37:
+      name: Latios
+      rarity: ♢♢♢
+    38:
+      name: Quabbel
+      rarity: ♢
+    39:
+      name: Apoquallyp
+      rarity: ♢♢
+    40:
+      name: Digda
+      rarity: ♢
+    41:
+      name: Digdri
+      rarity: ♢♢
+    42:
+      name: Quappo ex
+      rarity: ♢♢♢♢
+    43:
+      name: Phanpy
+      rarity: ♢
+    44:
+      name: Donphan
+      rarity: ♢♢
+    45:
+      name: Relicanth
+      rarity: ♢
+    46:
+      name: Lithomith
+      rarity: ♢
+    47:
+      name: Castellith
+      rarity: ♢♢
+    48:
+      name: Vipitis
+      rarity: ♢
+    49:
+      name: Zorua
+      rarity: ♢
+    50:
+      name: Zoroark
+      rarity: ♢♢♢
+    51:
+      name: Iscalar
+      rarity: ♢
+    52:
+      name: Calamanero
+      rarity: ♢♢
+    53:
+      name: Algitt
+      rarity: ♢
+    54:
+      name: Tandrak
+      rarity: ♢
+    55:
+      name: Altaria
+      rarity: ♢♢♢
+    56:
+      name: Porenta
+      rarity: ♢
+    57:
+      name: Schlurp
+      rarity: ♢
+    58:
+      name: Schlurplek
+      rarity: ♢♢
+    59:
+      name: Fluffeluff
+      rarity: ♢♢♢
+    60:
+      name: Teddiursa
+      rarity: ♢
+    61:
+      name: Ursaring
+      rarity: ♢♢
+    62:
+      name: Miltank
+      rarity: ♢♢
+    63:
+      name: Azurill
+      rarity: ♢♢♢
+    64:
+      name: Wablu
+      rarity: ♢
+    65:
+      name: Sengo
+      rarity: ♢♢
+    66:
+      name: Dartiri
+      rarity: ♢
+    67:
+      name: Gummiboot
+      rarity: ♢♢
+    68:
+      name: Gedächtnislicht
+      rarity: ♢♢
+    69:
+      name: Bianka
+      rarity: ♢♢
+    70:
+      name: Reisende Händlerin
+      rarity: ♢♢
+    71:
+      name: Jens
+      rarity: ♢♢
+    72:
+      name: Milotic
+      rarity: ☆
+    73:
+      name: Flunschlik
+      rarity: ☆
+    74:
+      name: Voldi
+      rarity: ☆
+    75:
+      name: Latios
+      rarity: ☆
+    76:
+      name: Phanpy
+      rarity: ☆
+    77:
+      name: Azurill
+      rarity: ☆
+    78:
+      name: Papungha ex
+      rarity: ☆☆
+    79:
+      name: Entei ex
+      rarity: ☆☆
+    80:
+      name: Suicune ex
+      rarity: ☆☆
+    81:
+      name: Raikou ex
+      rarity: ☆☆
+    82:
+      name: Quappo ex
+      rarity: ☆☆
+    83:
+      name: Bianka
+      rarity: ☆☆
+    84:
+      name: Reisende Händlerin
+      rarity: ☆☆
+    85:
+      name: Jens
+      rarity: ☆☆
+    86:
+      name: Papungha ex
+      rarity: ☆☆
+    87:
+      name: Entei ex
+      rarity: ☆☆
+    88:
+      name: Raikou ex
+      rarity: ☆☆
+    89:
+      name: Quappo ex
+      rarity: ☆☆
+    90:
+      name: Suicune ex
+      rarity: ☆☆☆
+    91:
+      name: Panflam
+      rarity: ✸
+    92:
+      name: Panpyro
+      rarity: ✸
+    93:
+      name: Enton
+      rarity: ✸
+    94:
+      name: Entoron
+      rarity: ✸
+    95:
+      name: Krabby
+      rarity: ✸
+    96:
+      name: Kingler
+      rarity: ✸
+    97:
+      name: Gufa
+      rarity: ✸
+    98:
+      name: Kaumalat
+      rarity: ✸
+    99:
+      name: Knarksel
+      rarity: ✸
+    100:
+      name: Paldea-Felino
+      rarity: ✸
+    101:
+      name: Panferno ex
+      rarity: ✸✸
+    102:
+      name: Mew ex
+      rarity: ✸✸
+    103:
+      name: Knakrack ex
+      rarity: ✸✸
+    104:
+      name: Paldea-Suelord ex
+      rarity: ✸✸
+    105:
+      name: Mantirps
+      rarity: ♛
 PROMO-A:
   name: Promo-A
   boosters: ~
@@ -6059,3 +6377,19 @@ PROMO-A:
       name: Marill
     100:
       name: Snibunna
+    101:
+      name: Latias
+    102:
+      name: Tropius
+    103:
+      name: Quapsel
+    104:
+      name: Milotic
+    105:
+      name: Zorua
+    106:
+      name: Zoroark
+    107:
+      name: Miltank
+    108:
+      name: Phanpy

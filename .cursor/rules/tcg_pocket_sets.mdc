@@ -1,0 +1,195 @@
+---
+description: Standards and patterns for adding new Pokémon TCG Pocket sets to tcgpcards.yaml
+globs: resources/tcgpcards.yaml, src/PokemonTcgPocket/PokemonTcgPocketService.ts
+alwaysApply: true
+---
+
+# Pokémon TCG Pocket Set Addition Guidelines
+
+## **Set Structure Patterns**
+
+### **Multi-Booster Sets (A1, A2, A3, A4)**
+- **Set Level**: Include `boosters` array with 2+ booster names
+- **Card Level**: Each card has individual `boosters` field (single booster or array)
+- **Example Structure**:
+  ```yaml
+  A4:
+    name: Weisheit von Meer und Himmel
+    boosters:
+      - Ho-Oh
+      - Lugia
+    cards:
+      1:
+        name: Myrapla
+        rarity: ♢
+        boosters: Lugia
+      16:
+        name: Sonnkern
+        rarity: ♢
+        boosters:
+          - Ho-Oh
+          - Lugia
+  ```
+
+### **Single-Booster Sets (A1a, A2a, A2b, A3a, A3b, A4a)**
+- **Set Level**: NO `boosters` field (implicit single booster)
+- **Card Level**: NO `boosters` field on any cards
+- **Example Structure**:
+  ```yaml
+  A4a:
+    name: Verborgene Quelle
+    cards:
+      1:
+        name: Hoppspross
+        rarity: ♢
+      2:
+        name: Hubelupf
+        rarity: ♢♢
+  ```
+
+### **Promo Sets (PROMO-A)**
+- **Set Level**: `boosters: ~` (null value, means there are no boosters at all)
+- **Card Level**: NO `boosters` field, may include `equalTo` references
+- **Example Structure**:
+  ```yaml
+  PROMO-A:
+    name: Promo-A
+    boosters: ~
+    cards:
+      9:
+        name: Pikachu
+        equalTo: A1
+  ```
+
+## **Rarity Symbol Mapping**
+
+- **♢** = Häufige Sammelkarte (Common)
+- **♢♢** = Nicht so häufige Sammelkarte (Uncommon)
+- **♢♢♢** = Seltene holografische Sammelkarte (Rare Holo)
+- **♢♢♢♢** = ex cards (Rare ex)
+- **☆** = Seltene Illustrations-Sammelkarte (Rare Illustration)
+- **☆☆** = Seltene besondere Illustrations-Sammelkarte (Special Illustration Rare)
+- **☆☆☆** = Immersive Special Illustration
+- **✸** = Seltene schillernde Sammelkarte (Shiny Rare)
+- **✸✸** = Higher tier Shiny
+- **♛** = Seltene geheime Sammelkarte (Crown Rare)
+
+## **Card Organization Pattern**
+
+Cards in Pokémon TCG Pocket sets are typically organized by rarity:
+
+1. **First**: All ♢, ♢♢, ♢♢♢, ♢♢♢♢ cards (order of these rarities is completely mixed)
+2. **Then**: All ☆ cards (by increasing card number)
+3. **Then**: All ☆☆ cards (by increasing card number)
+4. **Then**: All ☆☆☆ cards (by increasing card number)
+5. **Then**: All ✸ cards (by increasing card number)
+6. **Then**: All ✸✸ cards (by increasing card number)
+7. **Finally**: All ♛ cards (by increasing card number)
+
+## **Card Naming Conventions**
+
+- **ex Cards**: Use space before "ex" (e.g., "Papungha ex", not "Papungha-ex")
+- **Regional Forms**: Use hyphen format (e.g., "Alola-Raichu", "Galar-Corasonn", "Paldea-Felino")
+- **Consistent Names**: Maintain German Pokémon names as used in official TCG Pocket
+
+## **Special Card Properties**
+
+### **Six-Pack Only Cards**
+```yaml
+32:
+  name: Magby
+  rarity: ♢♢♢
+  boosters: Ho-Oh
+  isSixPackOnly: true
+```
+
+### **Equal To References (Promo Cards)**
+
+This is deprecated and doesn’t need to be added to newly added cards.
+
+```yaml
+9:
+  name: Pikachu
+  equalTo: A1
+```
+
+## **Service Integration Requirements**
+
+### **Update SET_KEY_VALUES and SET_KEY_NAMES**
+```typescript
+// In PokemonTcgPocketService.ts
+export const SET_KEY_VALUES = [
+  'A1', 'A1a', 'A2', 'A2a', 'A2b', 'A3', 'A3a', 'A3b', 'A4', 'A4a',
+  'NEW_SET_KEY', // Add new set key
+  'PROMO-A',
+] as const;
+
+export const SET_KEY_NAMES: Record<SetKey, string> = {
+  // ... existing mappings
+  'NEW_SET_KEY': 'New Set Name',
+};
+```
+
+### **Update BOOSTER_VALUES**
+```typescript
+export const BOOSTER_VALUES = [
+  // ... existing boosters
+  'New Booster Name', // Add if multi-booster set
+] as const;
+```
+
+## **Validation Checklist**
+
+- **✅ Set Structure**: Correct booster field presence based on set type
+- **✅ Card Numbering**: Sequential numbering starting from 1
+- **✅ Rarity Symbols**: Proper Unicode symbols, not ASCII alternatives
+- **✅ Ex Card Names**: Space before "ex", not hyphen
+- **✅ Service Constants**: Updated SET_KEY_VALUES, SET_KEY_NAMES, and BOOSTER_VALUES
+- **✅ YAML Syntax**: Proper indentation (2 spaces), no tabs
+- **✅ Card Count**: Matches expected total for the set
+- **✅ Booster Consistency**: Card-level boosters match set-level boosters (for multi-booster sets)
+
+## **Common Pitfalls to Avoid**
+
+- ❌ **DON'T**: Add booster fields to single-booster "a" sets (A1a, A2a, etc.)
+- ❌ **DON'T**: Use hyphens in ex card names ("Papungha-ex" → "Papungha ex")
+- ❌ **DON'T**: Use ASCII apostrophes or quotes in card names
+- ❌ **DON'T**: Mix single booster strings with booster arrays inconsistently
+- ❌ **DON'T**: Forget to update service constants after adding YAML data
+- ❌ **DON'T**: Use wrong rarity symbols (check Unicode characters)
+
+## **Testing After Addition**
+
+1. **Format Check**: `bun run format && bun run schema-format`
+2. **Type Check**: `bun run typecheck`
+3. **Lint Check**: `bun run lint && bun run validate-yaml`
+4. **Test Suite**: `bun test`
+
+All checks must pass before considering the set addition complete.
+
+## **Example: Adding New Set A5**
+
+1. **Add YAML Structure**:
+   ```yaml
+   A5:
+     name: New Set Name
+     boosters:
+       - Booster1
+       - Booster2
+     cards:
+       1:
+         name: First Card
+         rarity: ♢
+         boosters: Booster1
+   ```
+
+2. **Update Service Constants**:
+   ```typescript
+   // Add 'A5' to SET_KEY_VALUES
+   // Add 'A5': 'New Set Name' to SET_KEY_NAMES  
+   // Add 'Booster1', 'Booster2' to BOOSTER_VALUES
+   ```
+
+3. **Run Full Check Sequence**
+
+Follow [error_handling.mdc](mdc:.cursor/rules/error_handling.mdc) for proper error handling patterns and [testing.mdc](mdc:.cursor/rules/testing.mdc) for test coverage requirements.
