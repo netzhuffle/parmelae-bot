@@ -5,7 +5,7 @@ import { Config } from '../Config.js';
 import { Commands } from '../Command.js';
 import { TelegramService } from '../TelegramService.js';
 import { TelegramMessageWithReplyTo } from '../Repositories/Types.js';
-import { Message } from '@prisma/client';
+import { MessageModel } from '../generated/prisma/models/Message.js';
 
 /**
  * Comments a message (/comment command) when somebody replies with (just) the bot’s name.
@@ -26,7 +26,7 @@ export class CommentReplyStrategy extends AllowlistedReplyStrategy {
     );
   }
 
-  willHandleAllowlisted(message: Message): boolean {
+  willHandleAllowlisted(message: MessageModel): boolean {
     return (
       message.imageFileId === null && this.onlyUsernameRegExp.test(message.text)
     );

@@ -18,7 +18,7 @@ import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
 import { Config } from './Config.js';
 import { StructuredTool, Tool } from '@langchain/core/tools';
-import { Message } from '@prisma/client';
+import { MessageModel } from './generated/prisma/models/Message.js';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
 import { CallbackHandler } from './CallbackHandler.js';
 import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
@@ -160,7 +160,7 @@ export class ChatGptAgentService {
    * @param announceToolCall - Callback to announce tool calls (e.g., send to Telegram)
    */
   async generate(
-    message: Message,
+    message: MessageModel,
     prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,
@@ -199,7 +199,7 @@ export class ChatGptAgentService {
   }
 
   private async getReply(
-    message: Message,
+    message: MessageModel,
     prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,

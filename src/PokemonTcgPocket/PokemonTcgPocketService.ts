@@ -1,12 +1,9 @@
 import { injectable, inject } from 'inversify';
 import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
-import {
-  Rarity,
-  PokemonSet,
-  PokemonBooster,
-  PokemonCard,
-  OwnershipStatus,
-} from '@prisma/client';
+import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
+import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
+import { PokemonBoosterModel } from '../generated/prisma/models/PokemonBooster.js';
+import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
 import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketInvalidBoosterError.js';
 import { PokemonTcgPocketInvalidRarityError } from './Errors/PokemonTcgPocketInvalidRarityError.js';
 import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPocketDuplicateCardNumberError.js';
@@ -185,7 +182,7 @@ const RARITY_REVERSE_MAP: Record<Rarity, string> = {
 
 /** Card with ownership information */
 interface CardWithOwnership {
-  card: PokemonCard;
+  card: PokemonCardModel;
   ownershipStatus: CardOwnershipStatus;
 }
 
@@ -301,7 +298,7 @@ export class PokemonTcgPocketService {
     userId?: bigint,
   ): string {
     const boosterNames = card.boosters
-      .map((b: PokemonBooster) => b.name)
+      .map((b: PokemonBoosterModel) => b.name)
       .join(',');
 
     let ownershipStatus = 'No';
@@ -552,7 +549,7 @@ export class PokemonTcgPocketService {
   }
 
   /** Checks if a card has a specific rarity */
-  private isCardOfRarity(card: PokemonCard, rarities: Rarity[]): boolean {
+  private isCardOfRarity(card: PokemonCardModel, rarities: Rarity[]): boolean {
     return rarities.includes(card.rarity!);
   }
 
@@ -594,7 +591,7 @@ export class PokemonTcgPocketService {
   /** Calculates statistics for a group of cards */
   private calculateCardGroup(
     cards: CardWithOwnership[],
-    filter: (card: PokemonCard) => boolean,
+    filter: (card: PokemonCardModel) => boolean,
   ): CardGroup {
     const filteredCards = cards.filter(({ card }) => filter(card));
     return {
@@ -699,7 +696,7 @@ export class PokemonTcgPocketService {
   private async getOrCreateSet(
     setKey: string,
     setData: SetData,
-  ): Promise<PokemonSet | null> {
+  ): Promise<PokemonSetModel | null> {
     const set =
       (await this.repository.retrieveSetByKey(setKey)) ??
       (await this.repository.createSet(setKey, setData.name));
@@ -709,7 +706,7 @@ export class PokemonTcgPocketService {
   private async getOrCreateBoosters(
     setKey: string,
     setData: SetData,
-  ): Promise<PokemonBooster[]> {
+  ): Promise<PokemonBoosterModel[]> {
     // If boosters is explicitly null, return an empty array (no boosters)
     if (setData.boosters === null) {
       return [];
@@ -735,7 +732,7 @@ export class PokemonTcgPocketService {
   private async synchronizeCards(
     setKey: string,
     setData: SetData,
-    boosters: PokemonBooster[],
+    boosters: PokemonBoosterModel[],
   ): Promise<void> {
     // Create a set of valid booster names for this set
     const validBoosterNames = new Set(boosters.map((b) => b.name));

@@ -1,10 +1,10 @@
-import { ToolMessage } from '@prisma/client';
+import { ToolMessageModel } from '../generated/prisma/models/ToolMessage.js';
 
 /**
  * Fake implementation of ToolMessageRepository for testing.
  */
 export class ToolMessageRepositoryFake {
-  private toolMessages: ToolMessage[] = [];
+  private toolMessages: ToolMessageModel[] = [];
   private nextId = 1;
 
   public storeCallArgs: {

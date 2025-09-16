@@ -1,11 +1,8 @@
-import {
-  PokemonSet,
-  PokemonBooster,
-  PokemonCard,
-  Rarity,
-  PrismaClient,
-  OwnershipStatus,
-} from '@prisma/client';
+import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
+import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
+import { PokemonBoosterModel } from '../../generated/prisma/models/PokemonBooster.js';
+import { PokemonCardModel } from '../../generated/prisma/models/PokemonCard.js';
+import { PrismaClient } from '../../generated/prisma/client.js';
 import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { PokemonCardWithRelations } from '../Repositories/Types.js';
@@ -17,9 +14,9 @@ import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabas
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
 export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
-  private sets = new Map<string, PokemonSet>();
-  private boosters = new Map<string, PokemonBooster>();
-  private cards = new Map<string, PokemonCard>();
+  private sets = new Map<string, PokemonSetModel>();
+  private boosters = new Map<string, PokemonBoosterModel>();
+  private cards = new Map<string, PokemonCardModel>();
   private cardBoosters = new Map<number, Set<number>>();
   private cardOwners = new Map<number, Set<bigint>>();
   private cardOwnershipStatus = new Map<string, OwnershipStatus>();
@@ -35,7 +32,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Retrieves a set by its key, or null if it doesn't exist */
-  retrieveSetByKey(key: string): Promise<PokemonSet | null> {
+  retrieveSetByKey(key: string): Promise<PokemonSetModel | null> {
     return Promise.resolve(this.sets.get(key) ?? null);
   }
 
@@ -43,7 +40,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   retrieveBoosterByNameAndSetKey(
     name: string,
     setKey: string,
-  ): Promise<PokemonBooster | null> {
+  ): Promise<PokemonBoosterModel | null> {
     const set = this.sets.get(setKey);
     if (!set) return Promise.resolve(null);
 
@@ -54,7 +51,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   retrieveCardByNumberAndSetKey(
     number: number,
     setKey: string,
-  ): Promise<PokemonCard | null> {
+  ): Promise<PokemonCardModel | null> {
     const set = this.sets.get(setKey);
     if (!set) return Promise.resolve(null);
 
@@ -62,8 +59,8 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Creates a new set */
-  createSet(key: string, name: string): Promise<PokemonSet> {
-    const set: PokemonSet = {
+  createSet(key: string, name: string): Promise<PokemonSetModel> {
+    const set: PokemonSetModel = {
       id: this.nextId++,
       key,
       name,
@@ -73,13 +70,13 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Creates a new booster */
-  createBooster(name: string, setKey: string): Promise<PokemonBooster> {
+  createBooster(name: string, setKey: string): Promise<PokemonBoosterModel> {
     const set = this.sets.get(setKey);
     if (!set) {
       throw new Error(`Set ${setKey} not found`);
     }
 
-    const booster: PokemonBooster = {
+    const booster: PokemonBoosterModel = {
       id: this.nextId++,
       name,
       setId: set.id,
@@ -105,13 +102,13 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     rarity: Rarity | null;
     boosterNames: string[];
     isSixPackOnly: boolean;
-  }): Promise<PokemonCard> {
+  }): Promise<PokemonCardModel> {
     const set = this.sets.get(setKey);
     if (!set) {
       throw new Error(`Set ${setKey} not found`);
     }
 
-    const card: PokemonCard = {
+    const card: PokemonCardModel = {
       id: this.nextId++,
       name,
       setId: set.id,
@@ -141,7 +138,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     number: number,
     rarity: Rarity | null,
     boosterNames: string[],
-  ): Promise<PokemonCard> {
+  ): Promise<PokemonCardModel> {
     const card = await this.createCard({
       name,
       setKey,
@@ -514,7 +511,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Gets boosters for a card */
-  getCardBoosters(cardId: number): PokemonBooster[] {
+  getCardBoosters(cardId: number): PokemonBoosterModel[] {
     const boosterIds = this.cardBoosters.get(cardId) ?? new Set<number>();
     return Array.from(this.boosters.values()).filter((b) =>
       boosterIds.has(b.id),
@@ -522,22 +519,22 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Gets all stored sets */
-  getAllSets(): PokemonSet[] {
+  getAllSets(): PokemonSetModel[] {
     return Array.from(this.sets.values());
   }
 
   /** Gets all stored boosters */
-  getAllBoosters(): PokemonBooster[] {
+  getAllBoosters(): PokemonBoosterModel[] {
     return Array.from(this.boosters.values());
   }
 
   /** Gets all stored cards */
-  getAllCards(): PokemonCard[] {
+  getAllCards(): PokemonCardModel[] {
     return Array.from(this.cards.values());
   }
 
   /** Finds a card by its ID */
-  private findCardById(cardId: number): PokemonCard | undefined {
+  private findCardById(cardId: number): PokemonCardModel | undefined {
     return Array.from(this.cards.values()).find((c) => c.id === cardId);
   }
 
@@ -567,15 +564,15 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   /** Returns collection statistics for a user */
   retrieveCollectionStats(userId: bigint): Promise<{
     sets: {
-      set: PokemonSet;
+      set: PokemonSetModel;
       cards: {
-        card: PokemonCard;
+        card: PokemonCardModel;
         ownershipStatus: CardOwnershipStatus;
       }[];
       boosters: {
-        booster: PokemonBooster;
+        booster: PokemonBoosterModel;
         cards: {
-          card: PokemonCard;
+          card: PokemonCardModel;
           ownershipStatus: CardOwnershipStatus;
         }[];
       }[];
@@ -649,7 +646,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   async updateBoosterShinyRarity(
     boosterId: number,
     hasShinyRarity: boolean,
-  ): Promise<PokemonBooster> {
+  ): Promise<PokemonBoosterModel> {
     const booster = Array.from(this.boosters.values()).find(
       (b) => b.id === boosterId,
     );
@@ -668,7 +665,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   async updateBoosterSixPacks(
     boosterId: number,
     hasSixPacks: boolean,
-  ): Promise<PokemonBooster> {
+  ): Promise<PokemonBoosterModel> {
     const booster = Array.from(this.boosters.values()).find(
       (b) => b.id === boosterId,
     );

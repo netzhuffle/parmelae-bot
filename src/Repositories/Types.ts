@@ -5,20 +5,24 @@
  * See https://www.prisma.io/docs/concepts/components/prisma-client/advanced-type-safety/operating-against-partial-structures-of-model-types#problem-using-variations-of-the-generated-model-type.
  */
 
-import { Message, Prisma } from '@prisma/client';
+import {
+  MessageModel,
+  MessageDefaultArgs,
+  MessageGetPayload,
+} from '../generated/prisma/models/Message.js';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type HasTelegramMessageId = {
-  telegramMessageId: NonNullable<Message['telegramMessageId']>;
+  telegramMessageId: NonNullable<MessageModel['telegramMessageId']>;
 };
 
 /** Message coming from Telegram. */
-export type TelegramMessage = Message & HasTelegramMessageId;
+export type TelegramMessage = MessageModel & HasTelegramMessageId;
 
 /** Type value for a message including relations. */
-const MESSAGE_WITH_RELATIONS = Prisma.validator<Prisma.MessageDefaultArgs>()({
+const MESSAGE_WITH_RELATIONS = {
   include: {
     chat: true,
     from: true,
@@ -33,10 +37,10 @@ const MESSAGE_WITH_RELATIONS = Prisma.validator<Prisma.MessageDefaultArgs>()({
       },
     },
   },
-});
+} satisfies MessageDefaultArgs;
 
 /** Message including relations. */
-export type MessageWithRelations = Prisma.MessageGetPayload<
+export type MessageWithRelations = MessageGetPayload<
   typeof MESSAGE_WITH_RELATIONS
 >;
 
@@ -54,84 +58,79 @@ export type UnstoredMessageWithRelations = Omit<
   'id' | 'replyToMessage'
 > &
   HasTelegramMessageId & {
-    replyToMessage: (Omit<Message, 'id'> & HasTelegramMessageId) | null;
+    replyToMessage: (Omit<MessageModel, 'id'> & HasTelegramMessageId) | null;
   };
 
 /** Type value for a message including the user relation. */
-const MESSAGE_WITH_USER_RELATION =
-  Prisma.validator<Prisma.MessageDefaultArgs>()({
-    include: {
-      from: true,
-    },
-  });
+const MESSAGE_WITH_USER_RELATION = {
+  include: {
+    from: true,
+  },
+} satisfies MessageDefaultArgs;
 
 /** Message including the user relation. */
-export type MessageWithUser = Prisma.MessageGetPayload<
+export type MessageWithUser = MessageGetPayload<
   typeof MESSAGE_WITH_USER_RELATION
 >;
 
 /** Type value for a message including the reply-to relation. */
-const MESSAGE_WITH_REPLY_TO_RELATION =
-  Prisma.validator<Prisma.MessageDefaultArgs>()({
-    include: {
-      replyToMessage: true,
-    },
-  });
+const MESSAGE_WITH_REPLY_TO_RELATION = {
+  include: {
+    replyToMessage: true,
+  },
+} satisfies MessageDefaultArgs;
 
 /** Telegram message including the reply-to relation. */
-export type TelegramMessageWithReplyTo = Prisma.MessageGetPayload<
+export type TelegramMessageWithReplyTo = MessageGetPayload<
   typeof MESSAGE_WITH_REPLY_TO_RELATION
 > &
   HasTelegramMessageId;
 
 /** Type value for a message including user and tool messages relations. */
-const MESSAGE_WITH_USER_AND_TOOL_MESSAGES =
-  Prisma.validator<Prisma.MessageDefaultArgs>()({
-    include: {
-      from: true,
-      toolMessages: true,
-    },
-  });
+const MESSAGE_WITH_USER_AND_TOOL_MESSAGES = {
+  include: {
+    from: true,
+    toolMessages: true,
+  },
+} satisfies MessageDefaultArgs;
 
 /** Message including user and tool messages relations. */
-export type MessageWithUserAndToolMessages = Prisma.MessageGetPayload<
+export type MessageWithUserAndToolMessages = MessageGetPayload<
   typeof MESSAGE_WITH_USER_AND_TOOL_MESSAGES
 >;
 
 /** Type value for a message including user, reply-to, and tool messages relations. */
-const MESSAGE_WITH_USER_REPLY_TO_AND_TOOL_MESSAGES =
-  Prisma.validator<Prisma.MessageDefaultArgs>()({
-    include: {
-      from: true,
-      replyToMessage: true,
-      toolMessages: true,
-    },
-  });
+const MESSAGE_WITH_USER_REPLY_TO_AND_TOOL_MESSAGES = {
+  include: {
+    from: true,
+    replyToMessage: true,
+    toolMessages: true,
+  },
+} satisfies MessageDefaultArgs;
 
 /** Message including user, reply-to, and tool messages relations. */
-export type MessageWithUserReplyToAndToolMessages = Prisma.MessageGetPayload<
+export type MessageWithUserReplyToAndToolMessages = MessageGetPayload<
   typeof MESSAGE_WITH_USER_REPLY_TO_AND_TOOL_MESSAGES
 >;
 
 /** Type value for a message including user, reply-to, tool messages, and tool call messages relations. */
-const MESSAGE_WITH_USER_REPLY_TO_TOOL_MESSAGES_AND_TOOL_CALL_MESSAGES =
-  Prisma.validator<Prisma.MessageDefaultArgs>()({
-    include: {
-      from: true,
-      replyToMessage: true,
-      toolMessages: true,
-      toolCallMessages: {
-        include: {
-          from: true,
-          replyToMessage: true,
-          toolMessages: true,
-        },
+const MESSAGE_WITH_USER_REPLY_TO_TOOL_MESSAGES_AND_TOOL_CALL_MESSAGES = {
+  include: {
+    from: true,
+    replyToMessage: true,
+    toolMessages: true,
+    toolCallMessages: {
+      include: {
+        from: true,
+        replyToMessage: true,
+        toolMessages: true,
       },
     },
-  });
+  },
+} satisfies MessageDefaultArgs;
 
 /** Message including user, reply-to, tool messages, and tool call messages relations. */
 export type MessageWithUserReplyToToolMessagesAndToolCallMessages =
-  Prisma.MessageGetPayload<
+  MessageGetPayload<
     typeof MESSAGE_WITH_USER_REPLY_TO_TOOL_MESSAGES_AND_TOOL_CALL_MESSAGES
   >;

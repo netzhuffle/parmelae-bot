@@ -1,5 +1,7 @@
 import { describe, it, beforeEach, expect } from 'bun:test';
-import { PokemonCard, Rarity, PokemonSet } from '@prisma/client';
+import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
+import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
+import { Rarity } from '../generated/prisma/enums.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { PACK_CONFIG } from './PokemonTcgPocketProbabilityService.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
@@ -22,7 +24,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
   describe('Normal booster probabilities', () => {
     it('should calculate correct probabilities for normal boosters', () => {
       // Create a test booster with one card of each rarity
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         createCard(Rarity.TWO_DIAMONDS),
         createCard(Rarity.THREE_DIAMONDS),
         createCard(Rarity.FOUR_DIAMONDS),
@@ -46,7 +48,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('should handle diamond card probabilities correctly', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         createCard(Rarity.TWO_DIAMONDS),
         createCard(Rarity.THREE_DIAMONDS),
         createCard(Rarity.FOUR_DIAMONDS),
@@ -68,7 +70,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
   describe('Shiny booster probabilities', () => {
     it('should calculate correct probabilities for shiny boosters', () => {
       // Create a test booster with one card of each rarity including shinies
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         createCard(Rarity.TWO_DIAMONDS),
         createCard(Rarity.THREE_DIAMONDS),
         createCard(Rarity.FOUR_DIAMONDS),
@@ -94,7 +96,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('should calculate combined probability (including god pack) when shiny and all god pack cards are missing', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         createCard(Rarity.ONE_STAR),
         createCard(Rarity.TWO_STARS),
         createCard(Rarity.THREE_STARS),
@@ -118,7 +120,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
 
   describe('God pack branch (isolated via config)', () => {
     it('should return 1 when forcing all packs to be god packs and all god pack cards are missing', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         createCard(Rarity.ONE_STAR),
         createCard(Rarity.TWO_STARS),
         createCard(Rarity.THREE_STARS),
@@ -163,7 +165,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('should return 0 when there are no missing cards', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         createCard(Rarity.TWO_DIAMONDS),
         createCard(Rarity.THREE_DIAMONDS),
       ];
@@ -179,7 +181,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
 
     it('should handle mixed booster types correctly', () => {
       // Create a booster with both normal and shiny cards
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         createCard(Rarity.TWO_DIAMONDS),
         createCard(Rarity.ONE_SHINY),
       ];
@@ -208,7 +210,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
   describe('calculateNewCardProbability', () => {
     it('should return 0 when no cards are missing', () => {
       const boosterCards = createTestCards();
-      const missingCards: PokemonCard[] = [];
+      const missingCards: PokemonCardModel[] = [];
 
       const probability = service.calculateNewCardProbability(
         boosterCards,
@@ -283,8 +285,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('should handle empty booster', () => {
-      const boosterCards: PokemonCard[] = [];
-      const missingCards: PokemonCard[] = [];
+      const boosterCards: PokemonCardModel[] = [];
+      const missingCards: PokemonCardModel[] = [];
 
       const probability = service.calculateNewCardProbability(
         boosterCards,
@@ -337,8 +339,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('should handle empty booster for diamond probability', () => {
-      const boosterCards: PokemonCard[] = [];
-      const missingCards: PokemonCard[] = [];
+      const boosterCards: PokemonCardModel[] = [];
+      const missingCards: PokemonCardModel[] = [];
 
       const probability = service.calculateNewDiamondCardProbability(
         boosterCards,
@@ -370,7 +372,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           isSixPackOnly: false,
         },
       ];
-      const missingCards: PokemonCard[] = [];
+      const missingCards: PokemonCardModel[] = [];
 
       const probability = service.calculateNewTradableCardProbability(
         boosterCards,
@@ -561,12 +563,12 @@ describe('PokemonTcgPocketProbabilityService', () => {
         isSixPackOnly: true,
         boosters: [],
         ownership: [],
-        set: { id: 1, key: 'TEST', name: 'Test Set' } as PokemonSet,
+        set: { id: 1, key: 'TEST', name: 'Test Set' } as PokemonSetModel,
       } as PokemonCardWithRelations;
     }
 
     it('excludes isSixPackOnly from slots 1–5 and god packs; six-pack only contributes when only six-only cards are missing', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         // Non-six-only cards to populate normal/god pools
         createCard(Rarity.ONE_DIAMOND),
         createCard(Rarity.TWO_DIAMONDS),
@@ -578,7 +580,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       ];
 
       // Missing only the six-only cards
-      const missingCards: PokemonCard[] = [
+      const missingCards: PokemonCardModel[] = [
         sixOnlyCard(1001, Rarity.ONE_STAR),
         sixOnlyCard(1002, Rarity.THREE_DIAMONDS),
       ];
@@ -597,7 +599,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('slot-6 rarity distribution uses uniform split within same rarity', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         // Non-six-only noise
         createCard(Rarity.ONE_DIAMOND),
         // Three 3◆ six-only cards
@@ -607,7 +609,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       ];
 
       // Only one of the 3◆ six-only is missing
-      const missingCards: PokemonCard[] = [
+      const missingCards: PokemonCardModel[] = [
         sixOnlyCard(2001, Rarity.THREE_DIAMONDS),
       ];
 
@@ -625,7 +627,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('Ho-oh example: 1★ Magby and three 3◆ cards missing → six-pack branch equals weight', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         // Non-six-only noise
         createCard(Rarity.ONE_DIAMOND),
         // isSixPackOnly pools per example
@@ -634,7 +636,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         sixOnlyCard(3003, Rarity.THREE_DIAMONDS), // Kussilla 3◆
         sixOnlyCard(3004, Rarity.THREE_DIAMONDS), // Rabauz 3◆
       ];
-      const missingCards: PokemonCard[] = [
+      const missingCards: PokemonCardModel[] = [
         sixOnlyCard(3001, Rarity.ONE_STAR),
         sixOnlyCard(3002, Rarity.THREE_DIAMONDS),
         sixOnlyCard(3003, Rarity.THREE_DIAMONDS),
@@ -652,13 +654,13 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('excludes sixPackOnly from slots 1–5: only 3◆ six-only missing → normal and god contribute 0', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         // Provide at least one non-six-only ONE_DIAMOND so booster isn’t empty, but missing none
         createCard(Rarity.ONE_DIAMOND),
         // Only THREE_DIAMONDS available are six-pack-only
         sixOnlyCard(4001, Rarity.THREE_DIAMONDS),
       ];
-      const missingCards: PokemonCard[] = [
+      const missingCards: PokemonCardModel[] = [
         sixOnlyCard(4001, Rarity.THREE_DIAMONDS),
       ];
 
@@ -676,13 +678,15 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
 
     it('excludes sixPackOnly from god packs: only 1★ six-only missing → no god contribution', () => {
-      const boosterCards: PokemonCard[] = [
+      const boosterCards: PokemonCardModel[] = [
         // Provide non-six-only ONE_DIAMOND noise
         createCard(Rarity.ONE_DIAMOND),
         // Only ONE_STAR available is six-pack-only
         sixOnlyCard(5001, Rarity.ONE_STAR),
       ];
-      const missingCards: PokemonCard[] = [sixOnlyCard(5001, Rarity.ONE_STAR)];
+      const missingCards: PokemonCardModel[] = [
+        sixOnlyCard(5001, Rarity.ONE_STAR),
+      ];
 
       const p = service.calculateNewCardProbability(
         boosterCards,
@@ -719,7 +723,7 @@ function createTestCards(): PokemonCardWithRelations[] {
           name: 'Test Set',
           id: 1,
           key: 'TEST',
-        } as PokemonSet,
+        } as PokemonSetModel,
       } as PokemonCardWithRelations);
     }
   }
@@ -741,6 +745,6 @@ function createCard(rarity: Rarity): PokemonCardWithRelations {
       name: 'Test Set',
       id: 0,
       key: 'TEST',
-    } as PokemonSet,
+    } as PokemonSetModel,
   } as PokemonCardWithRelations;
 }

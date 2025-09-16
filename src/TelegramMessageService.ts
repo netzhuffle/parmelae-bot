@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
 import { MessageStorageService } from './MessageStorageService.js';
-import { Chat, User } from '@prisma/client';
+import { ChatModel } from './generated/prisma/models/Chat.js';
+import { UserModel } from './generated/prisma/models/User.js';
 import assert from 'assert';
 import {
   TelegramMessageWithRelations,
@@ -94,7 +95,7 @@ export class TelegramMessageService {
     return unixTimestamp ? this.getDate(unixTimestamp) : null;
   }
 
-  private getChat(telegramChat: Typegram.Chat): Chat {
+  private getChat(telegramChat: Typegram.Chat): ChatModel {
     return {
       id: BigInt(telegramChat.id),
       type: telegramChat.type,
@@ -107,7 +108,7 @@ export class TelegramMessageService {
     };
   }
 
-  private getUser(telegramUser: Typegram.User): User {
+  private getUser(telegramUser: Typegram.User): UserModel {
     return {
       id: BigInt(telegramUser.id),
       isBot: telegramUser.is_bot,

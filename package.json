@@ -23,6 +23,7 @@
     "@langchain/openai": "^0.6.11",
     "@prisma/client": "^6.16.1",
     "@sentry/node": "^10.11.0",
+    "@synapsenwerkstatt/prisma-bun-sqlite-adapter": "^1.2.2",
     "cheerio": "^1.1.2",
     "hnswlib-node": "^3.0.0",
     "inversify": "^7.9.1",

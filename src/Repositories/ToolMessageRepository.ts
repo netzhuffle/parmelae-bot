@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/prisma/client.js';
 
 /**
  * Repository for managing tool message persistence.

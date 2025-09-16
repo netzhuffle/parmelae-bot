@@ -9,8 +9,34 @@ alwaysApply: false
   - **Implement same interface** as the real service/repository
   - **Track method calls** for verification in tests
   - **Provide reset functionality** for test isolation
+  - **Use direct model imports** following Prisma Rust-free ORM patterns (see [prisma.mdc](mdc:.cursor/rules/prisma.mdc))
 
-- **Fake Class Structure:**
+- **Fake Class Structure with Prisma Models:**
+  ```typescript
+  // ✅ DO: Import models directly for type-only usage
+  import { MessageModel } from '../generated/prisma/models/Message.js';
+  import { ToolMessageModel } from '../generated/prisma/models/ToolMessage.js';
+
+  export class MessageRepositoryFake {
+    // Use the Model suffix for clarity
+    private messages: MessageModel[] = [];
+    public getCallArgs: number[] = [];
+
+    async get(id: number): Promise<MessageModel> {
+      this.getCallArgs.push(id);
+      const message = this.messages.find(m => m.id === id);
+      if (!message) throw new Error(`Message ${id} not found`);
+      return message;
+    }
+
+    reset(): void {
+      this.messages = [];
+      this.getCallArgs = [];
+    }
+  }
+  ```
+
+- **General Fake Class Structure:**
   ```typescript
   // ✅ DO: Complete fake implementation
   export class ServiceFake {

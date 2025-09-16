@@ -4,7 +4,7 @@ import { MessageWithUser, TelegramMessage } from './Repositories/Types.js';
 import { OldMessageReplyGenerator } from './MessageGenerators/OldMessageReplyGenerator.js';
 import { ChatGptService } from './ChatGptService.js';
 import { injectable } from 'inversify';
-import { Message } from '@prisma/client';
+import { MessageModel } from './generated/prisma/models/Message.js';
 
 /**
  * Minimum length to consider reply to a message.
@@ -53,7 +53,7 @@ export class OldMessageReplyService {
     }
   }
 
-  private isTelegramMessage(message: Message): message is TelegramMessage {
+  private isTelegramMessage(message: MessageModel): message is TelegramMessage {
     return message.telegramMessageId !== null;
   }
 

@@ -4,7 +4,7 @@ import {
   Sets,
 } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { Rarity, OwnershipStatus } from '@prisma/client';
+import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
 import { PokemonTcgPocketRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketRepository.js';
 import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 import { ToolContext } from '../ChatGptAgentService.js';

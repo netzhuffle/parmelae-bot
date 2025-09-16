@@ -5,7 +5,7 @@ import {
   Card,
 } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
-import { Rarity, OwnershipStatus } from '@prisma/client';
+import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 

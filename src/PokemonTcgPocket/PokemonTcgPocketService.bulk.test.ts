@@ -2,7 +2,7 @@ import { describe, beforeEach, it, expect } from 'bun:test';
 import { PokemonTcgPocketService, Sets } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
-import { OwnershipStatus } from '@prisma/client';
+import { OwnershipStatus } from '../generated/prisma/enums.js';
 
 describe('PokemonTcgPocketService bulk operations', () => {
   let service: PokemonTcgPocketService;

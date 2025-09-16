@@ -7,7 +7,7 @@ import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/Pokemo
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 import { pokemonCardRangeAddTool } from './pokemonCardRangeAddTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
-import { OwnershipStatus } from '@prisma/client';
+import { OwnershipStatus } from '../generated/prisma/enums.js';
 
 describe('pokemonCardRangeAdd', () => {
   let repository: PokemonTcgPocketRepositoryFake;

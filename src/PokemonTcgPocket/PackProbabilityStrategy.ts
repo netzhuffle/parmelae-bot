@@ -1,4 +1,4 @@
-import { Rarity } from '@prisma/client';
+import { Rarity } from '../generated/prisma/enums.js';
 
 /** Interface for pack probability strategies */
 export interface PackProbabilityStrategy {

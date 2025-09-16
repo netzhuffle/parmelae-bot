@@ -2592,11 +2592,79 @@
             "testStrategy": ""
           }
         ]
+      },
+      {
+        "id": 58,
+        "title": "Migrate to Prisma's Rust-free ORM with @synapsenwerkstatt/prisma-bun-sqlite-adapter",
+        "description": "Migrate the project to Prisma ORM v6.16.0's new Rust-free architecture using the Bun SQLite adapter to reduce bundle size, improve performance, and simplify deployment.",
+        "details": "1. Update the Prisma generator configuration in schema.prisma to use the new ESM-first 'prisma-client' with 'engineType: client' and enable 'queryCompiler' and 'driverAdapters' preview features as per Prisma v6.16.0 documentation.\n2. Remove any existing 'binaryTargets' configuration from the Prisma schema to avoid Rust binary dependencies.\n3. Install the '@synapsenwerkstatt/prisma-bun-sqlite-adapter' package and configure it as the database driver adapter for SQLite in the PrismaClient instantiation.\n4. Modify all PrismaClient instantiations in the codebase to use the Bun SQLite adapter, ensuring compatibility with the new client API.\n5. Thoroughly test all database operations (queries, mutations, transactions) to verify full compatibility and performance improvements.\n6. Update the CI/CD pipeline scripts and environment to remove Rust toolchain dependencies, reflecting the new Rust-free Prisma setup.\n7. Document the migration steps and any changes in developer setup or deployment processes.\n\nThis migration leverages the existing Bun runtime migration (Task 41) and Bun package management migration (Task 42) to ensure smooth integration with the Bun ecosystem and maximize performance and deployment benefits.",
+        "testStrategy": "1. Unit and Integration Testing:\n   - Run the full test suite using Bun's test runner to verify all database-related tests pass without regressions.\n   - Add tests if necessary to cover edge cases with the new Prisma client and Bun SQLite adapter.\n2. Performance Benchmarking:\n   - Measure query execution times and CPU usage before and after migration to confirm expected improvements.\n3. Deployment Validation:\n   - Deploy the application in a staging environment to verify that no Rust binaries are required and that deployment complexity is reduced.\n4. CI/CD Pipeline Verification:\n   - Run the updated CI/CD pipeline to ensure it completes successfully without Rust dependencies.\n5. Developer Experience:\n   - Confirm that local development setup works seamlessly without Rust toolchain installation.\n\nAll tests should confirm that the application behaves identically or better compared to the previous Prisma setup, with no loss of functionality or stability.",
+        "status": "pending",
+        "dependencies": [
+          41,
+          42
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Update .gitignore for Generated Client",
+            "description": "Add /src/generated/prisma to .gitignore to prevent compatibility issues with query engine binaries across different machines.",
+            "details": "The new ESM-first generator creates a directory with query engine binaries that can cause compatibility issues when committed to version control. Adding this to .gitignore is critical for deployment reliability.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 58
+          },
+          {
+            "id": 2,
+            "title": "Update Import Paths to Generated Client",
+            "description": "Update 31 files that import from '@prisma/client' to use the new ESM-first generated client paths for PrismaClient, enums, models, and Prisma namespace.",
+            "details": "Systematically update imports across the codebase:\n- PrismaClient: from '@prisma/client' to '../generated/prisma/client' \n- Enums (Rarity, OwnershipStatus): from '@prisma/client' to '../generated/prisma/enums'\n- Models (Message, Chat, User, etc): from '@prisma/client' to '../generated/prisma/models' or '../generated/prisma/client'  \n- Prisma namespace: from '@prisma/client' to '../generated/prisma/client'\n\nFiles identified: 31 total across repositories, services, tools, and tests.",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "parentTaskId": 58
+          },
+          {
+            "id": 3,
+            "title": "Validate Migration and Run Tests",
+            "description": "Comprehensive testing to ensure the Rust-free ORM migration works correctly with all database operations, TypeScript compilation, and application functionality.",
+            "details": "Execute validation steps in order:\n1. Regenerate Prisma client: bun prisma generate\n2. Run TypeScript compilation: bun run typecheck  \n3. Run full test suite: bun test\n4. Test application startup: bun run run-dev (basic connectivity test)\n5. Verify no Rust binaries are required during runtime\n6. Measure performance improvements (query speed, bundle size)\n7. Ensure all existing functionality works without regressions",
+            "status": "done",
+            "dependencies": [
+              2
+            ],
+            "parentTaskId": 58
+          },
+          {
+            "id": 4,
+            "title": "Update CI/CD Pipeline for Rust-free Setup",
+            "description": "Remove Rust toolchain dependencies from CI/CD pipelines and verify deployment works without Rust binaries, achieving simplified deployment complexity.",
+            "details": "Review and update deployment infrastructure:\n1. Examine .github/workflows/*.yml for Rust dependencies\n2. Remove any Rust toolchain installation steps  \n3. Verify Node.js version requirements for Prisma CLI operations\n4. Test that deployment pipeline runs successfully without Rust\n5. Update any Docker files if present to remove Rust dependencies\n6. Confirm reduced deployment complexity and faster build times",
+            "status": "done",
+            "dependencies": [
+              3
+            ],
+            "parentTaskId": 58
+          },
+          {
+            "id": 5,
+            "title": "Document Migration and Performance Gains",
+            "description": "Create comprehensive documentation of the Rust-free ORM migration including benefits achieved, breaking changes, and troubleshooting guide for future developers.",
+            "details": "Document the migration comprehensively:\n1. Record performance improvements achieved (~90% bundle size reduction, query speed improvements)\n2. Document new import patterns for future developers\n3. Create troubleshooting guide for common issues\n4. Update development setup instructions\n5. Document breaking changes from @prisma/client to generated client\n6. Record rollback procedure if needed\n7. Update any relevant README sections about database setup\n8. Document benefits: faster deployments, no Rust toolchain requirements, improved DX",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "parentTaskId": 58
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-09-03T12:54:36.276Z",
+      "updated": "2025-09-14T06:31:11.490Z",
       "description": "Tasks for master context"
     }
   }

@@ -5,7 +5,8 @@ import { ChatOpenAI } from '@langchain/openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { Octokit } from 'octokit';
 import { OpenAI } from 'openai';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './generated/prisma/client.js';
+import { PrismaBunSQLite } from '@synapsenwerkstatt/prisma-bun-sqlite-adapter';
 import { Config } from './Config.js';
 import { Telegraf } from 'telegraf';
 import {
@@ -99,11 +100,14 @@ container.bind(OpenAI).toDynamicValue(
     }),
 );
 container.bind(PrismaClient).toDynamicValue(() => {
-  const prismaClient = new PrismaClient({
-    errorFormat: 'pretty',
+  const adapter = new PrismaBunSQLite({
+    url: 'file:./prisma/sqlite.db',
   });
 
-  return prismaClient;
+  return new PrismaClient({
+    adapter,
+    errorFormat: 'pretty',
+  });
 });
 container
   .bind(Telegraf)

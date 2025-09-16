@@ -5,12 +5,53 @@ alwaysApply: false
 ---
 # Prisma Type Safety Patterns
 
+## Prisma Rust-free ORM Import Patterns (v6.16.0+)
+
+- **Type-Only Files Pattern:**
+  ```typescript
+  // ✅ DO: Import specific types from direct model files
+  import { MessageModel } from '../generated/prisma/models/Message.js';
+  import { ChatModel } from '../generated/prisma/models/Chat.js';
+  import { UserModel } from '../generated/prisma/models/User.js';
+  import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
+  ```
+
+- **Runtime Files Pattern:**
+  ```typescript
+  // ✅ DO: Keep client.js for PrismaClient and Prisma namespace
+  import { PrismaClient, Prisma } from '../generated/prisma/client.js';
+  // ✅ DO: Import types directly for type annotations
+  import { MessageModel } from '../generated/prisma/models/Message.js';
+  import { ChatModel } from '../generated/prisma/models/Chat.js';
+  
+  @injectable()
+  export class MessageRepository {
+    constructor(private readonly prisma: PrismaClient) {}
+    
+    async create(message: Omit<MessageModel, 'id'>): Promise<MessageModel> {
+      return this.prisma.message.create({ data: message });
+    }
+  }
+  ```
+
+- **Import Anti-Patterns:**
+  ```typescript
+  // ❌ DON'T: Use barrel imports from models.js
+  import { MessageModel, ChatModel } from '../generated/prisma/models.js';
+  
+  // ❌ DON'T: Import models from client.js
+  import { Message } from '../generated/prisma/client.js';
+  ```
+
 ## Custom Type Creation
 
-- **Type Validator Pattern:**
+- **Modern Type Creation Pattern (Rust-free ORM):**
   ```typescript
+  // ✅ DO: Import types directly for type-only files
+  import { MessageModel, MessageDefaultArgs, MessageGetPayload } from '../generated/prisma/models/Message.js';
+
   /** Type value for a message including relations. */
-  const MESSAGE_WITH_RELATIONS = Prisma.validator<Prisma.MessageDefaultArgs>()({
+  const MESSAGE_WITH_RELATIONS = {
     include: {
       chat: true,
       from: true,
@@ -20,10 +61,10 @@ alwaysApply: false
         },
       },
     },
-  });
+  } satisfies MessageDefaultArgs;
 
   /** Message including relations. */
-  export type MessageWithRelations = Prisma.MessageGetPayload<
+  export type MessageWithRelations = MessageGetPayload<
     typeof MESSAGE_WITH_RELATIONS
   >;
   ```
@@ -61,12 +102,12 @@ alwaysApply: false
 
 - **Conditional Type Usage:**
   ```typescript
-  // Use intersection types for additional constraints
-  export type TelegramMessage = Message & HasTelegramMessageId;
+  // ✅ DO: Use intersection types for additional constraints
+  export type TelegramMessage = MessageModel & HasTelegramMessageId;
   
-  // Create constraint types for specific requirements
+  // ✅ DO: Create constraint types for specific requirements
   type HasTelegramMessageId = {
-    telegramMessageId: NonNullable<Message['telegramMessageId']>;
+    telegramMessageId: NonNullable<MessageModel['telegramMessageId']>;
   };
   ```
 
@@ -180,12 +221,22 @@ alwaysApply: false
 
 ## Common Anti-Patterns
 
+**Import Anti-Patterns:**
+- ❌ **DON'T:** Use barrel imports from `models.js` or `client.js`
+- ❌ **DON'T:** Use deprecated `Prisma.validator` in Rust-free ORM
+
+**Development Anti-Patterns:**
 - ❌ **DON'T:** Use `any` type with Prisma operations
 - ❌ **DON'T:** Create overly complex nested includes
 - ❌ **DON'T:** Ignore unique constraints in schema design
 - ❌ **DON'T:** Skip error handling in repository methods
 
-- ✅ **DO:** Use Prisma's generated types
+**Best Practices:**
+- ✅ **DO:** Use direct model imports for type-only files
+- ✅ **DO:** Keep `client.js` imports only for runtime operations
+- ✅ **DO:** Use `satisfies` operator for type validation
+- ✅ **DO:** Import enums from `enums.js`
+- ✅ **DO:** Use Prisma's generated types consistently
 - ✅ **DO:** Create custom types for complex queries
 - ✅ **DO:** Handle database errors gracefully
 - ✅ **DO:** Use proper relation naming conventions

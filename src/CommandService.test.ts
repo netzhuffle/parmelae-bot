@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, mock, expect } from 'bun:test';
-import { Message } from '@prisma/client';
+import { MessageModel } from './generated/prisma/models/Message.js';
 import { CommandService } from './CommandService.js';
 import { Commands } from './Command.js';
 import { ReplyGenerator } from './MessageGenerators/ReplyGenerator.js';
@@ -48,7 +48,7 @@ describe('CommandService', () => {
     };
     replyGenerator.generate = mock(
       async (
-        message: Message,
+        message: MessageModel,
         announceToolCall: (text: string) => Promise<number | null>,
       ) => {
         const messageId = await announceToolCall('Using tool X');

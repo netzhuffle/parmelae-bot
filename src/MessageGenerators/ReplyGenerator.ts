@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { ChatGptAgentService } from '../ChatGptAgentService.js';
-import { Message } from '@prisma/client';
+import { MessageModel } from '../generated/prisma/models/Message.js';
 import { ConversationService } from '../ConversationService.js';
 import { Config } from '../Config.js';
 import { SchiParmelaeIdentity } from './Identities/SchiParmelaeIdentity.js';
@@ -33,7 +33,7 @@ export class ReplyGenerator {
    * @return The reply text and tool call message IDs
    */
   async generate(
-    message: Message,
+    message: MessageModel,
     announceToolCall: (text: string) => Promise<number | null>,
   ): Promise<ReplyGeneratorResponse> {
     const identity =

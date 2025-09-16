@@ -1,4 +1,7 @@
-import { Chat, Message, Prisma, PrismaClient, User } from '@prisma/client';
+import { Prisma, PrismaClient } from '../generated/prisma/client.js';
+import { ChatModel } from '../generated/prisma/models/Chat.js';
+import { MessageModel } from '../generated/prisma/models/Message.js';
+import { UserModel } from '../generated/prisma/models/User.js';
 import { injectable } from 'inversify';
 import assert from 'node:assert/strict';
 import {
@@ -17,7 +20,7 @@ const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const SEVEN_DAYS_IN_MILLISECONDS = 7 * DAY_IN_MILLISECONDS;
 
 /** Include pattern for telegram messages with telegram-specific relations */
-const TELEGRAM_MESSAGE_INCLUDE = Prisma.validator<Prisma.MessageDefaultArgs>()({
+const TELEGRAM_MESSAGE_INCLUDE = {
   include: {
     chat: true,
     from: true,
@@ -32,24 +35,23 @@ const TELEGRAM_MESSAGE_INCLUDE = Prisma.validator<Prisma.MessageDefaultArgs>()({
       },
     },
   },
-});
+} satisfies Prisma.MessageDefaultArgs;
 
 /** Include pattern for conversation messages with full tool context */
-const CONVERSATION_MESSAGE_INCLUDE =
-  Prisma.validator<Prisma.MessageDefaultArgs>()({
-    include: {
-      from: true,
-      replyToMessage: true,
-      toolMessages: true,
-      toolCallMessages: {
-        include: {
-          from: true,
-          replyToMessage: true,
-          toolMessages: true,
-        },
+const CONVERSATION_MESSAGE_INCLUDE = {
+  include: {
+    from: true,
+    replyToMessage: true,
+    toolMessages: true,
+    toolCallMessages: {
+      include: {
+        from: true,
+        replyToMessage: true,
+        toolMessages: true,
       },
     },
-  });
+  },
+} satisfies Prisma.MessageDefaultArgs;
 
 /** Repository for messages */
 @injectable()
@@ -191,7 +193,7 @@ export class MessageRepository {
   }
 
   private connectChat(
-    chat: Chat,
+    chat: ChatModel,
   ): Prisma.ChatCreateNestedOneWithoutMessagesInput {
     return {
       connectOrCreate: {
@@ -206,7 +208,7 @@ export class MessageRepository {
   }
 
   private connectUser(
-    user: User,
+    user: UserModel,
   ): Prisma.UserCreateNestedOneWithoutMessagesInput {
     return {
       connectOrCreate: {
@@ -269,7 +271,7 @@ export class MessageRepository {
   }
 
   private isTelegramMessage(
-    message: Omit<Message, 'id'>,
+    message: Omit<MessageModel, 'id'>,
   ): message is TelegramMessage {
     return message.telegramMessageId !== null;
   }

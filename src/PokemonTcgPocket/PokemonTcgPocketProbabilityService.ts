@@ -1,4 +1,5 @@
-import { PokemonCard, Rarity } from '@prisma/client';
+import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
+import { Rarity } from '../generated/prisma/enums.js';
 import { injectable } from 'inversify';
 import {
   NormalPackProbabilityStrategy,
@@ -82,8 +83,8 @@ export class PokemonTcgPocketProbabilityService {
    * This considers both normal packs (99.95%) and god packs (0.05%).
    */
   calculateNewCardProbability(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
     hasShinyRarity: boolean,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
@@ -99,8 +100,8 @@ export class PokemonTcgPocketProbabilityService {
    * This considers only cards with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢.
    */
   calculateNewDiamondCardProbability(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
     hasShinyRarity: boolean,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
@@ -116,8 +117,8 @@ export class PokemonTcgPocketProbabilityService {
    * This considers only cards with rarities ♢, ♢♢, ♢♢♢, ♢♢♢♢, and ☆.
    */
   calculateNewTradableCardProbability(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
     hasShinyRarity: boolean,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
@@ -133,9 +134,9 @@ export class PokemonTcgPocketProbabilityService {
    * that matches the given rarity filter.
    */
   private calculateNewCardProbabilityForRarities(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
-    rarityFilter: (card: PokemonCard) => boolean,
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
+    rarityFilter: (card: PokemonCardModel) => boolean,
     hasShinyRarity: boolean,
   ): number {
     const filteredBoosterCards = boosterCards.filter(rarityFilter);
@@ -178,7 +179,7 @@ export class PokemonTcgPocketProbabilityService {
    * Determines whether a booster supports six-card packs by checking for cards
    * flagged with `isSixPackOnly`. Used for branching into three-way weighting.
    */
-  private isSixPackBooster(boosterCards: PokemonCard[]): boolean {
+  private isSixPackBooster(boosterCards: PokemonCardModel[]): boolean {
     return boosterCards.some((card) => card.isSixPackOnly === true);
   }
 
@@ -249,8 +250,8 @@ export class PokemonTcgPocketProbabilityService {
    * - Fifth card: Distribution according to CARD5_RARITY_DISTRIBUTION
    */
   private computeNormalPackChance(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
     hasShinyRarity: boolean,
   ): number {
     const probabilityNoNewCard =
@@ -266,8 +267,8 @@ export class PokemonTcgPocketProbabilityService {
    * Computes the probability of getting no new cards in the first five slots
    */
   private computeProbabilityNoNewCardInFirstFiveSlots(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
     hasShinyRarity: boolean,
   ): number {
     let probabilityNoNewCard = 1.0;
@@ -307,8 +308,8 @@ export class PokemonTcgPocketProbabilityService {
    * Computes the probability of getting no new cards in the guaranteed ONE_DIAMOND slots
    */
   private computeProbabilityNoNewCardInGuaranteedSlots(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
   ): number {
     const pNewInOneDiamondSlot = this.probabilityOfNewCardInRarity(
       Rarity.ONE_DIAMOND,
@@ -330,8 +331,8 @@ export class PokemonTcgPocketProbabilityService {
    * - Each eligible card has equal probability
    */
   private computeGodPackChance(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
   ): number {
     const { godPackCards, missingGodPackCards } = this.filterGodPackCards(
       boosterCards,
@@ -357,11 +358,11 @@ export class PokemonTcgPocketProbabilityService {
    * Filters cards that are eligible for god packs
    */
   private filterGodPackCards(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
   ): {
-    godPackCards: PokemonCard[];
-    missingGodPackCards: PokemonCard[];
+    godPackCards: PokemonCardModel[];
+    missingGodPackCards: PokemonCardModel[];
   } {
     const godPackCards = boosterCards.filter((card) =>
       this.isGodPackCard(card),
@@ -376,7 +377,7 @@ export class PokemonTcgPocketProbabilityService {
   /**
    * Checks if a card is eligible for god packs
    */
-  private isGodPackCard(card: PokemonCard): boolean {
+  private isGodPackCard(card: PokemonCardModel): boolean {
     return (
       card.rarity !== null &&
       GOD_PACK_RARITIES.has(card.rarity) &&
@@ -389,8 +390,8 @@ export class PokemonTcgPocketProbabilityService {
    */
   private computeNewCardProbabilityAcrossRarities(
     distribution: Map<Rarity, number>,
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
   ): number {
     let probabilityNewCard = 0.0;
 
@@ -412,8 +413,8 @@ export class PokemonTcgPocketProbabilityService {
    * with rarity distribution: 1★ = 12.9%, 3◆ = 87.1%.
    */
   private computeSixPackChance(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
     hasShinyRarity: boolean,
   ): number {
     // Probability of no new card in slots 1–5 (identical to normal pack)
@@ -439,8 +440,8 @@ export class PokemonTcgPocketProbabilityService {
    * P(1★) = 0.129, P(3◆) = 0.871. Within a rarity tier, uniform split.
    */
   private computeNewCardProbabilityInSixthSlot(
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
   ): number {
     const all1Star = boosterCards.filter(
       (c) => c.isSixPackOnly && c.rarity === Rarity.ONE_STAR,
@@ -479,8 +480,8 @@ export class PokemonTcgPocketProbabilityService {
    */
   private probabilityOfNewCardInRarity(
     rarity: Rarity,
-    boosterCards: PokemonCard[],
-    missingCards: PokemonCard[],
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
   ): number {
     // Treat isSixPackOnly cards as non-existent for slots 1–5 and god packs
     const cardsInRarity = boosterCards.filter(

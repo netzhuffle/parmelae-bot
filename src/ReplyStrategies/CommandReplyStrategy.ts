@@ -5,7 +5,7 @@ import { CommandService } from '../CommandService.js';
 import { Config } from '../Config.js';
 import { Command, Commands } from '../Command.js';
 import { TelegramService } from '../TelegramService.js';
-import { Message } from '@prisma/client';
+import { MessageModel } from '../generated/prisma/models/Message.js';
 import { TelegramMessageWithReplyTo } from '../Repositories/Types.js';
 
 /** Regex matching the command name. */
@@ -22,7 +22,7 @@ export class CommandReplyStrategy extends AllowlistedReplyStrategy {
     super(config);
   }
 
-  willHandleAllowlisted(message: Message): boolean {
+  willHandleAllowlisted(message: MessageModel): boolean {
     return COMMAND_NAME.test(message.text);
   }
 

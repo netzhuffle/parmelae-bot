@@ -1,12 +1,13 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
-  runtime       = "bun"
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  engineType = "client"
+  runtime    = "bun"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./sqlite.db?connection_limit=1"
+  url      = "file:./sqlite.db"
 }
 
 model Chat {

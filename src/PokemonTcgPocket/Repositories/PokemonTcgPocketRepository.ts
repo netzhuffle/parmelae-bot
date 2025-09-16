@@ -1,10 +1,8 @@
-import {
-  PrismaClient,
-  PokemonSet,
-  PokemonBooster,
-  PokemonCard,
-  Rarity,
-} from '@prisma/client';
+import { PrismaClient } from '../../generated/prisma/client.js';
+import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
+import { PokemonBoosterModel } from '../../generated/prisma/models/PokemonBooster.js';
+import { PokemonCardModel } from '../../generated/prisma/models/PokemonCard.js';
+import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
 import { injectable } from 'inversify';
 import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 import { PokemonTcgPocketNotFoundError } from '../Errors/PokemonTcgPocketNotFoundError.js';
@@ -14,7 +12,6 @@ import {
   OwnershipFilter,
   CardOwnershipStatus,
 } from '../PokemonTcgPocketService.js';
-import { OwnershipStatus } from '@prisma/client';
 import { NotExhaustiveSwitchError } from '../../NotExhaustiveSwitchError.js';
 
 /** Repository for Pokémon TCG Pocket data */
@@ -26,7 +23,7 @@ export class PokemonTcgPocketRepository {
   ) {}
 
   /** Retrieves a set by its key, or null if it doesn't exist */
-  async retrieveSetByKey(key: string): Promise<PokemonSet | null> {
+  async retrieveSetByKey(key: string): Promise<PokemonSetModel | null> {
     try {
       const set = await this.prisma.pokemonSet.findUnique({
         where: { key },
@@ -50,7 +47,7 @@ export class PokemonTcgPocketRepository {
   async retrieveBoosterByNameAndSetKey(
     name: string,
     setKey: string,
-  ): Promise<PokemonBooster | null> {
+  ): Promise<PokemonBoosterModel | null> {
     try {
       const setId = await this.resolveSetId(setKey);
       if (!setId) {
@@ -84,7 +81,7 @@ export class PokemonTcgPocketRepository {
   async retrieveCardByNumberAndSetKey(
     number: number,
     setKey: string,
-  ): Promise<PokemonCard | null> {
+  ): Promise<PokemonCardModel | null> {
     try {
       const setId = await this.resolveSetId(setKey);
       if (!setId) {
@@ -109,7 +106,7 @@ export class PokemonTcgPocketRepository {
   }
 
   /** Creates a new set */
-  async createSet(key: string, name: string): Promise<PokemonSet> {
+  async createSet(key: string, name: string): Promise<PokemonSetModel> {
     try {
       const set = await this.prisma.pokemonSet.create({
         data: {
@@ -130,7 +127,10 @@ export class PokemonTcgPocketRepository {
   }
 
   /** Creates a new booster */
-  async createBooster(name: string, setKey: string): Promise<PokemonBooster> {
+  async createBooster(
+    name: string,
+    setKey: string,
+  ): Promise<PokemonBoosterModel> {
     try {
       const setId = await this.resolveSetId(setKey);
       if (!setId) {
@@ -173,7 +173,7 @@ export class PokemonTcgPocketRepository {
     rarity: Rarity | null;
     boosterNames: string[];
     isSixPackOnly: boolean;
-  }): Promise<PokemonCard> {
+  }): Promise<PokemonCardModel> {
     try {
       const setId = await this.resolveSetId(setKey);
       if (!setId) {
@@ -425,15 +425,15 @@ export class PokemonTcgPocketRepository {
   /** Returns collection statistics for a user */
   async retrieveCollectionStats(userId: bigint): Promise<{
     sets: {
-      set: PokemonSet;
+      set: PokemonSetModel;
       cards: {
-        card: PokemonCard;
+        card: PokemonCardModel;
         ownershipStatus: CardOwnershipStatus;
       }[];
       boosters: {
-        booster: PokemonBooster;
+        booster: PokemonBoosterModel;
         cards: {
-          card: PokemonCard;
+          card: PokemonCardModel;
           ownershipStatus: CardOwnershipStatus;
         }[];
       }[];
@@ -560,7 +560,7 @@ export class PokemonTcgPocketRepository {
   async updateBoosterShinyRarity(
     boosterId: number,
     hasShinyRarity: boolean,
-  ): Promise<PokemonBooster> {
+  ): Promise<PokemonBoosterModel> {
     try {
       return this.prisma.pokemonBooster.update({
         where: { id: boosterId },
@@ -579,7 +579,7 @@ export class PokemonTcgPocketRepository {
   async updateBoosterSixPacks(
     boosterId: number,
     hasSixPacks: boolean,
-  ): Promise<PokemonBooster> {
+  ): Promise<PokemonBoosterModel> {
     try {
       return this.prisma.pokemonBooster.update({
         where: { id: boosterId },

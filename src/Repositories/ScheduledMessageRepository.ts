@@ -1,4 +1,5 @@
-import { PrismaClient, ScheduledMessage } from '@prisma/client';
+import { PrismaClient } from '../generated/prisma/client.js';
+import { ScheduledMessageModel } from '../generated/prisma/models/ScheduledMessage.js';
 import { injectable } from 'inversify';
 
 /** Repository for scheduled messages */
@@ -12,7 +13,7 @@ export class ScheduledMessageRepository {
     text: string,
     chatId: bigint,
     fromId: bigint,
-  ): Promise<ScheduledMessage> {
+  ): Promise<ScheduledMessageModel> {
     return this.prisma.scheduledMessage.create({
       data: {
         chatId,
@@ -24,14 +25,14 @@ export class ScheduledMessageRepository {
   }
 
   /** Deletes a scheduled message. */
-  async delete(id: number): Promise<ScheduledMessage> {
+  async delete(id: number): Promise<ScheduledMessageModel> {
     return this.prisma.scheduledMessage.delete({
       where: { id },
     });
   }
 
   /** Returns the list of all scheduled messages. */
-  retrieveAll(): Promise<ScheduledMessage[]> {
+  retrieveAll(): Promise<ScheduledMessageModel[]> {
     return this.prisma.scheduledMessage.findMany();
   }
 }
