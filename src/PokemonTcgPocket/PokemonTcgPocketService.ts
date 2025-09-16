@@ -286,9 +286,7 @@ export class PokemonTcgPocketService {
   ): Promise<string> {
     const displayName = userId ? await this.getDisplayName(userId) : 'Owned';
     const header = `ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by ${displayName}`;
-    const csvLines = await Promise.all(
-      cards.map((card) => this.formatCardAsCsv(card, userId)),
-    );
+    const csvLines = cards.map((card) => this.formatCardAsCsv(card, userId));
     return [header, ...csvLines].join('\n');
   }
 

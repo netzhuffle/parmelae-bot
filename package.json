@@ -17,18 +17,18 @@
     "migrate-prod": "prisma migrate deploy"
   },
   "dependencies": {
-    "@langchain/community": "^0.3.55",
-    "@langchain/core": "0.3.75",
+    "@langchain/community": "^0.3.56",
+    "@langchain/core": "0.3.76",
     "@langchain/langgraph": "^0.4.9",
-    "@langchain/openai": "^0.6.11",
+    "@langchain/openai": "^0.6.12",
     "@prisma/client": "^6.16.1",
     "@sentry/node": "^10.11.0",
     "@synapsenwerkstatt/prisma-bun-sqlite-adapter": "^1.2.2",
     "cheerio": "^1.1.2",
     "hnswlib-node": "^3.0.0",
-    "inversify": "^7.9.1",
+    "inversify": "^7.10.0",
     "inversify-inject-decorators": "^3.1.0",
-    "langchain": "^0.3.33",
+    "langchain": "^0.3.34",
     "octokit": "^5.0.3",
     "openai": "^4.104.0",
     "reflect-metadata": "^0.2.2",
@@ -38,17 +38,17 @@
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@types/bun": "1.2.21",
-    "@types/node": "^24.3.2",
+    "@types/node": "^24.5.0",
     "eslint": "^9.35.0",
     "eslint-plugin-promise": "^7.2.1",
     "prettier": "^3.6.2",
     "prisma": "^6.16.1",
     "task-master-ai": "^0.26.0",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.43.0",
+    "typescript-eslint": "^8.44.0",
     "yaml-validator": "^5.1.0"
   },
   "overrides": {
-    "@langchain/core": "0.3.75"
+    "@langchain/core": "0.3.76"
   }
 }
