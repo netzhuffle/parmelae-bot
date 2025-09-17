@@ -63,6 +63,31 @@ alwaysApply: false
   const service = container.get(SomeService);
   ```
 
+- **ToolContext Security (CRITICAL):**
+  - **NEVER expose full Config object** in ToolContext - major security risk
+  - **Only include specific properties** tools actually need (principle of least privilege)
+  - **Use structured objects** instead of cluttering context with many individual properties
+  
+  ```typescript
+  // ✅ DO: Secure, minimal context exposure
+  export interface ToolContext {
+    chatId: bigint;
+    userId: bigint;
+    telegramService: TelegramService;
+    identityByChatId: Map<bigint, Identity>;      // Only needed map, not full Config
+    identities: {                                 // Structured object
+      schiParmelae: SchiParmelaeIdentity;
+      emulator: EmulatorIdentity;
+    };
+  }
+  
+  // ❌ DON'T: Expose entire config object (security vulnerability)
+  export interface ToolContext {
+    config: Config;  // Contains sensitive data like API keys!
+    // ... other fields
+  }
+  ```
+
 - **Error Handling:**
   - **Return error messages as strings** rather than throwing exceptions
   - **Provide context** in error messages for user understanding
@@ -100,12 +125,73 @@ alwaysApply: false
   - **Test tool description and name** are properly configured
   - **Test integration** - Ensure tool is registered and available (not just unit functionality)
 
+- **Testing Patterns:**
+  ```typescript
+  // ✅ DO: Use createTestToolConfig for context mocking
+  import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
+  
+  describe('myTool', () => {
+    let mockService: ServiceFake;
+    let config: { configurable: ToolContext };
+    
+    beforeEach(() => {
+      mockService = new ServiceFake();
+      config = createTestToolConfig({
+        chatId: BigInt('123456789'),
+        userId: BigInt('987654321'),
+        myService: mockService,
+        // Only provide the context properties your tool actually needs
+      });
+    });
+    
+    it('should handle success case', async () => {
+      const result = await myTool.invoke({ input: 'test' }, config);
+      expect(result).toBe('Expected result');
+      expect(mockService.methodCallArgs).toEqual(['test']);
+    });
+    
+    it('should handle error case', async () => {
+      mockService.shouldThrowError = true;
+      const result = await myTool.invoke({ input: 'test' }, config);
+      expect(result).toMatch(/Error:/);
+    });
+  });
+  ```
+
 - **File Organization:**
   - **Tool files** in `src/Tools/` directory
-  - **Factories are deprecated and must not be used.** All tool dependencies must be provided via the config argument (dependency injection). Migrate any remaining factories to use config-based injection.
+  - **Factories are DEPRECATED and FORBIDDEN** - All tool dependencies must be provided via the config argument (dependency injection)
+  - **When migrating legacy tools**: Delete factory classes, update ChatGptAgentService to inject dependencies via ToolContext, update all tests
   - **Inline descriptions** for most tools (preferred for simplicity)
   - **Constants file** only for descriptions/messages that require typographical apostrophes (’) (e.g., Pokémon tools use `texts.ts`).
   - **Related tools** grouped by functionality (e.g., Pokémon tools, GitHub tools)
+
+- **Modern Tool Migration Pattern:**
+  ```typescript
+  // ✅ DO: Modern tool function pattern
+  export const myTool = tool(
+    (input: MyToolInput, config: LangGraphRunnableConfig): string => {
+      const context = getToolContext(config);
+      // Use context.someService directly
+      return context.someService.process(input.data);
+    },
+    {
+      name: 'my-tool',
+      description: 'Tool description',
+      schema: mySchema,
+    },
+  );
+  
+  // ❌ DON'T: Legacy class-based tools with factories
+  export class MyTool extends StructuredTool {
+    constructor(private someService: SomeService) { super(); }
+    // ... legacy implementation
+  }
+  
+  export class MyToolFactory {
+    create(): MyTool { return new MyTool(this.someService); }
+  }
+  ```
 
 - **Documentation Standards:**
   - **JSDoc comments** for exported tools explaining purpose and usage

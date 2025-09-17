@@ -17,6 +17,9 @@ import { GitHubToolFactory } from './Tools/GitHubToolFactory.js';
 import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
 import { Config } from './Config.js';
+import { SchiParmelaeIdentity } from './MessageGenerators/Identities/SchiParmelaeIdentity.js';
+import { EmulatorIdentity } from './MessageGenerators/Identities/EmulatorIdentity.js';
+import { Identity } from './MessageGenerators/Identities/Identity.js';
 import { StructuredTool, Tool } from '@langchain/core/tools';
 import { MessageModel } from './generated/prisma/models/Message.js';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
@@ -24,8 +27,8 @@ import { CallbackHandler } from './CallbackHandler.js';
 import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
 import { ErrorService } from './ErrorService.js';
 import { Conversation } from './Conversation.js';
-import { IdentityQueryToolFactory } from './Tools/IdentityQueryToolFactory.js';
-import { IdentitySetterToolFactory } from './Tools/IdentitySetterToolFactory.js';
+import { identityQueryTool } from './Tools/identityQueryTool.js';
+import { identitySetterTool } from './Tools/identitySetterTool.js';
 import { diceTool } from './Tools/diceTool.js';
 import { dallETool } from './Tools/dallETool.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
@@ -54,6 +57,11 @@ export interface ToolContext {
   dallEService: DallEService;
   dallEPromptGenerator: DallEPromptGenerator;
   pokemonTcgPocketService: PokemonTcgPocketService;
+  identityByChatId: Map<bigint, Identity>;
+  identities: {
+    schiParmelae: SchiParmelaeIdentity;
+    emulator: EmulatorIdentity;
+  };
 }
 
 function assertIsToolContext(value: unknown): asserts value is ToolContext {
@@ -65,6 +73,8 @@ function assertIsToolContext(value: unknown): asserts value is ToolContext {
   assert('dallEService' in value);
   assert('dallEPromptGenerator' in value);
   assert('pokemonTcgPocketService' in value);
+  assert('identityByChatId' in value);
+  assert('identities' in value);
 }
 
 /**
@@ -93,6 +103,11 @@ export function createTestToolConfig(context: Partial<ToolContext>): {
       dallEService: undefined as unknown as DallEService,
       dallEPromptGenerator: undefined as unknown as DallEPromptGenerator,
       pokemonTcgPocketService: undefined as unknown as PokemonTcgPocketService,
+      identityByChatId: undefined as unknown as Map<bigint, Identity>,
+      identities: undefined as unknown as {
+        schiParmelae: SchiParmelaeIdentity;
+        emulator: EmulatorIdentity;
+      },
       ...context,
     },
   };
@@ -106,6 +121,8 @@ export class ChatGptAgentService {
     diceTool,
     dallETool,
     dateTimeTool,
+    identityQueryTool,
+    identitySetterTool,
     pokemonCardSearchTool,
     pokemonCardAddTool,
     pokemonCardRangeAddTool,
@@ -121,10 +138,10 @@ export class ChatGptAgentService {
     private readonly dallEPromptGenerator: DallEPromptGenerator,
     private readonly callbackHandler: CallbackHandler,
     private readonly pokemonTcgPocketService: PokemonTcgPocketService,
+    private readonly schiParmelaeIdentity: SchiParmelaeIdentity,
+    private readonly emulatorIdentity: EmulatorIdentity,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
-    private readonly identityQueryToolFactory: IdentityQueryToolFactory,
-    private readonly identitySetterToolFactory: IdentitySetterToolFactory,
     gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     gptModelQueryTool: GptModelQueryTool,
@@ -208,8 +225,6 @@ export class ChatGptAgentService {
     const agent = this.agentStateGraphFactory.create({
       tools: [
         ...this.tools,
-        this.identityQueryToolFactory.create(message.chatId),
-        this.identitySetterToolFactory.create(message.chatId),
         this.scheduleMessageToolFactory.create(message.chatId, message.fromId),
         this.intermediateAnswerToolFactory.create(message.chatId),
       ],
@@ -233,6 +248,11 @@ export class ChatGptAgentService {
           dallEService: this.dallEService,
           dallEPromptGenerator: this.dallEPromptGenerator,
           pokemonTcgPocketService: this.pokemonTcgPocketService,
+          identityByChatId: this.config.identityByChatId,
+          identities: {
+            schiParmelae: this.schiParmelaeIdentity,
+            emulator: this.emulatorIdentity,
+          },
         } satisfies ToolContext,
         callbacks: [this.callbackHandler],
       },

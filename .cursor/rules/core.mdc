@@ -84,27 +84,30 @@ In plan mode, think and explain how to best implement the necessary changes for 
 
 If you discover any uncertainties regarding requirements, ask the questions during plan mode to make sure that later in act mode all requirements are clear instead of suggesting act mode directly. Avoid basic questions about next steps – as a Senior Software Engineer you are fully qualified to prioritise and execute projects from start to finish yourself. You can also research and read existing code for better understanding to refine the plan.
 
-If you discover anything missing in Taskmaster (including if your current task is not mentioned yet), update Taskmaster now.
+If you discover anything missing in Taskmaster (including if your current task is not mentioned yet), update Taskmaster now. This includes creating a task, researching its complexity, and expading to subtask. Or if you are already on a subtask, mark it as "in-progress" if it isn’t and if you find other changes needing to be done that are out of scope for the current subtask, then add additional subtasks for the task.
 
 # Act Mode
 
 Implement the changes as planned and confirmed by the user.
 
 1. Update all necessary documentation, including Taskmaster, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster/taskmaster.mdc).
-2. Add all substeps for the current subtask to your to-do list.
-3. Implement all changes for the current task, according to the plan from plan mode, the task and subtask description and details in Taskmaster and on your to-do list.
-4. Self-review your implementation through a high quality code review.
-5. Refactor the implementation for improving code quality. If there were any changes, go back to step 4.
-5. Run the checks.
-6. Make all checks pass. If there were any changes necessary, go back to step 4.
-7. Update the documentation again to make sure it matches the implementation.
-8. Verify the test strategy recorded for your current subtask and task in Taskmaster.
-8. Update the documentation in Taskmaster and your to-do list.
-9. See if there are any rules that need self-improvement, see [self_improve.mdc](mdc:.cursor/rules/self_improve.mdc).
-10. Suggest to going to plan mode again for the next subtask.
+2. Mark the subtask as "in-progress" if it isn’t already.
+3. Add all substeps for the current subtask to your to-do list.
+4. Implement all changes for the current task, according to the plan from plan mode, the task and subtask description and details in Taskmaster and on your to-do list.
+5. Self-review your implementation through a high quality code review.
+6. Refactor the implementation for improving code quality. If there were any changes, go back to step 4.
+7. Run the checks.
+8. Make all checks pass. If there were any changes necessary, go back to step 4.
+9. Update the documentation again to make sure it matches the implementation.
+10. Verify the test strategy recorded for your current subtask and task in Taskmaster.
+11. Update the documentation in Taskmaster and your to-do list.
+12. See if there are any rules that need self-improvement, see [self_improve.mdc](mdc:.cursor/rules/self_improve.mdc).
+14. Mark the task as in "review" and ask for user confirmation of the changes.
+15. Once the user confirms that everything is good, mark the subtask "done" and suggest to going to plan mode again for the next subtask.
 
 - **CRITICAL PROCESS REQUIREMENTS:**
-  - **NEVER mark any task or subtask as "done" without running ALL required checks first**
+  - **NEVER mark any task or subtask as "done" without explicit USER CONFIRMATION first**
+  - **NEVER mark any task or subtask as "review" without running ALL required checks first**
   - Required check sequence MUST be completed in order:
     1. `bun run format && bun run schema-format`
     2. `bun run typecheck`
@@ -112,6 +115,8 @@ Implement the changes as planned and confirmed by the user.
     4. `bun test`
   - If ANY check fails, fix the issues and restart the entire sequence
   - testStrategy set in the task and subtasks MUST have been followed
-  - Only after ALL checks & test strategies pass successfully can a subtask be marked complete
+  - Only after ALL checks & test strategies pass successfully can a subtask be marked in "review"
   - This prevents broken/incomplete code from being considered "done"
-  - Only after ALL subtasks are marked complete AND the tasks test strategy passes can a task be marked complete
+  - Only after a subtask is in "review" AND the user confirms can a subtask be marked "done"
+  - Only after ALL subtasks are marked "done" AND the tasks test strategy passes can a task be marked in "review"
+  - Only after a task is in "review" AND the user confirms can a task be marked "done"
