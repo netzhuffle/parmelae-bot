@@ -2660,11 +2660,223 @@
             "parentTaskId": 58
           }
         ]
+      },
+      {
+        "id": 59,
+        "title": "Enable Support for Multiple Telegram Bots with Coordinated Message Handling and Identity Management",
+        "description": "Expand the Telegram bot system to support multiple bots with distinct identities, coordinated message processing, and bot-specific tools while maintaining a unified message storage and handling architecture.",
+        "details": "1. Environment Variables Expansion:\n   - Extend environment configuration to include DEFAULT_IDENTITY and additional bots via USERNAME_2-9, TELEGRAM_TOKEN_2-9, and DEFAULT_IDENTITY_2-9.\n   - Implement parsing and validation logic for these variables to dynamically register multiple bots.\n\n2. Message Handling Coordination:\n   - Modify the main bot to receive all messages for all bots.\n   - For each incoming message, iterate over all bots in random order to check if any bot will respond.\n   - Stop checking once a bot responds.\n   - If a bot responds, verify the response message against all other bots to prevent a bot from responding to its own message.\n\n3. Agent Context Management:\n   - Update LangGraph agent logic to treat messages from the responding bot as AI/Assistant messages.\n   - Treat messages from all other bots as user/human messages within the agent context.\n\n4. Identity Tools Extension:\n   - Extend the Identity interface (@Identity.ts) to support bot-specific tools.\n   - Maintain global tools in ChatGptAgentService applicable to all bots.\n   - Merge each bot's additional tools with the global tools dynamically.\n\n5. Architecture and System Design:\n   - Design and implement a multi-bot coordination system that centralizes message storage and handling responsibility in the main bot.\n   - Ensure multiple bot personalities can interact within the same chat environment without conflicts.\n\n6. Implementation Considerations:\n   - Ensure thread-safe or asynchronous-safe handling of messages and bot responses.\n   - Implement logging and error handling for multi-bot interactions.\n   - Provide configuration and documentation for adding or removing bots.\n\n7. Codebase Impact:\n   - Update relevant modules such as message routing, bot initialization, identity management, and agent services.\n   - Refactor existing single-bot assumptions to support multi-bot logic.\n\nExample snippet for environment variable parsing:\n```typescript\nconst bots = [];\nfor (let i = 1; i <= 9; i++) {\n  const username = process.env[`USERNAME_${i}`] || (i === 1 ? process.env.USERNAME : undefined);\n  const token = process.env[`TELEGRAM_TOKEN_${i}`] || (i === 1 ? process.env.TELEGRAM_TOKEN : undefined);\n  const identity = process.env[`DEFAULT_IDENTITY_${i}`] || (i === 1 ? process.env.DEFAULT_IDENTITY : undefined);\n  if (username && token && identity) {\n    bots.push({ username, token, identity });\n  }\n}\n```\n\nThis task requires careful integration with existing message persistence and tool call linkage to maintain conversation context across multiple bots.",
+        "testStrategy": "1. Unit Testing:\n   - Test environment variable parsing for multiple bots including edge cases (missing variables, partial configurations).\n   - Verify message routing logic correctly iterates over bots in random order and stops on first response.\n   - Test that a bot does not respond to its own messages.\n   - Validate Identity interface extensions and tool merging behavior.\n\n2. Integration Testing:\n   - Simulate multi-bot message flows to ensure correct message handling and response coordination.\n   - Confirm LangGraph agent context correctly distinguishes AI and user messages per bot.\n   - Test multi-bot interactions in shared chats to verify no cross-bot message contamination.\n\n3. Load and Concurrency Testing:\n   - Assess system behavior under concurrent messages to multiple bots.\n   - Ensure thread safety and no race conditions in message handling.\n\n4. Regression Testing:\n   - Verify existing single-bot functionality remains intact if only one bot is configured.\n\n5. Manual Testing:\n   - Deploy in a staging environment with multiple bots configured.\n   - Test real Telegram interactions for message receipt, response, and tool usage.\n\n6. Logging and Monitoring:\n   - Confirm detailed logs for multi-bot message processing are generated for troubleshooting.\n\n7. Documentation Review:\n   - Validate that configuration instructions for multiple bots are clear and complete.",
+        "status": "pending",
+        "dependencies": [
+          6,
+          9,
+          28,
+          29
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Extend Environment Variable Configuration for Multiple Bots",
+            "description": "Expand environment variables to support multiple bots by adding USERNAME_2-9, TELEGRAM_TOKEN_2-9, and DEFAULT_IDENTITY_2-9 alongside the existing single bot variables.",
+            "dependencies": [
+              "59.16",
+              "59.17"
+            ],
+            "details": "Implement parsing and validation logic to dynamically register multiple bots from environment variables, ensuring fallback to primary variables for the first bot as needed.\n<info added on 2025-09-17T21:33:43.385Z>\n**Dependencies:** This subtask now depends on subtasks 59.16 (Identity Resolution Service) and 59.17 (DI Refactoring) as they are prerequisites for proper multi-bot environment variable configuration.\n\n**Implementation Plan Complete:**\n\n**Core Changes:**\n1. Add BotConfiguration and MultiBotsConfig types\n2. Implement parseMultiBotEnvironment() method with USERNAME_2-9, TELEGRAM_TOKEN_2-9, DEFAULT_IDENTITY_2-9 parsing\n3. Add DEFAULT_IDENTITY support for primary bot (backwards compatibility)\n4. Maintain existing username/telegramToken properties pointing to primary bot\n5. Add comprehensive validation with clear error messages\n\n**Environment Variable Pattern:**\n- Bot 1: USERNAME, TELEGRAM_TOKEN, DEFAULT_IDENTITY (existing + new DEFAULT_IDENTITY)\n- Bots 2-9: USERNAME_2-9, TELEGRAM_TOKEN_2-9, DEFAULT_IDENTITY_2-9\n- Fallback logic: Bot 1 can use legacy variables or new numbered format\n\n**Validation Requirements:**\n- At least one complete bot configuration required\n- No duplicate usernames allowed\n- Identity names validated against available identities\n- Clear error messages for configuration issues\n\nReady for Act mode implementation once dependencies are completed.\n</info added on 2025-09-17T21:33:43.385Z>",
+            "status": "pending",
+            "testStrategy": "Unit test environment variable parsing with complete, partial, and missing configurations to verify correct bot registration."
+          },
+          {
+            "id": 2,
+            "title": "Implement BotManager to Initialize and Manage Multiple Telegraf Instances",
+            "description": "Create a BotManager component responsible for initializing multiple Telegraf bot instances based on parsed environment variables and managing their lifecycle.",
+            "dependencies": [
+              "59.1"
+            ],
+            "details": "Ensure BotManager can start, stop, and monitor all bot instances, providing a unified interface for message handling coordination.",
+            "status": "pending",
+            "testStrategy": "Unit test BotManager initialization with multiple bots and verify correct Telegraf instance creation."
+          },
+          {
+            "id": 3,
+            "title": "Design Centralized Message Reception and Routing in Main Bot",
+            "description": "Modify the main bot instance to receive all incoming messages for all bots and coordinate message routing to other bots for response evaluation.",
+            "dependencies": [
+              "59.2"
+            ],
+            "details": "Implement logic to iterate over all bots in random order for each incoming message, stopping at the first bot that responds, and prevent bots from responding to their own messages.",
+            "status": "pending",
+            "testStrategy": "Test message routing logic with multiple bots ensuring only one bot responds and self-responses are blocked."
+          },
+          {
+            "id": 4,
+            "title": "Update ConversationService to Classify Messages per Responding Bot Context",
+            "description": "Refactor ConversationService to classify messages as assistant or user messages based on the responding bot's identity rather than a single configured username.",
+            "dependencies": [
+              "59.3"
+            ],
+            "details": "Adjust message classification logic to dynamically use the responding bot's username for accurate conversation context handling.",
+            "status": "pending",
+            "testStrategy": "Unit test message classification with multiple bot identities to verify correct assistant/user message tagging."
+          },
+          {
+            "id": 5,
+            "title": "Extend Identity Interface to Support Bot-Specific Tools",
+            "description": "Modify the Identity interface to include a bot-specific tools property, allowing each bot to have additional tools beyond the global set.",
+            "dependencies": [],
+            "details": "Ensure Identity interface changes are backward compatible and support dynamic merging of global and bot-specific tools.",
+            "status": "pending",
+            "testStrategy": "Test Identity interface extension with sample bot-specific tools and verify correct merging behavior."
+          },
+          {
+            "id": 6,
+            "title": "Enhance ChatGptAgentService to Merge Global and Bot-Specific Tools",
+            "description": "Update ChatGptAgentService to dynamically merge each bot's additional tools with the global tools during agent initialization and tool invocation.",
+            "dependencies": [
+              "59.5"
+            ],
+            "details": "Implement merging logic that respects tool context and avoids conflicts between global and bot-specific tools.",
+            "status": "pending",
+            "testStrategy": "Unit test tool merging with various combinations of global and bot-specific tools."
+          },
+          {
+            "id": 7,
+            "title": "Modify LangGraph Agent to Handle Multi-Bot Message Contexts",
+            "description": "Update LangGraph agent logic to treat messages from the responding bot as AI/Assistant messages and messages from other bots as user/human messages within the conversation context.",
+            "dependencies": [
+              "59.4"
+            ],
+            "details": "Ensure conversation history and agent state correctly reflect multi-bot interactions for coherent dialogue management.",
+            "status": "pending",
+            "testStrategy": "Test LangGraph agent behavior with simulated multi-bot message flows to verify correct role assignment."
+          },
+          {
+            "id": 8,
+            "title": "Implement Thread-Safe and Asynchronous-Safe Message Handling",
+            "description": "Ensure message processing and bot response handling are thread-safe or asynchronous-safe to prevent race conditions and data corruption in multi-bot scenarios.",
+            "dependencies": [
+              "59.3"
+            ],
+            "details": "Use appropriate concurrency control mechanisms and asynchronous patterns to handle simultaneous messages and responses reliably.",
+            "status": "pending",
+            "testStrategy": "Stress test message handling under concurrent loads to detect race conditions or deadlocks."
+          },
+          {
+            "id": 9,
+            "title": "Update TelegramService to Route Outgoing Messages via Correct Bot Instance",
+            "description": "Modify TelegramService to send messages through the appropriate Telegraf instance corresponding to the responding bot's token and identity.",
+            "dependencies": [
+              "59.2",
+              "59.3"
+            ],
+            "details": "Implement routing logic that maps outgoing messages to the correct bot instance to maintain identity consistency.",
+            "status": "pending",
+            "testStrategy": "Test message sending with multiple bots ensuring messages are sent from the correct bot identity."
+          },
+          {
+            "id": 10,
+            "title": "Extend ToolContext to Include Responding Bot Context Information",
+            "description": "Enhance ToolContext dependency injection to carry information about the responding bot, enabling tools to access bot-specific context during execution.",
+            "dependencies": [
+              "59.6"
+            ],
+            "details": "Modify ToolContext interfaces and injection points to support multi-bot awareness.",
+            "status": "pending",
+            "testStrategy": "Unit test tool execution with ToolContext containing responding bot data."
+          },
+          {
+            "id": 11,
+            "title": "Refactor ReplyStrategyFinder to Support Multi-Bot Username Matching",
+            "description": "Update ReplyStrategyFinder to check for bot mentions dynamically across multiple bot usernames instead of a single configured username.",
+            "dependencies": [
+              "59.1"
+            ],
+            "details": "Implement logic to detect mentions for any registered bot and route replies accordingly.",
+            "status": "pending",
+            "testStrategy": "Test mention detection with messages referencing different bot usernames."
+          },
+          {
+            "id": 12,
+            "title": "Centralize Message Storage with Bot Identity Tagging",
+            "description": "Ensure TelegramMessageService stores all messages with clear identification of the originating bot by from.username to maintain unified message history.",
+            "dependencies": [],
+            "details": "Modify storage schema and service logic to support multi-bot message tagging and retrieval.",
+            "status": "pending",
+            "testStrategy": "Test message storage and retrieval with messages from multiple bots ensuring correct identity tagging."
+          },
+          {
+            "id": 13,
+            "title": "Implement Logging and Error Handling for Multi-Bot Interactions",
+            "description": "Add comprehensive logging and error handling mechanisms to capture multi-bot message flows, response decisions, and failures for easier debugging and monitoring.",
+            "dependencies": [
+              "59.3",
+              "59.8"
+            ],
+            "details": "Include context-rich logs indicating which bot processed or responded to each message and handle errors gracefully without impacting other bots.",
+            "status": "pending",
+            "testStrategy": "Simulate error scenarios and verify logs capture sufficient detail and system recovers appropriately."
+          },
+          {
+            "id": 14,
+            "title": "Provide Configuration and Documentation for Adding or Removing Bots",
+            "description": "Create clear documentation and configuration guidelines for adding new bots or removing existing ones, including environment variable setup and system restart procedures.",
+            "dependencies": [
+              "59.1",
+              "59.2"
+            ],
+            "details": "Document environment variable formats, BotManager usage, and best practices for multi-bot deployment.",
+            "status": "pending",
+            "testStrategy": "Review documentation accuracy and completeness; perform configuration changes following the guide."
+          },
+          {
+            "id": 15,
+            "title": "Refactor Codebase to Remove Single-Bot Assumptions",
+            "description": "Audit and refactor all relevant modules such as bot initialization, message routing, identity management, and agent services to support multi-bot logic and remove single-bot assumptions.",
+            "dependencies": [
+              "59.1",
+              "59.2",
+              "59.4",
+              "59.5"
+            ],
+            "details": "Ensure all components are compatible with multiple bots and integrate seamlessly with the new multi-bot architecture.",
+            "status": "pending",
+            "testStrategy": "Perform integration testing across modules with multiple bots to verify system stability and correctness."
+          },
+          {
+            "id": 16,
+            "title": "Create Identity Resolution Service for String-to-Identity Mapping",
+            "description": "Implement a service to resolve identity names from environment variables to Identity instances, supporting extensible identity registration.",
+            "details": "Create IdentityResolver service that maps strings like \"Schi Parmelä\" and \"Emulator\" to their respective Identity instances. This service should be injectable and support adding new identities without code changes.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 59
+          },
+          {
+            "id": 17,
+            "title": "Refactor Dependency Injection for Multi-Bot Configuration",
+            "description": "Update inversify.config.ts to support multiple bot configurations while maintaining backwards compatibility with existing single-bot DI patterns.",
+            "details": "Modify inversify container configuration to handle multiple Telegraf instances and bot configurations. Ensure Config singleton provides both single-bot (backwards compatible) and multi-bot access patterns. This affects Telegraf binding and any services that depend on single-bot assumptions.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 59
+          },
+          {
+            "id": 18,
+            "title": "Migrate Identity Tools to Modern Tool Function Pattern",
+            "description": "Convert IdentitySetterTool and IdentityQueryTool from legacy class-based Tool pattern to modern tool() function pattern with Zod schemas, following the patterns in diceTool, dallETool, and pokemonCardAddTool.",
+            "details": "Migrate both tools to use tool() function, Zod schema validation, getToolContext() for dependency injection, and proper modern TypeScript patterns. This creates a clean baseline before implementing multi-bot functionality.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 59
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-09-17T20:31:21.747Z",
+      "updated": "2025-09-17T21:05:34.425Z",
       "description": "Tasks for master context"
     }
   }
