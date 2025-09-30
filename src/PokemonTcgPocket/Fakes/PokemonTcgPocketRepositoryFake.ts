@@ -51,6 +51,11 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     return Promise.resolve(this.boosters.get(`${set.id}_${name}`) ?? null);
   }
 
+  /** Helper method to construct consistent card keys */
+  private getCardKey(setKey: string, number: number): string {
+    return `${setKey}_${number}`;
+  }
+
   /** Retrieves a card by its number and set key, or null if it doesn't exist */
   retrieveCardByNumberAndSetKey(
     number: number,
@@ -59,7 +64,9 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     const set = this.sets.get(setKey);
     if (!set) return Promise.resolve(null);
 
-    return Promise.resolve(this.cards.get(`${set.id}_${number}`) ?? null);
+    return Promise.resolve(
+      this.cards.get(this.getCardKey(setKey, number)) ?? null,
+    );
   }
 
   /** Creates a new set */
@@ -119,7 +126,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       rarity,
       isSixPackOnly,
     };
-    this.cards.set(`${setKey}_${number}`, card);
+    this.cards.set(this.getCardKey(setKey, number), card);
 
     // Store booster associations
     const boosterIds = new Set<number>();
@@ -662,5 +669,14 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     }
     booster.probabilitiesType = probabilitiesType;
     return await Promise.resolve(booster);
+  }
+
+  /** Resets all stored data for test isolation */
+  reset(): void {
+    this.sets.clear();
+    this.boosters.clear();
+    this.cards.clear();
+    this.cardBoosters.clear();
+    this.nextId = 1;
   }
 }

@@ -113,6 +113,31 @@ export const OWNERSHIP_FILTER_VALUES = [
 /** Ownership filter type */
 export type OwnershipFilter = (typeof OWNERSHIP_FILTER_VALUES)[number];
 
+/**
+ * Foil rarities for detection and classification.
+ *
+ * These rarities use the ✦ symbol suffix and trigger the
+ * FOUR_CARDS_WITH_GUARANTEED_EX probabilitiesType when detected
+ * in YAML data during booster synchronization.
+ *
+ * **Precedence:** Foil rarities have the highest precedence in booster type
+ * determination, overriding shiny and six-pack mechanics.
+ *
+ * **Exclusions:** Boosters with foil cards cannot contain:
+ * - ONE_SHINY rarity cards
+ * - Six-pack-only cards (isSixPackOnly: true)
+ * - God pack mechanics
+ *
+ * @see RARITY_MAP for symbol mappings (♢✦, ♢♢✦, ♢♢♢✦)
+ * @see determineProbabilitiesType for precedence logic
+ * @see FourCardGuaranteedExStrategy for four-card pack implementation
+ */
+const FOIL_RARITIES = new Set<Rarity>([
+  Rarity.ONE_DIAMOND_FOIL, // ♢✦
+  Rarity.TWO_DIAMONDS_FOIL, // ♢♢✦
+  Rarity.THREE_DIAMONDS_FOIL, // ♢♢♢✦
+]);
+
 /** Service-layer ownership status with explicit missing state */
 export enum CardOwnershipStatus {
   OWNED = 'OWNED',
@@ -154,11 +179,29 @@ export interface SetData {
 /** The complete YAML file structure */
 export type Sets = Record<string, SetData>;
 
-/** Maps rarity symbols to database enum values */
+/**
+ * Maps rarity symbols from YAML data to database enum values.
+ *
+ * **Symbol Categories:**
+ * - Diamond rarities: ♢, ♢♢, ♢♢♢, ♢♢♢♢
+ * - Foil rarities: ♢✦, ♢♢✦, ♢♢♢✦ (trigger FOUR_CARDS_WITH_GUARANTEED_EX)
+ * - Star rarities: ☆, ☆☆, ☆☆☆, ☆☆☆☆
+ * - Shiny rarities: ✸, ✸✸
+ * - Crown rarity: ♛
+ *
+ * **Foil Detection:** The presence of foil symbols (✦ suffix) triggers
+ * the FOUR_CARDS_WITH_GUARANTEED_EX probabilitiesType during synchronization.
+ *
+ * @see FOIL_RARITIES for foil detection logic
+ * @see Rarity enum for complete rarity definitions
+ */
 export const RARITY_MAP: Record<string, Rarity> = {
   '♢': Rarity.ONE_DIAMOND,
+  '♢✦': Rarity.ONE_DIAMOND_FOIL,
   '♢♢': Rarity.TWO_DIAMONDS,
+  '♢♢✦': Rarity.TWO_DIAMONDS_FOIL,
   '♢♢♢': Rarity.THREE_DIAMONDS,
+  '♢♢♢✦': Rarity.THREE_DIAMONDS_FOIL,
   '♢♢♢♢': Rarity.FOUR_DIAMONDS,
   '☆': Rarity.ONE_STAR,
   '☆☆': Rarity.TWO_STARS,
@@ -172,8 +215,11 @@ export const RARITY_MAP: Record<string, Rarity> = {
 /** Maps database enum values to rarity symbols */
 const RARITY_REVERSE_MAP: Record<Rarity, string> = {
   [Rarity.ONE_DIAMOND]: '♢',
+  [Rarity.ONE_DIAMOND_FOIL]: '♢✦',
   [Rarity.TWO_DIAMONDS]: '♢♢',
+  [Rarity.TWO_DIAMONDS_FOIL]: '♢♢✦',
   [Rarity.THREE_DIAMONDS]: '♢♢♢',
+  [Rarity.THREE_DIAMONDS_FOIL]: '♢♢♢✦',
   [Rarity.FOUR_DIAMONDS]: '♢♢♢♢',
   [Rarity.ONE_STAR]: '☆',
   [Rarity.TWO_STARS]: '☆☆',
@@ -732,12 +778,59 @@ export class PokemonTcgPocketService {
   }
 
   /**
-   * Determines the probabilities type based on boolean combinations
+   * Determines the booster probabilities type based on card content analysis.
+   *
+   * **Precedence Order (highest to lowest):**
+   * 1. **Foil cards** → `FOUR_CARDS_WITH_GUARANTEED_EX`
+   * 2. **Six-pack cards** → `POTENTIAL_SIXTH_CARD` (if also has shiny)
+   * 3. **Shiny cards** → `DEFAULT` (if no six-pack)
+   * 4. **Neither** → `NO_SHINY_RARITY`
+   *
+   * **Four-Card Pack Logic:**
+   * When foil rarities are detected, the booster uses a completely different
+   * pack structure with 4 cards instead of 5, no god packs, and specific
+   * slot distributions that include foil rarities.
+   *
+   * **Exclusion Rules:**
+   * - Foil + Six-pack: Foil wins (four-card packs don't support six-pack mechanics)
+   * - Foil + Shiny: Foil wins (four-card packs exclude ONE_SHINY cards)
+   * - Six-pack without Shiny: Invalid combination (throws error)
+   *
+   * @param hasShiny - Whether booster contains shiny rarity cards (✸, ✸✸)
+   * @param hasSix - Whether booster contains six-pack-only cards (isSixPackOnly: true)
+   * @param hasFoil - Whether booster contains foil rarity cards (♢✦, ♢♢✦, ♢♢♢✦)
+   * @returns The appropriate BoosterProbabilitiesType for probability calculations
+   *
+   * @example
+   * ```typescript
+   * // Foil cards always win precedence
+   * determineProbabilitiesType(true, true, true)
+   * // → FOUR_CARDS_WITH_GUARANTEED_EX
+   *
+   * // Standard shiny booster
+   * determineProbabilitiesType(true, false, false)
+   * // → DEFAULT
+   *
+   * // Six-pack booster (requires shiny)
+   * determineProbabilitiesType(true, true, false)
+   * // → POTENTIAL_SIXTH_CARD
+   * ```
+   *
+   * @throws {Error} When hasSix=true but hasShiny=false (invalid combination)
+   * @see FOIL_RARITIES for foil detection logic
+   * @see FourCardGuaranteedExStrategy for four-card pack implementation
+   * @see Task 61 for four-card pack requirements
    */
   private determineProbabilitiesType(
     hasShiny: boolean,
     hasSix: boolean,
+    hasFoil: boolean,
   ): BoosterProbabilitiesType {
+    // Foil cards indicate four-card packs with guaranteed EX (highest precedence)
+    if (hasFoil) {
+      return BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX;
+    }
+
     if (!hasShiny && !hasSix) return BoosterProbabilitiesType.NO_SHINY_RARITY;
     if (hasShiny && !hasSix) return BoosterProbabilitiesType.DEFAULT;
     if (hasShiny && hasSix)
@@ -758,9 +851,10 @@ export class PokemonTcgPocketService {
     // Create a set of valid booster names for this set
     const validBoosterNames = new Set(boosters.map((b) => b.name));
 
-    // Track which boosters contain shiny cards and can have packs with six cards
+    // Track which boosters contain shiny cards, foil cards, and can have packs with six cards
     const boostersWithShinyCards = new Set<string>();
     const boostersWithSixCardPacks = new Set<string>();
+    const boostersWithFoilCards = new Set<string>();
 
     // First pass: Process all cards and track which boosters contain shiny cards and can have packs with six cards
     for (const [cardNumberString, card] of Object.entries(setData.cards)) {
@@ -783,6 +877,14 @@ export class PokemonTcgPocketService {
         cardBoosterNames.forEach((name) => boostersWithShinyCards.add(name));
       }
 
+      // If card has foil rarity, mark its boosters
+      if (card.rarity) {
+        const convertedRarity = RARITY_MAP[card.rarity];
+        if (convertedRarity && FOIL_RARITIES.has(convertedRarity)) {
+          cardBoosterNames.forEach((name) => boostersWithFoilCards.add(name));
+        }
+      }
+
       // If card is exclusive to six-card packs, mark its boosters
       if (card.isSixPackOnly === true) {
         cardBoosterNames.forEach((name) => boostersWithSixCardPacks.add(name));
@@ -794,9 +896,11 @@ export class PokemonTcgPocketService {
       boosters.map((booster) => {
         const hasShiny = boostersWithShinyCards.has(booster.name);
         const hasSix = boostersWithSixCardPacks.has(booster.name);
+        const hasFoil = boostersWithFoilCards.has(booster.name);
         const probabilitiesType = this.determineProbabilitiesType(
           hasShiny,
           hasSix,
+          hasFoil,
         );
 
         return this.repository.updateBoosterProbabilitiesType(

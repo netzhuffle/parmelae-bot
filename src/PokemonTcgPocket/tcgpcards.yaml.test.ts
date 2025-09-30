@@ -16,8 +16,11 @@ interface YamlImportResult {
 /** Maps rarity symbols to database enum values */
 const VALID_RARITY_SYMBOLS = new Set([
   '♢',
+  '♢✦',
   '♢♢',
+  '♢♢✦',
   '♢♢♢',
+  '♢♢♢✦',
   '♢♢♢♢',
   '☆',
   '☆☆',
@@ -232,6 +235,65 @@ describe('tcgpcards.yaml', () => {
             expect(allowed.has(card.rarity!)).toBe(true);
           }
         });
+      });
+    });
+
+    it('should not have ONE_SHINY cards in sets with foil cards (FOUR_CARDS_WITH_GUARANTEED_EX)', () => {
+      const foilRarities = new Set(['♢✦', '♢♢✦', '♢♢♢✦']);
+      const oneShinyRarity = '✸'; // ONE_SHINY rarity symbol
+
+      Object.entries(sets).forEach(([setKey, setData]: [string, SetData]) => {
+        // Check if this set has any foil cards
+        const hasFoilCards = Object.values(setData.cards).some(
+          (card: Card) => card.rarity && foilRarities.has(card.rarity),
+        );
+
+        if (hasFoilCards) {
+          // If set has foil cards, it should not have any ONE_SHINY cards
+          const hasOneShinyCards = Object.values(setData.cards).some(
+            (card: Card) => card.rarity === oneShinyRarity,
+          );
+
+          expect(hasOneShinyCards).toBe(false);
+
+          // Also verify no cards have ONE_SHINY rarity explicitly
+          Object.values(setData.cards).forEach((card: Card) => {
+            if (card.rarity === oneShinyRarity) {
+              throw new Error(
+                `Set ${setKey} has foil cards (triggers FOUR_CARDS_WITH_GUARANTEED_EX) but also contains ONE_SHINY card: ${card.name}`,
+              );
+            }
+          });
+        }
+      });
+    });
+
+    it('should not have six-pack-only cards in sets with foil cards (FOUR_CARDS_WITH_GUARANTEED_EX)', () => {
+      const foilRarities = new Set(['♢✦', '♢♢✦', '♢♢♢✦']);
+
+      Object.entries(sets).forEach(([setKey, setData]: [string, SetData]) => {
+        // Check if this set has any foil cards
+        const hasFoilCards = Object.values(setData.cards).some(
+          (card: Card) => card.rarity && foilRarities.has(card.rarity),
+        );
+
+        if (hasFoilCards) {
+          // If set has foil cards, it should not have any six-pack-only cards
+          const hasSixPackOnlyCards = Object.values(setData.cards).some(
+            (card: Card) => card.isSixPackOnly === true,
+          );
+
+          expect(hasSixPackOnlyCards).toBe(false);
+
+          // Also verify no cards have isSixPackOnly flag explicitly
+          Object.values(setData.cards).forEach((card: Card) => {
+            if (card.isSixPackOnly === true) {
+              throw new Error(
+                `Set ${setKey} has foil cards (triggers FOUR_CARDS_WITH_GUARANTEED_EX) but also contains six-pack-only card: ${card.name}`,
+              );
+            }
+          });
+        }
       });
     });
   });

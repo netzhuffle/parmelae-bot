@@ -700,6 +700,93 @@ describe('PokemonTcgPocketProbabilityService', () => {
       expect(p).toBeCloseTo(expected, 4);
     });
   });
+
+  describe('Four-card pack probabilities (FOUR_CARDS_WITH_GUARANTEED_EX)', () => {
+    it('should handle four-card packs with foil rarities', () => {
+      const cards = createTestCardsWithFoilRarities();
+      const missingCards = cards.filter(
+        (c) =>
+          c.rarity === Rarity.ONE_DIAMOND_FOIL ||
+          c.rarity === Rarity.THREE_DIAMONDS_FOIL,
+      );
+
+      const probability = service.calculateNewCardProbability(
+        cards,
+        missingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+
+      expect(probability).toBeGreaterThan(0);
+      expect(probability).toBeLessThanOrEqual(1);
+    });
+
+    it('should return 0 when no cards are missing in four-card packs', () => {
+      const cards = createTestCardsWithFoilRarities();
+      const missingCards: PokemonCardWithRelations[] = [];
+
+      const probability = service.calculateNewCardProbability(
+        cards,
+        missingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+
+      expect(probability).toBe(0);
+    });
+
+    it('should calculate diamond card probabilities for four-card packs', () => {
+      const cards = createTestCardsWithFoilRarities();
+      const missingCards = cards.filter(
+        (c) =>
+          c.rarity === Rarity.ONE_DIAMOND ||
+          c.rarity === Rarity.ONE_DIAMOND_FOIL ||
+          c.rarity === Rarity.FOUR_DIAMONDS,
+      );
+
+      const probability = service.calculateNewDiamondCardProbability(
+        cards,
+        missingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+
+      expect(probability).toBeGreaterThan(0);
+      expect(probability).toBeLessThanOrEqual(1);
+    });
+
+    it('should calculate tradable card probabilities for four-card packs', () => {
+      const cards = createTestCardsWithFoilRarities();
+      const missingCards = cards.filter(
+        (c) =>
+          c.rarity === Rarity.ONE_DIAMOND_FOIL || c.rarity === Rarity.ONE_STAR,
+      );
+
+      const probability = service.calculateNewTradableCardProbability(
+        cards,
+        missingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+
+      expect(probability).toBeGreaterThan(0);
+      expect(probability).toBeLessThanOrEqual(1);
+    });
+
+    it('should not include ONE_SHINY cards in four-card pack calculations', () => {
+      const cards = createTestCardsWithFoilRarities();
+      // Add some ONE_SHINY cards to the pool
+      cards.push(createTestCard(999, Rarity.ONE_SHINY));
+
+      const missingCards = cards.filter((c) => c.rarity === Rarity.ONE_SHINY);
+
+      // Since ONE_SHINY cards should never appear in four-card packs,
+      // the probability should be 0 even if they're missing
+      const probability = service.calculateNewCardProbability(
+        cards,
+        missingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+
+      expect(probability).toBe(0);
+    });
+  });
 });
 
 /** Creates a set of test cards with various rarities */
@@ -747,4 +834,52 @@ function createCard(rarity: Rarity): PokemonCardWithRelations {
       key: 'TEST',
     } as PokemonSetModel,
   } as PokemonCardWithRelations;
+}
+
+function createTestCard(id: number, rarity: Rarity): PokemonCardWithRelations {
+  return {
+    id,
+    name: `Test Card ${id}`,
+    setId: 0,
+    number: id,
+    rarity,
+    isSixPackOnly: false,
+    boosters: [],
+    ownership: [],
+    set: {
+      name: 'Test Set',
+      id: 0,
+      key: 'TEST',
+    } as PokemonSetModel,
+  } as PokemonCardWithRelations;
+}
+
+/** Creates a set of test cards with foil rarities for four-card pack testing */
+function createTestCardsWithFoilRarities(): PokemonCardWithRelations[] {
+  const cards: PokemonCardWithRelations[] = [];
+  let id = 1;
+
+  // Add regular diamond cards
+  cards.push(createTestCard(id++, Rarity.ONE_DIAMOND));
+  cards.push(createTestCard(id++, Rarity.TWO_DIAMONDS));
+  cards.push(createTestCard(id++, Rarity.THREE_DIAMONDS));
+  cards.push(createTestCard(id++, Rarity.FOUR_DIAMONDS));
+
+  // Add foil diamond cards
+  cards.push(createTestCard(id++, Rarity.ONE_DIAMOND_FOIL));
+  cards.push(createTestCard(id++, Rarity.TWO_DIAMONDS_FOIL));
+  cards.push(createTestCard(id++, Rarity.THREE_DIAMONDS_FOIL));
+
+  // Add star cards
+  cards.push(createTestCard(id++, Rarity.ONE_STAR));
+  cards.push(createTestCard(id++, Rarity.TWO_STARS));
+  cards.push(createTestCard(id++, Rarity.THREE_STARS));
+
+  // Add shiny cards
+  cards.push(createTestCard(id++, Rarity.TWO_SHINY));
+
+  // Add crown card
+  cards.push(createTestCard(id++, Rarity.CROWN));
+
+  return cards;
 }

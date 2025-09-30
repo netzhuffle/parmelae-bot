@@ -6,6 +6,7 @@ import {
   NormalPackProbabilityStrategy,
   ShinyPackProbabilityStrategy,
 } from './PackProbabilityStrategy.js';
+import { FourCardGuaranteedExStrategy } from './FourCardGuaranteedExStrategy.js';
 
 /** Constants for pack probabilities and configurations */
 interface PackConfiguration {
@@ -63,21 +64,28 @@ export class PokemonTcgPocketProbabilityService {
   /** Set of diamond rarities */
   private readonly DIAMOND_RARITIES = new Set<Rarity>([
     Rarity.ONE_DIAMOND,
+    Rarity.ONE_DIAMOND_FOIL,
     Rarity.TWO_DIAMONDS,
+    Rarity.TWO_DIAMONDS_FOIL,
     Rarity.THREE_DIAMONDS,
+    Rarity.THREE_DIAMONDS_FOIL,
     Rarity.FOUR_DIAMONDS,
   ]);
 
   private readonly TRADABLE_RARITIES = new Set<Rarity>([
     Rarity.ONE_DIAMOND,
+    Rarity.ONE_DIAMOND_FOIL,
     Rarity.TWO_DIAMONDS,
+    Rarity.TWO_DIAMONDS_FOIL,
     Rarity.THREE_DIAMONDS,
+    Rarity.THREE_DIAMONDS_FOIL,
     Rarity.FOUR_DIAMONDS,
     Rarity.ONE_STAR,
   ]);
 
   private readonly normalStrategy = new NormalPackProbabilityStrategy();
   private readonly shinyStrategy = new ShinyPackProbabilityStrategy();
+  private readonly fourCardStrategy = new FourCardGuaranteedExStrategy();
 
   /**
    * Determines if the probabilities type includes shiny rarity cards
@@ -85,6 +93,7 @@ export class PokemonTcgPocketProbabilityService {
   private hasShinyRarity(probabilitiesType: BoosterProbabilitiesType): boolean {
     switch (probabilitiesType) {
       case BoosterProbabilitiesType.NO_SHINY_RARITY:
+      case BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX:
         return false;
       case BoosterProbabilitiesType.DEFAULT:
       case BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD:
@@ -101,8 +110,37 @@ export class PokemonTcgPocketProbabilityService {
     switch (probabilitiesType) {
       case BoosterProbabilitiesType.NO_SHINY_RARITY:
       case BoosterProbabilitiesType.DEFAULT:
+      case BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX:
         return false;
       case BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD:
+        return true;
+      default:
+        throw new NotExhaustiveSwitchError(probabilitiesType);
+    }
+  }
+
+  /**
+   * Determines if a booster uses four-card pack mechanics.
+   *
+   * Four-card packs have fundamentally different probability calculations:
+   * - Use FourCardGuaranteedExStrategy instead of standard slot logic
+   * - Bypass god pack calculations entirely
+   * - Use 4 slots instead of 5 slots
+   * - Include foil rarities in distributions
+   *
+   * @param probabilitiesType - The booster's probability calculation type
+   * @returns true if this is a four-card pack, false for standard 5-card packs
+   *
+   * @see FourCardGuaranteedExStrategy for four-card pack implementation
+   * @see computeFourCardPackChance for four-card probability calculations
+   */
+  private isFourCardPack(probabilitiesType: BoosterProbabilitiesType): boolean {
+    switch (probabilitiesType) {
+      case BoosterProbabilitiesType.NO_SHINY_RARITY:
+      case BoosterProbabilitiesType.DEFAULT:
+      case BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD:
+        return false;
+      case BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX:
         return true;
       default:
         throw new NotExhaustiveSwitchError(probabilitiesType);
@@ -178,6 +216,14 @@ export class PokemonTcgPocketProbabilityService {
       filteredMissingCards.length === 0
     ) {
       return 0.0;
+    }
+
+    // Handle four-card packs separately (no god packs, different calculation)
+    if (this.isFourCardPack(probabilitiesType)) {
+      return this.computeFourCardPackChance(
+        filteredBoosterCards,
+        filteredMissingCards,
+      );
     }
 
     const normalPackChance = this.computeNormalPackChance(
@@ -527,5 +573,79 @@ export class PokemonTcgPocketProbabilityService {
     }
 
     return missingCardsInRarity.length / cardsInRarity.length;
+  }
+
+  /**
+   * Calculates the probability of getting at least one new card in a four-card pack.
+   *
+   * **Four-Card Pack Logic:**
+   * Unlike standard 5-card packs, four-card packs use a completely different
+   * probability calculation system with 4 slots and no god pack mechanics.
+   *
+   * **Calculation Method:**
+   * 1. For each slot (1-4), get the rarity distribution from FourCardGuaranteedExStrategy
+   * 2. Calculate probability of NOT getting a new card in that slot
+   * 3. Multiply all "no new card" probabilities together
+   * 4. Return 1 - (combined no new card probability)
+   *
+   * **Slot Characteristics:**
+   * - Slot 1: Always ONE_DIAMOND (common cards)
+   * - Slot 2: Mix of ONE_DIAMOND and TWO_DIAMONDS
+   * - Slot 3: Complex distribution including foil rarities
+   * - Slot 4: Always FOUR_DIAMONDS (guaranteed EX)
+   *
+   * **Foil Rarity Handling:**
+   * Foil rarities (♢✦, ♢♢✦, ♢♢♢✦) are included in slot distributions
+   * and treated as first-class rarities, not mappings of base rarities.
+   *
+   * @param boosterCards - All cards available in this booster
+   * @param missingCards - Cards the user doesn't own yet
+   * @returns Probability (0.0-1.0) of getting at least one new card
+   *
+   * @see FourCardGuaranteedExStrategy for slot distributions
+   * @see computeNoNewCardProbabilityForSlot for per-slot calculations
+   * @see Task 61 for four-card pack requirements
+   */
+  private computeFourCardPackChance(
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
+  ): number {
+    // Calculate probability of no new card in each slot independently
+    let probabilityNoNewCard = 1.0;
+
+    for (let slot = 1; slot <= 4; slot++) {
+      const slotDistribution = this.fourCardStrategy.getSlotDistribution(
+        slot as 1 | 2 | 3 | 4,
+      );
+      const probabilityNoNewInSlot = this.computeNoNewCardProbabilityForSlot(
+        slotDistribution,
+        boosterCards,
+        missingCards,
+      );
+      probabilityNoNewCard *= probabilityNoNewInSlot;
+    }
+
+    return 1.0 - probabilityNoNewCard;
+  }
+
+  /**
+   * Computes the probability of getting no new card in a specific slot
+   * given the slot's rarity distribution
+   */
+  private computeNoNewCardProbabilityForSlot(
+    distribution: ReadonlyMap<Rarity, number>,
+    boosterCards: PokemonCardModel[],
+    missingCards: PokemonCardModel[],
+  ): number {
+    let probabilityNoNewCard = 0.0;
+
+    for (const [rarity, probability] of distribution) {
+      const probabilityNoNewCardInRarity =
+        1.0 -
+        this.probabilityOfNewCardInRarity(rarity, boosterCards, missingCards);
+      probabilityNoNewCard += probability * probabilityNoNewCardInRarity;
+    }
+
+    return probabilityNoNewCard;
   }
 }

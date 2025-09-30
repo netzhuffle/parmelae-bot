@@ -1,0 +1,176 @@
+---
+description: JSDoc documentation standards for complex systems and business logic
+globs: src/**/*.ts, prisma/schema.prisma
+alwaysApply: true
+---
+
+# JSDoc Documentation Standards
+
+## **Core Documentation Principles**
+
+- **Document business logic comprehensively** - Complex systems need detailed explanations
+- **Use structured JSDoc format** with clear sections and cross-references
+- **Include examples for complex methods** - Show usage patterns and expected behavior
+- **Cross-reference related components** using @see tags
+- **Document precedence and decision logic** explicitly
+
+## **Method Documentation Structure**
+
+### **Complex Business Logic Methods**
+```typescript
+/**
+ * Determines the booster probabilities type based on card content analysis.
+ *
+ * **Precedence Order (highest to lowest):**
+ * 1. **Foil cards** → `FOUR_CARDS_WITH_GUARANTEED_EX`
+ * 2. **Six-pack cards** → `POTENTIAL_SIXTH_CARD` (if also has shiny)
+ * 3. **Shiny cards** → `DEFAULT` (if no six-pack)
+ * 4. **Neither** → `NO_SHINY_RARITY`
+ *
+ * **Four-Card Pack Logic:**
+ * When foil rarities are detected, the booster uses a completely different
+ * pack structure with 4 cards instead of 5, no god packs, and specific
+ * slot distributions that include foil rarities.
+ *
+ * **Exclusion Rules:**
+ * - Foil + Six-pack: Foil wins (four-card packs don't support six-pack mechanics)
+ * - Foil + Shiny: Foil wins (four-card packs exclude ONE_SHINY cards)
+ * - Six-pack without Shiny: Invalid combination (throws error)
+ *
+ * @param hasShiny - Whether booster contains shiny rarity cards (✸, ✸✸)
+ * @param hasSix - Whether booster contains six-pack-only cards (isSixPackOnly: true)
+ * @param hasFoil - Whether booster contains foil rarity cards (♢✦, ♢♢✦, ♢♢♢✦)
+ * @returns The appropriate BoosterProbabilitiesType for probability calculations
+ *
+ * @example
+ * ```typescript
+ * // Foil cards always win precedence
+ * determineProbabilitiesType(true, true, true)
+ * // → FOUR_CARDS_WITH_GUARANTEED_EX
+ *
+ * // Standard shiny booster
+ * determineProbabilitiesType(true, false, false)
+ * // → DEFAULT
+ * ```
+ *
+ * @throws {Error} When hasSix=true but hasShiny=false (invalid combination)
+ * @see FOIL_RARITIES for foil detection logic
+ * @see FourCardGuaranteedExStrategy for four-card pack implementation
+ * @see Task 61 for four-card pack requirements
+ */
+```
+
+### **Class Documentation with System Context**
+```typescript
+/**
+ * Strategy for four-card packs with guaranteed EX cards.
+ * 
+ * Implements the `FOUR_CARDS_WITH_GUARANTEED_EX` probabilitiesType with
+ * a fundamentally different pack structure from standard 5-card packs.
+ * 
+ * **Pack Characteristics:**
+ * - Always contains exactly **4 cards** (not 5)
+ * - **No god pack mechanics** (bypassed entirely in probability service)
+ * - **Never contains ONE_SHINY** rarity cards (validated in constructor)
+ * - **Never contains six-pack-only** cards (incompatible mechanics)
+ * - **Includes foil rarities** with ✦ symbol suffix
+ * 
+ * **Slot Distribution System:**
+ * - **Slot 1:** 100% ONE_DIAMOND (guaranteed common)
+ * - **Slot 2:** Mix of ONE_DIAMOND and TWO_DIAMONDS
+ * - **Slot 3:** Complex distribution including foil rarities
+ * - **Slot 4:** 100% FOUR_DIAMONDS (guaranteed EX)
+ * 
+ * **Validation Rules:**
+ * - All slot distributions must sum to 1.0 (validated in constructor)
+ * - ONE_SHINY rarity is explicitly forbidden (throws error if found)
+ * - No negative probabilities allowed
+ * 
+ * @see BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX
+ * @see FourCardPackProbabilityStrategy interface
+ * @see Task 61 for implementation requirements
+ */
+```
+
+## **Constants and Configuration Documentation**
+
+### **Complex Constants with Business Context**
+```typescript
+/** 
+ * Foil rarities for detection and classification.
+ * 
+ * These rarities use the ✦ symbol suffix and trigger the
+ * FOUR_CARDS_WITH_GUARANTEED_EX probabilitiesType when detected
+ * in YAML data during booster synchronization.
+ * 
+ * **Precedence:** Foil rarities have the highest precedence in booster type
+ * determination, overriding shiny and six-pack mechanics.
+ * 
+ * **Exclusions:** Boosters with foil cards cannot contain:
+ * - ONE_SHINY rarity cards
+ * - Six-pack-only cards (isSixPackOnly: true)
+ * - God pack mechanics
+ * 
+ * @see RARITY_MAP for symbol mappings (♢✦, ♢♢✦, ♢♢♢✦)
+ * @see determineProbabilitiesType for precedence logic
+ * @see FourCardGuaranteedExStrategy for four-card pack implementation
+ */
+const FOIL_RARITIES = new Set<Rarity>([
+  Rarity.ONE_DIAMOND_FOIL,    // ♢✦
+  Rarity.TWO_DIAMONDS_FOIL,   // ♢♢✦  
+  Rarity.THREE_DIAMONDS_FOIL, // ♢♢♢✦
+]);
+```
+
+## **Prisma Schema Documentation**
+
+### **Enum Documentation with Business Context**
+```prisma
+/// Booster pack probability calculation types.
+/// Determines pack structure, card counts, and probability distributions.
+enum BoosterProbabilitiesType {
+  /// Standard 5-card packs without shiny rarities, has god pack mechanics
+  NO_SHINY_RARITY
+  /// Standard 5-card packs with shiny rarities and god pack mechanics
+  DEFAULT
+  /// 5-card packs with potential 6th card from six-pack-only pool, has god pack mechanics
+  POTENTIAL_SIXTH_CARD
+  /// 4-card packs with guaranteed EX cards and foil rarities
+  /// - Always exactly 4 cards (not 5)
+  /// - No god pack mechanics
+  /// - Excludes ONE_SHINY and six-pack-only cards
+  /// - Triggered by presence of foil rarity cards
+  /// - Uses FourCardGuaranteedExStrategy for probability calculations
+  FOUR_CARDS_WITH_GUARANTEED_EX
+}
+```
+
+## **Documentation Quality Standards**
+
+- **Use markdown formatting** in JSDoc comments for better readability
+- **Include symbol examples** when dealing with special characters (♢✦, ✸, etc.)
+- **Document exclusion rules** explicitly when systems have complex interactions
+- **Cross-reference related components** using @see tags
+- **Include task references** for implementation context (@see Task 61)
+- **Use structured sections** with bold headers for complex explanations
+- **Provide concrete examples** with expected outputs
+- **Document error conditions** with @throws when appropriate
+
+## **Anti-Patterns to Avoid**
+
+- ❌ **DON'T:** Document obvious parameters without context
+- ❌ **DON'T:** Use generic descriptions like "handles the logic"
+- ❌ **DON'T:** Skip cross-references to related components
+- ❌ **DON'T:** Forget to document precedence in decision logic
+- ❌ **DON'T:** Use technical jargon without explanation
+
+## **Best Practices**
+
+- ✅ **DO:** Document business rules and their implications
+- ✅ **DO:** Explain why certain decisions are made (precedence, exclusions)
+- ✅ **DO:** Include examples that show real usage patterns
+- ✅ **DO:** Cross-reference related classes, methods, and tasks
+- ✅ **DO:** Use consistent formatting and structure
+- ✅ **DO:** Update documentation when implementation changes
+
+Follow [error_handling.mdc](mdc:.cursor/rules/error_handling.mdc) for error documentation patterns and [testing.mdc](mdc:.cursor/rules/testing.mdc) for test documentation standards.

@@ -166,24 +166,59 @@ model PokemonCardOwnership {
   @@index([status])
 }
 
+/// Card rarity definitions for Pokemon TCG Pocket.
+/// Each rarity has a corresponding symbol used in YAML data.
 enum Rarity {
+  /// Standard diamond rarity (symbol: ♢)
   ONE_DIAMOND
+  /// Foil variant of ONE_DIAMOND (symbol: ♢✦)
+  /// Triggers FOUR_CARDS_WITH_GUARANTEED_EX when present
+  ONE_DIAMOND_FOIL
+  /// Standard diamond rarity (symbol: ♢♢)
   TWO_DIAMONDS
+  /// Foil variant of TWO_DIAMONDS (symbol: ♢♢✦)
+  /// Triggers FOUR_CARDS_WITH_GUARANTEED_EX when present
+  TWO_DIAMONDS_FOIL
+  /// Standard diamond rarity (symbol: ♢♢♢)
   THREE_DIAMONDS
+  /// Foil variant of THREE_DIAMONDS (symbol: ♢♢♢✦)
+  /// Triggers FOUR_CARDS_WITH_GUARANTEED_EX when present
+  THREE_DIAMONDS_FOIL
+  /// EX card rarity (symbol: ♢♢♢♢)
   FOUR_DIAMONDS
+  /// Illustration rare (symbol: ☆)
   ONE_STAR
+  /// Special illustration rare (symbol: ☆☆)
   TWO_STARS
+  /// Immersive special illustration (symbol: ☆☆☆)
   THREE_STARS
+  /// Crown rare variant (symbol: ☆☆☆☆)
   FOUR_STARS
+  /// Shiny rare (symbol: ✸)
+  /// Excluded from FOUR_CARDS_WITH_GUARANTEED_EX packs
   ONE_SHINY
+  /// Higher tier shiny (symbol: ✸✸)
   TWO_SHINY
+  /// Crown rare (symbol: ♛)
   CROWN
 }
 
+/// Booster pack probability calculation types.
+/// Determines pack structure, card counts, and probability distributions.
 enum BoosterProbabilitiesType {
+  /// Standard 5-card packs without shiny rarities, has god pack mechanics
   NO_SHINY_RARITY
+  /// Standard 5-card packs with shiny rarities and god pack mechanics
   DEFAULT
+  /// 5-card packs with potential 6th card from six-pack-only pool, has god pack mechanics
   POTENTIAL_SIXTH_CARD
+  /// 4-card packs with guaranteed EX cards and foil rarities
+  /// - Always exactly 4 cards (not 5)
+  /// - No god pack mechanics
+  /// - Excludes ONE_SHINY and six-pack-only cards
+  /// - Triggered by presence of foil rarity cards
+  /// - Uses FourCardGuaranteedExStrategy for probability calculations
+  FOUR_CARDS_WITH_GUARANTEED_EX
 }
 
 enum OwnershipStatus {

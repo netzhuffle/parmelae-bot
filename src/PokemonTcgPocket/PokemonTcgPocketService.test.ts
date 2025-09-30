@@ -1,6 +1,7 @@
 import { describe, beforeEach, it, afterEach, expect, spyOn } from 'bun:test';
 import {
   PokemonTcgPocketService,
+  RARITY_MAP,
   Sets,
   Card,
 } from './PokemonTcgPocketService.js';
@@ -1108,6 +1109,201 @@ describe('PokemonTcgPocketService', () => {
         stats.boosters[2].newCardProbability,
       );
       expect(stats.boosters[2].newCardProbability).toBe(0);
+    });
+  });
+
+  describe('Foil rarity detection and FOUR_CARDS_WITH_GUARANTEED_EX', () => {
+    let service: PokemonTcgPocketService;
+    let probabilityService: PokemonTcgPocketProbabilityService;
+
+    beforeEach(async () => {
+      probabilityService = new PokemonTcgPocketProbabilityService();
+
+      // Create a test set with foil cards
+      const testSets: Sets = {
+        TEST: {
+          name: 'Test Set with Foil Cards',
+          boosters: ['Test Booster'],
+          cards: {
+            1: { name: 'Regular Card', rarity: '♢' },
+            2: { name: 'Foil Card 1', rarity: '♢✦' },
+            3: { name: 'Foil Card 2', rarity: '♢♢✦' },
+            4: { name: 'Foil Card 3', rarity: '♢♢♢✦' },
+            5: { name: 'EX Card', rarity: '♢♢♢♢' },
+          },
+        },
+      };
+
+      service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        testSets,
+      );
+
+      await service.synchronizeCardDatabaseWithYamlSource();
+    });
+
+    it('should detect foil rarities and set FOUR_CARDS_WITH_GUARANTEED_EX', async () => {
+      const booster = await repository.retrieveBoosterByNameAndSetKey(
+        'Test Booster',
+        'TEST',
+      );
+
+      expect(booster).toBeDefined();
+      expect(booster?.probabilitiesType).toBe(
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+    });
+
+    it('should create cards with foil rarities correctly', async () => {
+      // Check individual cards
+      const foilCard1 = await repository.retrieveCardByNumberAndSetKey(
+        2,
+        'TEST',
+      );
+      const foilCard2 = await repository.retrieveCardByNumberAndSetKey(
+        3,
+        'TEST',
+      );
+      const foilCard3 = await repository.retrieveCardByNumberAndSetKey(
+        4,
+        'TEST',
+      );
+
+      expect(foilCard1?.rarity).toBe(Rarity.ONE_DIAMOND_FOIL);
+      expect(foilCard2?.rarity).toBe(Rarity.TWO_DIAMONDS_FOIL);
+      expect(foilCard3?.rarity).toBe(Rarity.THREE_DIAMONDS_FOIL);
+    });
+
+    it('should handle mixed boosters with and without foil cards', async () => {
+      const mixedSets: Sets = {
+        MIXED: {
+          name: 'Mixed Set',
+          boosters: ['Regular Booster', 'Foil Booster'],
+          cards: {
+            1: {
+              name: 'Regular Card',
+              rarity: '♢',
+              boosters: 'Regular Booster',
+            },
+            2: { name: 'Shiny Card', rarity: '✸', boosters: 'Regular Booster' },
+            3: { name: 'Foil Card', rarity: '♢✦', boosters: 'Foil Booster' },
+            4: {
+              name: 'EX Card',
+              rarity: '♢♢♢♢',
+              boosters: ['Regular Booster', 'Foil Booster'],
+            },
+          },
+        },
+      };
+
+      const mixedService = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        mixedSets,
+      );
+
+      await mixedService.synchronizeCardDatabaseWithYamlSource();
+
+      const regularBooster = await repository.retrieveBoosterByNameAndSetKey(
+        'Regular Booster',
+        'MIXED',
+      );
+      const foilBooster = await repository.retrieveBoosterByNameAndSetKey(
+        'Foil Booster',
+        'MIXED',
+      );
+
+      expect(regularBooster?.probabilitiesType).toBe(
+        BoosterProbabilitiesType.DEFAULT,
+      );
+      expect(foilBooster?.probabilitiesType).toBe(
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+    });
+
+    it('should prioritize foil over six-pack when both are present', async () => {
+      const mixedSets = {
+        MIXED: {
+          name: 'Mixed Set',
+          boosters: ['Mixed Booster'],
+          cards: {
+            1: {
+              name: 'Foil Card',
+              rarity: '♢✦',
+              boosters: 'Mixed Booster',
+            },
+            2: {
+              name: 'Six Pack Card',
+              rarity: '♢♢♢',
+              boosters: 'Mixed Booster',
+              isSixPackOnly: true,
+            },
+          },
+        },
+      };
+
+      const mixedService = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        mixedSets,
+      );
+
+      await mixedService.synchronizeCardDatabaseWithYamlSource();
+
+      const booster = await repository.retrieveBoosterByNameAndSetKey(
+        'Mixed Booster',
+        'MIXED',
+      );
+
+      expect(booster?.probabilitiesType).toBe(
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+    });
+
+    it('should prioritize foil over shiny when both are present', async () => {
+      const mixedSets = {
+        MIXED: {
+          name: 'Mixed Set',
+          boosters: ['Mixed Booster'],
+          cards: {
+            1: {
+              name: 'Foil Card',
+              rarity: '♢♢✦',
+              boosters: 'Mixed Booster',
+            },
+            2: {
+              name: 'Shiny Card',
+              rarity: '✸',
+              boosters: 'Mixed Booster',
+            },
+          },
+        },
+      };
+
+      const mixedService = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        mixedSets,
+      );
+
+      await mixedService.synchronizeCardDatabaseWithYamlSource();
+
+      const booster = await repository.retrieveBoosterByNameAndSetKey(
+        'Mixed Booster',
+        'MIXED',
+      );
+
+      expect(booster?.probabilitiesType).toBe(
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+    });
+
+    it('should correctly map foil rarity symbols in RARITY_MAP', () => {
+      // Test that the RARITY_MAP correctly maps foil symbols to enum values
+      expect(RARITY_MAP['♢✦']).toBe(Rarity.ONE_DIAMOND_FOIL);
+      expect(RARITY_MAP['♢♢✦']).toBe(Rarity.TWO_DIAMONDS_FOIL);
+      expect(RARITY_MAP['♢♢♢✦']).toBe(Rarity.THREE_DIAMONDS_FOIL);
     });
   });
 });

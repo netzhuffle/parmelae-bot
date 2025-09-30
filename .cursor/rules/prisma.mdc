@@ -113,6 +113,43 @@ alwaysApply: false
 
 ## Schema Design Patterns
 
+### **Enum Documentation Standards**
+```prisma
+/// Comprehensive enum documentation with business context.
+/// Each enum value should explain its purpose and usage.
+enum BoosterProbabilitiesType {
+  /// Standard 5-card packs without shiny rarities, has god pack mechanics
+  NO_SHINY_RARITY
+  /// Standard 5-card packs with shiny rarities and god pack mechanics
+  DEFAULT
+  /// 5-card packs with potential 6th card from six-pack-only pool, has god pack mechanics
+  POTENTIAL_SIXTH_CARD
+  /// 4-card packs with guaranteed EX cards and foil rarities
+  /// - Always exactly 4 cards (not 5)
+  /// - No god pack mechanics
+  /// - Excludes ONE_SHINY and six-pack-only cards
+  /// - Triggered by presence of foil rarity cards
+  /// - Uses FourCardGuaranteedExStrategy for probability calculations
+  FOUR_CARDS_WITH_GUARANTEED_EX
+}
+
+/// Card rarity definitions with symbol mappings.
+/// Each rarity corresponds to specific symbols used in YAML data.
+enum Rarity {
+  /// Standard diamond rarity (symbol: ♢)
+  ONE_DIAMOND
+  /// Foil variant of ONE_DIAMOND (symbol: ♢✦)
+  /// Triggers FOUR_CARDS_WITH_GUARANTEED_EX when present
+  ONE_DIAMOND_FOIL
+  /// Standard diamond rarity (symbol: ♢♢)
+  TWO_DIAMONDS
+  /// Foil variant of TWO_DIAMONDS (symbol: ♢♢✦)
+  /// Triggers FOUR_CARDS_WITH_GUARANTEED_EX when present
+  TWO_DIAMONDS_FOIL
+  // ... other rarities with similar documentation
+}
+```
+
 - **Relation Definitions:**
   ```prisma
   model Message {

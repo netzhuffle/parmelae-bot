@@ -2949,7 +2949,7 @@
         "description": "Implement a new probabilitiesType 'FOUR_CARDS_WITH_GUARANTEED_EX' for boosters that always contain exactly four cards with a specific rarity distribution and no god packs, along with three new rarities: ONE_DIAMOND_FOIL, TWO_DIAMONDS_FOIL, and THREE_DIAMONDS_FOIL.",
         "details": "1. Define the new enum value 'FOUR_CARDS_WITH_GUARANTEED_EX' in the probabilitiesType enum used for booster packs.\n2. Add the three new rarities 'ONE_DIAMOND_FOIL', 'TWO_DIAMONDS_FOIL', and 'THREE_DIAMONDS_FOIL' to the rarity definitions in the system.\n3. Implement booster pack logic for this probabilitiesType to always produce exactly four cards with the following slot distributions:\n   - Card 1: 100% ONE_DIAMOND rarity\n   - Card 2: 17.73% ONE_DIAMOND, 82.27% TWO_DIAMONDS\n   - Card 3: 23.021% ONE_DIAMOND_FOIL, 17.986% TWO_DIAMONDS, 31.663% THREE_DIAMONDS, 8.996% THREE_DIAMONDS_FOIL, 12.858% ONE_STAR, 2.5% TWO_STARS, 1.111% THREE_STARS, 1.667% TWO_SHINY, 0.198% CROWN\n   - Card 4: 100% FOUR_DIAMONDS rarity\n4. Ensure that boosters of this type do not include any god packs.\n5. Update all relevant services, probability calculation modules, and database schemas if necessary to support the new enum and rarities.\n6. Validate that no ONE_SHINY rarity cards appear in these boosters as per specification.\n7. Follow existing patterns from Task 60 for enum and schema updates and from Task 53 for probability calculations.\n8. Document the new probabilitiesType and rarity definitions clearly for future maintenance and testing.\n\nUse best practices for probability distributions and ensure the implementation is consistent with existing booster pack handling logic.",
         "testStrategy": "1. Unit test the new probabilitiesType enum integration and rarity additions to confirm correct recognition and handling.\n2. Write unit tests for the booster pack generation logic to verify that:\n   - Exactly four cards are generated per booster.\n   - Card rarities match the specified probabilities for each slot.\n   - No god packs are included.\n   - No ONE_SHINY cards appear in any generated booster.\n3. Perform integration tests with sample boosters of this type to ensure correct end-to-end behavior.\n4. Validate database migrations or schema changes if any, ensuring data integrity.\n5. Conduct regression testing on existing booster types to confirm no side effects.\n6. Use statistical sampling tests to verify that the rarity distributions approximate the specified probabilities over many booster generations.\n7. Review code coverage to ensure all new logic paths are tested.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           60,
           53
@@ -2961,8 +2961,8 @@
             "title": "Define new probabilitiesType enum and add new rarities",
             "description": "Add the new enum value 'FOUR_CARDS_WITH_GUARANTEED_EX' to the probabilitiesType enum and define the three new rarities 'ONE_DIAMOND_FOIL', 'TWO_DIAMONDS_FOIL', and 'THREE_DIAMONDS_FOIL' in the system's rarity definitions.",
             "dependencies": [],
-            "details": "Update the probabilitiesType enum to include 'FOUR_CARDS_WITH_GUARANTEED_EX'. Extend the rarity definitions to include the three new foil rarities. Follow the pattern established in Task 60 for enum and schema updates.",
-            "status": "pending",
+            "details": "Update the probabilitiesType enum to include 'FOUR_CARDS_WITH_GUARANTEED_EX'. Extend the rarity definitions to include the three new foil rarities. Follow the pattern established in Task 60 for enum and schema updates.\n<info added on 2025-09-30T00:46:11.087Z>\nImplementation approach:\n1. Add FOUR_CARDS_WITH_GUARANTEED_EX to BoosterProbabilitiesType enum in Prisma schema\n2. Add three new foil rarities to Rarity enum: ONE_DIAMOND_FOIL, TWO_DIAMONDS_FOIL, THREE_DIAMONDS_FOIL\n3. Create and run Prisma migration\n4. Regenerate Prisma client to expose new enum values\n\nFollowing the patterns established in task 60 for enum additions and migrations.\n</info added on 2025-09-30T00:46:11.087Z>\n<info added on 2025-09-30T00:58:08.703Z>\nSubtask 61.1 completed successfully. Implementation details:\n\n✅ Added FOUR_CARDS_WITH_GUARANTEED_EX to BoosterProbabilitiesType enum in Prisma schema\n✅ Added three new foil rarities to Rarity enum: ONE_DIAMOND_FOIL, TWO_DIAMONDS_FOIL, THREE_DIAMONDS_FOIL  \n✅ Prisma client regenerated successfully with new enum values\n✅ Updated RARITY_MAP and RARITY_REVERSE_MAP with foil rarity symbols (♢✦, ♢♢✦, ♢♢♢✦)\n✅ All enum integrations tested and working correctly\n\nThe new rarities use a star suffix (✦) to distinguish foil variants from regular diamond rarities.\n</info added on 2025-09-30T00:58:08.703Z>",
+            "status": "done",
             "testStrategy": "Unit test enum integration and rarity additions to ensure they are recognized and handled correctly."
           },
           {
@@ -2973,7 +2973,7 @@
               "61.1"
             ],
             "details": "Implement logic to generate four cards per booster with the following rarity distributions: Card 1: 100% ONE_DIAMOND; Card 2: 17.73% ONE_DIAMOND, 82.27% TWO_DIAMONDS; Card 3: mixed rarities with specified probabilities; Card 4: 100% FOUR_DIAMONDS. Ensure no god packs are included.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write unit tests to verify four cards are generated per booster and that each card's rarity matches the specified probabilities."
           },
           {
@@ -2984,7 +2984,7 @@
               "61.2"
             ],
             "details": "Add validation logic within booster generation to exclude god packs and ONE_SHINY rarity cards, ensuring compliance with the task requirements.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Unit test booster generation to confirm no god packs or ONE_SHINY rarity cards appear in the output."
           },
           {
@@ -2995,7 +2995,7 @@
               "61.1"
             ],
             "details": "Review and update probability calculation modules to incorporate the new probabilitiesType and rarities. Adjust database schemas if necessary to store and handle the new enum and rarity values. Follow existing patterns from Task 53 for probability calculations.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Integration tests to verify that services and database interactions correctly handle the new enum and rarities."
           },
           {
@@ -3008,7 +3008,7 @@
               "61.4"
             ],
             "details": "Document the enum addition, rarity definitions, booster pack generation logic, and exclusion rules. Include examples and references to related tasks (60 and 53) for context.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Review documentation for completeness and clarity; ensure it aligns with implemented logic."
           }
         ]
@@ -3016,7 +3016,7 @@
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-09-30T00:09:58.822Z",
+      "updated": "2025-09-30T01:40:38.739Z",
       "description": "Tasks for master context"
     }
   }
