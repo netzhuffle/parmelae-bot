@@ -124,7 +124,7 @@ export class PokemonTcgPocketProbabilityService {
    *
    * Four-card packs have fundamentally different probability calculations:
    * - Use FourCardGuaranteedExStrategy instead of standard slot logic
-   * - Bypass god pack calculations entirely
+   * - Two-way weighting (normal + god) applies; god pack chance is 0.05% using 4 cards
    * - Use 4 slots instead of 5 slots
    * - Include foil rarities in distributions
    *
@@ -218,11 +218,20 @@ export class PokemonTcgPocketProbabilityService {
       return 0.0;
     }
 
-    // Handle four-card packs separately (no god packs, different calculation)
+    // Handle four-card packs with god pack support
     if (this.isFourCardPack(probabilitiesType)) {
-      return this.computeFourCardPackChance(
+      const normalFourCardChance = this.computeFourCardPackChance(
         filteredBoosterCards,
         filteredMissingCards,
+      );
+      const godFourCardChance = this.computeGodPackChance(
+        filteredBoosterCards,
+        filteredMissingCards,
+        4, // Four-card god packs contain 4 cards
+      );
+      return this.combinePackProbabilities(
+        normalFourCardChance,
+        godFourCardChance,
       );
     }
 
@@ -404,12 +413,18 @@ export class PokemonTcgPocketProbabilityService {
   /**
    * Calculates the probability of getting at least one new card in a god pack.
    * In a god pack:
-   * - All 5 cards are from {⭐️, ⭐️⭐️, ⭐️⭐️⭐️, ✴️, ✴️✴️, 👑}
+   * - All cards are from {⭐️, ⭐️⭐️, ⭐️⭐️⭐️, ✴️, ✴️✴️, 👑}
    * - Each eligible card has equal probability
+   *
+   * @param boosterCards - All cards available in this booster
+   * @param missingCards - Cards the user doesn't own yet
+   * @param cardsPerPack - Number of cards in the pack (4 for four-card packs, 5 for others)
+   * @returns Probability of getting at least one new card in a god pack
    */
   private computeGodPackChance(
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
+    cardsPerPack: number = PACK_CONFIG.CARDS_PER_PACK,
   ): number {
     const { godPackCards, missingGodPackCards } = this.filterGodPackCards(
       boosterCards,
@@ -425,7 +440,7 @@ export class PokemonTcgPocketProbabilityService {
     const probabilityNoNewCardInOneSlot = 1.0 - probabilityNewCardInOneSlot;
     const probabilityNoNewCardInPack = Math.pow(
       probabilityNoNewCardInOneSlot,
-      PACK_CONFIG.CARDS_PER_PACK,
+      cardsPerPack,
     );
 
     return 1.0 - probabilityNoNewCardInPack;
@@ -580,7 +595,8 @@ export class PokemonTcgPocketProbabilityService {
    *
    * **Four-Card Pack Logic:**
    * Unlike standard 5-card packs, four-card packs use a completely different
-   * probability calculation system with 4 slots and no god pack mechanics.
+   * probability calculation system with 4 slots. Two-way weighting (normal + god)
+   * applies; god pack chance is 0.05% using 4 cards.
    *
    * **Calculation Method:**
    * 1. For each slot (1-4), get the rarity distribution from FourCardGuaranteedExStrategy

@@ -788,12 +788,12 @@ export class PokemonTcgPocketService {
    *
    * **Four-Card Pack Logic:**
    * When foil rarities are detected, the booster uses a completely different
-   * pack structure with 4 cards instead of 5, no god packs, and specific
+   * pack structure with 4 cards instead of 5 and specific
    * slot distributions that include foil rarities.
    *
    * **Exclusion Rules:**
    * - Foil + Six-pack: Foil wins (four-card packs don't support six-pack mechanics)
-   * - Foil + Shiny: Foil wins (four-card packs exclude ONE_SHINY cards)
+   * - Foil + Shiny: Foil wins (four-card packs take precedence)
    * - Six-pack without Shiny: Invalid combination (throws error)
    *
    * @param hasShiny - Whether booster contains shiny rarity cards (✸, ✸✸)

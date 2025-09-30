@@ -3012,11 +3012,92 @@
             "testStrategy": "Review documentation for completeness and clarity; ensure it aligns with implemented logic."
           }
         ]
+      },
+      {
+        "id": 62,
+        "title": "Fix incorrect implementation in Task 61: FOUR_CARDS_WITH_GUARANTEED_EX probabilitiesType should support god packs",
+        "description": "Correct the implementation of FOUR_CARDS_WITH_GUARANTEED_EX boosters to properly include god pack mechanics and probability calculations, which were incorrectly excluded in Task 61.",
+        "status": "done",
+        "dependencies": [
+          61
+        ],
+        "priority": "high",
+        "details": "The current implementation in Task 61 incorrectly excluded god packs from FOUR_CARDS_WITH_GUARANTEED_EX boosters. This task will fix the following issues:\n\n1. **Update PokemonTcgPocketProbabilityService.calculateNewCardProbabilityForRarities():**\n   - Remove the bypass logic that skips god pack calculations for four-card packs\n   - Combine normal 4-card and god 4-card pack calculations using 2-way weights (normal vs god pack)\n   - Ensure god pack selection follows the same 0.05% probability as other pack types\n   - Parameterize computeGodPackChance by pack size only (allowed rarities use the global GOD_PACK_RARITIES set)\n   - For FOUR_CARDS_WITH_GUARANTEED_EX: god pack pool includes ALL god-pack rarities from ONE_STAR to CROWN, including ONE_SHINY and TWO_SHINY when present, still excluding isSixPackOnly\n\n2. **Update FourCardGuaranteedExStrategy.ts:**\n   - Remove documentation stating \"No god pack mechanics\"\n   - Add proper documentation explaining how god packs work with 4-card guaranteed EX packs\n   - Implement god pack detection and handling logic within the strategy\n   - Ensure the strategy can differentiate between regular 4-card packs and god packs\n   - Use the global GOD_PACK_RARITIES set for god pack rarity selection\n\n3. **Update Documentation Across All Booster Types:**\n   - Remove any documentation hints that suggest some booster types do NOT have god packs\n   - Keep neutral wording without adding new documentation that states which types have god packs\n   - Update Prisma schema comments to remove contradictory statements about god pack support\n\n4. **Clarify Normal Flow Behavior:**\n   - Normal FOUR_CARDS_WITH_GUARANTEED_EX flow remains unchanged: TWO_SHINY can appear per slot distribution\n   - ONE_SHINY absence in normal flow is data-driven (not present in available cards), not enforced by validation\n   - No validation restrictions need to be removed for normal flow\n\n5. **Update Related Tests:**\n   - Ensure normal four-card path allows TWO_SHINY as per slot distribution\n   - Test that god packs include shiny rarities (ONE_SHINY/TWO_SHINY) where present in the global GOD_PACK_RARITIES set\n   - Update mock data and test fixtures to reflect the corrected behavior\n   - Test the 2-way weight system for normal vs god pack selection\n\n6. **Ensure Proper Integration:**\n   - Verify that god pack probability calculations integrate correctly with the existing 4-card pack slot distribution logic\n   - Maintain backward compatibility with existing booster configurations\n   - Ensure the parameterized approach supports different pack sizes using the global GOD_PACK_RARITIES set\n   - Ensure the fix doesn't break existing functionality for other pack types",
+        "testStrategy": "1. **Unit Testing:**\n   - Test PokemonTcgPocketProbabilityService.calculateNewCardProbabilityForRarities() with FOUR_CARDS_WITH_GUARANTEED_EX boosters to verify god pack calculations are included\n   - Verify that god pack probability is correctly set to 0.05% for four-card packs using 2-way weights\n   - Test that god pack pool includes ALL god-pack rarities from ONE_STAR to CROWN, including ONE_SHINY and TWO_SHINY when present\n   - Test FourCardGuaranteedExStrategy with both regular 4-card packs and god pack scenarios\n   - Verify parameterized computeGodPackChance works correctly with different pack sizes using global GOD_PACK_RARITIES\n   - Test that normal four-card flow allows TWO_SHINY as per slot distribution\n   - Ensure all existing unit tests for other pack types continue to pass\n\n2. **Integration Testing:**\n   - Create end-to-end tests that generate multiple FOUR_CARDS_WITH_GUARANTEED_EX boosters and verify god packs appear at the expected frequency\n   - Test the complete probability calculation flow from booster selection through card generation using 2-way weights\n   - Verify that god packs maintain their special properties while respecting the 4-card structure\n   - Test that god packs for this type can contain all god-pack rarities including shiny rarities when present\n   - Test the combined normal-4 and god-4 pack weight system\n\n3. **Regression Testing:**\n   - Run the full test suite to ensure no existing functionality is broken\n   - Specifically test other probabilitiesType values (NO_SHINY_RARITY, DEFAULT, POTENTIAL_SIXTH_CARD) to ensure they remain unaffected\n   - Verify that 5-card and 6-card pack logic continues to work correctly\n   - Test that other pack types' god pack behavior remains unchanged\n\n4. **Documentation Verification:**\n   - Review updated documentation in code comments and schema to ensure accuracy\n   - Verify that all references suggesting some pack types don't support god packs have been removed\n   - Ensure documentation maintains neutral wording without explicitly stating which types have god packs",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Remove god pack bypass logic and implement 2-way weight system",
+            "description": "Update the calculateNewCardProbabilityForRarities() method to remove the bypass logic that incorrectly skips god pack calculations for FOUR_CARDS_WITH_GUARANTEED_EX boosters and implement 2-way weights for normal vs god pack selection.",
+            "status": "done",
+            "dependencies": [],
+            "details": "Locate the PokemonTcgPocketProbabilityService.calculateNewCardProbabilityForRarities() method and identify the conditional logic that bypasses god pack calculations for four-card packs. Remove this bypass logic and implement a 2-way weight system that combines normal 4-card and god 4-card pack calculations. The system should use weights to determine whether to generate a normal 4-card pack or a god pack (0.05% weight for god packs). Maintain the existing logic flow for other pack types while ensuring four-card packs follow the same god pack probability calculation path as other supported pack types.",
+            "testStrategy": "Create unit tests to verify that calculateNewCardProbabilityForRarities() no longer bypasses god pack calculations for FOUR_CARDS_WITH_GUARANTEED_EX boosters. Test the 2-way weight system to ensure correct probability distribution between normal and god packs. Test with mock data to ensure the method processes both normal and god pack probabilities correctly."
+          },
+          {
+            "id": 2,
+            "title": "Parameterize computeGodPackChance by pack size only",
+            "description": "Update computeGodPackChance to be parameterized by pack size only while using the global GOD_PACK_RARITIES set for allowed rarities.",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "Refactor the computeGodPackChance function to accept pack size as the only parameter while using the existing global GOD_PACK_RARITIES set for rarity selection. For FOUR_CARDS_WITH_GUARANTEED_EX boosters: set god pack probability to 0.05% (0.0005), god pack size to 4 cards, and use the global GOD_PACK_RARITIES set which includes ALL god-pack rarities from ONE_STAR to CROWN, including ONE_SHINY and TWO_SHINY when present, while maintaining exclusion of isSixPackOnly cards. Ensure the calculation integrates properly with the 2-way weight system and existing 4-card pack slot distribution logic.",
+            "testStrategy": "Test that computeGodPackChance correctly calculates god pack probability as 0.05% for four-card packs when parameterized by pack size only. Verify that the god pack pool includes all god-pack rarities including shiny rarities when present using the global GOD_PACK_RARITIES set. Test that the parameterized approach works correctly and integrates with the 2-way weight system."
+          },
+          {
+            "id": 3,
+            "title": "Update FourCardGuaranteedExStrategy documentation and implementation",
+            "description": "Remove the 'No god pack mechanics' documentation from FourCardGuaranteedExStrategy.ts and implement proper god pack detection and handling logic using the global GOD_PACK_RARITIES set.",
+            "status": "done",
+            "dependencies": [
+              2
+            ],
+            "details": "Update the FourCardGuaranteedExStrategy.ts file to remove all documentation stating 'No god pack mechanics'. Add comprehensive documentation explaining how god packs work with 4-card guaranteed EX packs, including that they use the global GOD_PACK_RARITIES set (which includes all god-pack rarities including shiny rarities when present). Implement god pack detection logic that can differentiate between regular 4-card packs and god packs. Add handling logic for god pack scenarios that uses the global GOD_PACK_RARITIES set while maintaining the existing guaranteed EX card functionality. Ensure the strategy properly processes both regular 4-card packs and god pack variants.",
+            "testStrategy": "Test the updated strategy with both regular 4-card packs and god pack scenarios. Verify that god pack detection works correctly and that god packs include all god-pack rarities including shiny rarities when present from the global set. Ensure guaranteed EX functionality is maintained for regular packs."
+          },
+          {
+            "id": 4,
+            "title": "Update documentation to remove contradictory god pack statements",
+            "description": "Remove any documentation hints that suggest some booster types do NOT have god packs while maintaining neutral wording without explicitly stating which types have god packs.",
+            "status": "done",
+            "dependencies": [],
+            "details": "Conduct a comprehensive review of all documentation including Prisma schema, code comments, and strategy files to identify and remove any statements suggesting that certain booster types do not support god packs. Remove contradictory documentation from the FOUR_CARDS_WITH_GUARANTEED_EX enum and other relevant areas. Maintain neutral wording throughout the codebase without adding new documentation that explicitly states which booster types have god packs. Focus on removing negative statements rather than adding positive ones.",
+            "testStrategy": "Review all updated documentation to ensure contradictory statements have been removed. Verify that documentation maintains neutral wording without explicitly stating god pack support for specific types. Ensure no references to unsupported god pack mechanics remain anywhere in the codebase."
+          },
+          {
+            "id": 5,
+            "title": "Update and create comprehensive test coverage",
+            "description": "Update existing unit tests that incorrectly assumed god packs are not supported and create new test cases specifically for god pack scenarios with FOUR_CARDS_WITH_GUARANTEED_EX boosters, ensuring normal flow allows TWO_SHINY and god packs include shiny rarities when present.",
+            "status": "done",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Identify all existing unit tests that were written with the incorrect assumption that god packs are not supported for FOUR_CARDS_WITH_GUARANTEED_EX boosters. Update these tests to reflect the corrected behavior. Create comprehensive new test cases covering: parameterized computeGodPackChance calculations, 2-way weight system for normal vs god pack selection, god pack detection and handling, integration with guaranteed EX mechanics, normal four-card flow allowing TWO_SHINY as per slot distribution, inclusion of ALL god-pack rarities (including shiny rarities when present) in god packs, and edge cases. Update mock data and test fixtures to include god pack scenarios with appropriate rarity distributions using the global GOD_PACK_RARITIES set.\n<info added on 2025-09-30T09:36:03.788Z>\nNormal four-card flow already permits TWO_SHINY via slot distribution; validation should not be added to forbid shiny cards. ONE_SHINY absence from sets is data-driven rather than enforced by validation logic. God pack path uses global GOD_PACK_RARITIES (including shiny rarities when present) and excludes isSixPackOnly cards. Test strategy should focus on asserting TWO_SHINY can appear in normal four-card slot distributions when present in the card pool, and that god packs can include shiny rarities. No tests should enforce absence of ONE_SHINY beyond what the data naturally provides.\n</info added on 2025-09-30T09:36:03.788Z>",
+            "testStrategy": "Run the complete test suite to ensure all updated tests pass. Verify that new test cases cover all god pack scenarios including the 2-way weight system, probability calculations, card selection with all god-pack rarities including shiny rarities when present, and that normal flow allows TWO_SHINY. Test coverage should include both positive and negative test cases."
+          },
+          {
+            "id": 6,
+            "title": "Verify integration and handle system-wide impacts",
+            "description": "Ensure proper integration of parameterized god pack mechanics with existing systems, maintain backward compatibility, and address any impacts from the universal god pack support changes.",
+            "status": "done",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "details": "Perform comprehensive integration testing to verify that parameterized computeGodPackChance and 2-way weight system integrate correctly with existing booster configuration systems. Ensure backward compatibility is maintained for existing pack types and configurations. Check for any references to booster types in UI components, CSV files, or configuration files that might need updates to reflect the removal of contradictory god pack documentation. Verify that the parameterized approach works correctly across all pack types using the global GOD_PACK_RARITIES set and that the changes don't break existing functionality for any pack types.",
+            "testStrategy": "Conduct end-to-end integration testing with various pack configurations and all booster types. Test the 2-way weight system across different scenarios. Test backward compatibility with existing booster setups. Check UI components and CSV files for any references that need updating. Perform regression testing to ensure all pack types work correctly with the updated god pack system."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-09-30T01:40:38.739Z",
+      "updated": "2025-09-30T10:50:08.393Z",
       "description": "Tasks for master context"
     }
   }

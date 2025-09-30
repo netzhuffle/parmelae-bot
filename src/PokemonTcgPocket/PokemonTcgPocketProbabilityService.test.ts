@@ -11,6 +11,8 @@ const GOD_PACK_RARITIES = new Set<Rarity>([
   Rarity.ONE_STAR,
   Rarity.TWO_STARS,
   Rarity.THREE_STARS,
+  Rarity.ONE_SHINY,
+  Rarity.TWO_SHINY,
   Rarity.CROWN,
 ]);
 
@@ -769,22 +771,109 @@ describe('PokemonTcgPocketProbabilityService', () => {
       expect(probability).toBeLessThanOrEqual(1);
     });
 
-    it('should not include ONE_SHINY cards in four-card pack calculations', () => {
+    it('should include god pack rarities in four-card god packs', () => {
       const cards = createTestCardsWithFoilRarities();
-      // Add some ONE_SHINY cards to the pool
-      cards.push(createTestCard(999, Rarity.ONE_SHINY));
 
-      const missingCards = cards.filter((c) => c.rarity === Rarity.ONE_SHINY);
+      // Test with god pack rarities (ONE_STAR exists in both normal slot 3 and god packs)
+      const missingCards = cards.filter((c) => c.rarity === Rarity.ONE_STAR);
 
-      // Since ONE_SHINY cards should never appear in four-card packs,
-      // the probability should be 0 even if they're missing
+      // Monkey-patch PACK_CONFIG to force god packs only and restore afterwards
+      const originalNormal = PACK_CONFIG.NORMAL_PACK_PROBABILITY;
+      const originalGod = PACK_CONFIG.GOD_PACK_PROBABILITY;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        (PACK_CONFIG as any).NORMAL_PACK_PROBABILITY = 0;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        (PACK_CONFIG as any).GOD_PACK_PROBABILITY = 1;
+
+        const probability = service.calculateNewCardProbability(
+          cards,
+          missingCards,
+          BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+        );
+
+        // Should be greater than 0 when god packs are forced (probability = 1)
+        // This proves god pack logic is working for four-card packs
+        expect(probability).toBeGreaterThan(0);
+        expect(probability).toBeLessThanOrEqual(1);
+      } finally {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        (PACK_CONFIG as any).NORMAL_PACK_PROBABILITY = originalNormal;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        (PACK_CONFIG as any).GOD_PACK_PROBABILITY = originalGod;
+      }
+    });
+
+    it('should use 2-way weighting for four-card packs (normal + god)', () => {
+      const cards = createTestCardsWithFoilRarities();
+
+      // Create a scenario where only god pack rarities are missing
+      const godPackOnlyMissingCards = cards.filter(
+        (c) => c.rarity === Rarity.ONE_STAR || c.rarity === Rarity.CROWN,
+      );
+
+      // Create a scenario where only normal pack rarities are missing
+      const normalPackOnlyMissingCards = cards.filter(
+        (c) =>
+          c.rarity === Rarity.ONE_DIAMOND ||
+          c.rarity === Rarity.ONE_DIAMOND_FOIL,
+      );
+
+      const godPackProbability = service.calculateNewCardProbability(
+        cards,
+        godPackOnlyMissingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+
+      const normalPackProbability = service.calculateNewCardProbability(
+        cards,
+        normalPackOnlyMissingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+
+      // Both should be greater than 0, indicating 2-way weighting
+      expect(godPackProbability).toBeGreaterThan(0);
+      expect(normalPackProbability).toBeGreaterThan(0);
+
+      // God pack probability should be much smaller due to 0.05% weight
+      expect(godPackProbability).toBeLessThan(normalPackProbability);
+    });
+
+    it('should exclude isSixPackOnly cards from four-card god packs', () => {
+      const cards = createTestCardsWithFoilRarities();
+
+      // Add a six-pack-only card
+      const sixPackOnlyCard = createTestCard(998, Rarity.ONE_STAR);
+      sixPackOnlyCard.isSixPackOnly = true;
+      cards.push(sixPackOnlyCard);
+
+      const missingCards = [sixPackOnlyCard];
+
       const probability = service.calculateNewCardProbability(
         cards,
         missingCards,
         BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
       );
 
+      // Should be 0 since six-pack-only cards are excluded from god packs
       expect(probability).toBe(0);
+    });
+
+    it('should allow TWO_SHINY in normal four-card flow per slot distribution', () => {
+      const cards = createTestCardsWithFoilRarities();
+
+      // Test with TWO_SHINY cards (which are in the slot 3 distribution)
+      const missingCards = cards.filter((c) => c.rarity === Rarity.TWO_SHINY);
+
+      const probability = service.calculateNewCardProbability(
+        cards,
+        missingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
+
+      // Should be greater than 0 since TWO_SHINY can appear in normal flow
+      expect(probability).toBeGreaterThan(0);
+      expect(probability).toBeLessThanOrEqual(1);
     });
   });
 });

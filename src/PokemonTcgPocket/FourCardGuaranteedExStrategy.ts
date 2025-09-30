@@ -16,8 +16,6 @@ export interface FourCardPackProbabilityStrategy {
  *
  * **Pack Characteristics:**
  * - Always contains exactly **4 cards** (not 5)
- * - **No god pack mechanics** (bypassed entirely in probability service)
- * - **Never contains ONE_SHINY** rarity cards (validated in constructor)
  * - **Never contains six-pack-only** cards (incompatible mechanics)
  * - **Includes foil rarities** with ✦ symbol suffix
  *
@@ -31,14 +29,14 @@ export interface FourCardPackProbabilityStrategy {
  * Slot 3 includes foil variants (ONE_DIAMOND_FOIL, TWO_DIAMONDS_FOIL,
  * THREE_DIAMONDS_FOIL) that trigger this pack type when detected in YAML data.
  *
+ * **Normal Pack Probability Calculation:**
+ * This strategy defines the slot distributions for normal four-card packs.
+ * God pack handling is universal across all booster types and computed
+ * separately in the probability service using the global god pack rarity pool.
+ *
  * **Validation Rules:**
  * - All slot distributions must sum to 1.0 (validated in constructor)
- * - ONE_SHINY rarity is explicitly forbidden (throws error if found)
  * - No negative probabilities allowed
- *
- * **Probability Calculation:**
- * Used by `PokemonTcgPocketProbabilityService.computeFourCardPackChance()`
- * to calculate the probability of getting new cards from four-card packs.
  *
  * @see BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX
  * @see FourCardPackProbabilityStrategy interface
@@ -59,7 +57,7 @@ export class FourCardGuaranteedExStrategy
     [Rarity.TWO_DIAMONDS, 0.8227],
   ]);
 
-  /** Slot 3: Complex distribution with foil rarities and no ONE_SHINY */
+  /** Slot 3: Complex distribution with foil rarities */
   private readonly SLOT3_DISTRIBUTION = new Map<Rarity, number>([
     [Rarity.ONE_DIAMOND_FOIL, 0.23021],
     [Rarity.TWO_DIAMONDS_FOIL, 0.17986],
@@ -83,9 +81,6 @@ export class FourCardGuaranteedExStrategy
     this.validateDistribution(this.SLOT2_DISTRIBUTION, 'Slot 2');
     this.validateDistribution(this.SLOT3_DISTRIBUTION, 'Slot 3');
     this.validateDistribution(this.SLOT4_DISTRIBUTION, 'Slot 4');
-
-    // Ensure ONE_SHINY is not present in any slot
-    this.assertNoOneShiny();
   }
 
   getCardsPerPack(): 4 {
@@ -126,26 +121,6 @@ export class FourCardGuaranteedExStrategy
       if (probability < 0) {
         throw new Error(
           `${slotName} has negative probability for ${rarity}: ${probability}`,
-        );
-      }
-    }
-  }
-
-  /**
-   * Ensures ONE_SHINY rarity is not present in any slot distribution
-   */
-  private assertNoOneShiny(): void {
-    const allDistributions = [
-      { name: 'Slot 1', dist: this.SLOT1_DISTRIBUTION },
-      { name: 'Slot 2', dist: this.SLOT2_DISTRIBUTION },
-      { name: 'Slot 3', dist: this.SLOT3_DISTRIBUTION },
-      { name: 'Slot 4', dist: this.SLOT4_DISTRIBUTION },
-    ];
-
-    for (const { name, dist } of allDistributions) {
-      if (dist.has(Rarity.ONE_SHINY)) {
-        throw new Error(
-          `${name} contains ONE_SHINY rarity, which is not allowed in four-card packs`,
         );
       }
     }

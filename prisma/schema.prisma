@@ -195,7 +195,6 @@ enum Rarity {
   /// Crown rare variant (symbol: ☆☆☆☆)
   FOUR_STARS
   /// Shiny rare (symbol: ✸)
-  /// Excluded from FOUR_CARDS_WITH_GUARANTEED_EX packs
   ONE_SHINY
   /// Higher tier shiny (symbol: ✸✸)
   TWO_SHINY
@@ -214,8 +213,6 @@ enum BoosterProbabilitiesType {
   POTENTIAL_SIXTH_CARD
   /// 4-card packs with guaranteed EX cards and foil rarities
   /// - Always exactly 4 cards (not 5)
-  /// - No god pack mechanics
-  /// - Excludes ONE_SHINY and six-pack-only cards
   /// - Triggered by presence of foil rarity cards
   /// - Uses FourCardGuaranteedExStrategy for probability calculations
   FOUR_CARDS_WITH_GUARANTEED_EX
