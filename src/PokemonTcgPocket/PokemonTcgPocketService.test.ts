@@ -1306,4 +1306,83 @@ describe('PokemonTcgPocketService', () => {
       expect(RARITY_MAP['♢♢♢✦']).toBe(Rarity.THREE_DIAMONDS_FOIL);
     });
   });
+
+  describe('formatCardsAsCsv', () => {
+    let service: PokemonTcgPocketService;
+
+    beforeEach(() => {
+      repository = new PokemonTcgPocketRepositoryFake();
+      const probabilityService = new PokemonTcgPocketProbabilityService();
+      const setsData: Sets = {
+        TEST: {
+          name: 'Test Set',
+          cards: {
+            1: { name: 'Test Card', rarity: '♢' },
+          },
+        },
+      };
+      service = new PokemonTcgPocketService(
+        probabilityService,
+        repository,
+        setsData,
+      );
+
+      // Setup repository with test data for probability calculations
+      repository.countByBoosterAndRarityReturnValue = 10; // Default count
+      repository.countGodPackEligibleByBoosterReturnValue = 0; // No god pack by default
+    });
+
+    it('should include Probability column in correct position', async () => {
+      // Create the set first
+      await repository.createSet('TEST', 'Test Set');
+      await repository.createBooster('Test Booster', 'TEST');
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'TEST',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+
+      // Get cards with relations using searchCards
+      const cardsWithRelations = await repository.searchCards({
+        cardName: 'Test Card',
+      });
+
+      const csv = await service.formatCardsAsCsv(cardsWithRelations);
+      const lines = csv.split('\n');
+      const header = lines[0];
+
+      expect(header).toBe(
+        'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by Owned',
+      );
+    });
+
+    it('should format probability as percentage with 2 decimals', async () => {
+      // Create the set first
+      await repository.createSet('TEST', 'Test Set');
+      await repository.createBooster('Test Booster', 'TEST');
+      await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'TEST',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: ['Test Booster'],
+        isSixPackOnly: false,
+      });
+
+      const cardsWithRelations = await repository.searchCards({
+        cardName: 'Test Card 2',
+      });
+      const csv = await service.formatCardsAsCsv(cardsWithRelations);
+      const lines = csv.split('\n');
+      const dataLine = lines[1];
+      const columns = dataLine.split(',');
+      const probabilityColumn = columns[5]; // 6th column (0-indexed)
+
+      // Should be a percentage string with 2 decimal places
+      expect(probabilityColumn).toMatch(/^\d+\.\d{2}%$/);
+    });
+  });
 });

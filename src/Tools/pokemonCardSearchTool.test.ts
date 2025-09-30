@@ -57,7 +57,7 @@ describe('pokemonCardSearch', () => {
     );
 
     expect(result).toBe(
-      'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1\nA1-001,Test Card,♢,Test Set,Glurak,No,No',
+      'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1\nA1-001,Test Card,♢,Test Set,Glurak,N/A,No,No',
     );
     expect(repository.searchCards).toHaveBeenCalledWith({});
   });
@@ -87,7 +87,7 @@ describe('pokemonCardSearch', () => {
 
     // Validate exact header and row including column order and SixPackOnly flag
     expect(result).toBe(
-      'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1\nA1-001,Six Only Card,☆,Test Set,Glurak,Yes,No',
+      'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1\nA1-001,Six Only Card,☆,Test Set,Glurak,N/A,Yes,No',
     );
     expect(repository.searchCards).toHaveBeenCalledWith({});
   });
@@ -155,7 +155,7 @@ describe('pokemonCardSearch', () => {
     // Header + 20 cards + empty line + message
     expect(lines).toHaveLength(23);
     expect(lines[0]).toBe(
-      'ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by @test1',
+      'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1',
     );
     expect(lines[lines.length - 1]).toBe(
       'Limited list above to first 20 cards to save token usage. Tell the user there are 5 additional cards matching the search query (25 total).',

@@ -671,6 +671,24 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     return await Promise.resolve(booster);
   }
 
+  // Count methods for probability calculations
+  public countByBoosterAndRarityReturnValue = 0;
+  public countGodPackEligibleByBoosterReturnValue = 0;
+
+  /** Count cards by booster, rarity, and six-pack exclusivity for probability calculations */
+  async countByBoosterAndRarity(
+    _boosterId: number,
+    _rarity: Rarity,
+    _isSixPackOnly: boolean,
+  ): Promise<number> {
+    return Promise.resolve(this.countByBoosterAndRarityReturnValue);
+  }
+
+  /** Count god pack eligible cards in a booster for probability calculations */
+  async countGodPackEligibleByBooster(_boosterId: number): Promise<number> {
+    return Promise.resolve(this.countGodPackEligibleByBoosterReturnValue);
+  }
+
   /** Resets all stored data for test isolation */
   reset(): void {
     this.sets.clear();
@@ -678,5 +696,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     this.cards.clear();
     this.cardBoosters.clear();
     this.nextId = 1;
+    this.countByBoosterAndRarityReturnValue = 0;
+    this.countGodPackEligibleByBoosterReturnValue = 0;
   }
 }

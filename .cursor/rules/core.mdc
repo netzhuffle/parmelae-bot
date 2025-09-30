@@ -120,3 +120,65 @@ Implement the changes as planned and confirmed by the user.
   - Only after a subtask is in "review" AND the user confirms can a subtask be marked "done"
   - Only after ALL subtasks are marked "done" AND the tasks test strategy passes can a task be marked in "review"
   - Only after a task is in "review" AND the user confirms can a task be marked "done"
+
+## Constants Management Patterns
+
+- **Centralized Constants:**
+  ```typescript
+  // ✅ DO: Centralize related constants in service files
+  /** Array of rarities that can appear in god packs */
+  const GOD_PACK_RARITIES_ARRAY: Rarity[] = [
+    Rarity.ONE_STAR,
+    Rarity.TWO_STARS,
+    Rarity.THREE_STARS,
+    Rarity.ONE_SHINY,
+    Rarity.TWO_SHINY,
+    Rarity.CROWN,
+  ];
+
+  /** Set of rarities that can appear in god packs */
+  export const GOD_PACK_RARITIES = new Set<Rarity>(GOD_PACK_RARITIES_ARRAY);
+
+  /** Array of rarities that can appear in god packs (for Prisma queries) */
+  export const GOD_PACK_RARITIES_FOR_PRISMA = GOD_PACK_RARITIES_ARRAY;
+  ```
+
+- **Constants Organization:**
+  ```typescript
+  // ✅ DO: Group related constants with interfaces
+  interface PackConfiguration {
+    readonly NORMAL_PACK_PROBABILITY: number;
+    readonly GOD_PACK_PROBABILITY: number;
+    readonly CARDS_PER_PACK: number;
+    readonly GUARANTEED_ONE_DIAMOND_CARDS: number;
+  }
+
+  export const PACK_CONFIG: PackConfiguration = {
+    NORMAL_PACK_PROBABILITY: 0.9995,
+    GOD_PACK_PROBABILITY: 0.0005,
+    CARDS_PER_PACK: 5,
+    GUARANTEED_ONE_DIAMOND_CARDS: 3,
+  } as const;
+  ```
+
+- **Export Strategy:**
+  ```typescript
+  // ✅ DO: Export both Set and Array versions for different use cases
+  export const GOD_PACK_RARITIES = new Set<Rarity>(GOD_PACK_RARITIES_ARRAY);
+  export const GOD_PACK_RARITIES_FOR_PRISMA = GOD_PACK_RARITIES_ARRAY;
+
+  // ✅ DO: Use const assertions for immutable configurations
+  export const SIX_PACK_WEIGHTS = {
+    NORMAL_PACK_PROBABILITY: 0.9162,
+    GOD_PACK_PROBABILITY: 0.0005,
+    SIX_PACK_PROBABILITY: 0.0833,
+  } as const;
+  ```
+
+- **Anti-Patterns:**
+  ```typescript
+  // ❌ DON'T: Duplicate constants across multiple files
+  // ❌ DON'T: Use mutable arrays when immutable sets are more appropriate
+  // ❌ DON'T: Export constants without proper documentation
+  // ❌ DON'T: Mix different types of constants in single exports
+  ```

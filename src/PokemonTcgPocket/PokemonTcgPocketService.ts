@@ -14,6 +14,7 @@ import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPoc
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+import { BoosterCardCountsAdapter } from './Repositories/Types.js';
 import { BOOSTERS_STATS_EXPLANATION, SETS_STATS_EXPLANATION } from './texts.js';
 import assert from 'node:assert/strict';
 import {
@@ -146,6 +147,26 @@ export enum CardOwnershipStatus {
   OWNED = 'OWNED',
   NOT_NEEDED = 'NOT_NEEDED',
   MISSING = 'MISSING',
+}
+
+/** Adapter implementation for count-based probability calculations */
+class RepositoryBoosterCardCountsAdapter implements BoosterCardCountsAdapter {
+  constructor(
+    private readonly repository: PokemonTcgPocketRepository,
+    private readonly boosterId: number,
+  ) {}
+
+  async countByRarity(rarity: Rarity, isSixPackOnly: boolean): Promise<number> {
+    return this.repository.countByBoosterAndRarity(
+      this.boosterId,
+      rarity,
+      isSixPackOnly,
+    );
+  }
+
+  async countGodPackEligible(): Promise<number> {
+    return this.repository.countGodPackEligibleByBooster(this.boosterId);
+  }
 }
 
 /** Symbol for injecting the Pokemon TCG Pocket YAML content */
@@ -332,25 +353,64 @@ export class PokemonTcgPocketService {
     return user.username ? `@${user.username}` : user.firstName;
   }
 
+  /** Calculates the probability string for a card in its first booster */
+  private async calculateCardProbabilityString(
+    card: PokemonCardWithRelations,
+  ): Promise<string> {
+    if (card.boosters.length === 0) {
+      return 'N/A';
+    }
+
+    try {
+      // Use first booster (probability is same across all boosters for a card)
+      const firstBooster = card.boosters[0];
+      const countsAdapter = new RepositoryBoosterCardCountsAdapter(
+        this.repository,
+        firstBooster.id,
+      );
+
+      const probability =
+        await this.probabilityService.calculateSingleCardProbability(
+          card,
+          countsAdapter,
+          firstBooster.probabilitiesType,
+        );
+
+      return probability > 0 ? `${(probability * 100).toFixed(2)}%` : 'N/A';
+    } catch (error) {
+      // Log error but don't fail CSV generation
+      console.warn(
+        `Failed to calculate probability for card ${card.id}:`,
+        error,
+      );
+      return 'N/A';
+    }
+  }
+
   /** Formats multiple cards as CSV strings */
   async formatCardsAsCsv(
     cards: PokemonCardWithRelations[],
     userId?: bigint,
   ): Promise<string> {
     const displayName = userId ? await this.getDisplayName(userId) : 'Owned';
-    const header = `ID,Name,Rarity,Set,Boosters,SixPackOnly,Owned by ${displayName}`;
-    const csvLines = cards.map((card) => this.formatCardAsCsv(card, userId));
+    const header = `ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by ${displayName}`;
+    const csvLines = await Promise.all(
+      cards.map((card) => this.formatCardAsCsv(card, userId)),
+    );
     return [header, ...csvLines].join('\n');
   }
 
   /** Formats a card as a CSV string */
-  private formatCardAsCsv(
+  private async formatCardAsCsv(
     card: PokemonCardWithRelations,
     userId?: bigint,
-  ): string {
+  ): Promise<string> {
     const boosterNames = card.boosters
       .map((b: PokemonBoosterModel) => b.name)
       .join(',');
+
+    // Calculate probability for first booster (same probability across all boosters)
+    const probabilityString = await this.calculateCardProbabilityString(card);
 
     let ownershipStatus = 'No';
     if (userId) {
@@ -371,7 +431,7 @@ export class PokemonTcgPocketService {
       .padStart(
         3,
         '0',
-      )},${card.name},${raritySymbol},${card.set.name},${boosterNames},${sixPackOnly},${ownershipStatus}`;
+      )},${card.name},${raritySymbol},${card.set.name},${boosterNames},${probabilityString},${sixPackOnly},${ownershipStatus}`;
   }
 
   /** Gets formatted collection statistics for a user */

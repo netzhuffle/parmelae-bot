@@ -192,6 +192,35 @@ enum Rarity {
   });
   ```
 
+- **Count-Based Queries for Performance:**
+  ```typescript
+  // ✅ DO: Use count queries when only counts are needed
+  async countByBoosterAndRarity(
+    boosterId: number,
+    rarity: Rarity,
+    isSixPackOnly: boolean,
+  ): Promise<number> {
+    return await this.prisma.pokemonCard.count({
+      where: {
+        rarity,
+        isSixPackOnly,
+        boosters: { some: { id: boosterId } },
+      },
+    });
+  }
+
+  // ✅ DO: Use count for existence checks
+  const hasCards = await this.prisma.pokemonCard.count({
+    where: { userId, status: 'ACTIVE' }
+  }) > 0;
+
+  // ❌ DON'T: Fetch full data when only counts are needed
+  const cards = await this.prisma.pokemonCard.findMany({
+    where: { boosterId, rarity }
+  });
+  const count = cards.length; // Inefficient!
+  ```
+
 - **Efficient Filtering:**
   ```typescript
   // ✅ DO: Use proper where conditions
@@ -200,6 +229,20 @@ enum Rarity {
       ? { some: { id: userId } }
       : { none: { id: userId } }
   }
+  ```
+
+- **Batch Operations:**
+  ```typescript
+  // ✅ DO: Use batch operations for multiple records
+  await this.prisma.pokemonCard.updateMany({
+    where: { boosterId },
+    data: { lastUpdated: new Date() }
+  });
+
+  // ✅ DO: Use createMany for bulk inserts
+  await this.prisma.pokemonCard.createMany({
+    data: cards.map(card => ({ ...card, boosterId }))
+  });
   ```
 
 ## Migration Best Practices
