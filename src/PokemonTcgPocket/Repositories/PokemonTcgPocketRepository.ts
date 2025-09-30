@@ -2,7 +2,11 @@ import { PrismaClient } from '../../generated/prisma/client.js';
 import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
 import { PokemonBoosterModel } from '../../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../../generated/prisma/models/PokemonCard.js';
-import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
+import {
+  Rarity,
+  OwnershipStatus,
+  BoosterProbabilitiesType,
+} from '../../generated/prisma/enums.js';
 import { injectable } from 'inversify';
 import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 import { PokemonTcgPocketNotFoundError } from '../Errors/PokemonTcgPocketNotFoundError.js';
@@ -494,8 +498,7 @@ export class PokemonTcgPocketRepository {
               id: booster.id,
               name: booster.name,
               setId: booster.setId,
-              hasShinyRarity: booster.hasShinyRarity,
-              hasSixPacks: booster.hasSixPacks,
+              probabilitiesType: booster.probabilitiesType,
             },
             cards: booster.cards.map((card) => ({
               card: {
@@ -556,39 +559,20 @@ export class PokemonTcgPocketRepository {
     }
   }
 
-  /** Updates the hasShinyRarity field of a booster */
-  async updateBoosterShinyRarity(
+  /** Updates the probabilitiesType field of a booster */
+  async updateBoosterProbabilitiesType(
     boosterId: number,
-    hasShinyRarity: boolean,
+    probabilitiesType: BoosterProbabilitiesType,
   ): Promise<PokemonBoosterModel> {
     try {
       return this.prisma.pokemonBooster.update({
         where: { id: boosterId },
-        data: { hasShinyRarity },
+        data: { probabilitiesType },
       });
     } catch (error) {
       throw new PokemonTcgPocketDatabaseError(
         'update',
-        `booster ${boosterId} shiny rarity`,
-        this.formatError(error),
-      );
-    }
-  }
-
-  /** Updates the hasSixPacks field of a booster */
-  async updateBoosterSixPacks(
-    boosterId: number,
-    hasSixPacks: boolean,
-  ): Promise<PokemonBoosterModel> {
-    try {
-      return this.prisma.pokemonBooster.update({
-        where: { id: boosterId },
-        data: { hasSixPacks },
-      });
-    } catch (error) {
-      throw new PokemonTcgPocketDatabaseError(
-        'update',
-        `booster ${boosterId} six packs`,
+        `booster ${boosterId} probabilities type`,
         this.formatError(error),
       );
     }

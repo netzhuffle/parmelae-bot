@@ -5,7 +5,11 @@ import {
   Card,
 } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
-import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
+import {
+  Rarity,
+  OwnershipStatus,
+  BoosterProbabilitiesType,
+} from '../generated/prisma/enums.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 
@@ -405,10 +409,12 @@ describe('PokemonTcgPocketService', () => {
       expect(cardInOneBoosters).toHaveLength(1);
       expect(cardInOneBoosters[0].name).toBe('Booster1');
 
-      // Verify all boosters have hasShinyRarity set to false since there are no shiny cards
+      // Verify all boosters have NO_SHINY_RARITY since there are no shiny cards
       const boosters = repository.getAllBoosters();
       boosters.forEach((booster) => {
-        expect(booster.hasShinyRarity).toBe(false);
+        expect(booster.probabilitiesType).toBe(
+          BoosterProbabilitiesType.NO_SHINY_RARITY,
+        );
       });
     });
 
@@ -458,10 +464,12 @@ describe('PokemonTcgPocketService', () => {
       );
       expect(cardWithoutBoostersBoosters).toHaveLength(0);
 
-      // Verify all boosters have hasShinyRarity set to false since there are no shiny cards
+      // Verify all boosters have NO_SHINY_RARITY since there are no shiny cards
       const boosters = repository.getAllBoosters();
       boosters.forEach((booster) => {
-        expect(booster.hasShinyRarity).toBe(false);
+        expect(booster.probabilitiesType).toBe(
+          BoosterProbabilitiesType.NO_SHINY_RARITY,
+        );
       });
     });
   });
@@ -499,13 +507,15 @@ describe('PokemonTcgPocketService', () => {
       const boosters = repository.getAllBoosters();
       expect(boosters).toHaveLength(2);
 
-      // Verify Booster1 (no shiny cards) has hasShinyRarity false
+      // Verify Booster1 (no shiny cards) has NO_SHINY_RARITY
       const booster1 = boosters.find((b) => b.name === 'Booster1')!;
-      expect(booster1.hasShinyRarity).toBe(false);
+      expect(booster1.probabilitiesType).toBe(
+        BoosterProbabilitiesType.NO_SHINY_RARITY,
+      );
 
-      // Verify Booster2 (with shiny cards) has hasShinyRarity true
+      // Verify Booster2 (with shiny cards) has DEFAULT
       const booster2 = boosters.find((b) => b.name === 'Booster2')!;
-      expect(booster2.hasShinyRarity).toBe(true);
+      expect(booster2.probabilitiesType).toBe(BoosterProbabilitiesType.DEFAULT);
     });
 
     it('sets hasShinyRarity to true for boosters containing shiny cards when cards are in multiple boosters', async () => {
@@ -544,17 +554,19 @@ describe('PokemonTcgPocketService', () => {
       const boosters = repository.getAllBoosters();
       expect(boosters).toHaveLength(3);
 
-      // Verify Booster1 (with one shiny card) has hasShinyRarity true
+      // Verify Booster1 (with one shiny card) has DEFAULT
       const booster1 = boosters.find((b) => b.name === 'Booster1')!;
-      expect(booster1.hasShinyRarity).toBe(true);
+      expect(booster1.probabilitiesType).toBe(BoosterProbabilitiesType.DEFAULT);
 
-      // Verify Booster2 (with two shiny cards) has hasShinyRarity true
+      // Verify Booster2 (with two shiny cards) has DEFAULT
       const booster2 = boosters.find((b) => b.name === 'Booster2')!;
-      expect(booster2.hasShinyRarity).toBe(true);
+      expect(booster2.probabilitiesType).toBe(BoosterProbabilitiesType.DEFAULT);
 
-      // Verify Booster3 (no shiny cards) has hasShinyRarity false
+      // Verify Booster3 (no shiny cards) has NO_SHINY_RARITY
       const booster3 = boosters.find((b) => b.name === 'Booster3')!;
-      expect(booster3.hasShinyRarity).toBe(false);
+      expect(booster3.probabilitiesType).toBe(
+        BoosterProbabilitiesType.NO_SHINY_RARITY,
+      );
     });
   });
 
@@ -581,6 +593,11 @@ describe('PokemonTcgPocketService', () => {
               rarity: '♢♢♢',
               boosters: 'Booster3',
             },
+            4: {
+              name: 'Shiny Card',
+              rarity: '✸',
+              boosters: ['Booster1', 'Booster2'],
+            },
           },
         },
       };
@@ -594,7 +611,7 @@ describe('PokemonTcgPocketService', () => {
 
       // Verify cards were created with correct isSixPackOnly values
       const cards = repository.getAllCards();
-      expect(cards).toHaveLength(3);
+      expect(cards).toHaveLength(4);
 
       const regularCard = cards.find((c) => c.name === 'Regular Card')!;
       expect(regularCard.isSixPackOnly).toBe(false);
@@ -611,17 +628,23 @@ describe('PokemonTcgPocketService', () => {
       const boosters = repository.getAllBoosters();
       expect(boosters).toHaveLength(3);
 
-      // Verify Booster1 (contains six-pack card) has hasSixPacks true
+      // Verify Booster1 (contains six-pack card and shiny card) has POTENTIAL_SIXTH_CARD
       const booster1 = boosters.find((b) => b.name === 'Booster1')!;
-      expect(booster1.hasSixPacks).toBe(true);
+      expect(booster1.probabilitiesType).toBe(
+        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+      );
 
-      // Verify Booster2 (contains six-pack card) has hasSixPacks true
+      // Verify Booster2 (contains six-pack card and shiny card) has POTENTIAL_SIXTH_CARD
       const booster2 = boosters.find((b) => b.name === 'Booster2')!;
-      expect(booster2.hasSixPacks).toBe(true);
+      expect(booster2.probabilitiesType).toBe(
+        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+      );
 
-      // Verify Booster3 (no six-pack cards) has hasSixPacks false
+      // Verify Booster3 (no six-pack cards, no shiny cards) has NO_SHINY_RARITY
       const booster3 = boosters.find((b) => b.name === 'Booster3')!;
-      expect(booster3.hasSixPacks).toBe(false);
+      expect(booster3.probabilitiesType).toBe(
+        BoosterProbabilitiesType.NO_SHINY_RARITY,
+      );
     });
 
     it('should set hasSixPacks to true for boosters containing six-pack-only cards when cards are in multiple boosters', async () => {
@@ -643,6 +666,16 @@ describe('PokemonTcgPocketService', () => {
               isSixPackOnly: true,
               boosters: 'Booster2',
             },
+            4: {
+              name: 'Shiny Card 1',
+              rarity: '✸',
+              boosters: 'Booster1',
+            },
+            5: {
+              name: 'Shiny Card 2',
+              rarity: '✸✸',
+              boosters: 'Booster2',
+            },
           },
         },
       };
@@ -656,7 +689,7 @@ describe('PokemonTcgPocketService', () => {
 
       // Verify cards were created with correct isSixPackOnly values
       const cards = repository.getAllCards();
-      expect(cards).toHaveLength(3);
+      expect(cards).toHaveLength(5);
 
       const regularCard = cards.find((c) => c.name === 'Regular Card')!;
       expect(regularCard.isSixPackOnly).toBe(false);
@@ -673,12 +706,16 @@ describe('PokemonTcgPocketService', () => {
       const boosters = repository.getAllBoosters();
       expect(boosters).toHaveLength(2);
 
-      // Both boosters should have hasSixPacks true since they each contain a six-pack card
+      // Both boosters should have POTENTIAL_SIXTH_CARD since they each contain a six-pack card and shiny card
       const booster1 = boosters.find((b) => b.name === 'Booster1')!;
-      expect(booster1.hasSixPacks).toBe(true);
+      expect(booster1.probabilitiesType).toBe(
+        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+      );
 
       const booster2 = boosters.find((b) => b.name === 'Booster2')!;
-      expect(booster2.hasSixPacks).toBe(true);
+      expect(booster2.probabilitiesType).toBe(
+        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+      );
     });
 
     it('should set hasSixPacks to false for all boosters when no six-pack-only cards exist', async () => {
@@ -708,11 +745,13 @@ describe('PokemonTcgPocketService', () => {
         expect(card.isSixPackOnly).toBe(false);
       });
 
-      // Verify all boosters have hasSixPacks false
+      // Verify all boosters have NO_SHINY_RARITY since there are no shiny or six-pack cards
       const boosters = repository.getAllBoosters();
       expect(boosters).toHaveLength(2);
       boosters.forEach((booster) => {
-        expect(booster.hasSixPacks).toBe(false);
+        expect(booster.probabilitiesType).toBe(
+          BoosterProbabilitiesType.NO_SHINY_RARITY,
+        );
       });
     });
   });

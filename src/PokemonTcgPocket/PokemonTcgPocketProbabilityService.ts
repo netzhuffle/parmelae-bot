@@ -1,6 +1,7 @@
 import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
-import { Rarity } from '../generated/prisma/enums.js';
+import { Rarity, BoosterProbabilitiesType } from '../generated/prisma/enums.js';
 import { injectable } from 'inversify';
+import { NotExhaustiveSwitchError } from '../NotExhaustiveSwitchError.js';
 import {
   NormalPackProbabilityStrategy,
   ShinyPackProbabilityStrategy,
@@ -79,19 +80,49 @@ export class PokemonTcgPocketProbabilityService {
   private readonly shinyStrategy = new ShinyPackProbabilityStrategy();
 
   /**
+   * Determines if the probabilities type includes shiny rarity cards
+   */
+  private hasShinyRarity(probabilitiesType: BoosterProbabilitiesType): boolean {
+    switch (probabilitiesType) {
+      case BoosterProbabilitiesType.NO_SHINY_RARITY:
+        return false;
+      case BoosterProbabilitiesType.DEFAULT:
+      case BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD:
+        return true;
+      default:
+        throw new NotExhaustiveSwitchError(probabilitiesType);
+    }
+  }
+
+  /**
+   * Determines if the probabilities type supports six-card packs
+   */
+  private hasSixPacks(probabilitiesType: BoosterProbabilitiesType): boolean {
+    switch (probabilitiesType) {
+      case BoosterProbabilitiesType.NO_SHINY_RARITY:
+      case BoosterProbabilitiesType.DEFAULT:
+        return false;
+      case BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD:
+        return true;
+      default:
+        throw new NotExhaustiveSwitchError(probabilitiesType);
+    }
+  }
+
+  /**
    * Calculates the probability of getting at least one new card from a booster pack.
    * This considers both normal packs (99.95%) and god packs (0.05%).
    */
   calculateNewCardProbability(
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
-    hasShinyRarity: boolean,
+    probabilitiesType: BoosterProbabilitiesType,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
       boosterCards,
       missingCards,
       () => true,
-      hasShinyRarity,
+      probabilitiesType,
     );
   }
 
@@ -102,13 +133,13 @@ export class PokemonTcgPocketProbabilityService {
   calculateNewDiamondCardProbability(
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
-    hasShinyRarity: boolean,
+    probabilitiesType: BoosterProbabilitiesType,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
       boosterCards,
       missingCards,
       (card) => card.rarity !== null && this.DIAMOND_RARITIES.has(card.rarity),
-      hasShinyRarity,
+      probabilitiesType,
     );
   }
 
@@ -119,13 +150,13 @@ export class PokemonTcgPocketProbabilityService {
   calculateNewTradableCardProbability(
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
-    hasShinyRarity: boolean,
+    probabilitiesType: BoosterProbabilitiesType,
   ): number {
     return this.calculateNewCardProbabilityForRarities(
       boosterCards,
       missingCards,
       (card) => card.rarity !== null && this.TRADABLE_RARITIES.has(card.rarity),
-      hasShinyRarity,
+      probabilitiesType,
     );
   }
 
@@ -137,7 +168,7 @@ export class PokemonTcgPocketProbabilityService {
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
     rarityFilter: (card: PokemonCardModel) => boolean,
-    hasShinyRarity: boolean,
+    probabilitiesType: BoosterProbabilitiesType,
   ): number {
     const filteredBoosterCards = boosterCards.filter(rarityFilter);
     const filteredMissingCards = missingCards.filter(rarityFilter);
@@ -152,13 +183,13 @@ export class PokemonTcgPocketProbabilityService {
     const normalPackChance = this.computeNormalPackChance(
       filteredBoosterCards,
       filteredMissingCards,
-      hasShinyRarity,
+      this.hasShinyRarity(probabilitiesType),
     );
     const godPackChance = this.computeGodPackChance(
       filteredBoosterCards,
       filteredMissingCards,
     );
-    const hasSixPacks = this.isSixPackBooster(boosterCards);
+    const hasSixPacks = this.hasSixPacks(probabilitiesType);
     if (!hasSixPacks) {
       return this.combinePackProbabilities(normalPackChance, godPackChance);
     }
@@ -166,7 +197,7 @@ export class PokemonTcgPocketProbabilityService {
     const sixPackChance = this.computeSixPackChance(
       filteredBoosterCards,
       filteredMissingCards,
-      hasShinyRarity,
+      this.hasShinyRarity(probabilitiesType),
     );
     return this.combinePackProbabilities3(
       normalPackChance,

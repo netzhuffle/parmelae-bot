@@ -1,4 +1,8 @@
-import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
+import {
+  Rarity,
+  OwnershipStatus,
+  BoosterProbabilitiesType,
+} from '../../generated/prisma/enums.js';
 import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
 import { PokemonBoosterModel } from '../../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../../generated/prisma/models/PokemonCard.js';
@@ -80,8 +84,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       id: this.nextId++,
       name,
       setId: set.id,
-      hasShinyRarity: false,
-      hasSixPacks: false,
+      probabilitiesType: BoosterProbabilitiesType.NO_SHINY_RARITY,
     };
     this.boosters.set(`${set.id}_${name}`, booster);
     return Promise.resolve(booster);
@@ -642,10 +645,10 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     return Promise.resolve(result);
   }
 
-  /** Updates the hasShinyRarity field of a booster */
-  async updateBoosterShinyRarity(
+  /** Updates the probabilitiesType field of a booster */
+  async updateBoosterProbabilitiesType(
     boosterId: number,
-    hasShinyRarity: boolean,
+    probabilitiesType: BoosterProbabilitiesType,
   ): Promise<PokemonBoosterModel> {
     const booster = Array.from(this.boosters.values()).find(
       (b) => b.id === boosterId,
@@ -653,30 +656,11 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     if (!booster) {
       throw new PokemonTcgPocketDatabaseError(
         'update',
-        `booster ${boosterId} shiny rarity`,
+        `booster ${boosterId} probabilities type`,
         'Booster not found',
       );
     }
-    booster.hasShinyRarity = hasShinyRarity;
-    return await Promise.resolve(booster);
-  }
-
-  /** Updates the hasSixPacks field of a booster */
-  async updateBoosterSixPacks(
-    boosterId: number,
-    hasSixPacks: boolean,
-  ): Promise<PokemonBoosterModel> {
-    const booster = Array.from(this.boosters.values()).find(
-      (b) => b.id === boosterId,
-    );
-    if (!booster) {
-      throw new PokemonTcgPocketDatabaseError(
-        'update',
-        `booster ${boosterId} six packs`,
-        'Booster not found',
-      );
-    }
-    booster.hasSixPacks = hasSixPacks;
+    booster.probabilitiesType = probabilitiesType;
     return await Promise.resolve(booster);
   }
 }

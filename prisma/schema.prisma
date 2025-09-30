@@ -119,18 +119,17 @@ model PokemonSet {
 }
 
 model PokemonBooster {
-  id             Int           @id @default(autoincrement())
-  name           String
-  set            PokemonSet    @relation(fields: [setId], references: [id])
-  setId          Int
-  hasShinyRarity Boolean       @default(false)
-  hasSixPacks    Boolean       @default(false)
-  cards          PokemonCard[]
+  id                Int                      @id @default(autoincrement())
+  name              String
+  set               PokemonSet               @relation(fields: [setId], references: [id])
+  setId             Int
+  probabilitiesType BoosterProbabilitiesType @default(NO_SHINY_RARITY)
+  cards             PokemonCard[]
 
   @@unique([setId, name])
   @@index([setId])
-  @@index([hasShinyRarity])
-  @@index([hasSixPacks])
+  @@index([probabilitiesType])
+  @@index([setId, probabilitiesType])
 }
 
 model PokemonCard {
@@ -179,6 +178,12 @@ enum Rarity {
   ONE_SHINY
   TWO_SHINY
   CROWN
+}
+
+enum BoosterProbabilitiesType {
+  NO_SHINY_RARITY
+  DEFAULT
+  POTENTIAL_SIXTH_CARD
 }
 
 enum OwnershipStatus {

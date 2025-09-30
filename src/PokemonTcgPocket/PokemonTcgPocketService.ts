@@ -1,6 +1,10 @@
 import { injectable, inject } from 'inversify';
 import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
-import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
+import {
+  Rarity,
+  OwnershipStatus,
+  BoosterProbabilitiesType,
+} from '../generated/prisma/enums.js';
 import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
 import { PokemonBoosterModel } from '../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
@@ -507,7 +511,7 @@ export class PokemonTcgPocketService {
                 this.probabilityService.calculateNewDiamondCardProbability(
                   allCards,
                   missingCards,
-                  booster.hasShinyRarity,
+                  booster.probabilitiesType,
                 ) * 100,
               tradableOwned: tradableCards.filter(
                 ({ ownershipStatus }) =>
@@ -522,7 +526,7 @@ export class PokemonTcgPocketService {
                 this.probabilityService.calculateNewTradableCardProbability(
                   allCards,
                   missingCards,
-                  booster.hasShinyRarity,
+                  booster.probabilitiesType,
                 ) * 100,
               allOwned: cardsWithServiceStatus.filter(
                 ({ ownershipStatus }) =>
@@ -537,7 +541,7 @@ export class PokemonTcgPocketService {
                 this.probabilityService.calculateNewCardProbability(
                   allCards,
                   missingCards,
-                  booster.hasShinyRarity,
+                  booster.probabilitiesType,
                 ) * 100,
             };
           }),
@@ -727,6 +731,25 @@ export class PokemonTcgPocketService {
     return boosters.filter((b): b is NonNullable<typeof b> => b !== null);
   }
 
+  /**
+   * Determines the probabilities type based on boolean combinations
+   */
+  private determineProbabilitiesType(
+    hasShiny: boolean,
+    hasSix: boolean,
+  ): BoosterProbabilitiesType {
+    if (!hasShiny && !hasSix) return BoosterProbabilitiesType.NO_SHINY_RARITY;
+    if (hasShiny && !hasSix) return BoosterProbabilitiesType.DEFAULT;
+    if (hasShiny && hasSix)
+      return BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD;
+
+    // This should never happen according to requirements, but throw a descriptive error
+    throw new Error(
+      `Invalid combination: hasShiny=${hasShiny}, hasSix=${hasSix}. ` +
+        'The combination of hasShiny=false and hasSix=true is not allowed.',
+    );
+  }
+
   private async synchronizeCards(
     setKey: string,
     setData: SetData,
@@ -766,21 +789,22 @@ export class PokemonTcgPocketService {
       }
     }
 
-    // Update hasShinyRarity and hasSixPacks for boosters
-    await Promise.all([
-      ...boosters.map((booster) =>
-        this.repository.updateBoosterShinyRarity(
+    // Update probabilitiesType for boosters based on their characteristics
+    await Promise.all(
+      boosters.map((booster) => {
+        const hasShiny = boostersWithShinyCards.has(booster.name);
+        const hasSix = boostersWithSixCardPacks.has(booster.name);
+        const probabilitiesType = this.determineProbabilitiesType(
+          hasShiny,
+          hasSix,
+        );
+
+        return this.repository.updateBoosterProbabilitiesType(
           booster.id,
-          boostersWithShinyCards.has(booster.name),
-        ),
-      ),
-      ...boosters.map((booster) =>
-        this.repository.updateBoosterSixPacks(
-          booster.id,
-          boostersWithSixCardPacks.has(booster.name),
-        ),
-      ),
-    ]);
+          probabilitiesType,
+        );
+      }),
+    );
 
     // Second pass: Create all cards
     for (const [cardNumberString, card] of Object.entries(setData.cards)) {
