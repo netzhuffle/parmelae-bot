@@ -21,7 +21,6 @@ tasks:
       - postDevcontainerStart
     command: |
       bun install
-      bun run build
       bun run migrate
   check:
     name: Check

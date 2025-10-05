@@ -8,9 +8,6 @@ import {
   ChatGptMessage,
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage.js';
-import { MinecraftStartTool } from './Tools/MinecraftStartTool.js';
-import { MinecraftStatusTool } from './Tools/MinecraftStatusTool.js';
-import { MinecraftStopTool } from './Tools/MinecraftStopTool.js';
 import { WebBrowserToolFactory } from './Tools/WebBrowserToolFactory.js';
 import { GoogleSearchToolFactory } from './Tools/GoogleSearchToolFactory.js';
 import { GitHubToolFactory } from './Tools/GitHubToolFactory.js';
@@ -20,6 +17,8 @@ import { Config } from './Config.js';
 import { SchiParmelaeIdentity } from './MessageGenerators/Identities/SchiParmelaeIdentity.js';
 import { EmulatorIdentity } from './MessageGenerators/Identities/EmulatorIdentity.js';
 import { Identity } from './MessageGenerators/Identities/Identity.js';
+import { SCHEDULE_MESSAGE_TOOL_NAME } from './Tools/ScheduleMessageTool.js';
+import { INTERMEDIATE_ANSWER_TOOL_NAME } from './Tools/IntermediateAnswerTool.js';
 import { StructuredTool, Tool } from '@langchain/core/tools';
 import { MessageModel } from './generated/prisma/models/Message.js';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
@@ -30,7 +29,6 @@ import { Conversation } from './Conversation.js';
 import { identityQueryTool } from './Tools/identityQueryTool.js';
 import { identitySetterTool } from './Tools/identitySetterTool.js';
 import { diceTool } from './Tools/diceTool.js';
-import { dallETool } from './Tools/dallETool.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
 import { pokemonCardSearchTool } from './Tools/pokemonCardSearchTool.js';
 import { pokemonCardAddTool } from './Tools/pokemonCardAddTool.js';
@@ -119,7 +117,6 @@ export class ChatGptAgentService {
   private readonly tools: (StructuredTool | Tool)[] = [
     new Calculator(),
     diceTool,
-    dallETool,
     dateTimeTool,
     identityQueryTool,
     identitySetterTool,
@@ -146,9 +143,6 @@ export class ChatGptAgentService {
     googleSearchToolFactory: GoogleSearchToolFactory,
     gptModelQueryTool: GptModelQueryTool,
     gptModelSetterTool: GptModelSetterTool,
-    minecraftStatusTool: MinecraftStatusTool,
-    minecraftStartTool: MinecraftStartTool,
-    minecraftStopTool: MinecraftStopTool,
     webBrowserToolFactory: WebBrowserToolFactory,
   ) {
     this.tools = [
@@ -156,11 +150,11 @@ export class ChatGptAgentService {
       googleSearchToolFactory.create(),
       gptModelQueryTool,
       gptModelSetterTool,
-      minecraftStatusTool,
-      minecraftStartTool,
-      minecraftStopTool,
       webBrowserToolFactory.create(),
     ];
+
+    // Note: GitHub tool is loaded asynchronously and added to tools array after creation
+    // This allows the tool to be available for subsequent requests without blocking startup
     const tools = this.tools;
     gitHubToolFactory
       .create()
@@ -173,33 +167,43 @@ export class ChatGptAgentService {
   /**
    * Generates and returns a message using an agent executor and tools.
    *
-   * @param basePrompt - Prompt Template with the following MessagesPlaceholders: example, conversation
+   * **Tool Merge Precedence:** global tools → identity.tools → schedule → intermediate
+   * **Prompt Source:** Uses identity.prompt internally (must include 'example' and 'conversation' placeholders)
+   * **Identity.tools Contract:** Must be safe to reuse across calls (no mutable internal state)
+   * **Critical Tool Protection:** Identity tools with reserved names ('schedule-message', 'intermediate-answer') are filtered out with warnings
+   *
+   * @param message - The message to respond to
+   * @param example - Example conversation messages for the prompt
+   * @param conversation - Recent conversation history for context
    * @param announceToolCall - Callback to announce tool calls (e.g., send to Telegram)
+   * @param identity - Bot identity containing prompt template and tools
+   * @param retries - Current retry attempt (internal use)
    */
   async generate(
     message: MessageModel,
-    prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
+    identity: Identity,
     retries = 0,
   ): Promise<ChatGptAgentResponse> {
     try {
       return this.getReply(
         message,
-        prompt,
+        identity.prompt,
         example,
         conversation,
         announceToolCall,
+        identity,
       );
     } catch (error) {
       if (retries < 2) {
         return this.generate(
           message,
-          prompt,
           example,
           conversation,
           announceToolCall,
+          identity,
           retries + 1,
         );
       }
@@ -215,19 +219,60 @@ export class ChatGptAgentService {
     }
   }
 
+  /**
+   * Builds the complete tools array by merging global tools with identity-specific tools.
+   *
+   * **Tool Merge Order:** global tools → identity.tools → schedule → intermediate
+   * **Critical Tool Protection:** Identity tools with reserved names ('schedule-message', 'intermediate-answer')
+   * are filtered out with warnings to prevent system instability
+   *
+   * @param identity - The bot identity containing prompt and tools
+   * @param message - The message being processed (needed for dynamic tool creation)
+   * @returns Complete tools array ready for agent creation
+   */
+  private buildTools(
+    identity: Identity,
+    message: MessageModel,
+  ): (StructuredTool | Tool)[] {
+    // Guard against identity tools shadowing critical system tools
+    const criticalToolNames = new Set([
+      SCHEDULE_MESSAGE_TOOL_NAME,
+      INTERMEDIATE_ANSWER_TOOL_NAME,
+    ]);
+    const conflictingTools = identity.tools.filter((tool) =>
+      criticalToolNames.has(tool.name),
+    );
+    if (conflictingTools.length > 0) {
+      console.warn(
+        `Identity "${identity.name}" defines tools that conflict with critical system tools: ${conflictingTools.map((t) => t.name).join(', ')}. ` +
+          'These will be ignored to prevent system instability.',
+      );
+    }
+
+    // Merge global tools with identity-specific tools (excluding conflicts)
+    const identityTools = identity.tools.filter(
+      (tool) => !criticalToolNames.has(tool.name),
+    );
+    return [
+      ...this.tools,
+      ...identityTools,
+      this.scheduleMessageToolFactory.create(message.chatId, message.fromId),
+      this.intermediateAnswerToolFactory.create(message.chatId),
+    ];
+  }
+
   private async getReply(
     message: MessageModel,
     prompt: ChatPromptTemplate,
     example: BaseMessage[],
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
+    identity: Identity,
   ): Promise<ChatGptAgentResponse> {
+    const allTools = this.buildTools(identity, message);
+
     const agent = this.agentStateGraphFactory.create({
-      tools: [
-        ...this.tools,
-        this.scheduleMessageToolFactory.create(message.chatId, message.fromId),
-        this.intermediateAnswerToolFactory.create(message.chatId),
-      ],
+      tools: allTools,
       llm: this.models.getModel(this.config.gptModel),
       announceToolCall,
     });

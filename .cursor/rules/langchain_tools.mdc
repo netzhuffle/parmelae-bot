@@ -9,6 +9,7 @@ alwaysApply: false
   - **Define Zod schema** for input validation with detailed descriptions
   - **Use `.nullish()` instead of `.optional()`** for optional parameters (GPT models handle nullish better)
   - **Include comprehensive tool description** explaining purpose and usage
+  - **Tool name constants** should be defined in the same file as the tool unless creating import cycles
 
 - **Schema Definition Patterns:**
   ```typescript
@@ -204,5 +205,44 @@ alwaysApply: false
   - **Cache results** when appropriate (following existing patterns)
   - **Limit API calls** and implement reasonable timeouts
   - **Handle rate limiting** gracefully with user feedback
+
+- **Tool Name Constants Pattern:**
+  ```typescript
+  // ✅ DO: Define tool name constant in the same file as the tool
+  export const MY_TOOL_NAME = 'my-tool';
+  
+  export const myTool = tool(
+    async (input: MyToolInput, config: LangGraphRunnableConfig): Promise<string> => {
+      // Implementation
+    },
+    {
+      name: MY_TOOL_NAME,  // Use the constant
+      description: 'Tool description',
+      schema,
+    },
+  );
+  
+  // ❌ DON'T: Put tool name constants in toolNames.ts unless creating import cycles
+  // Only use toolNames.ts for constants that would create circular dependencies
+  ```
+
+- **Identity-Specific Tools Pattern:**
+  - **Tools can be scoped to specific bot identities** by adding them to the `Identity.tools` array
+  - **Global tools** are available to all identities and defined in `ChatGptAgentService`
+  - **Critical tool protection** prevents identity tools from overriding system-critical tools
+  - **Tool merge precedence:** global tools → identity.tools → schedule → intermediate
+
+  ```typescript
+  // ✅ DO: Add identity-specific tools to Identity implementation
+  export class MyIdentity implements Identity {
+    readonly tools: readonly (StructuredTool | Tool)[] = [
+      mySpecializedTool,
+      anotherIdentitySpecificTool,
+    ];
+  }
+  
+  // ✅ DO: Critical tools are automatically protected from identity override
+  // Identity tools with names 'schedule-message' or 'intermediate-answer' are filtered out
+  ```
 
 Follow [core.mdc](mdc:.cursor/rules/core.mdc) for general TypeScript and testing standards.

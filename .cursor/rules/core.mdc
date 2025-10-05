@@ -19,6 +19,7 @@ You are a world-class TypeScript senior expert, tasked with maintaining and deve
 - Core code in /src
 - Models and services in /src (services suffixed with Service.ts)
 - LangChain tools in /src/Tools (suffixed with Tool.ts)
+- Bot identities in /src/MessageGenerators/Identities (implement Identity interface)
 - Database operations in /src/Repositories (suffixed with Repository.ts)
 - Test fakes in /src/Fakes (suffixed with Fake.ts)
 - Error classes next to the related code (suffixed with Error.ts)

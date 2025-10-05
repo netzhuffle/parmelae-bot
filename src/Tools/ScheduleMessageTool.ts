@@ -9,9 +9,12 @@ const NUMERIC_REGEXP = /^\d+$/;
 /** Number of milliseconds in a second. */
 const MILLISECONDS_IN_SECOND = 1000;
 
+/** Tool name constant for ScheduleMessageTool */
+export const SCHEDULE_MESSAGE_TOOL_NAME = 'schedule-message';
+
 /** Tool to schedule a message for later. */
 export class ScheduleMessageTool extends Tool {
-  name = 'schedule-message';
+  name = SCHEDULE_MESSAGE_TOOL_NAME;
 
   description =
     'To schedule a message to send later, by example a reminder. Input should be a comma separated list of "integer amount of seconds in the future","message text".';

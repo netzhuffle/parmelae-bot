@@ -13,7 +13,12 @@ import {
   HumanMessagePromptTemplate,
 } from '@langchain/core/prompts';
 import { AIMessage, BaseMessage } from '@langchain/core/messages';
+import { StructuredTool, Tool } from '@langchain/core/tools';
 import { Identity } from './Identity.js';
+import { dallETool } from '../../Tools/dallETool.js';
+import { minecraftStatusTool } from '../../Tools/minecraftStatusTool.js';
+import { minecraftStartTool } from '../../Tools/minecraftStartTool.js';
+import { minecraftStopTool } from '../../Tools/minecraftStopTool.js';
 
 const dateTime = new Date().toLocaleString('de-CH', {
   timeZone: 'Europe/Zurich',
@@ -339,4 +344,10 @@ export class SchiParmelaeIdentity implements Identity {
   readonly prompt = PROMPT;
   readonly exampleConversations = EXAMPLE_CONVERSATIONS;
   readonly conversationLength = 15;
+  readonly tools: readonly (StructuredTool | Tool)[] = [
+    dallETool,
+    minecraftStatusTool,
+    minecraftStartTool,
+    minecraftStopTool,
+  ];
 }

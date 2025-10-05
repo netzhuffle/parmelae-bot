@@ -4,6 +4,7 @@ import {
   MessagesPlaceholder,
   SystemMessagePromptTemplate,
 } from '@langchain/core/prompts';
+import { StructuredTool, Tool } from '@langchain/core/tools';
 import { Identity } from './Identity.js';
 
 /** The prompt messages. */
@@ -230,4 +231,5 @@ export class EmulatorIdentity implements Identity {
   readonly prompt = PROMPT;
   readonly exampleConversations = [];
   readonly conversationLength = 50;
+  readonly tools: readonly (StructuredTool | Tool)[] = [];
 }

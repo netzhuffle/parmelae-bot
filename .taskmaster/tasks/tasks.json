@@ -2727,7 +2727,7 @@
             "description": "Modify the Identity interface to include a bot-specific tools property, allowing each bot to have additional tools beyond the global set.",
             "dependencies": [],
             "details": "Ensure Identity interface changes are backward compatible and support dynamic merging of global and bot-specific tools.",
-            "status": "pending",
+            "status": "review",
             "testStrategy": "Test Identity interface extension with sample bot-specific tools and verify correct merging behavior."
           },
           {
@@ -3170,7 +3170,7 @@
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-09-30T16:23:34.149Z",
+      "updated": "2025-10-05T22:55:53.640Z",
       "description": "Tasks for master context"
     }
   }
