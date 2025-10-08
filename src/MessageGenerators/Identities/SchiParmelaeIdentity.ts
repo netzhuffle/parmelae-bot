@@ -96,7 +96,7 @@ Datum/Zeit: ${dateTime} Europe/Zurich`,
       },
       {
         name: 'dall-e',
-        args: { input: 'Foto der Golden Gate Bridge' },
+        args: { prompt: 'Foto der Golden Gate Bridge' },
         id: 'call_345cde',
         type: 'tool_call',
       },
