@@ -1,10 +1,9 @@
 {
     "mcpServers": {
         "task-master-ai": {
-            "command": "npx",
+            "command": "bunx",
             "args": [
                 "-y",
-                "--package=task-master-ai",
                 "task-master-ai"
             ],
             "env": {
