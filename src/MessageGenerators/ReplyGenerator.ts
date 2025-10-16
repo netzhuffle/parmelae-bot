@@ -3,6 +3,7 @@ import { ChatGptAgentService } from '../ChatGptAgentService.js';
 import { MessageModel } from '../generated/prisma/models/Message.js';
 import { ConversationService } from '../ConversationService.js';
 import { Config } from '../Config.js';
+import { BotIdentityContext } from '../BotIdentityContext.js';
 import { SchiParmelaeIdentity } from './Identities/SchiParmelaeIdentity.js';
 import { Identity } from './Identities/Identity.js';
 import { BaseMessage } from '@langchain/core/messages';
@@ -40,9 +41,11 @@ export class ReplyGenerator {
   ): Promise<ReplyGeneratorResponse> {
     const identity = this.getIdentityForChat(message.chatId);
     const example = this.selectRandomExample(identity.exampleConversations);
+    const botContext: BotIdentityContext = { username: this.config.username };
     const conversation = await this.conversation.getConversation(
       message.id,
       identity.conversationLength,
+      botContext,
     );
     const completion = await this.chatGptAgent.generate(
       message,

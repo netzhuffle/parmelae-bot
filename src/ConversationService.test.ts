@@ -4,6 +4,7 @@ import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageHistoryServiceFake } from './Fakes/MessageHistoryServiceFake.js';
 import { TelegramServiceFake } from './Fakes/TelegramServiceFake.js';
 import { ConfigFake } from './Fakes/ConfigFake.js';
+import { BotIdentityContext } from './BotIdentityContext.js';
 import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
 import { MessageWithUserAndToolMessages } from './Repositories/Types.js';
 
@@ -12,11 +13,13 @@ describe('ConversationService', () => {
   let messageHistory: MessageHistoryServiceFake;
   let telegram: TelegramServiceFake;
   let config: ConfigFake;
+  let botContext: BotIdentityContext;
 
   beforeEach(() => {
     messageHistory = new MessageHistoryServiceFake();
     telegram = new TelegramServiceFake();
     config = new ConfigFake();
+    botContext = { username: 'testbot' };
     service = new ConversationService(
       messageHistory as unknown as MessageHistoryService,
       telegram,
@@ -53,7 +56,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(HumanMessage);
@@ -88,7 +91,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -126,7 +129,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -166,7 +169,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -207,7 +210,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -247,7 +250,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -290,7 +293,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(2);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -337,7 +340,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(3);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -381,7 +384,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       const aiMessage = result.messages[0] as AIMessage;
@@ -419,7 +422,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(0);
     });
@@ -456,7 +459,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -495,7 +498,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(AIMessage);
@@ -531,7 +534,7 @@ describe('ConversationService', () => {
       ];
       messageHistory.setMessages(messages);
 
-      const result = await service.getConversation(1, 1);
+      const result = await service.getConversation(1, 1, botContext);
 
       expect(result.messages).toHaveLength(1);
       expect(result.messages[0]).toBeInstanceOf(HumanMessage);
@@ -544,6 +547,184 @@ describe('ConversationService', () => {
       expect(content).toHaveLength(2);
       expect(content[0]?.type).toBe('image_url');
       expect(content[1]?.type).toBe('text');
+    });
+
+    it('should classify messages correctly with explicit bot context', async () => {
+      const respondingBot = { username: 'assistant_bot' };
+
+      // Messages from different bots and users
+      const messages: MessageWithUserAndToolMessages[] = [
+        {
+          id: 1,
+          telegramMessageId: 101,
+          chatId: BigInt(1),
+          fromId: BigInt(1),
+          sentAt: new Date(),
+          editedAt: null,
+          text: 'I am the assistant',
+          imageFileId: null,
+          stickerFileId: null,
+          replyToMessageId: null,
+          toolCalls: null,
+          messageAfterToolCallsId: null,
+          toolMessages: [],
+          from: {
+            id: BigInt(1),
+            isBot: true,
+            firstName: 'Assistant',
+            lastName: null,
+            username: 'assistant_bot', // This should be treated as assistant
+            languageCode: null,
+          },
+        },
+        {
+          id: 2,
+          telegramMessageId: 102,
+          chatId: BigInt(1),
+          fromId: BigInt(2),
+          sentAt: new Date(),
+          editedAt: null,
+          text: 'I am another bot',
+          imageFileId: null,
+          stickerFileId: null,
+          replyToMessageId: null,
+          toolCalls: null,
+          messageAfterToolCallsId: null,
+          toolMessages: [],
+          from: {
+            id: BigInt(2),
+            isBot: true,
+            firstName: 'Other',
+            lastName: null,
+            username: 'other_bot', // This should be treated as user
+            languageCode: null,
+          },
+        },
+        {
+          id: 3,
+          telegramMessageId: 103,
+          chatId: BigInt(1),
+          fromId: BigInt(3),
+          sentAt: new Date(),
+          editedAt: null,
+          text: 'Hello from human',
+          imageFileId: null,
+          stickerFileId: null,
+          replyToMessageId: null,
+          toolCalls: null,
+          messageAfterToolCallsId: null,
+          toolMessages: [],
+          from: {
+            id: BigInt(3),
+            isBot: false,
+            firstName: 'Human',
+            lastName: null,
+            username: 'human_user',
+            languageCode: null,
+          },
+        },
+      ];
+
+      messageHistory.setMessages(messages);
+
+      const result = await service.getConversation(3, 3, respondingBot);
+
+      expect(result.messages).toHaveLength(3);
+
+      // Only assistant_bot messages should be AIMessage
+      const aiMessages = result.messages.filter((m) => m instanceof AIMessage);
+      expect(aiMessages).toHaveLength(1);
+      expect(aiMessages[0]?.content).toBe('I am the assistant');
+
+      // Other bot and human messages should be HumanMessage
+      const humanMessages = result.messages.filter(
+        (m) => m instanceof HumanMessage,
+      );
+      expect(humanMessages).toHaveLength(2);
+
+      // Verify the human messages contain the expected content
+      const humanContents = humanMessages.map((m) => m.content);
+      expect(humanContents).toContain('I am another bot');
+      expect(humanContents).toContain('Hello from human');
+    });
+
+    it('should require valid bot identity context', () => {
+      const invalidBotContext = { username: '' };
+
+      expect(service.getConversation(1, 1, invalidBotContext)).rejects.toThrow(
+        'BotIdentityContext.username must be non-empty',
+      );
+    });
+
+    it('should handle case-insensitive bot username matching', async () => {
+      // Setup messages with mixed case usernames
+      const messages = [
+        {
+          id: 1,
+          telegramMessageId: 1,
+          chatId: BigInt(1),
+          fromId: BigInt(100),
+          sentAt: new Date(),
+          editedAt: null,
+          replyToMessageId: null,
+          text: 'Hello',
+          imageFileId: null,
+          stickerFileId: null,
+          toolCalls: null,
+          messageAfterToolCallsId: null,
+          from: {
+            id: BigInt(100),
+            isBot: false,
+            firstName: 'User',
+            lastName: null,
+            username: 'user1',
+            languageCode: null,
+          },
+          chat: { id: BigInt(1), title: 'Test Chat' },
+          toolMessages: [],
+          replyToMessage: null,
+        },
+        {
+          id: 2,
+          telegramMessageId: 2,
+          chatId: BigInt(1),
+          fromId: BigInt(200),
+          sentAt: new Date(),
+          editedAt: null,
+          replyToMessageId: null,
+          text: 'Hi there!',
+          imageFileId: null,
+          stickerFileId: null,
+          toolCalls: null,
+          messageAfterToolCallsId: null,
+          from: {
+            id: BigInt(200),
+            isBot: true,
+            firstName: 'Bot',
+            lastName: null,
+            username: 'TestBot', // Mixed case username
+            languageCode: null,
+          },
+          chat: { id: BigInt(1), title: 'Test Chat' },
+          toolMessages: [],
+          replyToMessage: null,
+        },
+      ];
+
+      messageHistory.setMessages(messages);
+
+      // Bot context with lowercase username
+      const caseInsensitiveBotContext = { username: 'testbot' };
+
+      const conversation = await service.getConversation(
+        2,
+        2,
+        caseInsensitiveBotContext,
+      );
+
+      expect(conversation.messages).toHaveLength(2);
+      expect(conversation.messages[0].constructor.name).toBe('HumanMessage');
+      expect(conversation.messages[1].constructor.name).toBe('AIMessage');
     });
   });
 });

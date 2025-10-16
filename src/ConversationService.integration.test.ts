@@ -4,6 +4,7 @@ import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageRepositoryFake } from './Fakes/MessageRepositoryFake.js';
 import { TelegramServiceFake } from './Fakes/TelegramServiceFake.js';
 import { ConfigFake } from './Fakes/ConfigFake.js';
+import { BotIdentityContext } from './BotIdentityContext.js';
 import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
 import { MessageRepository } from './Repositories/MessageRepository.js';
 
@@ -13,11 +14,13 @@ describe('ConversationService Integration', () => {
   let messageRepository: MessageRepositoryFake;
   let telegramService: TelegramServiceFake;
   let config: ConfigFake;
+  let botContext: BotIdentityContext;
 
   beforeEach(() => {
     messageRepository = new MessageRepositoryFake();
     telegramService = new TelegramServiceFake();
     config = new ConfigFake();
+    botContext = { username: 'testbot' };
 
     // Use real services for integration testing
     messageHistoryService = new MessageHistoryService(
@@ -128,7 +131,11 @@ describe('ConversationService Integration', () => {
       });
 
       // Get the conversation starting from the final message
-      const conversation = await conversationService.getConversation(4, 10);
+      const conversation = await conversationService.getConversation(
+        4,
+        10,
+        botContext,
+      );
 
       // Verify the complete conversation flow
       expect(conversation.messages).toHaveLength(6);
@@ -240,7 +247,11 @@ describe('ConversationService Integration', () => {
         toolCallMessages: [searchToolCallMessage],
       });
 
-      const conversation = await conversationService.getConversation(12, 5);
+      const conversation = await conversationService.getConversation(
+        12,
+        5,
+        botContext,
+      );
 
       expect(conversation.messages).toHaveLength(4);
 
@@ -314,7 +325,11 @@ describe('ConversationService Integration', () => {
         toolCallMessages: [],
       });
 
-      const conversation = await conversationService.getConversation(21, 5);
+      const conversation = await conversationService.getConversation(
+        21,
+        5,
+        botContext,
+      );
 
       expect(conversation.messages).toHaveLength(2);
 

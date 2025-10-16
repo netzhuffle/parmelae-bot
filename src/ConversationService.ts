@@ -10,6 +10,11 @@ import type { ToolCall } from '@langchain/core/messages/tool';
 import { injectable } from 'inversify';
 import { TelegramService } from './TelegramService.js';
 import { Conversation } from './Conversation.js';
+import {
+  BotIdentityContext,
+  validateBotIdentityContext,
+  normalizeUsername,
+} from './BotIdentityContext.js';
 import type { MessageWithUserAndToolMessages } from './Repositories/Types.js';
 
 /**
@@ -23,11 +28,23 @@ export class ConversationService {
     private readonly config: Config,
   ) {}
 
-  /** Return the conversation for the given message id, up to this message. */
+  /**
+   * Return the conversation for the given message id, up to this message.
+   *
+   * Requires explicit bot identity context to ensure correct assistant message
+   * classification in multi-bot scenarios. Uses case-insensitive username
+   * comparison as per Telegram standards.
+   *
+   * @param messageId - The message ID to build conversation up to
+   * @param messageCount - Maximum number of messages to include
+   * @param respondingBot - The bot context for identifying assistant messages
+   */
   async getConversation(
     messageId: number,
     messageCount: number,
+    respondingBot: BotIdentityContext,
   ): Promise<Conversation> {
+    validateBotIdentityContext(respondingBot);
     const historyMessages = await this.messageHistory.getHistory(
       messageId,
       messageCount,
@@ -40,7 +57,7 @@ export class ConversationService {
         continue;
       }
 
-      if (this.isAssistantMessage(message)) {
+      if (this.isAssistantMessage(message, respondingBot)) {
         const assistantMessages = this.processAssistantMessage(message);
         allMessages.push(...assistantMessages);
       } else {
@@ -99,11 +116,19 @@ export class ConversationService {
   }
 
   /**
-   * Checks if a message is from the assistant.
+   * Checks if a message is from the specified responding bot.
+   *
+   * @param message - The message to check
+   * @param respondingBot - The bot context to compare against
    */
-  private isAssistantMessage(message: MessageWithUserAndToolMessages): boolean {
+  private isAssistantMessage(
+    message: MessageWithUserAndToolMessages,
+    respondingBot: BotIdentityContext,
+  ): boolean {
     return (
-      message.from.username === this.config.username &&
+      message.from.isBot &&
+      normalizeUsername(message.from.username ?? '') ===
+        normalizeUsername(respondingBot.username) &&
       // OpenAI API does not allow image content in assistant messages.
       message.imageFileId === null
     );

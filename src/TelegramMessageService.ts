@@ -2,12 +2,14 @@ import { injectable } from 'inversify';
 import { MessageStorageService } from './MessageStorageService.js';
 import { ChatModel } from './generated/prisma/models/Chat.js';
 import { UserModel } from './generated/prisma/models/User.js';
-import assert from 'assert';
+import { Config } from './Config.js';
+import assert from 'node:assert/strict';
 import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
 } from './Repositories/Types.js';
 import * as Typegram from '@telegraf/types';
+import { normalizeUsername } from './BotIdentityContext.js';
 
 type SupportedMessage =
   | Typegram.Message.TextMessage
@@ -33,7 +35,10 @@ type ImageAttachmentMessage =
 /** Handles incoming and outgoing Telegram messages. */
 @injectable()
 export class TelegramMessageService {
-  constructor(private readonly messageStorage: MessageStorageService) {}
+  constructor(
+    private readonly messageStorage: MessageStorageService,
+    private readonly config: Config,
+  ) {}
 
   /** Stores a message sent to or coming from Telegram. */
   store(
@@ -108,10 +113,45 @@ export class TelegramMessageService {
     };
   }
 
+  /**
+   * Converts Telegram User to UserModel with invariant enforcement.
+   *
+   * **Enforced Invariants:**
+   * - Configured bot (matching config.username) must have `is_bot=true` in Telegram API
+   * - All bots must have non-empty `username` in Telegram API
+   *
+   * These invariants ensure bot identity can be reliably tracked across
+   * message storage and conversation handling in multi-bot scenarios.
+   *
+   * @param telegramUser - User data from Telegram API
+   * @returns UserModel for database storage
+   * @throws {AssertionError} When invariants are violated
+   */
   private getUser(telegramUser: Typegram.User): UserModel {
+    const isBot = telegramUser.is_bot;
+
+    // Invariant: configured bot must be marked as bot in Telegram API
+    const isConfiguredBot =
+      normalizeUsername(telegramUser.username ?? '') ===
+      normalizeUsername(this.config.username);
+    if (isConfiguredBot) {
+      assert(
+        isBot,
+        `Configured bot ${this.config.username} must have isBot=true in Telegram API`,
+      );
+    }
+
+    // Invariant: bots must have usernames in Telegram API
+    if (isBot) {
+      assert(
+        telegramUser.username?.trim(),
+        `Bot user ${telegramUser.id} must have a username in Telegram API`,
+      );
+    }
+
     return {
       id: BigInt(telegramUser.id),
-      isBot: telegramUser.is_bot,
+      isBot,
       firstName: telegramUser.first_name,
       lastName: telegramUser.last_name ?? null,
       username: telegramUser.username ?? null,
