@@ -3166,11 +3166,25 @@
             "testStrategy": "Automated test suite with coverage for all new features and edge cases, including regression tests to ensure existing functionality remains unaffected."
           }
         ]
+      },
+      {
+        "id": 64,
+        "title": "Stabilize PM2-Based Production Startup for Bun Bot",
+        "description": "Refactor the bot's entry point to eliminate top-level await issues with PM2, implement proper production startup configuration, and create comprehensive production deployment documentation.",
+        "details": "1. **Refactor src/index.ts to Remove Top-Level Await:**\n   - Wrap all async initialization code in an Immediately Invoked Function Expression (IIFE) to avoid \"async module\" errors when PM2 requires the module\n   - Structure the IIFE to handle initialization errors gracefully with proper error logging and process exit codes\n   - Ensure all database connections, service initializations, and bot startup logic are contained within the async wrapper\n   - Example pattern: `(async () => { try { await initializeBot(); } catch (error) { console.error('Bot initialization failed:', error); process.exit(1); } })()`\n\n2. **Maintain PM2 Configuration:**\n   - Keep ecosystem.config.cjs as the primary PM2 configuration file in the repository root\n   - Ensure the configuration includes proper error handling, restart policies, and environment variable management\n   - Configure appropriate instance scaling, memory limits, and log rotation settings for production\n\n3. **Implement Smoke Test Script:**\n   - Create a new script accessible via `bun run smoke-test` that validates bot startup without full initialization\n   - Test should verify core dependencies are loadable, configuration is valid, and essential services can be instantiated\n   - Include timeout mechanisms and clear success/failure reporting\n   - Script should exit cleanly with appropriate exit codes for CI/CD integration\n\n4. **Production Runbook Documentation:**\n   - Add comprehensive PM2 section to README with step-by-step production deployment instructions\n   - Document commands for start (`pm2 start ecosystem.config.cjs`), stop, restart, and status checking\n   - Include log file locations, monitoring commands (`pm2 logs`, `pm2 monit`), and troubleshooting steps\n   - Add environment variable configuration guidance and security considerations",
+        "testStrategy": "1. **PM2 Startup Validation:**\n   - Test that `pm2 start ecosystem.config.cjs` successfully starts the bot without async module errors\n   - Verify the bot initializes correctly and connects to all required services (database, Telegram API)\n   - Confirm PM2 can restart the application after crashes and maintains proper process state\n\n2. **Smoke Test Verification:**\n   - Run `bun run smoke-test` in clean environment to ensure it passes without full bot initialization\n   - Test smoke test failure scenarios by temporarily breaking configuration or dependencies\n   - Verify smoke test completes within reasonable time limits (< 30 seconds) and provides clear output\n\n3. **Production Deployment Testing:**\n   - Follow the documented runbook steps on a staging environment to validate all commands work correctly\n   - Test log access and monitoring commands to ensure they provide useful information\n   - Verify graceful shutdown and restart procedures work as documented\n\n4. **Integration Testing:**\n   - Test the refactored index.ts both directly with Bun and through PM2 to ensure consistent behavior\n   - Validate that all existing functionality remains intact after removing top-level await\n   - Confirm error handling and logging work correctly in both development and production modes",
+        "status": "done",
+        "dependencies": [
+          24,
+          41
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-10-16T22:21:33.667Z",
+      "updated": "2025-11-17T23:12:34.267Z",
       "description": "Tasks for master context"
     }
   }

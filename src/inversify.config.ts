@@ -1,6 +1,10 @@
 import 'reflect-metadata/lite';
 import { Container } from 'inversify';
-import { GptModels, GptModelsProvider, GptModelsSettings } from './GptModelsProvider.js';
+import {
+  GptModels,
+  GptModelsProvider,
+  GptModelsSettings,
+} from './GptModelsProvider.js';
 import { ChatOpenAI } from '@langchain/openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { Octokit } from 'octokit';

@@ -163,11 +163,51 @@ bun run migrate-prod
 
 # Start the application
 bun src/index.ts
+
+# Start the application with pm2
+pm2 start ecosystem.config.cjs
 ```
+
+### Process Management with PM2
+
+This project uses **PM2** for production process management. The configuration is stored in `ecosystem.config.cjs`.
+
+**PM2 Commands:**
+
+```bash
+# Start the bot
+pm2 start ecosystem.config.cjs
+
+# Stop the bot
+pm2 stop parmelae-bot
+
+# Restart the bot
+pm2 restart parmelae-bot
+
+# View logs
+pm2 logs parmelae-bot
+
+# Monitor status
+pm2 status
+
+# View detailed info
+pm2 show parmelae-bot
+```
+
+**Log Files:**
+
+- General logs: `~/.pm2/logs/parmelae-bot.log`
+- Output logs: `~/.pm2/logs/parmelae-bot-out.log`
+- Error logs: `~/.pm2/logs/parmelae-bot-error.log`
+
+**Important Notes:**
+
+- The `src/index.ts` entry file must remain a synchronous module (no top-level await) to ensure compatibility with pm2's process management.
+- The smoke test (`bun run smoke-test`) validates that the bot can start correctly and should be run before deploying changes.
 
 ### Environment Considerations
 
-- **Process Management**: Use your preferred process manager (PM2, systemd, Docker, etc.)
+- **Process Management**: PM2 configured in `ecosystem.config.cjs` (see above)
 - **Database**: SQLite for simplicity, easily replaceable with PostgreSQL
 - **Monitoring**: Helicone integration for API usage tracking
 - **Error Handling**: Sentry integration available for error tracking

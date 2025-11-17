@@ -1,7 +1,10 @@
 module.exports = {
   apps: [{
     name: 'parmelae-bot',
-    script: 'src/index.ts',  // Direct TypeScript execution with Bun
+    // Direct TypeScript execution with Bun
+    // Note: src/index.ts must remain a sync module (no top-level await)
+    // to avoid pm2's require-in-the-middle instrumentation errors
+    script: 'src/index.ts',
     interpreter: '/home/jannis/.bun/bin/bun',
     cwd: '/home/jannis/parmelae-bot',
     env: {
