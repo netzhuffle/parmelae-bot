@@ -7,7 +7,7 @@ import { Identity } from './MessageGenerators/Identities/Identity.js';
 @injectable()
 export class Config {
   /** Which GPT language model to use for LangChain agent and tools. */
-  public gptModel: GptModel = GptModels.Cheap;
+  public gptModel: GptModel = GptModels.Advanced;
 
   /** The identity to use to reply to messages for each chat. */
   public identityByChatId = new Map<bigint, Identity>();

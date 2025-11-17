@@ -1,6 +1,6 @@
 import 'reflect-metadata/lite';
 import { Container } from 'inversify';
-import { GptModels, GptModelsProvider } from './GptModelsProvider.js';
+import { GptModels, GptModelsProvider, GptModelsSettings } from './GptModelsProvider.js';
 import { ChatOpenAI } from '@langchain/openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { Octokit } from 'octokit';
@@ -32,19 +32,7 @@ container.bind(GptModelsProvider).toDynamicValue(
   (context) =>
     new GptModelsProvider({
       cheap: new ChatOpenAI({
-        model: GptModels.Cheap,
-        reasoning: { effort: 'low' },
-        configuration: {
-          baseURL: 'https://oai.hconeai.com/v1',
-          defaultHeaders: {
-            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
-          },
-        },
-      }),
-      cheapStrict: new ChatOpenAI({
-        model: GptModels.Cheap,
-        temperature: 0,
-        reasoning: { effort: 'low' },
+        ...GptModelsSettings[GptModels.Cheap],
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
@@ -53,19 +41,7 @@ container.bind(GptModelsProvider).toDynamicValue(
         },
       }),
       advanced: new ChatOpenAI({
-        model: GptModels.Advanced,
-        reasoning: { effort: 'low' },
-        configuration: {
-          baseURL: 'https://oai.hconeai.com/v1',
-          defaultHeaders: {
-            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
-          },
-        },
-      }),
-      advancedStrict: new ChatOpenAI({
-        model: GptModels.Advanced,
-        temperature: 0,
-        reasoning: { effort: 'low' },
+        ...GptModelsSettings[GptModels.Advanced],
         configuration: {
           baseURL: 'https://oai.hconeai.com/v1',
           defaultHeaders: {
