@@ -4,11 +4,12 @@
   "scripts": {
     "format": "prettier --write src scripts",
     "schema-format": "prisma format",
-    "typecheck": "tsc",
+    "typecheck": "node --max-old-space-size=8192 ./node_modules/.bin/tsc -p tsconfig.notests.json",
+    "typecheck-all": "node --max-old-space-size=8192 ./node_modules/.bin/tsc -p tsconfig.json",
     "lint": "eslint src scripts",
     "validate-yaml": "yaml-validator resources/*.yaml",
     "test": "bun test src scripts",
-    "checks": "bun run format && bun run schema-format && bun run typecheck && bun run lint && bun run validate-yaml && bun test",
+    "checks": "bun run format && bun run schema-format && bun run typecheck && bun run typecheck-all && bun run lint && bun run validate-yaml && bun test",
     "migrate": "prisma migrate dev",
     "tasks": "task-master list --status=pending,in-progress,review,deferred --with-subtasks",
     "run-dev": "bun src/index.ts",
@@ -17,23 +18,20 @@
     "migrate-prod": "prisma migrate deploy"
   },
   "dependencies": {
-    "@langchain/community": "^0.3.57",
-    "@langchain/core": "0.3.78",
-    "@langchain/langgraph": "^0.4.9",
-    "@langchain/openai": "^0.6.16",
+    "@langchain/core": "1.0.5",
+    "@langchain/langgraph": "^1.0.2",
+    "@langchain/openai": "^1.1.1",
     "@prisma/client": "^6.19.0",
     "@sentry/node": "^10.25.0",
     "@synapsenwerkstatt/prisma-bun-sqlite-adapter": "^1.2.2",
-    "cheerio": "^1.1.2",
-    "hnswlib-node": "^3.0.0",
     "inversify": "^7.10.4",
     "inversify-inject-decorators": "^3.1.0",
-    "langchain": "^0.3.36",
+    "langchain": "^1.0.4",
     "octokit": "^5.0.5",
     "openai": "^4.104.0",
     "reflect-metadata": "^0.2.2",
     "telegraf": "^4.16.3",
-    "zod": "^3.25.76"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -47,8 +45,5 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.4",
     "yaml-validator": "^5.1.0"
-  },
-  "overrides": {
-    "@langchain/core": "0.3.78"
   }
 }

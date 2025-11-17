@@ -1,5 +1,5 @@
 import { tool } from '@langchain/core/tools';
-import { z } from 'zod/v4';
+import * as z from 'zod';
 import { OwnershipStatus } from '../generated/prisma/enums.js';
 import {
   SET_KEY_VALUES,

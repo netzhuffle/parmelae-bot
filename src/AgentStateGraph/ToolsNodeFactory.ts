@@ -1,6 +1,6 @@
 import { ToolNode } from '@langchain/langgraph/prebuilt';
 import { injectable } from 'inversify';
-import { StructuredTool, Tool } from 'langchain/tools';
+import { StructuredTool, Tool } from '@langchain/core/tools';
 
 @injectable()
 export class ToolsNodeFactory {

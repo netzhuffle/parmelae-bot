@@ -5,7 +5,7 @@ import { injectable } from 'inversify';
 import { StateAnnotation } from './StateAnnotation.js';
 
 @injectable()
-export class AgentNodeFactory {
+export class ModelNodeFactory {
   create(model: Runnable<BaseLanguageModelInput, AIMessageChunk>) {
     return async ({ messages }: typeof StateAnnotation.State) => {
       const response = await model.invoke(messages);

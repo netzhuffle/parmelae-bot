@@ -10,10 +10,9 @@ import {
   AIMessage,
   AIMessageFields,
   BaseMessage,
+  ContentBlock,
   HumanMessage,
   MessageContent,
-  MessageContentComplex,
-  MessageContentText,
   ToolMessage,
 } from '@langchain/core/messages';
 import { ChainValues, InputValues } from '@langchain/core/utils/types';
@@ -148,10 +147,10 @@ export class ChatGptService {
   ): Promise<ChatGptMessage> {
     const chain = prompt.pipe(this.models.getModel(model));
     const response = await chain.invoke(promptValues);
-    const textContent = this.getTextContent(response.content);
+    const textContentBlock = this.getTextContentBlock(response.contentBlocks);
     return {
       role: ChatGptRoles.Assistant,
-      content: textContent.text,
+      content: textContentBlock.text,
     };
   }
 
@@ -166,24 +165,14 @@ export class ChatGptService {
     });
   }
 
-  private getTextContent(content: MessageContent): MessageContentText {
-    if (typeof content === 'string') {
-      return {
-        type: 'text',
-        text: content,
-      };
-    }
-    for (const item of content) {
-      if (this.isTextContent(item)) {
-        return item;
+  private getTextContentBlock(
+    contentBlocks: ContentBlock.Standard[],
+  ): ContentBlock.Text {
+    for (const contentBlock of contentBlocks) {
+      if (contentBlock.type === 'text') {
+        return contentBlock;
       }
     }
     throw new Error('No text content found in response');
-  }
-
-  private isTextContent(
-    content: MessageContentComplex,
-  ): content is MessageContentText {
-    return content.type === 'text';
   }
 }

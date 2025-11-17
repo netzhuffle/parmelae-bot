@@ -1,5 +1,5 @@
 import { tool } from '@langchain/core/tools';
-import { z } from 'zod/v4';
+import * as z from 'zod';
 import { POKEMON_CARD_SEARCH_TOOL_NAME } from './toolNames.js';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';

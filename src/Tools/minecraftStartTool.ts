@@ -1,6 +1,6 @@
 import { $ } from 'bun';
 import { tool } from '@langchain/core/tools';
-import { z } from 'zod';
+import * as z from 'zod';
 
 /**
  * Tool for starting the Minecraft server.
@@ -23,6 +23,6 @@ export const minecraftStartTool = tool(
   {
     name: 'minecraft-start',
     description: 'Starts the minecraft server and returns the console output.',
-    schema: z.object({}).describe('No input parameters required'),
+    schema: z.strictObject({}),
   },
 );

@@ -151,10 +151,8 @@ describe('ToolCallAnnouncementNodeFactory', () => {
     const node = factory.create(announceToolCall);
     const messages = [
       new AIMessage({
-        content: '',
-        tool_calls: [
-          // @ts-expect-error: Simulate missing args property
-          { name: 'TestTool' },
+        contentBlocks: [
+          { type: 'tool_call', name: 'TestTool', args: undefined },
         ],
       }),
     ];

@@ -1,6 +1,6 @@
 import { describe, it, mock, expect } from 'bun:test';
 import { ToolsNodeFactory } from './ToolsNodeFactory.js';
-import { StructuredTool } from 'langchain/tools';
+import { StructuredTool } from '@langchain/core/tools';
 import { ToolNode } from '@langchain/langgraph/prebuilt';
 
 void mock.module('@langchain/langgraph/prebuilt', () => ({

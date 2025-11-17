@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'bun:test';
-import { AgentNodeFactory } from './AgentNodeFactory.js';
+import { ModelNodeFactory } from './ModelNodeFactory.js';
 import { AIMessageChunk } from '@langchain/core/messages';
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
 import { StateAnnotation } from './StateAnnotation.js';
 
-describe('AgentNodeFactory', () => {
+describe('ModelNodeFactory', () => {
   it('returns a function that calls model.invoke and returns the response', async () => {
     // Arrange
     const aiMessage = new AIMessageChunk('hello');
     const fakeModel = new ChatOpenAiFake(aiMessage);
-    const factory = new AgentNodeFactory();
+    const factory = new ModelNodeFactory();
     const messages = [aiMessage];
     const state: typeof StateAnnotation.State = {
       messages,

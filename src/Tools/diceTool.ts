@@ -1,5 +1,5 @@
 import { tool } from '@langchain/core/tools';
-import { z } from 'zod/v4';
+import * as z from 'zod';
 import { NotExhaustiveSwitchError } from '../NotExhaustiveSwitchError.js';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';
@@ -47,8 +47,21 @@ function handleSoccer(value: number): string {
   return 'Game ⚽: Perfect corner goal and hard to catch!';
 }
 
+const diceParametersSchema = z.object({
+  type: z
+    .enum(['🎲', '🎯', '🏀', '⚽', '🎳', '🎰'])
+    .describe(
+      'The emoji on which the animation is based: "🎲" (default), "🎯", "🎳", "🏀", "⚽", or "🎰".',
+    ),
+});
+
+type DiceInput = z.infer<typeof diceParametersSchema>;
+
 export const diceTool = tool(
-  async ({ type }, config: LangGraphRunnableConfig): Promise<string> => {
+  async (
+    { type }: DiceInput,
+    config: LangGraphRunnableConfig,
+  ): Promise<string> => {
     const context = getToolContext(config);
     const chatId = context.chatId;
     const telegram = context.telegramService;
@@ -80,12 +93,6 @@ export const diceTool = tool(
     name: 'dice',
     description:
       'Throw a die in the telegram chat. Will be displayed as an emoji with a random value to users. This tools returns your random value. If you need a random value, you must always use this tool.',
-    schema: z.object({
-      type: z
-        .enum(['🎲', '🎯', '🏀', '⚽', '🎳', '🎰'])
-        .describe(
-          'The emoji on which the animation is based: "🎲" (default), "🎯", "🎳", "🏀", "⚽", or "🎰".',
-        ),
-    }),
+    schema: diceParametersSchema,
   },
 );

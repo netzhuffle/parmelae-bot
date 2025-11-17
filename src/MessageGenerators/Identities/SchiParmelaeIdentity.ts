@@ -13,7 +13,6 @@ import {
   HumanMessagePromptTemplate,
 } from '@langchain/core/prompts';
 import { AIMessage, BaseMessage } from '@langchain/core/messages';
-import { StructuredTool, Tool } from '@langchain/core/tools';
 import { Identity } from './Identity.js';
 import { dallETool } from '../../Tools/dallETool.js';
 import { minecraftStatusTool } from '../../Tools/minecraftStatusTool.js';
@@ -337,6 +336,13 @@ Schi Permelä`),
   ],
 ];
 
+const tools = [
+  dallETool,
+  minecraftStatusTool,
+  minecraftStartTool,
+  minecraftStopTool,
+];
+
 /** Schi Parmelae is a helpful Swiss federal council. */
 @injectable()
 export class SchiParmelaeIdentity implements Identity {
@@ -344,10 +350,5 @@ export class SchiParmelaeIdentity implements Identity {
   readonly prompt = PROMPT;
   readonly exampleConversations = EXAMPLE_CONVERSATIONS;
   readonly conversationLength = 15;
-  readonly tools: readonly (StructuredTool | Tool)[] = [
-    dallETool,
-    minecraftStatusTool,
-    minecraftStartTool,
-    minecraftStopTool,
-  ];
+  readonly tools = tools;
 }

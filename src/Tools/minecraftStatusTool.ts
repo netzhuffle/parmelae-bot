@@ -1,6 +1,6 @@
 import { $ } from 'bun';
 import { tool } from '@langchain/core/tools';
-import { z } from 'zod';
+import * as z from 'zod';
 
 /**
  * Tool for checking Minecraft server status.
@@ -24,6 +24,6 @@ export const minecraftStatusTool = tool(
     name: 'minecraft-status',
     description:
       'Checks if the minecraft server is running and returns the status.',
-    schema: z.object({}).describe('No input parameters required'),
+    schema: z.strictObject({}),
   },
 );

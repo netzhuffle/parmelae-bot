@@ -41,10 +41,15 @@ export class ToolResponsePersistenceNodeFactory {
         .filter((msg) => currentToolCallIds.includes(msg.tool_call_id));
 
       // Only store tool calls that have corresponding responses
-      const toolCallsWithResponses = originalAIMessage.tool_calls?.filter(
-        (toolCall) =>
+      const toolCallsWithResponses = originalAIMessage.tool_calls
+        ?.filter((toolCall) =>
           newToolMessages.some((msg) => msg.tool_call_id === toolCall.id),
-      );
+        )
+        .map((toolCall) => ({
+          id: toolCall.id,
+          name: toolCall.name,
+          args: toolCall.args,
+        }));
 
       // Persist tool calls to Message.toolCalls JSON (only those with responses)
       if (toolCallsWithResponses?.length) {

@@ -161,7 +161,7 @@ export const BOOSTER_VALUES = [
 ## **Testing After Addition**
 
 1. **Format Check**: `bun run format && bun run schema-format`
-2. **Type Check**: `bun run typecheck`
+2. **Type Check**: `bun run typecheck && bun run typecheck-all`
 3. **Lint Check**: `bun run lint && bun run validate-yaml`
 4. **Test Suite**: `bun test`
 

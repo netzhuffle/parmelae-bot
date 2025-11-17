@@ -1,18 +1,18 @@
 import { describe, it, expect, mock } from 'bun:test';
 import { AgentStateGraphFactory } from './AgentStateGraphFactory.js';
-import { AgentNodeFactory } from './AgentNodeFactory.js';
+import { ModelNodeFactory } from './ModelNodeFactory.js';
 import { ToolsNodeFactory } from './ToolsNodeFactory.js';
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
 import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
 import { ChatOpenAI } from '@langchain/openai';
-import { StructuredTool } from 'langchain/tools';
+import { StructuredTool } from '@langchain/core/tools';
 
 describe('AgentStateGraphFactory', () => {
   it('should create factory with dependencies', () => {
     // Arrange
     const agentNodeFactory = mock(
       () => 'agent-node',
-    ) as unknown as AgentNodeFactory;
+    ) as unknown as ModelNodeFactory;
     const toolsNodeFactory = mock(
       () => 'tools-node',
     ) as unknown as ToolsNodeFactory;
@@ -54,7 +54,7 @@ describe('AgentStateGraphFactory', () => {
 
     const agentNodeFactory = {
       create: mockAgentNodeFactoryCreate,
-    } as unknown as AgentNodeFactory;
+    } as unknown as ModelNodeFactory;
     const toolsNodeFactory = {
       create: mockToolsNodeFactoryCreate,
     } as unknown as ToolsNodeFactory;

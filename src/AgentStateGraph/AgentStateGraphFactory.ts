@@ -2,14 +2,14 @@ import { AIMessage } from '@langchain/core/messages';
 import { END, START, StateGraph } from '@langchain/langgraph';
 import { ChatOpenAI } from '@langchain/openai';
 import { injectable } from 'inversify';
-import { StructuredTool, Tool } from 'langchain/tools';
-import { AgentNodeFactory } from './AgentNodeFactory.js';
+import { StructuredTool, Tool } from '@langchain/core/tools';
+import { ModelNodeFactory } from './ModelNodeFactory.js';
 import { ToolsNodeFactory } from './ToolsNodeFactory.js';
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
 import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
 import { StateAnnotation } from './StateAnnotation.js';
 
-function routeAgentReply({ messages }: typeof StateAnnotation.State) {
+function routeModelReply({ messages }: typeof StateAnnotation.State) {
   const lastMessage = messages[messages.length - 1] as AIMessage;
   if (lastMessage.tool_calls?.length) {
     return 'toolCallAnnouncement';
@@ -20,7 +20,7 @@ function routeAgentReply({ messages }: typeof StateAnnotation.State) {
 @injectable()
 export class AgentStateGraphFactory {
   constructor(
-    private readonly agentNodeFactory: AgentNodeFactory,
+    private readonly modelNodeFactory: ModelNodeFactory,
     private readonly toolsNodeFactory: ToolsNodeFactory,
     private readonly toolCallAnnouncementNodeFactory: ToolCallAnnouncementNodeFactory,
     private readonly toolResponsePersistenceNodeFactory: ToolResponsePersistenceNodeFactory,
@@ -38,7 +38,7 @@ export class AgentStateGraphFactory {
     const model = llm.bindTools(tools);
 
     return new StateGraph(StateAnnotation)
-      .addNode('agent', this.agentNodeFactory.create(model))
+      .addNode('model', this.modelNodeFactory.create(model))
       .addNode(
         'toolCallAnnouncement',
         this.toolCallAnnouncementNodeFactory.create(announceToolCall),
@@ -48,14 +48,14 @@ export class AgentStateGraphFactory {
         'toolResponsePersistence',
         this.toolResponsePersistenceNodeFactory.create(),
       )
-      .addEdge(START, 'agent')
-      .addConditionalEdges('agent', routeAgentReply, [
+      .addEdge(START, 'model')
+      .addConditionalEdges('model', routeModelReply, [
         'toolCallAnnouncement',
         END,
       ])
       .addEdge('toolCallAnnouncement', 'tools')
       .addEdge('tools', 'toolResponsePersistence')
-      .addEdge('toolResponsePersistence', 'agent')
+      .addEdge('toolResponsePersistence', 'model')
       .compile();
   }
 }

@@ -8,9 +8,7 @@ import {
   ChatGptMessage,
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage.js';
-import { WebBrowserToolFactory } from './Tools/WebBrowserToolFactory.js';
 import { GoogleSearchToolFactory } from './Tools/GoogleSearchToolFactory.js';
-import { GitHubToolFactory } from './Tools/GitHubToolFactory.js';
 import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
 import { Config } from './Config.js';
@@ -139,29 +137,16 @@ export class ChatGptAgentService {
     private readonly emulatorIdentity: EmulatorIdentity,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
-    gitHubToolFactory: GitHubToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
     gptModelQueryTool: GptModelQueryTool,
     gptModelSetterTool: GptModelSetterTool,
-    webBrowserToolFactory: WebBrowserToolFactory,
   ) {
     this.tools = [
       ...this.tools,
       googleSearchToolFactory.create(),
       gptModelQueryTool,
       gptModelSetterTool,
-      webBrowserToolFactory.create(),
     ];
-
-    // Note: GitHub tool is loaded asynchronously and added to tools array after creation
-    // This allows the tool to be available for subsequent requests without blocking startup
-    const tools = this.tools;
-    gitHubToolFactory
-      .create()
-      .then((tool) => tools.push(tool))
-      .catch((e) =>
-        console.error('Could not create github-qa tool, continuing without', e),
-      );
   }
 
   /**
