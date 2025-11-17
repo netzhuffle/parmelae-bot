@@ -13,7 +13,7 @@ test('generate', async () => {
     new ChatGptService(
       new GptModelsProvider({
         cheap: chatOpenAiFake as unknown as ChatOpenAI,
-        advanced: undefined as unknown as ChatOpenAI,
+        advanced: chatOpenAiFake as unknown as ChatOpenAI,
         embeddings: undefined as unknown as OpenAIEmbeddings,
       }),
     ),
