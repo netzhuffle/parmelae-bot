@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import { injectable } from 'inversify';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { AIMessage, BaseMessage } from '@langchain/core/messages';
-import { Calculator } from '@langchain/community/tools/calculator';
 import { GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
@@ -113,7 +112,6 @@ export function createTestToolConfig(context: Partial<ToolContext>): {
 @injectable()
 export class ChatGptAgentService {
   private readonly tools: (StructuredTool | Tool)[] = [
-    new Calculator(),
     diceTool,
     dateTimeTool,
     identityQueryTool,
