@@ -3180,11 +3180,25 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 65,
+        "title": "Harden GitHub Commit Polling Against Invalid Date Handling",
+        "description": "Implement robust date validation and error handling in GitHub commit polling to prevent RangeError crashes from invalid lastCommitDateTime values, ensuring graceful handling of corrupted stored dates.",
+        "details": "1. **Update DateTimeSettingRepository:**\n   - Add validation method `validateAndNormalizeDate(dateValue: any): Date | null` that:\n     - Checks if the input is a valid Date object or valid date string\n     - Returns null for invalid dates (NaN, invalid strings, null, undefined)\n     - Normalizes valid date strings to Date objects\n   - Modify existing getter methods to use validation before returning dates\n   - Add error logging for detected invalid dates with context about the setting key\n\n2. **Enhance GitHubService Date Handling:**\n   - Update commit polling methods to validate lastCommitDateTime before GitHub API calls\n   - Implement helper method `sanitizeLastCommitDate(lastCommitDateTime: Date | null): string | undefined` that:\n     - Returns undefined for null/invalid dates (omits 'since' parameter from API call)\n     - Formats valid dates to ISO string for GitHub API\n   - Add try-catch blocks around date operations with specific error handling for RangeError\n   - Log warnings when invalid dates are detected and handled\n\n3. **Add Date Utility Functions:**\n   - Create `src/utils/dateValidation.ts` with helper functions:\n     - `isValidDate(date: any): boolean` - comprehensive date validation\n     - `safeParseDate(input: any): Date | null` - safe date parsing with error handling\n     - `formatDateForGitHubAPI(date: Date): string` - consistent API date formatting\n   - Handle edge cases like dates before Unix epoch, future dates, and malformed ISO strings\n\n4. **Database Migration Considerations:**\n   - Add database query to identify and log existing invalid date entries\n   - Consider adding database constraints to prevent future invalid date storage",
+        "testStrategy": "1. **Unit Tests for Date Validation:**\n   - Test `validateAndNormalizeDate()` with various invalid inputs: null, undefined, \"invalid\", NaN dates, malformed ISO strings\n   - Test with valid inputs: proper Date objects, valid ISO strings, timestamps\n   - Verify that invalid dates return null and valid dates return proper Date objects\n\n2. **Integration Tests for GitHubService:**\n   - Mock DateTimeSettingRepository to return invalid dates and verify GitHub API calls handle them gracefully\n   - Test that invalid lastCommitDateTime results in API calls without 'since' parameter\n   - Verify no RangeError exceptions are thrown during commit polling with corrupted dates\n   - Test logging behavior when invalid dates are detected and sanitized\n\n3. **Database Integration Tests:**\n   - Create test scenarios with intentionally corrupted date values in the database\n   - Verify that the application starts successfully even with invalid stored dates\n   - Test that subsequent valid date updates work correctly after handling invalid dates\n\n4. **Error Scenario Testing:**\n   - Simulate various date corruption scenarios: database returning strings like \"invalid\", null values, malformed timestamps\n   - Verify graceful degradation where invalid dates are treated as \"no previous commit date\" scenarios\n   - Test that the system recovers properly and can store valid dates after encountering invalid ones",
+        "status": "done",
+        "dependencies": [
+          13,
+          20
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-11-17T23:12:34.267Z",
+      "updated": "2025-11-17T23:35:35.182Z",
       "description": "Tasks for master context"
     }
   }

@@ -30,6 +30,18 @@ export class GitHubService {
     private readonly config: Config,
   ) {}
 
+  /**
+   * Converts a Date to ISO string for GitHub API, or returns undefined if invalid.
+   * @param date - The date to convert
+   * @returns ISO string if valid, undefined otherwise
+   */
+  private toSinceIso(date: Date | null): string | undefined {
+    if (!date || !this.isValidDate(date)) {
+      return undefined;
+    }
+    return date.toISOString();
+  }
+
   /** Fetches commits and announces new ones. */
   async announceNewCommits(): Promise<void> {
     this.lastCommitDateTime = await this.dateTimeSettingRepository.get(
@@ -50,10 +62,11 @@ export class GitHubService {
   private async pollCommits(): Promise<Commit[]> {
     let commitsList: { data: Commit[] };
     try {
+      const sinceParam = this.toSinceIso(this.lastCommitDateTime);
       commitsList = await this.octokit.rest.repos.listCommits({
         owner: 'netzhuffle',
         repo: 'parmelae-bot',
-        since: this.lastCommitDateTime?.toISOString(),
+        ...(sinceParam ? { since: sinceParam } : {}),
       });
     } catch (e) {
       if (e instanceof RequestError) {
@@ -72,10 +85,17 @@ export class GitHubService {
     const dateString = commit.commit.committer?.date;
     if (dateString) {
       const date = new Date(dateString);
-      if (this.lastCommitDateTime && date <= this.lastCommitDateTime) {
-        return;
+      // Validate the date from GitHub API - skip if invalid
+      if (!this.isValidDate(date)) {
+        console.warn(
+          `Invalid date in commit from GitHub API: "${dateString}". Skipping date processing.`,
+        );
+      } else {
+        if (this.lastCommitDateTime && date <= this.lastCommitDateTime) {
+          return;
+        }
+        await this.updateSettingIfNewer(date);
       }
-      await this.updateSettingIfNewer(date);
     }
 
     const commitMessage = commit.commit.message;
@@ -93,6 +113,14 @@ export class GitHubService {
   }
 
   private async updateSettingIfNewer(date: Date): Promise<void> {
+    // Validate date before processing
+    if (!this.isValidDate(date)) {
+      console.warn(
+        `Cannot update lastCommitDateTime: provided date is invalid.`,
+      );
+      return;
+    }
+
     if (this.lastCommitDateTime && date > this.lastCommitDateTime) {
       this.lastCommitDateTime = date;
       await this.dateTimeSettingRepository.update(
@@ -100,5 +128,9 @@ export class GitHubService {
         date,
       );
     }
+  }
+
+  private isValidDate(date: unknown): date is Date {
+    return date instanceof Date && !Number.isNaN(date.getTime());
   }
 }
