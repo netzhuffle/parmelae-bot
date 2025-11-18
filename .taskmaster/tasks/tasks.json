@@ -3194,11 +3194,25 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 66,
+        "title": "Fix Foreign Key Constraint Violations on Message Deletion",
+        "description": "Implement cascading updates and deletions to resolve Prisma P2003 foreign key violations when messages are deleted, ensuring referential integrity across related tables.",
+        "details": "This task addresses the Prisma P2003 foreign key constraint violation that occurs when attempting to delete messages that are referenced by other entities. The implementation requires careful handling of cascading operations to maintain data integrity.\n\n**Implementation Steps:**\n\n1. **Update Prisma Schema (schema.prisma):**\n   - Modify the `replyToMessageId` foreign key relationship in the Message model to use `onDelete: SetNull`\n   - Add cascading delete rules for ChatEntryMessagesUsers and ToolMessages relationships\n   - Example schema changes:\n   ```prisma\n   model Message {\n     replyToMessage   Message? @relation(\"MessageReplies\", fields: [replyToMessageId], references: [id], onDelete: SetNull)\n     replyToMessageId String?\n     replies          Message[] @relation(\"MessageReplies\")\n     chatEntryMessagesUsers ChatEntryMessagesUsers[]\n     toolMessages     ToolMessages[]\n   }\n   \n   model ChatEntryMessagesUsers {\n     message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)\n     messageId String\n   }\n   \n   model ToolMessages {\n     message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)\n     messageId String\n   }\n   ```\n\n2. **Update Message Deletion Logic:**\n   - Modify any existing message deletion functions to handle the new cascading behavior\n   - Ensure proper transaction handling when deleting messages with multiple related records\n   - Add logging for cascading operations to track what gets updated/deleted\n\n3. **Database Migration:**\n   - Generate and apply Prisma migration for the schema changes\n   - Test migration on development database first\n   - Verify existing data integrity after migration\n\n4. **Update Service Layer:**\n   - Review MessageService and related services for any hardcoded deletion logic that might conflict with the new cascading rules\n   - Update any bulk deletion operations to work with the new constraints\n   - Add proper error handling for any remaining constraint violations",
+        "testStrategy": "1. **Schema Validation Tests:**\n   - Verify Prisma schema compiles without errors after adding cascading rules\n   - Test migration generation and application on a test database\n   - Confirm all foreign key relationships are properly configured\n\n2. **Cascading Behavior Tests:**\n   - Create test messages with reply relationships and verify that deleting a parent message sets replyToMessageId to null for child messages\n   - Test deletion of messages with associated ChatEntryMessagesUsers records to confirm cascading deletion\n   - Test deletion of messages with associated ToolMessages records to confirm cascading deletion\n   - Verify that orphaned records are properly cleaned up\n\n3. **Integration Tests:**\n   - Test message deletion through the API endpoints to ensure no P2003 errors occur\n   - Test bulk message deletion operations\n   - Verify that message history and conversation threads remain intact after deletions\n   - Test edge cases like circular reply relationships and deeply nested reply chains\n\n4. **Data Integrity Tests:**\n   - Verify that no orphaned records remain after message deletions\n   - Test that conversation context is preserved appropriately when messages are deleted\n   - Confirm that tool call history remains consistent after message deletions",
+        "status": "done",
+        "dependencies": [
+          4,
+          58
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-15T19:26:22.531Z",
-      "updated": "2025-11-17T23:35:35.182Z",
+      "updated": "2025-11-18T00:03:21.307Z",
       "description": "Tasks for master context"
     }
   }
