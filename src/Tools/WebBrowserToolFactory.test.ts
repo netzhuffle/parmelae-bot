@@ -1,6 +1,7 @@
 import { describe, test, expect, expectTypeOf, beforeEach } from 'bun:test';
 import container from '../inversify.config.js';
 import { WebBrowserToolFactory } from './WebBrowserToolFactory.js';
+import packageJson from '../../package.json' with { type: 'json' };
 
 describe('WebBrowserToolFactory', () => {
   let factory: WebBrowserToolFactory;
@@ -24,28 +25,64 @@ describe('WebBrowserToolFactory', () => {
     expect(factory).toBeInstanceOf(WebBrowserToolFactory);
   });
 
-  test('should create WebBrowser tool without throwing cheerio error', () => {
-    // This test should reproduce the cheerio dependency error
-    // if cheerio is not installed
-    expect(() => {
-      const tool = factory.create();
-      expect(tool).toBeDefined();
-      expectTypeOf(tool.invoke).toBeFunction();
-      expect(tool.name).toBe('web-browser');
-    }).not.toThrow();
+  test('should have cheerio declared in package.json (required dependency for WebBrowser tool)', () => {
+    // The WebBrowser tool from @langchain/classic requires cheerio as a peer dependency
+    // This test verifies that cheerio is properly declared in package.json dependencies
+    // (not devDependencies, as it's needed at runtime)
+    const dependencies = packageJson.dependencies ?? {};
+    const hasCheerio = 'cheerio' in dependencies;
+
+    if (!hasCheerio) {
+      throw new Error(
+        'cheerio is not declared in package.json dependencies. The WebBrowser tool requires cheerio as a peer dependency. ' +
+          'Add it with: bun add cheerio',
+      );
+    }
+
+    expect(hasCheerio).toBe(true);
   });
 
-  test('should be able to initialize WebBrowser tool internals without cheerio errors', () => {
-    // This test tries to trigger the internal initialization that might require cheerio
+  test('should have cheerio installed and importable (required dependency for WebBrowser tool)', async () => {
+    // Verify that cheerio can actually be imported at runtime
+    let cheerioModule: unknown;
+    try {
+      // Try to dynamically import cheerio to verify it's available
+      cheerioModule = await import('cheerio');
+    } catch {
+      throw new Error(
+        'cheerio is not installed. The WebBrowser tool requires cheerio as a peer dependency. ' +
+          'Install it with: bun add cheerio',
+      );
+    }
+
+    // Verify cheerio module is actually loaded
+    expect(cheerioModule).toBeDefined();
+    expect(typeof cheerioModule).toBe('object');
+    expect(cheerioModule).not.toBeNull();
+
+    // Cheerio exports a default function (load) or named exports
+    // Verify the module has the expected structure
+    const module = cheerioModule as Record<string, unknown>;
+    const hasDefaultExport =
+      'default' in module && typeof module.default === 'function';
+    const hasLoadExport = 'load' in module && typeof module.load === 'function';
+
+    expect(hasDefaultExport || hasLoadExport).toBe(true);
+  });
+
+  test('should create WebBrowser tool without throwing errors', () => {
+    const tool = factory.create();
+    expect(tool).toBeDefined();
+    expectTypeOf(tool.invoke).toBeFunction();
+    expect(tool.name).toBe('web-browser');
+  });
+
+  test('should be able to initialize WebBrowser tool internals', () => {
     const tool = factory.create();
 
-    // Try to access properties that might trigger cheerio loading
+    // Verify tool properties are accessible
     expect(tool.description).toBeDefined();
     expect(tool.name).toBe('web-browser');
-
-    // Note: We don't actually call the tool with a URL as that would require
-    // a real HTTP request and the cheerio parsing, but this tests the basic
-    // initialization path
   });
 
   test('should have proper tool description', () => {
