@@ -18,15 +18,15 @@
     "migrate-prod": "prisma migrate deploy"
   },
   "dependencies": {
-    "@langchain/core": "1.0.5",
+    "@langchain/core": "1.0.6",
     "@langchain/langgraph": "^1.0.2",
-    "@langchain/openai": "^1.1.1",
+    "@langchain/openai": "^1.1.2",
     "@prisma/client": "^6.19.0",
-    "@sentry/node": "^10.25.0",
+    "@sentry/node": "^10.26.0",
     "@synapsenwerkstatt/prisma-bun-sqlite-adapter": "^1.2.2",
     "inversify": "^7.10.4",
     "inversify-inject-decorators": "^3.1.0",
-    "langchain": "^1.0.4",
+    "langchain": "^1.0.6",
     "octokit": "^5.0.5",
     "openai": "^4.104.0",
     "reflect-metadata": "^0.2.2",
@@ -41,7 +41,7 @@
     "eslint-plugin-promise": "^7.2.1",
     "prettier": "^3.6.2",
     "prisma": "^6.19.0",
-    "task-master-ai": "^0.32.1",
+    "task-master-ai": "^0.33.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.4",
     "yaml-validator": "^5.1.0"
