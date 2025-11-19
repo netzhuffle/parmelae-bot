@@ -36,30 +36,23 @@ container.bind(GptModelsProvider).toDynamicValue(
     new GptModelsProvider({
       cheap: new ChatOpenAI({
         ...GptModelsSettings[GptModels.Cheap],
+        apiKey: context.get(Config).heliconeApiKey,
         configuration: {
-          baseURL: 'https://oai.hconeai.com/v1',
-          defaultHeaders: {
-            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
-          },
+          baseURL: 'https://ai-gateway.helicone.ai/v1',
         },
       }),
       advanced: new ChatOpenAI({
         ...GptModelsSettings[GptModels.Advanced],
+        apiKey: context.get(Config).heliconeApiKey,
         configuration: {
-          baseURL: 'https://oai.hconeai.com/v1',
-          defaultHeaders: {
-            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
-          },
+          baseURL: 'https://ai-gateway.helicone.ai/v1',
         },
       }),
       embeddings: new OpenAIEmbeddings({
         model: 'text-embedding-3-small',
+        apiKey: context.get(Config).heliconeApiKey,
         configuration: {
-          baseURL: 'https://oai.hconeai.com/v1',
-          defaultHeaders: {
-            'Helicone-Auth': `Bearer ${context.get(Config).heliconeApiKey}`,
-            'Helicone-Cache-Enabled': 'true',
-          },
+          baseURL: 'https://ai-gateway.helicone.ai/v1',
         },
       }),
     }),
