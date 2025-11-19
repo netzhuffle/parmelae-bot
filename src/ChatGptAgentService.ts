@@ -37,6 +37,7 @@ import { TelegramService } from './TelegramService.js';
 import { DallEService } from './DallEService.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 import { AgentStateGraphFactory } from './AgentStateGraph/AgentStateGraphFactory.js';
+import { WebBrowserToolFactory } from './Tools/WebBrowserToolFactory.js';
 
 /** Enhanced response from ChatGPT agent including tool call message IDs */
 export interface ChatGptAgentResponse {
@@ -138,12 +139,14 @@ export class ChatGptAgentService {
     googleSearchToolFactory: GoogleSearchToolFactory,
     gptModelQueryTool: GptModelQueryTool,
     gptModelSetterTool: GptModelSetterTool,
+    webBrowserToolFactory: WebBrowserToolFactory,
   ) {
     this.tools = [
       ...this.tools,
       googleSearchToolFactory.create(),
       gptModelQueryTool,
       gptModelSetterTool,
+      webBrowserToolFactory.create(),
     ];
   }
 

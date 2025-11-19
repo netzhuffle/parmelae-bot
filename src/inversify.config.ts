@@ -50,10 +50,7 @@ container.bind(GptModelsProvider).toDynamicValue(
       }),
       embeddings: new OpenAIEmbeddings({
         model: 'text-embedding-3-small',
-        apiKey: context.get(Config).heliconeApiKey,
-        configuration: {
-          baseURL: 'https://ai-gateway.helicone.ai/v1',
-        },
+        apiKey: context.get(Config).openAiKey,
       }),
     }),
 );

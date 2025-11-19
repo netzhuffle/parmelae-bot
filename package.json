@@ -18,6 +18,7 @@
     "migrate-prod": "prisma migrate deploy"
   },
   "dependencies": {
+    "@langchain/classic": "^1.0.4",
     "@langchain/core": "1.0.6",
     "@langchain/langgraph": "^1.0.2",
     "@langchain/openai": "^1.1.2",
