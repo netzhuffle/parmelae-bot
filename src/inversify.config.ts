@@ -5,10 +5,9 @@ import {
   GptModelsProvider,
   GptModelsSettings,
 } from './GptModelsProvider.js';
-import { ChatOpenAI } from '@langchain/openai';
+import { ChatOpenAI, DallEAPIWrapper } from '@langchain/openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { Octokit } from 'octokit';
-import { OpenAI } from 'openai';
 import { PrismaClient } from './generated/prisma/client.js';
 import { PrismaBunSQLite } from '@synapsenwerkstatt/prisma-bun-sqlite-adapter';
 import { Config } from './Config.js';
@@ -65,18 +64,21 @@ container.bind(GptModelsProvider).toDynamicValue(
       }),
     }),
 );
+container.bind(DallEAPIWrapper).toDynamicValue(
+  (context) =>
+    new DallEAPIWrapper({
+      model: 'dall-e-3',
+      size: '1024x1024',
+      quality: 'hd',
+      apiKey: context.get(Config).openAiKey,
+    }),
+);
 container.bind(Octokit).toDynamicValue(
   (context) =>
     new Octokit({
       auth: context.get(Config).gitHubPersonalAccessToken,
       userAgent: 'parmelae-bot',
       timeZone: 'Europe/Zurich',
-    }),
-);
-container.bind(OpenAI).toDynamicValue(
-  (context) =>
-    new OpenAI({
-      apiKey: context.get(Config).openAiKey,
     }),
 );
 container.bind(PrismaClient).toDynamicValue(() => {
