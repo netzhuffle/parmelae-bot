@@ -28,7 +28,7 @@
     "inversify-inject-decorators": "^3.1.0",
     "langchain": "^1.0.6",
     "octokit": "^5.0.5",
-    "openai": "^4.104.0",
+    "openai": "^6.9.1",
     "reflect-metadata": "^0.2.2",
     "telegraf": "^4.16.3",
     "zod": "^4.1.12"
