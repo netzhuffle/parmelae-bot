@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { injectable } from 'inversify';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { AIMessage, BaseMessage } from '@langchain/core/messages';
+import { AIMessage } from '@langchain/core/messages';
 import { GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
@@ -154,12 +154,11 @@ export class ChatGptAgentService {
    * Generates and returns a message using an agent executor and tools.
    *
    * **Tool Merge Precedence:** global tools → identity.tools → schedule → intermediate
-   * **Prompt Source:** Uses identity.prompt internally (must include 'example' and 'conversation' placeholders)
+   * **Prompt Source:** Uses identity.prompt internally (must include 'conversation' placeholder)
    * **Identity.tools Contract:** Must be safe to reuse across calls (no mutable internal state)
    * **Critical Tool Protection:** Identity tools with reserved names ('schedule-message', 'intermediate-answer') are filtered out with warnings
    *
    * @param message - The message to respond to
-   * @param example - Example conversation messages for the prompt
    * @param conversation - Recent conversation history for context
    * @param announceToolCall - Callback to announce tool calls (e.g., send to Telegram)
    * @param identity - Bot identity containing prompt template and tools
@@ -167,7 +166,6 @@ export class ChatGptAgentService {
    */
   async generate(
     message: MessageModel,
-    example: BaseMessage[],
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
     identity: Identity,
@@ -177,7 +175,6 @@ export class ChatGptAgentService {
       return this.getReply(
         message,
         identity.prompt,
-        example,
         conversation,
         announceToolCall,
         identity,
@@ -186,7 +183,6 @@ export class ChatGptAgentService {
       if (retries < 2) {
         return this.generate(
           message,
-          example,
           conversation,
           announceToolCall,
           identity,
@@ -250,7 +246,6 @@ export class ChatGptAgentService {
   private async getReply(
     message: MessageModel,
     prompt: ChatPromptTemplate,
-    example: BaseMessage[],
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
     identity: Identity,
@@ -266,7 +261,6 @@ export class ChatGptAgentService {
     const agentOutput = await agent.invoke(
       {
         messages: await prompt.formatMessages({
-          example,
           conversation: conversation.messages,
           message,
         }),

@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'bun:test';
-import { ChatGptService, UserMessagePromptTemplate } from './ChatGptService.js';
+import { ChatGptService } from './ChatGptService.js';
 import { ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
 import { GptModels, GptModelsProvider } from './GptModelsProvider.js';
 import { ChatOpenAI } from '@langchain/openai';
@@ -11,6 +11,7 @@ import {
 import {
   AIMessagePromptTemplate,
   ChatPromptTemplate,
+  HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
 } from '@langchain/core/prompts';
 import { ChatOpenAiFake } from './Fakes/ChatOpenAiFake.js';
@@ -29,7 +30,7 @@ describe('ChatGptService', () => {
     const prompt = ChatPromptTemplate.fromMessages([
       SystemMessagePromptTemplate.fromTemplate('System Message'),
       AIMessagePromptTemplate.fromTemplate('Assistant Message'),
-      UserMessagePromptTemplate.fromNameAndTemplate('Username', '{text}'),
+      HumanMessagePromptTemplate.fromTemplate('{text}'),
     ]);
     const response = await sut.generate(prompt, GptModels.Cheap, {
       text: 'User Message',
@@ -39,12 +40,10 @@ describe('ChatGptService', () => {
       role: ChatGptRoles.Assistant,
       content: 'completion',
     });
-    const humanMessage = new HumanMessage('User Message');
-    humanMessage.name = 'Username';
     expect(chatOpenAiFake.request).toEqual([
       new SystemMessage('System Message'),
       new AIMessage('Assistant Message'),
-      humanMessage,
+      new HumanMessage('User Message'),
     ]);
   });
 });

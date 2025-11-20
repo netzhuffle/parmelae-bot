@@ -6,7 +6,6 @@ import { Config } from '../Config.js';
 import { BotIdentityContext } from '../BotIdentityContext.js';
 import { SchiParmelaeIdentity } from './Identities/SchiParmelaeIdentity.js';
 import { Identity } from './Identities/Identity.js';
-import { BaseMessage } from '@langchain/core/messages';
 
 /** Enhanced response from ReplyGenerator including tool call message IDs */
 export interface ReplyGeneratorResponse {
@@ -40,7 +39,6 @@ export class ReplyGenerator {
     announceToolCall: (text: string) => Promise<number | null>,
   ): Promise<ReplyGeneratorResponse> {
     const identity = this.getIdentityForChat(message.chatId);
-    const example = this.selectRandomExample(identity.exampleConversations);
     const botContext: BotIdentityContext = { username: this.config.username };
     const conversation = await this.conversation.getConversation(
       message.id,
@@ -49,7 +47,6 @@ export class ReplyGenerator {
     );
     const completion = await this.chatGptAgent.generate(
       message,
-      example,
       conversation,
       announceToolCall,
       identity,
@@ -67,14 +64,5 @@ export class ReplyGenerator {
     return (
       this.config.identityByChatId.get(chatId) ?? this.schiParmelaeIdentity
     );
-  }
-
-  /**
-   * Selects a random example conversation from the identity's examples.
-   */
-  private selectRandomExample(examples: BaseMessage[][]): BaseMessage[] {
-    return examples.length > 0
-      ? examples[Math.floor(Math.random() * examples.length)]
-      : [];
   }
 }

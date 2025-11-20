@@ -1,133 +1,16 @@
-import assert from 'node:assert/strict';
+import { BaseChatPromptTemplate } from '@langchain/core/prompts';
 import {
-  AIMessagePromptTemplate,
-  BaseChatPromptTemplate,
-  BaseStringPromptTemplate,
-  HumanMessagePromptTemplate,
-  PromptTemplate,
-} from '@langchain/core/prompts';
-import {
-  AIMessage,
-  AIMessageFields,
-  BaseMessage,
   ContentBlock,
   HumanMessage,
   MessageContent,
-  ToolMessage,
 } from '@langchain/core/messages';
-import { ChainValues, InputValues } from '@langchain/core/utils/types';
+import { ChainValues } from '@langchain/core/utils/types';
 import { injectable } from 'inversify';
 import { GptModel, GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
   ChatGptRoles,
 } from './MessageGenerators/ChatGptMessage.js';
-
-type ToolCalls = NonNullable<AIMessageFields['tool_calls']>;
-
-/** Human message template with username. */
-export class UserMessagePromptTemplate extends HumanMessagePromptTemplate<
-  InputValues<string>
-> {
-  async format(values: InputValues<string>): Promise<BaseMessage> {
-    if (!this.username) {
-      return super.format(values);
-    }
-
-    const message = await super.format(values);
-    assert(message instanceof HumanMessage);
-    message.name = this.username;
-    return message;
-  }
-
-  constructor(
-    prompt: BaseStringPromptTemplate<
-      InputValues<Extract<keyof InputValues<string>, string>>
-    >,
-    private readonly username?: string,
-  ) {
-    super(prompt);
-  }
-
-  static fromNameAndTemplate(username: string, template: string) {
-    return new this(PromptTemplate.fromTemplate(template), username);
-  }
-}
-
-/** AI message template with tool call(s). */
-export class AIToolCallsMessagePromptTemplate extends AIMessagePromptTemplate<
-  InputValues<string>
-> {
-  async format(values: InputValues<string>): Promise<BaseMessage> {
-    assert(this.prompt instanceof BaseStringPromptTemplate);
-    assert(this.toolCalls);
-    assert(this.toolCalls.every((toolCall) => typeof toolCall.id === 'string'));
-
-    return new AIMessage({
-      content: await this.prompt.format(values),
-      tool_calls: this.toolCalls,
-      additional_kwargs: {
-        tool_calls: this.toolCalls.map((toolCall) => ({
-          id: toolCall.id!,
-          type: 'function',
-          function: {
-            name: toolCall.name,
-            arguments: JSON.stringify(toolCall.args),
-          },
-        })),
-      },
-    });
-  }
-
-  constructor(
-    prompt: BaseStringPromptTemplate<
-      InputValues<Extract<keyof InputValues<string>, string>>
-    >,
-    private readonly toolCalls: ToolCalls,
-  ) {
-    super(prompt);
-  }
-
-  /** Use fromCallsAndTemplate instead. */
-  static fromTemplate(template: string) {
-    return new this(PromptTemplate.fromTemplate(template), []);
-  }
-
-  static fromTemplateAndCalls(template: string, toolCalls: ToolCalls) {
-    return new this(PromptTemplate.fromTemplate(template), toolCalls);
-  }
-}
-
-/** Tool result message template. */
-export class ToolMessagePromptTemplate extends HumanMessagePromptTemplate<
-  InputValues<string>
-> {
-  async format(values: InputValues<string>): Promise<BaseMessage> {
-    assert(this.prompt instanceof BaseStringPromptTemplate);
-    return new ToolMessage({
-      content: await this.prompt.format(values),
-      tool_call_id: this.toolCallId,
-    });
-  }
-
-  constructor(
-    prompt: BaseStringPromptTemplate<
-      InputValues<Extract<keyof InputValues<string>, string>>
-    >,
-    private readonly toolCallId: string,
-  ) {
-    super(prompt);
-  }
-
-  /** Use fromCallIdAndTemplate instead. */
-  static fromTemplate(template: string) {
-    return new this(PromptTemplate.fromTemplate(template), '');
-  }
-
-  static fromCallIdAndTemplate(toolCallId: string, template: string) {
-    return new this(PromptTemplate.fromTemplate(template), toolCallId);
-  }
-}
 
 /** ChatGPT Service */
 @injectable()

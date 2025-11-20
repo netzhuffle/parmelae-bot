@@ -229,7 +229,6 @@ WICHTIG:
 export class EmulatorIdentity implements Identity {
   readonly name = 'Emulator';
   readonly prompt = PROMPT;
-  readonly exampleConversations = [];
   readonly conversationLength = 50;
   readonly tools: readonly (StructuredTool | Tool)[] = [];
 }
