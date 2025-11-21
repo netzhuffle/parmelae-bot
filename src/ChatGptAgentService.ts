@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { injectable } from 'inversify';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { AIMessage } from '@langchain/core/messages';
+import { AIMessage, SystemMessage } from '@langchain/core/messages';
 import { GptModelsProvider } from './GptModelsProvider.js';
 import {
   ChatGptMessage,
@@ -174,7 +173,7 @@ export class ChatGptAgentService {
     try {
       return this.getReply(
         message,
-        identity.prompt,
+        identity.systemPrompt,
         conversation,
         announceToolCall,
         identity,
@@ -245,7 +244,7 @@ export class ChatGptAgentService {
 
   private async getReply(
     message: MessageModel,
-    prompt: ChatPromptTemplate,
+    systemPrompt: string,
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
     identity: Identity,
@@ -260,10 +259,7 @@ export class ChatGptAgentService {
 
     const agentOutput = await agent.invoke(
       {
-        messages: await prompt.formatMessages({
-          conversation: conversation.messages,
-          message,
-        }),
+        messages: [new SystemMessage(systemPrompt), ...conversation.messages],
       },
       {
         configurable: {

@@ -1,16 +1,9 @@
 import { injectable } from 'inversify';
-import {
-  ChatPromptTemplate,
-  MessagesPlaceholder,
-  SystemMessagePromptTemplate,
-} from '@langchain/core/prompts';
 import { StructuredTool, Tool } from '@langchain/core/tools';
 import { Identity } from './Identity.js';
 
 /** The prompt messages. */
-const PROMPT = ChatPromptTemplate.fromMessages([
-  SystemMessagePromptTemplate.fromTemplate(
-    `Du bist ein Spiele-Emulator. Du kannst JEDES Spiel emulieren, aber textbasiert. Dein Ziel ist es, eine vollständig spielbare textbasierte Version des Spiels zu sein, die so nah wie möglich am Original ist, von Anfang bis Ende.
+const SYSTEM_PROMPT = `Du bist ein Spiele-Emulator. Du kannst JEDES Spiel emulieren, aber textbasiert. Dein Ziel ist es, eine vollständig spielbare textbasierte Version des Spiels zu sein, die so nah wie möglich am Original ist, von Anfang bis Ende.
 
 Du erhältst:
 1. Das ausgewählte Spiel.
@@ -219,16 +212,13 @@ WICHTIG:
 - Gestalte eine gut ausgerichtete Benutzeroberfläche für jeden Bildschirm. Positioniere Elemente in 2D.
 - Antworte nur mit dem nächsten Emulationsschritt und den dazugehörigen Optionen.
 - Denk an spannende und herausfordernde Gameplay-Elemente sowie überraschende Plottwists, weiche jedoch in keiner Weise vom Originalspiel ab.
-- SEI KREATIV. Mach daraus eine grossartige, unterhaltsame Erfahrung.`,
-  ),
-  new MessagesPlaceholder('conversation'),
-]);
+- SEI KREATIV. Mach daraus eine grossartige, unterhaltsame Erfahrung.`;
 
 /** A game emulator. */
 @injectable()
 export class EmulatorIdentity implements Identity {
   readonly name = 'Emulator';
-  readonly prompt = PROMPT;
+  readonly systemPrompt = SYSTEM_PROMPT;
   readonly conversationLength = 50;
   readonly tools: readonly (StructuredTool | Tool)[] = [];
 }
