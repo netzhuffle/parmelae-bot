@@ -7,7 +7,7 @@ import { MessageRepository } from '../Repositories/MessageRepository.js';
 import { TelegramMessage } from '../Repositories/Types.js';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
-const RANDOM_REPLY_PROBABILITY = 0.035;
+const RANDOM_REPLY_PROBABILITY = 0.02;
 
 /** Picks a message by random chance to reply with the reply generator. */
 @injectable()
