@@ -3474,6 +3474,75 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 69,
+        "title": "Add Pagination and Configurable Card Limit to pokemonCardSearchTool",
+        "description": "Enhance the pokemonCardSearchTool to support cursor-based pagination navigation and configurable card limits instead of the hardcoded 20-card limit, allowing users to browse through large result sets efficiently using card IDs as cursors.",
+        "status": "pending",
+        "dependencies": [
+          3,
+          4
+        ],
+        "priority": "medium",
+        "details": "This task involves modifying the pokemonCardSearchTool to support cursor-based pagination and configurable result limits:\n\n1. **Update Tool Parameters:**\n   - Add optional `limit` parameter (default: 20, max: 100) to control number of cards per page\n   - Add optional `startAfterCardId` parameter for cursor-based pagination navigation (e.g., \"A1-001\")\n   - Remove page and offset parameters in favor of cursor-based approach\n\n2. **Modify Search Logic:**\n   - Update the database query to use cursor-based pagination with card ID ordering\n   - Implement WHERE clause to filter cards with IDs greater than the cursor: `WHERE cardId > startAfterCardId`\n   - Ensure proper ordering by card ID for consistent pagination\n   - Add validation for card ID format and existence\n\n3. **Enhance Response Format:**\n   - Include cursor metadata in tool response: `nextCursor` (ID of last card in current page), `hasNextPage`\n   - Remove page-based metadata (totalCount, currentPage, totalPages) as they're not needed for cursor pagination\n   - Add navigation hints showing how to use the nextCursor for subsequent requests\n   - Maintain backward compatibility with existing tool usage\n\n4. **Update Tool Schema:**\n   - Modify the tool's JSON schema to include the new `startAfterCardId` parameter\n   - Add parameter descriptions and validation rules for card ID format\n   - Update tool documentation and examples to demonstrate cursor-based navigation\n\n5. **Repository Layer Updates:**\n   - Extend the PokemonCardRepository to support cursor-based queries\n   - Implement efficient cursor pagination that doesn't require counting total results\n   - Ensure proper indexing on card ID field for optimal performance\n   - Add card ID validation methods",
+        "testStrategy": "1. **Parameter Validation Testing:**\n   - Test with various limit values (1, 20, 50, 100, 101) to ensure proper bounds checking\n   - Test with invalid card IDs (malformed, non-existent) to verify error handling\n   - Test with valid card ID formats (e.g., \"A1-001\", \"B2-150\") to ensure proper cursor functionality\n   - Verify default values are applied when parameters are omitted\n\n2. **Cursor Pagination Logic Testing:**\n   - Test pagination across multiple pages using card ID cursors\n   - Verify that results start correctly after the specified card ID\n   - Test edge cases: first page (no cursor), last page, cursor pointing to last card\n   - Ensure consistent ordering and no duplicate or missing cards between pages\n\n3. **Response Format Testing:**\n   - Verify cursor metadata is accurate (nextCursor, hasNextPage)\n   - Test that card results match expected cursor boundaries\n   - Ensure backward compatibility with existing tool consumers\n   - Verify nextCursor is properly set to the last card ID in the result set\n\n4. **Performance Testing:**\n   - Benchmark cursor-based query performance with large datasets\n   - Compare performance against previous page-based approach\n   - Test memory usage with different limit sizes\n   - Verify database queries use proper indexing and don't scan unnecessary data\n\n5. **Integration Testing:**\n   - Test tool integration with Telegram bot interface using cursor navigation\n   - Verify cursor pagination works correctly with different search filters and criteria\n   - Test user workflow for navigating through multiple pages using card ID cursors\n   - Test cursor persistence and reliability across different search sessions",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Update Tool Parameters for Cursor-Based Pagination",
+            "description": "Modify the pokemonCardSearchTool to accept optional limit and startAfterCardId parameters, removing page and offset parameters.",
+            "dependencies": [],
+            "details": "Add limit (default: 20, max: 100) and startAfterCardId parameters to the tool. Remove legacy page/offset parameters. Ensure parameters are optional and properly documented.",
+            "status": "pending",
+            "testStrategy": "Validate parameter acceptance and removal of legacy parameters."
+          },
+          {
+            "id": 2,
+            "title": "Modify Search Logic for Cursor Pagination",
+            "description": "Update database query to use cursor-based pagination with card ID ordering and WHERE clause filtering.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement WHERE cardId > startAfterCardId in the query. Ensure ordering by card ID. Add validation for card ID format and existence.",
+            "status": "pending",
+            "testStrategy": "Test query with valid and invalid card IDs, verify correct ordering and filtering."
+          },
+          {
+            "id": 3,
+            "title": "Enhance Response Format with Cursor Metadata",
+            "description": "Include nextCursor and hasNextPage in tool response, remove page-based metadata.",
+            "dependencies": [
+              2
+            ],
+            "details": "Add nextCursor (last card ID in page) and hasNextPage to response. Remove totalCount, currentPage, totalPages. Add navigation hints for next request.",
+            "status": "pending",
+            "testStrategy": "Verify response structure and metadata presence."
+          },
+          {
+            "id": 4,
+            "title": "Update Tool Schema and Documentation",
+            "description": "Modify JSON schema to include new parameters and update documentation with cursor-based examples.",
+            "dependencies": [
+              1,
+              3
+            ],
+            "details": "Update schema with startAfterCardId and limit parameters. Add descriptions and validation rules. Update tool docs and usage examples.",
+            "status": "pending",
+            "testStrategy": "Check schema validity and documentation clarity."
+          },
+          {
+            "id": 5,
+            "title": "Extend Repository Layer for Cursor Pagination",
+            "description": "Update PokemonCardRepository to support cursor-based queries and efficient pagination.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement cursor pagination in repository. Ensure indexing on card ID. Add card ID validation methods.",
+            "status": "pending",
+            "testStrategy": "Test repository performance and validation logic."
+          }
+        ]
       }
     ],
     "metadata": {
@@ -3486,7 +3555,7 @@
       ],
       "created": "2025-11-22T17:28:44.087Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-22T17:48:06.737Z"
+      "updated": "2025-11-22T17:52:29.965Z"
     }
   }
 }
