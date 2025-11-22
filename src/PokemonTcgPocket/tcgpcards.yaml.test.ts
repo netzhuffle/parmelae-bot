@@ -107,7 +107,7 @@ describe('tcgpcards.yaml', () => {
       });
     });
 
-    it('should only use " ex" as a suffix for ex cards', () => {
+    it('should only use "-ex" as a suffix for ex cards', () => {
       Object.values(sets).forEach((setData: SetData) => {
         Object.values(setData.cards).forEach((card: Card) => {
           // Check if card name ends with ' ex' or '-ex' (case insensitive)
@@ -119,9 +119,9 @@ describe('tcgpcards.yaml', () => {
             return;
           }
 
-          // Fail if suffix is not exactly ' ex'
+          // Fail if suffix is not exactly '-ex'
           const suffix = match[0];
-          expect(suffix).toBe(' ex');
+          expect(suffix).toBe('-ex');
         });
       });
     });
@@ -141,7 +141,7 @@ describe('tcgpcards.yaml', () => {
 
       Object.values(sets).forEach((setData: SetData) => {
         Object.values(setData.cards).forEach((card: Card) => {
-          if (card.name.endsWith(' ex')) {
+          if (card.name.endsWith('-ex')) {
             // Allow undefined rarity or valid ex rarity
             if (card.rarity) {
               expect(validExRarities.has(card.rarity)).toBe(true);
@@ -157,7 +157,7 @@ describe('tcgpcards.yaml', () => {
       Object.values(sets).forEach((setData: SetData) => {
         Object.values(setData.cards).forEach((card: Card) => {
           if (card.rarity && exRequiredRarities.has(card.rarity)) {
-            expect(card.name.endsWith(' ex')).toBe(true);
+            expect(card.name.endsWith('-ex')).toBe(true);
           }
         });
       });

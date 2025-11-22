@@ -18,7 +18,7 @@ A1:
       rarity: ♢♢♢
       boosters: Mewtu
     4:
-      name: Bisaflor ex
+      name: Bisaflor-ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     5:
@@ -94,7 +94,7 @@ A1:
       rarity: ♢♢♢
       boosters: Glurak
     23:
-      name: Kokowei ex
+      name: Kokowei-ex
       rarity: ♢♢♢♢
       boosters: Glurak
     24:
@@ -161,7 +161,7 @@ A1:
       rarity: ♢♢♢
       boosters: Glurak
     36:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ♢♢♢♢
       boosters: Glurak
     37:
@@ -181,7 +181,7 @@ A1:
       rarity: ♢♢♢
       boosters: Pikachu
     41:
-      name: Arkani ex
+      name: Arkani-ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     42:
@@ -211,7 +211,7 @@ A1:
       rarity: ♢♢♢
       boosters: Glurak
     47:
-      name: Lavados ex
+      name: Lavados-ex
       rarity: ♢♢♢♢
       boosters: Glurak
     48:
@@ -256,7 +256,7 @@ A1:
       rarity: ♢♢♢
       boosters: Pikachu
     56:
-      name: Turtok ex
+      name: Turtok-ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     57:
@@ -342,7 +342,7 @@ A1:
       rarity: ♢♢
       boosters: Glurak
     76:
-      name: Starmie ex
+      name: Starmie-ex
       rarity: ♢♢♢♢
       boosters: Glurak
     77:
@@ -374,7 +374,7 @@ A1:
       rarity: ♢♢♢
       boosters: Mewtu
     84:
-      name: Arktos ex
+      name: Arktos-ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     85:
@@ -431,7 +431,7 @@ A1:
       rarity: ♢♢♢
       boosters: Pikachu
     96:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     97:
@@ -463,7 +463,7 @@ A1:
       rarity: ♢♢♢
       boosters: Pikachu
     104:
-      name: Zapdos ex
+      name: Zapdos-ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     105:
@@ -560,7 +560,7 @@ A1:
       rarity: ♢♢♢
       boosters: Mewtu
     123:
-      name: Gengar ex
+      name: Gengar-ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     124:
@@ -584,7 +584,7 @@ A1:
       rarity: ♢♢♢
       boosters: Mewtu
     129:
-      name: Mewtu ex
+      name: Mewtu-ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     130:
@@ -670,7 +670,7 @@ A1:
       rarity: ♢♢♢
       boosters: Glurak
     146:
-      name: Machomei ex
+      name: Machomei-ex
       rarity: ♢♢♢♢
       boosters: Glurak
     147:
@@ -698,7 +698,7 @@ A1:
       rarity: ♢♢
       boosters: Mewtu
     153:
-      name: Knogga ex
+      name: Knogga-ex
       rarity: ♢♢♢♢
       boosters: Mewtu
     154:
@@ -890,7 +890,7 @@ A1:
       rarity: ♢
       boosters: Pikachu
     195:
-      name: Knuddeluff ex
+      name: Knuddeluff-ex
       rarity: ♢♢♢♢
       boosters: Pikachu
     196:
@@ -1135,63 +1135,63 @@ A1:
       rarity: ☆
       boosters: Pikachu
     251:
-      name: Bisaflor ex
+      name: Bisaflor-ex
       rarity: ☆☆
       boosters: Mewtu
     252:
-      name: Kokowei ex
+      name: Kokowei-ex
       rarity: ☆☆
       boosters: Glurak
     253:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ☆☆
       boosters: Glurak
     254:
-      name: Arkani ex
+      name: Arkani-ex
       rarity: ☆☆
       boosters: Pikachu
     255:
-      name: Lavados ex
+      name: Lavados-ex
       rarity: ☆☆
       boosters: Glurak
     256:
-      name: Turtok ex
+      name: Turtok-ex
       rarity: ☆☆
       boosters: Pikachu
     257:
-      name: Starmie ex
+      name: Starmie-ex
       rarity: ☆☆
       boosters: Glurak
     258:
-      name: Arktos ex
+      name: Arktos-ex
       rarity: ☆☆
       boosters: Mewtu
     259:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ☆☆
       boosters: Pikachu
     260:
-      name: Zapdos ex
+      name: Zapdos-ex
       rarity: ☆☆
       boosters: Pikachu
     261:
-      name: Gengar ex
+      name: Gengar-ex
       rarity: ☆☆
       boosters: Mewtu
     262:
-      name: Mewtu ex
+      name: Mewtu-ex
       rarity: ☆☆
       boosters: Mewtu
     263:
-      name: Machomei ex
+      name: Machomei-ex
       rarity: ☆☆
       boosters: Glurak
     264:
-      name: Knogga ex
+      name: Knogga-ex
       rarity: ☆☆
       boosters: Mewtu
     265:
-      name: Knuddeluff ex
+      name: Knuddeluff-ex
       rarity: ☆☆
       boosters: Pikachu
     266:
@@ -1227,39 +1227,39 @@ A1:
       rarity: ☆☆
       boosters: Pikachu
     274:
-      name: Lavados ex
+      name: Lavados-ex
       rarity: ☆☆
       boosters: Glurak
     275:
-      name: Arktos ex
+      name: Arktos-ex
       rarity: ☆☆
       boosters: Mewtu
     276:
-      name: Zapdos ex
+      name: Zapdos-ex
       rarity: ☆☆
       boosters: Pikachu
     277:
-      name: Gengar ex
+      name: Gengar-ex
       rarity: ☆☆
       boosters: Mewtu
     278:
-      name: Machomei ex
+      name: Machomei-ex
       rarity: ☆☆
       boosters: Glurak
     279:
-      name: Knuddeluff ex
+      name: Knuddeluff-ex
       rarity: ☆☆
       boosters: Pikachu
     280:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ☆☆☆
       boosters: Glurak
     281:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ☆☆☆
       boosters: Pikachu
     282:
-      name: Mewtu ex
+      name: Mewtu-ex
       rarity: ☆☆☆
       boosters: Mewtu
     283:
@@ -1267,21 +1267,21 @@ A1:
       rarity: ☆☆☆
       boosters: ~
     284:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ♛
       boosters:
         - Glurak
         - Mewtu
         - Pikachu
     285:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ♛
       boosters:
         - Glurak
         - Mewtu
         - Pikachu
     286:
-      name: Mewtu ex
+      name: Mewtu-ex
       rarity: ♛
       boosters:
         - Glurak
@@ -1297,7 +1297,7 @@ A1a:
       name: Kokowei
       rarity: ♢♢
     3:
-      name: Celebi ex
+      name: Celebi-ex
       rarity: ♢♢♢♢
     4:
       name: Serpifeu
@@ -1342,7 +1342,7 @@ A1a:
       name: Karpador
       rarity: ♢
     18:
-      name: Garados ex
+      name: Garados-ex
       rarity: ♢♢♢♢
     19:
       name: Aquana
@@ -1384,7 +1384,7 @@ A1a:
       name: Mew
       rarity: ♢♢♢
     32:
-      name: Mew ex
+      name: Mew-ex
       rarity: ♢♢♢♢
     33:
       name: Symvolara
@@ -1426,7 +1426,7 @@ A1a:
       name: Geowaz
       rarity: ♢♢♢
     46:
-      name: Aerodactyl ex
+      name: Aerodactyl-ex
       rarity: ♢♢♢♢
     47:
       name: Marshadow
@@ -1465,7 +1465,7 @@ A1a:
       name: Tauboga
       rarity: ♢
     59:
-      name: Tauboss ex
+      name: Tauboss-ex
       rarity: ♢♢♢♢
     60:
       name: Tauros
@@ -1514,19 +1514,19 @@ A1a:
       name: Marshadow
       rarity: ☆
     75:
-      name: Celebi ex
+      name: Celebi-ex
       rarity: ☆☆
     76:
-      name: Garados ex
+      name: Garados-ex
       rarity: ☆☆
     77:
-      name: Mew ex
+      name: Mew-ex
       rarity: ☆☆
     78:
-      name: Aerodactyl ex
+      name: Aerodactyl-ex
       rarity: ☆☆
     79:
-      name: Tauboss ex
+      name: Tauboss-ex
       rarity: ☆☆
     80:
       name: Abenteurer-Neuling
@@ -1538,16 +1538,16 @@ A1a:
       name: Leaf
       rarity: ☆☆
     83:
-      name: Mew ex
+      name: Mew-ex
       rarity: ☆☆
     84:
-      name: Aerodactyl ex
+      name: Aerodactyl-ex
       rarity: ☆☆
     85:
-      name: Celebi ex
+      name: Celebi-ex
       rarity: ☆☆☆
     86:
-      name: Mew ex
+      name: Mew-ex
       rarity: ♛
 A2:
   name: Kollision von Raum und Zeit
@@ -1586,7 +1586,7 @@ A2:
       rarity: ♢
       boosters: Dialga
     7:
-      name: Yanmega ex
+      name: Yanmega-ex
       rarity: ♢♢♢♢
       boosters: Dialga
     8:
@@ -1688,7 +1688,7 @@ A2:
       rarity: ♢♢
       boosters: Palkia
     29:
-      name: Panferno ex
+      name: Panferno-ex
       rarity: ♢♢♢♢
       boosters: Palkia
     30:
@@ -1786,7 +1786,7 @@ A2:
         - Dialga
         - Palkia
     49:
-      name: Palkia ex
+      name: Palkia-ex
       rarity: ♢♢♢♢
       boosters: Palkia
     50:
@@ -1844,7 +1844,7 @@ A2:
       rarity: ♢♢♢
       boosters: Dialga
     61:
-      name: Pachirisu ex
+      name: Pachirisu-ex
       rarity: ♢♢♢♢
       boosters: Dialga
     62:
@@ -1874,7 +1874,7 @@ A2:
       rarity: ♢
       boosters: Palkia
     67:
-      name: Traunmagil ex
+      name: Traunmagil-ex
       rarity: ♢♢♢♢
       boosters: Palkia
     68:
@@ -1996,7 +1996,7 @@ A2:
       rarity: ♢♢
       boosters: Palkia
     95:
-      name: Galagladi ex
+      name: Galagladi-ex
       rarity: ♢♢♢♢
       boosters: Dialga
     96:
@@ -2012,7 +2012,7 @@ A2:
       rarity: ♢
       boosters: Palkia
     99:
-      name: Snibunna ex
+      name: Snibunna-ex
       rarity: ♢♢♢♢
       boosters: Palkia
     100:
@@ -2064,7 +2064,7 @@ A2:
       rarity: ♢♢♢
       boosters: Dialga
     110:
-      name: Darkrai ex
+      name: Darkrai-ex
       rarity: ♢♢♢♢
       boosters: Dialga
     111:
@@ -2104,7 +2104,7 @@ A2:
         - Dialga
         - Palkia
     119:
-      name: Dialga ex
+      name: Dialga-ex
       rarity: ♢♢♢♢
       boosters: Dialga
     120:
@@ -2128,7 +2128,7 @@ A2:
       rarity: ♢
       boosters: Palkia
     125:
-      name: Schlurplek ex
+      name: Schlurplek-ex
       rarity: ♢♢♢♢
       boosters: Palkia
     126:
@@ -2358,43 +2358,43 @@ A2:
       rarity: ☆
       boosters: Dialga
     180:
-      name: Yanmega ex
+      name: Yanmega-ex
       rarity: ☆☆
       boosters: Dialga
     181:
-      name: Panferno ex
+      name: Panferno-ex
       rarity: ☆☆
       boosters: Palkia
     182:
-      name: Palkia ex
+      name: Palkia-ex
       rarity: ☆☆
       boosters: Palkia
     183:
-      name: Pachirisu ex
+      name: Pachirisu-ex
       rarity: ☆☆
       boosters: Dialga
     184:
-      name: Traunmagil ex
+      name: Traunmagil-ex
       rarity: ☆☆
       boosters: Palkia
     185:
-      name: Galagladi ex
+      name: Galagladi-ex
       rarity: ☆☆
       boosters: Dialga
     186:
-      name: Snibunna ex
+      name: Snibunna-ex
       rarity: ☆☆
       boosters: Palkia
     187:
-      name: Darkrai ex
+      name: Darkrai-ex
       rarity: ☆☆
       boosters: Dialga
     188:
-      name: Dialga ex
+      name: Dialga-ex
       rarity: ☆☆
       boosters: Dialga
     189:
-      name: Schlurplek ex
+      name: Schlurplek-ex
       rarity: ☆☆
       boosters: Palkia
     190:
@@ -2422,51 +2422,51 @@ A2:
       rarity: ☆☆
       boosters: Palkia
     196:
-      name: Yanmega ex
+      name: Yanmega-ex
       rarity: ☆☆
       boosters: Dialga
     197:
-      name: Panferno ex
+      name: Panferno-ex
       rarity: ☆☆
       boosters: Palkia
     198:
-      name: Pachirisu ex
+      name: Pachirisu-ex
       rarity: ☆☆
       boosters: Dialga
     199:
-      name: Traunmagil ex
+      name: Traunmagil-ex
       rarity: ☆☆
       boosters: Palkia
     200:
-      name: Galagladi ex
+      name: Galagladi-ex
       rarity: ☆☆
       boosters: Dialga
     201:
-      name: Snibunna ex
+      name: Snibunna-ex
       rarity: ☆☆
       boosters: Palkia
     202:
-      name: Darkrai ex
+      name: Darkrai-ex
       rarity: ☆☆
       boosters: Dialga
     203:
-      name: Schlurplek ex
+      name: Schlurplek-ex
       rarity: ☆☆
       boosters: Palkia
     204:
-      name: Palkia ex
+      name: Palkia-ex
       rarity: ☆☆☆
       boosters: Palkia
     205:
-      name: Dialga ex
+      name: Dialga-ex
       rarity: ☆☆☆
       boosters: Dialga
     206:
-      name: Palkia ex
+      name: Palkia-ex
       rarity: ♛
       boosters: Palkia
     207:
-      name: Dialga ex
+      name: Dialga-ex
       rarity: ♛
       boosters: Dialga
 A2a:
@@ -2500,7 +2500,7 @@ A2a:
       name: Venuflibis
       rarity: ♢♢♢
     10:
-      name: Folipurba ex
+      name: Folipurba-ex
       rarity: ♢♢♢♢
     11:
       name: Hunduster
@@ -2536,7 +2536,7 @@ A2a:
       name: Rexblisar
       rarity: ♢♢♢
     22:
-      name: Glaziola ex
+      name: Glaziola-ex
       rarity: ♢♢♢♢
     23:
       name: Ur-Palkia
@@ -2611,7 +2611,7 @@ A2a:
       name: Knarksel
       rarity: ♢
     47:
-      name: Knakrack ex
+      name: Knakrack-ex
       rarity: ♢♢♢♢
     48:
       name: Zubat
@@ -2641,7 +2641,7 @@ A2a:
       name: Flunkifer
       rarity: ♢
     57:
-      name: Voluminas ex
+      name: Voluminas-ex
       rarity: ♢♢♢♢
     58:
       name: Bronzel
@@ -2683,7 +2683,7 @@ A2a:
       name: Arceus
       rarity: ♢♢♢
     71:
-      name: Arceus ex
+      name: Arceus-ex
       rarity: ♢♢♢♢
     72:
       name: Perla
@@ -2716,19 +2716,19 @@ A2a:
       name: Shaymin
       rarity: ☆
     82:
-      name: Folipurba ex
+      name: Folipurba-ex
       rarity: ☆☆
     83:
-      name: Glaziola ex
+      name: Glaziola-ex
       rarity: ☆☆
     84:
-      name: Knakrack ex
+      name: Knakrack-ex
       rarity: ☆☆
     85:
-      name: Voluminas ex
+      name: Voluminas-ex
       rarity: ☆☆
     86:
-      name: Arceus ex
+      name: Arceus-ex
       rarity: ☆☆
     87:
       name: Perla
@@ -2743,22 +2743,22 @@ A2a:
       name: Diam
       rarity: ☆☆
     91:
-      name: Folipurba ex
+      name: Folipurba-ex
       rarity: ☆☆
     92:
-      name: Glaziola ex
+      name: Glaziola-ex
       rarity: ☆☆
     93:
-      name: Knakrack ex
+      name: Knakrack-ex
       rarity: ☆☆
     94:
-      name: Voluminas ex
+      name: Voluminas-ex
       rarity: ☆☆
     95:
-      name: Arceus ex
+      name: Arceus-ex
       rarity: ☆☆☆
     96:
-      name: Arceus ex
+      name: Arceus-ex
       rarity: ♛
 A2b:
   name: Glänzendes Festival
@@ -2770,7 +2770,7 @@ A2b:
       name: Kokuna
       rarity: ♢♢
     3:
-      name: Bibor ex
+      name: Bibor-ex
       rarity: ♢♢♢♢
     4:
       name: Pinsir
@@ -2791,7 +2791,7 @@ A2b:
       name: Glutexo
       rarity: ♢♢
     10:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ♢♢♢♢
     11:
       name: Magmar
@@ -2818,7 +2818,7 @@ A2b:
       name: Schligda
       rarity: ♢
     19:
-      name: Schligdri ex
+      name: Schligdri-ex
       rarity: ♢♢♢♢
     20:
       name: Heerashai
@@ -2827,7 +2827,7 @@ A2b:
       name: Nigiragi
       rarity: ♢♢
     22:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ♢♢♢♢
     23:
       name: Voltobal
@@ -2866,7 +2866,7 @@ A2b:
       name: Drifzepeli
       rarity: ♢♢
     35:
-      name: Giratina ex
+      name: Giratina-ex
       rarity: ♢♢♢♢
     36:
       name: Gierspenst
@@ -2890,7 +2890,7 @@ A2b:
       name: Riolu
       rarity: ♢
     43:
-      name: Lucario ex
+      name: Lucario-ex
       rarity: ♢♢♢♢
     44:
       name: Flaminkno
@@ -2905,7 +2905,7 @@ A2b:
       name: Paldea-Felino
       rarity: ♢
     48:
-      name: Paldea-Suelord ex
+      name: Paldea-Suelord-ex
       rarity: ♢♢♢♢
     49:
       name: Kryppuk
@@ -2923,7 +2923,7 @@ A2b:
       name: Tafforgita
       rarity: ♢♢
     54:
-      name: Granforgita ex
+      name: Granforgita-ex
       rarity: ♢♢♢♢
     55:
       name: Knattox
@@ -2956,7 +2956,7 @@ A2b:
       name: Bidiza
       rarity: ♢
     65:
-      name: Bidifas ex
+      name: Bidifas-ex
       rarity: ♢♢♢♢
     66:
       name: Haspiror
@@ -2998,31 +2998,31 @@ A2b:
       name: Knuddeluff
       rarity: ☆
     79:
-      name: Bibor ex
+      name: Bibor-ex
       rarity: ☆☆
     80:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ☆☆
     81:
-      name: Schligdri ex
+      name: Schligdri-ex
       rarity: ☆☆
     82:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ☆☆
     83:
-      name: Giratina ex
+      name: Giratina-ex
       rarity: ☆☆
     84:
-      name: Lucario ex
+      name: Lucario-ex
       rarity: ☆☆
     85:
-      name: Paldea-Suelord ex
+      name: Paldea-Suelord-ex
       rarity: ☆☆
     86:
-      name: Granforgita ex
+      name: Granforgita-ex
       rarity: ☆☆
     87:
-      name: Bidifas ex
+      name: Bidifas-ex
       rarity: ☆☆
     88:
       name: Enigmara
@@ -3037,19 +3037,19 @@ A2b:
       name: Rüpel von Team Rocket
       rarity: ☆☆
     92:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ☆☆
     93:
-      name: Paldea-Suelord ex
+      name: Paldea-Suelord-ex
       rarity: ☆☆
     94:
-      name: Granforgita ex
+      name: Granforgita-ex
       rarity: ☆☆
     95:
-      name: Bidifas ex
+      name: Bidifas-ex
       rarity: ☆☆
     96:
-      name: Giratina ex
+      name: Giratina-ex
       rarity: ☆☆☆
     97:
       name: Hornliu
@@ -3082,16 +3082,16 @@ A2b:
       name: Knattatox
       rarity: ✸
     107:
-      name: Bibor ex
+      name: Bibor-ex
       rarity: ✸✸
     108:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ✸✸
     109:
-      name: Schligdri ex
+      name: Schligdri-ex
       rarity: ✸✸
     110:
-      name: Lucario ex
+      name: Lucario-ex
       rarity: ✸✸
     111:
       name: Pokéball
@@ -3153,7 +3153,7 @@ A3:
       rarity: ♢♢
       boosters: Lunala
     12:
-      name: Silvarro ex
+      name: Silvarro-ex
       rarity: ♢♢♢♢
       boosters: Lunala
     13:
@@ -3201,7 +3201,7 @@ A3:
       rarity: ♢♢♢
       boosters: Solgaleo
     23:
-      name: Moruda ex
+      name: Moruda-ex
       rarity: ♢♢♢♢
       boosters: Solgaleo
     24:
@@ -3245,7 +3245,7 @@ A3:
       rarity: ♢♢
       boosters: Solgaleo
     33:
-      name: Fuegro ex
+      name: Fuegro-ex
       rarity: ♢♢♢♢
       boosters: Solgaleo
     34:
@@ -3319,7 +3319,7 @@ A3:
       rarity: ♢♢♢
       boosters: Lunala
     49:
-      name: Krawell ex
+      name: Krawell-ex
       rarity: ♢♢♢♢
       boosters: Solgaleo
     50:
@@ -3327,7 +3327,7 @@ A3:
       rarity: ♢
       boosters: Lunala
     51:
-      name: Lusardin ex
+      name: Lusardin-ex
       rarity: ♢♢♢♢
       boosters: Lunala
     52:
@@ -3357,7 +3357,7 @@ A3:
       rarity: ♢
       boosters: Solgaleo
     58:
-      name: Alola-Raichu ex
+      name: Alola-Raichu-ex
       rarity: ♢♢♢♢
       boosters: Solgaleo
     59:
@@ -3491,7 +3491,7 @@ A3:
         - Solgaleo
         - Lunala
     87:
-      name: Lunala ex
+      name: Lunala-ex
       rarity: ♢♢♢♢
       boosters: Lunala
     88:
@@ -3565,7 +3565,7 @@ A3:
       rarity: ♢♢
       boosters: Solgaleo
     104:
-      name: Quartermak ex
+      name: Quartermak-ex
       rarity: ♢♢♢♢
       boosters: Lunala
     105:
@@ -3593,7 +3593,7 @@ A3:
       rarity: ♢
       boosters: Lunala
     111:
-      name: Alola-Sleimok ex
+      name: Alola-Sleimok-ex
       rarity: ♢♢♢♢
       boosters: Lunala
     112:
@@ -3649,7 +3649,7 @@ A3:
       rarity: ♢♢♢
       boosters: Solgaleo
     122:
-      name: Solgaleo ex
+      name: Solgaleo-ex
       rarity: ♢♢♢♢
       boosters: Solgaleo
     123:
@@ -3897,43 +3897,43 @@ A3:
       rarity: ☆
       boosters: Solgaleo
     180:
-      name: Silvarro ex
+      name: Silvarro-ex
       rarity: ☆☆
       boosters: Lunala
     181:
-      name: Moruda ex
+      name: Moruda-ex
       rarity: ☆☆
       boosters: Solgaleo
     182:
-      name: Fuegro ex
+      name: Fuegro-ex
       rarity: ☆☆
       boosters: Solgaleo
     183:
-      name: Krawell ex
+      name: Krawell-ex
       rarity: ☆☆
       boosters: Solgaleo
     184:
-      name: Lusardin ex
+      name: Lusardin-ex
       rarity: ☆☆
       boosters: Lunala
     185:
-      name: Alola-Raichu ex
+      name: Alola-Raichu-ex
       rarity: ☆☆
       boosters: Solgaleo
     186:
-      name: Lunala ex
+      name: Lunala-ex
       rarity: ☆☆
       boosters: Lunala
     187:
-      name: Quartermak ex
+      name: Quartermak-ex
       rarity: ☆☆
       boosters: Lunala
     188:
-      name: Alola-Sleimok ex
+      name: Alola-Sleimok-ex
       rarity: ☆☆
       boosters: Lunala
     189:
-      name: Solgaleo ex
+      name: Solgaleo-ex
       rarity: ☆☆
       boosters: Solgaleo
     190:
@@ -3969,43 +3969,43 @@ A3:
       rarity: ☆☆
       boosters: Solgaleo
     198:
-      name: Silvarro ex
+      name: Silvarro-ex
       rarity: ☆☆
       boosters: Lunala
     199:
-      name: Moruda ex
+      name: Moruda-ex
       rarity: ☆☆
       boosters: Solgaleo
     200:
-      name: Fuegro ex
+      name: Fuegro-ex
       rarity: ☆☆
       boosters: Solgaleo
     201:
-      name: Krawell ex
+      name: Krawell-ex
       rarity: ☆☆
       boosters: Solgaleo
     202:
-      name: Lusardin ex
+      name: Lusardin-ex
       rarity: ☆☆
       boosters: Lunala
     203:
-      name: Alola-Raichu ex
+      name: Alola-Raichu-ex
       rarity: ☆☆
       boosters: Solgaleo
     204:
-      name: Lunala ex
+      name: Lunala-ex
       rarity: ☆☆
       boosters: Lunala
     205:
-      name: Quartermak ex
+      name: Quartermak-ex
       rarity: ☆☆
       boosters: Lunala
     206:
-      name: Alola-Sleimok ex
+      name: Alola-Sleimok-ex
       rarity: ☆☆
       boosters: Lunala
     207:
-      name: Solgaleo ex
+      name: Solgaleo-ex
       rarity: ☆☆
       boosters: Solgaleo
     208:
@@ -4097,45 +4097,45 @@ A3:
       rarity: ✸
       boosters: Solgaleo
     230:
-      name: Bisaflor ex
+      name: Bisaflor-ex
       rarity: ✸✸
       boosters: Solgaleo
     231:
-      name: Kokowei ex
+      name: Kokowei-ex
       rarity: ✸✸
       boosters: Lunala
     232:
-      name: Turtok ex
+      name: Turtok-ex
       rarity: ✸✸
       boosters: Lunala
     233:
-      name: Starmie ex
+      name: Starmie-ex
       rarity: ✸✸
       boosters: Solgaleo
     234:
-      name: Gengar ex
+      name: Gengar-ex
       rarity: ✸✸
       boosters: Lunala
     235:
-      name: Machomei ex
+      name: Machomei-ex
       rarity: ✸✸
       boosters: Solgaleo
     236:
-      name: Knogga ex
+      name: Knogga-ex
       rarity: ✸✸
       boosters: Lunala
     237:
-      name: Knuddeluff ex
+      name: Knuddeluff-ex
       rarity: ✸✸
       boosters: Solgaleo
     238:
-      name: Lunala ex
+      name: Lunala-ex
       rarity: ♛
       boosters:
         - Lunala
         - Solgaleo
     239:
-      name: Solgaleo ex
+      name: Solgaleo-ex
       rarity: ♛
       boosters:
         - Lunala
@@ -4159,7 +4159,7 @@ A3a:
       name: Silvarro
       rarity: ♢♢♢
     6:
-      name: Masskito ex
+      name: Masskito-ex
       rarity: ♢♢♢♢
     7:
       name: Schabelle
@@ -4198,7 +4198,7 @@ A3a:
       name: Emolga
       rarity: ♢
     19:
-      name: Kapu-Riki ex
+      name: Kapu-Riki-ex
       rarity: ♢♢♢♢
     20:
       name: Voltriant
@@ -4240,7 +4240,7 @@ A3a:
       name: Wuffels
       rarity: ♢
     33:
-      name: Wolwerock ex
+      name: Wolwerock-ex
       rarity: ♢♢♢♢
     34:
       name: Quartermak
@@ -4270,7 +4270,7 @@ A3a:
       name: Anego
       rarity: ♢♢♢
     43:
-      name: Schlingking ex
+      name: Schlingking-ex
       rarity: ♢♢♢♢
     44:
       name: Venicro
@@ -4282,7 +4282,7 @@ A3a:
       name: Alola-Digda
       rarity: ♢
     47:
-      name: Alola-Digdri ex
+      name: Alola-Digdri-ex
       rarity: ♢♢♢♢
     48:
       name: Stollunior
@@ -4369,19 +4369,19 @@ A3a:
       name: Kaguron
       rarity: ☆
     76:
-      name: Masskito ex
+      name: Masskito-ex
       rarity: ☆☆
     77:
-      name: Kapu-Riki ex
+      name: Kapu-Riki-ex
       rarity: ☆☆
     78:
-      name: Wolwerock ex
+      name: Wolwerock-ex
       rarity: ☆☆
     79:
-      name: Schlingking ex
+      name: Schlingking-ex
       rarity: ☆☆
     80:
-      name: Alola-Digdri ex
+      name: Alola-Digdri-ex
       rarity: ☆☆
     81:
       name: Gladio
@@ -4393,19 +4393,19 @@ A3a:
       name: Samantha
       rarity: ☆☆
     84:
-      name: Kapu-Riki ex
+      name: Kapu-Riki-ex
       rarity: ☆☆
     85:
-      name: Wolwerock ex
+      name: Wolwerock-ex
       rarity: ☆☆
     86:
-      name: Schlingking ex
+      name: Schlingking-ex
       rarity: ☆☆
     87:
-      name: Alola-Digdri ex
+      name: Alola-Digdri-ex
       rarity: ☆☆
     88:
-      name: Masskito ex
+      name: Masskito-ex
       rarity: ☆☆☆
     89:
       name: Fukano
@@ -4438,16 +4438,16 @@ A3a:
       name: Aerodactyl
       rarity: ✸
     99:
-      name: Celebi ex
+      name: Celebi-ex
       rarity: ✸✸
     100:
-      name: Arkani ex
+      name: Arkani-ex
       rarity: ✸✸
     101:
-      name: Aerodactyl ex
+      name: Aerodactyl-ex
       rarity: ✸✸
     102:
-      name: Tauboss ex
+      name: Tauboss-ex
       rarity: ✸✸
     103:
       name: Anego
@@ -4480,7 +4480,7 @@ A3b:
       name: Flamara
       rarity: ♢♢♢
     9:
-      name: Flamara ex
+      name: Flamara-ex
       rarity: ♢♢♢♢
     10:
       name: Qurtel
@@ -4525,7 +4525,7 @@ A3b:
       name: Marikeck
       rarity: ♢
     24:
-      name: Primarene ex
+      name: Primarene-ex
       rarity: ♢♢♢♢
     25:
       name: Blitza
@@ -4555,7 +4555,7 @@ A3b:
       name: Feelinara
       rarity: ♢♢♢
     34:
-      name: Feelinara ex
+      name: Feelinara-ex
       rarity: ♢♢♢♢
     35:
       name: Mimigma
@@ -4612,7 +4612,7 @@ A3b:
       name: Dragonir
       rarity: ♢
     53:
-      name: Dragoran ex
+      name: Dragoran-ex
       rarity: ♢♢♢♢
     54:
       name: Sen-Long
@@ -4621,10 +4621,10 @@ A3b:
       name: Evoli
       rarity: ♢
     56:
-      name: Evoli ex
+      name: Evoli-ex
       rarity: ♢♢♢♢
     57:
-      name: Relaxo ex
+      name: Relaxo-ex
       rarity: ♢♢♢♢
     58:
       name: Griffel
@@ -4690,46 +4690,46 @@ A3b:
       name: Evoli
       rarity: ☆
     79:
-      name: Flamara ex
+      name: Flamara-ex
       rarity: ☆☆
     80:
-      name: Primarene ex
+      name: Primarene-ex
       rarity: ☆☆
     81:
-      name: Feelinara ex
+      name: Feelinara-ex
       rarity: ☆☆
     82:
-      name: Dragoran ex
+      name: Dragoran-ex
       rarity: ☆☆
     83:
-      name: Evoli ex
+      name: Evoli-ex
       rarity: ☆☆
     84:
-      name: Relaxo ex
+      name: Relaxo-ex
       rarity: ☆☆
     85:
       name: Tali
       rarity: ☆☆
     86:
-      name: Cosima ex
+      name: Cosima-ex
       rarity: ☆☆
     87:
-      name: Flamara ex
+      name: Flamara-ex
       rarity: ☆☆
     88:
-      name: Primarene ex
+      name: Primarene-ex
       rarity: ☆☆
     89:
-      name: Feelinara ex
+      name: Feelinara-ex
       rarity: ☆☆
     90:
-      name: Dragoran ex
+      name: Dragoran-ex
       rarity: ☆☆
     91:
-      name: Relaxo ex
+      name: Relaxo-ex
       rarity: ☆☆
     92:
-      name: Evoli ex
+      name: Evoli-ex
       rarity: ☆☆☆
     93:
       name: Pinsir
@@ -4762,16 +4762,16 @@ A3b:
       name: Porenta
       rarity: ✸
     103:
-      name: Lavados ex
+      name: Lavados-ex
       rarity: ✸✸
     104:
-      name: Arktos ex
+      name: Arktos-ex
       rarity: ✸✸
     105:
-      name: Zapdos ex
+      name: Zapdos-ex
       rarity: ✸✸
     106:
-      name: Galagladi ex
+      name: Galagladi-ex
       rarity: ✸✸
     107:
       name: Evoli-Rucksack
@@ -4873,7 +4873,7 @@ A4:
         - Ho-Oh
         - Lugia
     21:
-      name: Pottrott ex
+      name: Pottrott-ex
       rarity: ♢♢♢♢
       boosters: Lugia
     22:
@@ -4930,7 +4930,7 @@ A4:
       rarity: ♢♢♢
       boosters: Ho-Oh
     34:
-      name: Ho-Oh ex
+      name: Ho-Oh-ex
       rarity: ♢♢♢♢
       boosters: Ho-Oh
     35:
@@ -4972,7 +4972,7 @@ A4:
       rarity: ♢♢
       boosters: Lugia
     43:
-      name: Seedraking ex
+      name: Seedraking-ex
       rarity: ♢♢♢♢
       boosters: Lugia
     44:
@@ -5060,7 +5060,7 @@ A4:
       rarity: ♢
       boosters: Lugia
     65:
-      name: Lanturn ex
+      name: Lanturn-ex
       rarity: ♢♢♢♢
       boosters: Lugia
     66:
@@ -5140,7 +5140,7 @@ A4:
       rarity: ♢♢♢
       boosters: Lugia
     83:
-      name: Psiana ex
+      name: Psiana-ex
       rarity: ♢♢♢♢
       boosters: Lugia
     84:
@@ -5218,7 +5218,7 @@ A4:
       rarity: ♢
       boosters: Ho-Oh
     100:
-      name: Donphan ex
+      name: Donphan-ex
       rarity: ♢♢♢♢
       boosters: Ho-Oh
     101:
@@ -5257,7 +5257,7 @@ A4:
       rarity: ♢♢
       boosters: Ho-Oh
     109:
-      name: Iksbat ex
+      name: Iksbat-ex
       rarity: ♢♢♢♢
       boosters: Ho-Oh
     110:
@@ -5269,7 +5269,7 @@ A4:
       rarity: ♢♢
       boosters: Ho-Oh
     112:
-      name: Nachtara ex
+      name: Nachtara-ex
       rarity: ♢♢♢♢
       boosters: Ho-Oh
     113:
@@ -5325,7 +5325,7 @@ A4:
       rarity: ♢♢♢
       boosters: Lugia
     124:
-      name: Panzaeron ex
+      name: Panzaeron-ex
       rarity: ♢♢♢♢
       boosters: Ho-Oh
     125:
@@ -5435,7 +5435,7 @@ A4:
       rarity: ♢♢
       boosters: Lugia
     149:
-      name: Lugia ex
+      name: Lugia-ex
       rarity: ♢♢♢♢
       boosters: Lugia
     150:
@@ -5589,43 +5589,43 @@ A4:
       rarity: ☆
       boosters: Ho-Oh
     186:
-      name: Pottrott ex
+      name: Pottrott-ex
       rarity: ☆☆
       boosters: Lugia
     187:
-      name: Ho-Oh ex
+      name: Ho-Oh-ex
       rarity: ☆☆
       boosters: Ho-Oh
     188:
-      name: Seedraking ex
+      name: Seedraking-ex
       rarity: ☆☆
       boosters: Lugia
     189:
-      name: Lanturn ex
+      name: Lanturn-ex
       rarity: ☆☆
       boosters: Lugia
     190:
-      name: Psiana ex
+      name: Psiana-ex
       rarity: ☆☆
       boosters: Lugia
     191:
-      name: Donphan ex
+      name: Donphan-ex
       rarity: ☆☆
       boosters: Ho-Oh
     192:
-      name: Iksbat ex
+      name: Iksbat-ex
       rarity: ☆☆
       boosters: Ho-Oh
     193:
-      name: Nachtara ex
+      name: Nachtara-ex
       rarity: ☆☆
       boosters: Ho-Oh
     194:
-      name: Panzaeron ex
+      name: Panzaeron-ex
       rarity: ☆☆
       boosters: Ho-Oh
     195:
-      name: Lugia ex
+      name: Lugia-ex
       rarity: ☆☆
       boosters: Lugia
     196:
@@ -5653,43 +5653,43 @@ A4:
       rarity: ☆☆
       boosters: Ho-Oh
     202:
-      name: Pottrott ex
+      name: Pottrott-ex
       rarity: ☆☆
       boosters: Lugia
     203:
-      name: Seedraking ex
+      name: Seedraking-ex
       rarity: ☆☆
       boosters: Lugia
     204:
-      name: Lanturn ex
+      name: Lanturn-ex
       rarity: ☆☆
       boosters: Lugia
     205:
-      name: Psiana ex
+      name: Psiana-ex
       rarity: ☆☆
       boosters: Lugia
     206:
-      name: Donphan ex
+      name: Donphan-ex
       rarity: ☆☆
       boosters: Ho-Oh
     207:
-      name: Iksbat ex
+      name: Iksbat-ex
       rarity: ☆☆
       boosters: Ho-Oh
     208:
-      name: Nachtara ex
+      name: Nachtara-ex
       rarity: ☆☆
       boosters: Ho-Oh
     209:
-      name: Panzaeron ex
+      name: Panzaeron-ex
       rarity: ☆☆
       boosters: Ho-Oh
     210:
-      name: Ho-Oh ex
+      name: Ho-Oh-ex
       rarity: ☆☆☆
       boosters: Ho-Oh
     211:
-      name: Lugia ex
+      name: Lugia-ex
       rarity: ☆☆☆
       boosters: Lugia
     212:
@@ -5773,45 +5773,45 @@ A4:
       rarity: ✸
       boosters: Ho-Oh
     232:
-      name: Yanmega ex
+      name: Yanmega-ex
       rarity: ✸✸
       boosters: Ho-Oh
     233:
-      name: Folipurba ex
+      name: Folipurba-ex
       rarity: ✸✸
       boosters: Ho-Oh
     234:
-      name: Garados ex
+      name: Garados-ex
       rarity: ✸✸
       boosters: Lugia
     235:
-      name: Glaziola ex
+      name: Glaziola-ex
       rarity: ✸✸
       boosters: Lugia
     236:
-      name: Pachirisu ex
+      name: Pachirisu-ex
       rarity: ✸✸
       boosters: Lugia
     237:
-      name: Traunmagil ex
+      name: Traunmagil-ex
       rarity: ✸✸
       boosters: Ho-Oh
     238:
-      name: Snibunna ex
+      name: Snibunna-ex
       rarity: ✸✸
       boosters: Lugia
     239:
-      name: Schlurplek ex
+      name: Schlurplek-ex
       rarity: ✸✸
       boosters: Ho-Oh
     240:
-      name: Ho-Oh ex
+      name: Ho-Oh-ex
       rarity: ♛
       boosters:
         - Ho-Oh
         - Lugia
     241:
-      name: Lugia ex
+      name: Lugia-ex
       rarity: ♛
       boosters:
         - Ho-Oh
@@ -5826,7 +5826,7 @@ A4a:
       name: Hubelupf
       rarity: ♢♢
     3:
-      name: Papungha ex
+      name: Papungha-ex
       rarity: ♢♢♢♢
     4:
       name: Sonnkern
@@ -5847,7 +5847,7 @@ A4a:
       name: Magcargo
       rarity: ♢♢
     10:
-      name: Entei ex
+      name: Entei-ex
       rarity: ♢♢♢♢
     11:
       name: Dartignis
@@ -5877,7 +5877,7 @@ A4a:
       name: Rossana
       rarity: ♢
     20:
-      name: Suicune ex
+      name: Suicune-ex
       rarity: ♢♢♢♢
     21:
       name: Barschwa
@@ -5892,7 +5892,7 @@ A4a:
       name: Frigometri
       rarity: ♢
     25:
-      name: Raikou ex
+      name: Raikou-ex
       rarity: ♢♢♢♢
     26:
       name: Zapplardin
@@ -5943,7 +5943,7 @@ A4a:
       name: Digdri
       rarity: ♢♢
     42:
-      name: Quappo ex
+      name: Quappo-ex
       rarity: ♢♢♢♢
     43:
       name: Phanpy
@@ -6051,19 +6051,19 @@ A4a:
       name: Azurill
       rarity: ☆
     78:
-      name: Papungha ex
+      name: Papungha-ex
       rarity: ☆☆
     79:
-      name: Entei ex
+      name: Entei-ex
       rarity: ☆☆
     80:
-      name: Suicune ex
+      name: Suicune-ex
       rarity: ☆☆
     81:
-      name: Raikou ex
+      name: Raikou-ex
       rarity: ☆☆
     82:
-      name: Quappo ex
+      name: Quappo-ex
       rarity: ☆☆
     83:
       name: Bianka
@@ -6075,19 +6075,19 @@ A4a:
       name: Jens
       rarity: ☆☆
     86:
-      name: Papungha ex
+      name: Papungha-ex
       rarity: ☆☆
     87:
-      name: Entei ex
+      name: Entei-ex
       rarity: ☆☆
     88:
-      name: Raikou ex
+      name: Raikou-ex
       rarity: ☆☆
     89:
-      name: Quappo ex
+      name: Quappo-ex
       rarity: ☆☆
     90:
-      name: Suicune ex
+      name: Suicune-ex
       rarity: ☆☆☆
     91:
       name: Panflam
@@ -6120,22 +6120,22 @@ A4a:
       name: Paldea-Felino
       rarity: ✸
     101:
-      name: Panferno ex
+      name: Panferno-ex
       rarity: ✸✸
     102:
-      name: Mew ex
+      name: Mew-ex
       rarity: ✸✸
     103:
-      name: Knakrack ex
+      name: Knakrack-ex
       rarity: ✸✸
     104:
-      name: Paldea-Suelord ex
+      name: Paldea-Suelord-ex
       rarity: ✸✸
     105:
       name: Mantirps
       rarity: ♛
 A4b:
-  name: Deluxepack ex
+  name: Deluxepack-ex
   cards:
     1:
       name: Bisasam
@@ -6150,7 +6150,7 @@ A4b:
       name: Bisaknosp
       rarity: ♢♢✦
     5:
-      name: Bisaflor ex
+      name: Bisaflor-ex
       rarity: ♢♢♢♢
     6:
       name: Hornliu
@@ -6165,7 +6165,7 @@ A4b:
       name: Kokuna
       rarity: ♢♢✦
     10:
-      name: Bibor ex
+      name: Bibor-ex
       rarity: ♢♢♢♢
     11:
       name: Owei
@@ -6174,7 +6174,7 @@ A4b:
       name: Owei
       rarity: ♢✦
     13:
-      name: Kokowei ex
+      name: Kokowei-ex
       rarity: ♢♢♢♢
     14:
       name: Hoppspross
@@ -6201,13 +6201,13 @@ A4b:
       name: Yanma
       rarity: ♢✦
     22:
-      name: Yanmega ex
+      name: Yanmega-ex
       rarity: ♢♢♢♢
     23:
-      name: Pottrott ex
+      name: Pottrott-ex
       rarity: ♢♢♢♢
     24:
-      name: Celebi ex
+      name: Celebi-ex
       rarity: ♢♢♢♢
     25:
       name: Kikugi
@@ -6222,7 +6222,7 @@ A4b:
       name: Kinoso
       rarity: ♢♢✦
     29:
-      name: Folipurba ex
+      name: Folipurba-ex
       rarity: ♢♢♢♢
     30:
       name: Shaymin
@@ -6261,13 +6261,13 @@ A4b:
       name: Arboretoss
       rarity: ♢♢✦
     42:
-      name: Silvarro ex
+      name: Silvarro-ex
       rarity: ♢♢♢♢
     43:
-      name: Moruda ex
+      name: Moruda-ex
       rarity: ♢♢♢♢
     44:
-      name: Masskito ex
+      name: Masskito-ex
       rarity: ♢♢♢♢
     45:
       name: Schabelle
@@ -6312,10 +6312,10 @@ A4b:
       name: Glutexo
       rarity: ♢♢✦
     59:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ♢♢♢♢
     60:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ♢♢♢♢
     61:
       name: Fukano
@@ -6324,7 +6324,7 @@ A4b:
       name: Fukano
       rarity: ♢✦
     63:
-      name: Arkani ex
+      name: Arkani-ex
       rarity: ♢♢♢♢
     64:
       name: Flamara
@@ -6333,13 +6333,13 @@ A4b:
       name: Flamara
       rarity: ♢♢♢✦
     66:
-      name: Flamara ex
+      name: Flamara-ex
       rarity: ♢♢♢♢
     67:
-      name: Lavados ex
+      name: Lavados-ex
       rarity: ♢♢♢♢
     68:
-      name: Ho-Oh ex
+      name: Ho-Oh-ex
       rarity: ♢♢♢♢
     69:
       name: Qurtel
@@ -6360,7 +6360,7 @@ A4b:
       name: Panpyro
       rarity: ♢♢✦
     75:
-      name: Panferno ex
+      name: Panferno-ex
       rarity: ♢♢♢♢
     76:
       name: Heatran
@@ -6381,7 +6381,7 @@ A4b:
       name: Miezunder
       rarity: ♢♢✦
     82:
-      name: Fuegro ex
+      name: Fuegro-ex
       rarity: ♢♢♢♢
     83:
       name: Schiggy
@@ -6396,7 +6396,7 @@ A4b:
       name: Schillok
       rarity: ♢♢✦
     87:
-      name: Turtok ex
+      name: Turtok-ex
       rarity: ♢♢♢♢
     88:
       name: Seeper
@@ -6411,7 +6411,7 @@ A4b:
       name: Seemon
       rarity: ♢♢✦
     92:
-      name: Seedraking ex
+      name: Seedraking-ex
       rarity: ♢♢♢♢
     93:
       name: Sterndu
@@ -6420,7 +6420,7 @@ A4b:
       name: Sterndu
       rarity: ♢✦
     95:
-      name: Starmie ex
+      name: Starmie-ex
       rarity: ♢♢♢♢
     96:
       name: Karpador
@@ -6429,7 +6429,7 @@ A4b:
       name: Karpador
       rarity: ♢✦
     98:
-      name: Garados ex
+      name: Garados-ex
       rarity: ♢♢♢♢
     99:
       name: Aquana
@@ -6438,7 +6438,7 @@ A4b:
       name: Aquana
       rarity: ♢♢♢✦
     101:
-      name: Arktos ex
+      name: Arktos-ex
       rarity: ♢♢♢♢
     102:
       name: Krebscorps
@@ -6453,10 +6453,10 @@ A4b:
       name: Krebutack
       rarity: ♢♢♢✦
     106:
-      name: Glaziola ex
+      name: Glaziola-ex
       rarity: ♢♢♢♢
     107:
-      name: Palkia ex
+      name: Palkia-ex
       rarity: ♢♢♢♢
     108:
       name: Manaphy
@@ -6495,10 +6495,10 @@ A4b:
       name: Marikeck
       rarity: ♢✦
     120:
-      name: Primarene ex
+      name: Primarene-ex
       rarity: ♢♢♢♢
     121:
-      name: Krawell ex
+      name: Krawell-ex
       rarity: ♢♢♢♢
     122:
       name: Lusardin
@@ -6507,7 +6507,7 @@ A4b:
       name: Lusardin
       rarity: ♢✦
     124:
-      name: Lusardin ex
+      name: Lusardin-ex
       rarity: ♢♢♢♢
     125:
       name: Schligda
@@ -6516,7 +6516,7 @@ A4b:
       name: Schligda
       rarity: ♢✦
     127:
-      name: Schligdri ex
+      name: Schligdri-ex
       rarity: ♢♢♢♢
     128:
       name: Pikachu
@@ -6525,13 +6525,13 @@ A4b:
       name: Pikachu
       rarity: ♢✦
     130:
-      name: Alola-Raichu ex
+      name: Alola-Raichu-ex
       rarity: ♢♢♢♢
     131:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ♢♢♢♢
     132:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ♢♢♢♢
     133:
       name: Magnetilo
@@ -6552,7 +6552,7 @@ A4b:
       name: Magnezone
       rarity: ♢♢♢✦
     139:
-      name: Zapdos ex
+      name: Zapdos-ex
       rarity: ♢♢♢♢
     140:
       name: Lampi
@@ -6561,7 +6561,7 @@ A4b:
       name: Lampi
       rarity: ♢✦
     142:
-      name: Lanturn ex
+      name: Lanturn-ex
       rarity: ♢♢♢♢
     143:
       name: Pachirisu
@@ -6570,7 +6570,7 @@ A4b:
       name: Pachirisu
       rarity: ♢♢✦
     145:
-      name: Pachirisu ex
+      name: Pachirisu-ex
       rarity: ♢♢♢♢
     146:
       name: Choreogel
@@ -6579,7 +6579,7 @@ A4b:
       name: Choreogel
       rarity: ♢♢♢✦
     148:
-      name: Kapu-Riki ex
+      name: Kapu-Riki-ex
       rarity: ♢♢♢♢
     149:
       name: Zeraora
@@ -6600,7 +6600,7 @@ A4b:
       name: Alpollo
       rarity: ♢♢✦
     155:
-      name: Gengar ex
+      name: Gengar-ex
       rarity: ♢♢♢♢
     156:
       name: Rossana
@@ -6609,13 +6609,13 @@ A4b:
       name: Rossana
       rarity: ♢✦
     158:
-      name: Mewtu ex
+      name: Mewtu-ex
       rarity: ♢♢♢♢
     159:
-      name: Mew ex
+      name: Mew-ex
       rarity: ♢♢♢♢
     160:
-      name: Psiana ex
+      name: Psiana-ex
       rarity: ♢♢♢♢
     161:
       name: Traunfugil
@@ -6624,7 +6624,7 @@ A4b:
       name: Traunfugil
       rarity: ♢✦
     163:
-      name: Traunmagil ex
+      name: Traunmagil-ex
       rarity: ♢♢♢♢
     164:
       name: Trasla
@@ -6651,7 +6651,7 @@ A4b:
       name: Giratina
       rarity: ♢♢♢✦
     172:
-      name: Giratina ex
+      name: Giratina-ex
       rarity: ♢♢♢♢
     173:
       name: Flauschling
@@ -6666,7 +6666,7 @@ A4b:
       name: Sabbaione
       rarity: ♢♢✦
     177:
-      name: Feelinara ex
+      name: Feelinara-ex
       rarity: ♢♢♢♢
     178:
       name: Choreogel
@@ -6687,7 +6687,7 @@ A4b:
       name: Cosmovum
       rarity: ♢♢✦
     184:
-      name: Lunala ex
+      name: Lunala-ex
       rarity: ♢♢♢♢
     185:
       name: Hokumil
@@ -6714,7 +6714,7 @@ A4b:
       name: Maschock
       rarity: ♢♢✦
     193:
-      name: Machomei ex
+      name: Machomei-ex
       rarity: ♢♢♢♢
     194:
       name: Tragosso
@@ -6723,10 +6723,10 @@ A4b:
       name: Tragosso
       rarity: ♢✦
     196:
-      name: Knogga ex
+      name: Knogga-ex
       rarity: ♢♢♢♢
     197:
-      name: Aerodactyl ex
+      name: Aerodactyl-ex
       rarity: ♢♢♢♢
     198:
       name: Mogelbaum
@@ -6741,7 +6741,7 @@ A4b:
       name: Phanpy
       rarity: ♢✦
     202:
-      name: Donphan ex
+      name: Donphan-ex
       rarity: ♢♢♢♢
     203:
       name: Nasgnet
@@ -6762,7 +6762,7 @@ A4b:
       name: Knarksel
       rarity: ♢✦
     209:
-      name: Knakrack ex
+      name: Knakrack-ex
       rarity: ♢♢♢♢
     210:
       name: Riolu
@@ -6777,10 +6777,10 @@ A4b:
       name: Lucario
       rarity: ♢♢♢✦
     214:
-      name: Lucario ex
+      name: Lucario-ex
       rarity: ♢♢♢♢
     215:
-      name: Galagladi ex
+      name: Galagladi-ex
       rarity: ♢♢♢♢
     216:
       name: Rotomurf
@@ -6801,10 +6801,10 @@ A4b:
       name: Wuffels
       rarity: ♢✦
     222:
-      name: Wolwerock ex
+      name: Wolwerock-ex
       rarity: ♢♢♢♢
     223:
-      name: Quartermak ex
+      name: Quartermak-ex
       rarity: ♢♢♢♢
     224:
       name: Marshadow
@@ -6831,7 +6831,7 @@ A4b:
       name: Iksbat
       rarity: ♢♢♢✦
     232:
-      name: Iksbat ex
+      name: Iksbat-ex
       rarity: ♢♢♢♢
     233:
       name: Alola-Sleima
@@ -6840,7 +6840,7 @@ A4b:
       name: Alola-Sleima
       rarity: ♢✦
     235:
-      name: Alola-Sleimok ex
+      name: Alola-Sleimok-ex
       rarity: ♢♢♢♢
     236:
       name: Paldea-Felino
@@ -6849,7 +6849,7 @@ A4b:
       name: Paldea-Felino
       rarity: ♢✦
     238:
-      name: Paldea-Suelord ex
+      name: Paldea-Suelord-ex
       rarity: ♢♢♢♢
     239:
       name: Nachtara
@@ -6858,7 +6858,7 @@ A4b:
       name: Nachtara
       rarity: ♢♢♢✦
     241:
-      name: Nachtara ex
+      name: Nachtara-ex
       rarity: ♢♢♢♢
     242:
       name: Sniebel
@@ -6867,10 +6867,10 @@ A4b:
       name: Sniebel
       rarity: ♢✦
     244:
-      name: Snibunna ex
+      name: Snibunna-ex
       rarity: ♢♢♢♢
     245:
-      name: Darkrai ex
+      name: Darkrai-ex
       rarity: ♢♢♢♢
     246:
       name: Anego
@@ -6879,7 +6879,7 @@ A4b:
       name: Anego
       rarity: ♢♢♢✦
     248:
-      name: Schlingking ex
+      name: Schlingking-ex
       rarity: ♢♢♢♢
     249:
       name: Alola-Digda
@@ -6888,16 +6888,16 @@ A4b:
       name: Alola-Digda
       rarity: ♢✦
     251:
-      name: Alola-Digdri ex
+      name: Alola-Digdri-ex
       rarity: ♢♢♢♢
     252:
-      name: Panzaeron ex
+      name: Panzaeron-ex
       rarity: ♢♢♢♢
     253:
-      name: Voluminas ex
+      name: Voluminas-ex
       rarity: ♢♢♢♢
     254:
-      name: Dialga ex
+      name: Dialga-ex
       rarity: ♢♢♢♢
     255:
       name: Stalobor
@@ -6912,7 +6912,7 @@ A4b:
       name: Clavion
       rarity: ♢♢♢✦
     259:
-      name: Solgaleo ex
+      name: Solgaleo-ex
       rarity: ♢♢♢♢
     260:
       name: Magearna
@@ -6933,7 +6933,7 @@ A4b:
       name: Tafforgita
       rarity: ♢♢✦
     266:
-      name: Granforgita ex
+      name: Granforgita-ex
       rarity: ♢♢♢♢
     267:
       name: Dratini
@@ -6948,7 +6948,7 @@ A4b:
       name: Dragonir
       rarity: ♢✦
     271:
-      name: Dragoran ex
+      name: Dragoran-ex
       rarity: ♢♢♢♢
     272:
       name: Taubsi
@@ -6963,7 +6963,7 @@ A4b:
       name: Tauboga
       rarity: ♢✦
     276:
-      name: Tauboss ex
+      name: Tauboss-ex
       rarity: ♢♢♢♢
     277:
       name: Pummeluff
@@ -6972,7 +6972,7 @@ A4b:
       name: Pummeluff
       rarity: ♢✦
     279:
-      name: Knuddeluff ex
+      name: Knuddeluff-ex
       rarity: ♢♢♢♢
     280:
       name: Porenta
@@ -6987,7 +6987,7 @@ A4b:
       name: Schlurp
       rarity: ♢✦
     284:
-      name: Schlurplek ex
+      name: Schlurplek-ex
       rarity: ♢♢♢♢
     285:
       name: Evoli
@@ -6996,13 +6996,13 @@ A4b:
       name: Evoli
       rarity: ♢✦
     287:
-      name: Evoli ex
+      name: Evoli-ex
       rarity: ♢♢♢♢
     288:
-      name: Relaxo ex
+      name: Relaxo-ex
       rarity: ♢♢♢♢
     289:
-      name: Lugia ex
+      name: Lugia-ex
       rarity: ♢♢♢♢
     290:
       name: Eneco
@@ -7023,7 +7023,7 @@ A4b:
       name: Bidiza
       rarity: ♢✦
     296:
-      name: Bidifas ex
+      name: Bidifas-ex
       rarity: ♢♢♢♢
     297:
       name: Shaymin
@@ -7032,7 +7032,7 @@ A4b:
       name: Shaymin
       rarity: ♢♢♢✦
     299:
-      name: Arceus ex
+      name: Arceus-ex
       rarity: ♢♢♢♢
     300:
       name: Typ:Null
@@ -7215,43 +7215,43 @@ A4b:
       name: Porenta
       rarity: ☆
     360:
-      name: Masskito ex
+      name: Masskito-ex
       rarity: ☆☆
     361:
-      name: Glurak ex
+      name: Glurak-ex
       rarity: ☆☆
     362:
-      name: Ho-Oh ex
+      name: Ho-Oh-ex
       rarity: ☆☆
     363:
-      name: Palkia ex
+      name: Palkia-ex
       rarity: ☆☆
     364:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ☆☆
     365:
-      name: Mewtu ex
+      name: Mewtu-ex
       rarity: ☆☆
     366:
-      name: Mew ex
+      name: Mew-ex
       rarity: ☆☆
     367:
-      name: Lunala ex
+      name: Lunala-ex
       rarity: ☆☆
     368:
-      name: Dialga ex
+      name: Dialga-ex
       rarity: ☆☆
     369:
-      name: Solgaleo ex
+      name: Solgaleo-ex
       rarity: ☆☆
     370:
-      name: Evoli ex
+      name: Evoli-ex
       rarity: ☆☆
     371:
-      name: Lugia ex
+      name: Lugia-ex
       rarity: ☆☆
     372:
-      name: Arceus ex
+      name: Arceus-ex
       rarity: ☆☆
     373:
       name: Forschung des Professors
@@ -7263,13 +7263,13 @@ A4b:
       name: Samantha
       rarity: ☆☆
     376:
-      name: Pikachu ex
+      name: Pikachu-ex
       rarity: ☆☆☆
     377:
-      name: Giratina ex
+      name: Giratina-ex
       rarity: ✸✸
     378:
-      name: Darkrai ex
+      name: Darkrai-ex
       rarity: ✸✸
     379:
       name: Sonderbonbon
@@ -7310,7 +7310,7 @@ P-A:
       name: Smettbo
       equalTo: A1
     14:
-      name: Lapras ex
+      name: Lapras-ex
     15:
       name: Pikachu
       equalTo: A1
@@ -7339,7 +7339,7 @@ P-A:
       name: Magnetilo
       equalTo: A1
     25:
-      name: Lavados ex
+      name: Lavados-ex
       equalTo: A1
     26:
       name: Pikachu
@@ -7373,7 +7373,7 @@ P-A:
       name: Elevoltek
       equalTo: A2
     37:
-      name: Cresselia ex
+      name: Cresselia-ex
     38:
       name: Traunfugil
     39:
@@ -7386,7 +7386,7 @@ P-A:
       name: Togepi
       equalTo: A2
     42:
-      name: Darkrai ex
+      name: Darkrai-ex
       equalTo: A2
     43:
       name: Kinoso
@@ -7408,7 +7408,7 @@ P-A:
       name: Relaxo
       equalTo: A2a
     50:
-      name: Mewtu ex
+      name: Mewtu-ex
       equalTo: A1
     51:
       name: Mopex
@@ -7444,9 +7444,9 @@ P-A:
     63:
       name: Rayquaza
     64:
-      name: Rayquaza ex
+      name: Rayquaza-ex
     65:
-      name: Rayquaza ex
+      name: Rayquaza-ex
     66:
       name: Mimigma
     67:
@@ -7478,13 +7478,13 @@ P-A:
     80:
       name: Muramura
     81:
-      name: Ultra-Necrozma ex
+      name: Ultra-Necrozma-ex
     82:
       name: Venicro
     83:
       name: Velursi
     84:
-      name: Kapu-Riki ex
+      name: Kapu-Riki-ex
     85:
       name: Gelatini
     86:
@@ -7512,7 +7512,7 @@ P-A:
     97:
       name: Kangama
     98:
-      name: Heiteira ex
+      name: Heiteira-ex
     99:
       name: Marill
     100:
@@ -7534,13 +7534,13 @@ P-A:
     108:
       name: Phanpy
     109:
-      name: Evoli ex
+      name: Evoli-ex
     110:
-      name: Entei ex
+      name: Entei-ex
     111:
       name: Pikachu
     112:
-      name: Raichu ex
+      name: Raichu-ex
     113:
       name: Mimigma
     114:
