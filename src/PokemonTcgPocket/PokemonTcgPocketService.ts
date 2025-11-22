@@ -61,7 +61,7 @@ export const SET_KEY_VALUES = [
   'A4',
   'A4a',
   'A4b',
-  'PROMO-A',
+  'P-A',
 ] as const;
 
 /** Set key type */
@@ -80,7 +80,7 @@ export const SET_KEY_NAMES: Record<SetKey, string> = {
   A4: 'Weisheit von Meer und Himmel',
   A4a: 'Verborgene Quelle',
   A4b: 'Deluxepack ex',
-  'PROMO-A': 'Promo-A',
+  'P-A': 'PROMO-A',
 };
 
 /** Booster values */
