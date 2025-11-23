@@ -8,7 +8,7 @@
 				"oven.bun-vscode",
 				"dbaeumer.vscode-eslint",
 				"Prisma.prisma",
-				"Hamster.task-master-hamster"
+				"hamster.task-master-hamster"
 			]
 		}
 	},
