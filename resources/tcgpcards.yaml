@@ -7551,3 +7551,1489 @@ P-A:
       name: Shaymin
     117:
       name: Absol
+P-B:
+  name: PROMO-B
+  boosters: ~
+  cards:
+    1:
+      name: Pikachu
+    2:
+      name: Lilminip
+    3:
+      name: Froxy
+    4:
+      name: Luxtra
+    5:
+      name: Taubsi
+    6:
+      name: Mega-Tauboss-ex
+    7:
+      name: Flemmli
+    8:
+      name: Enton
+    9:
+      name: Mega-Absol-ex
+    10:
+      name: Drifzepeli
+    11:
+      name: Evoli
+B1:
+  name: Mega-Aufstieg
+  boosters:
+    - Mega-Garados
+    - Mega-Lohgock
+    - Mega-Altaria
+  cards:
+    1:
+      name: Pinsir
+      rarity: ♢
+      boosters: Mega-Lohgock
+    2:
+      name: Mega-Pinsir-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Lohgock
+    3:
+      name: Waumpel
+      rarity: ♢
+      boosters: Mega-Lohgock
+    4:
+      name: Schaloko
+      rarity: ♢
+      boosters: Mega-Lohgock
+    5:
+      name: Papinella
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    6:
+      name: Panekon
+      rarity: ♢
+      boosters: Mega-Lohgock
+    7:
+      name: Pudox
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    8:
+      name: Samurzel
+      rarity: ♢
+      boosters: Mega-Lohgock
+    9:
+      name: Blanas
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    10:
+      name: Tengulist
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    11:
+      name: Knilz
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    12:
+      name: Kapilz
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    13:
+      name: Vegimak
+      rarity: ♢
+      boosters: Mega-Garados
+    14:
+      name: Vegichita
+      rarity: ♢
+      boosters: Mega-Garados
+    15:
+      name: Waumboll
+      rarity: ♢
+      boosters: Mega-Altaria
+    16:
+      name: Elfun-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Altaria
+    17:
+      name: Lilminip
+      rarity: ♢
+      boosters: Mega-Altaria
+    18:
+      name: Dressella
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    19:
+      name: Maracamba
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    20:
+      name: Viridium
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    21:
+      name: Mähikel
+      rarity: ♢
+      boosters: Mega-Altaria
+    22:
+      name: Chevrumm
+      rarity: ♢
+      boosters: Mega-Altaria
+    23:
+      name: Paragoni
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    24:
+      name: Trombork
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    25:
+      name: Chimpep
+      rarity: ♢
+      boosters: Mega-Altaria
+    26:
+      name: Chimstix
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    27:
+      name: Gortrom
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    28:
+      name: Fukano
+      rarity: ♢
+      boosters: Mega-Lohgock
+    29:
+      name: Arkani
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    30:
+      name: Ponita
+      rarity: ♢
+      boosters: Mega-Lohgock
+    31:
+      name: Gallopa-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Lohgock
+    32:
+      name: Ho-Oh
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    33:
+      name: Flemmli
+      rarity: ♢
+      boosters: Mega-Lohgock
+    34:
+      name: Jungglut
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    35:
+      name: Lohgock
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    36:
+      name: Mega-Lohgock-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Lohgock
+    37:
+      name: Grillmak
+      rarity: ♢
+      boosters: Mega-Lohgock
+    38:
+      name: Grillchita
+      rarity: ♢
+      boosters: Mega-Lohgock
+    39:
+      name: Flampion
+      rarity: ♢
+      boosters: Mega-Garados
+    40:
+      name: Flampivian
+      rarity: ♢♢
+      boosters: Mega-Garados
+    41:
+      name: Lichtel
+      rarity: ♢
+      boosters: Mega-Altaria
+    42:
+      name: Laternecto
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    43:
+      name: Skelabra
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    44:
+      name: Furnifraß
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    45:
+      name: Leufeo
+      rarity: ♢
+      boosters: Mega-Lohgock
+    46:
+      name: Pyroleo
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    47:
+      name: Tortunator
+      rarity: ♢♢
+      boosters: Mega-Garados
+    48:
+      name: Enton
+      rarity: ♢
+      boosters: Mega-Lohgock
+    49:
+      name: Entoron
+      rarity: ♢
+      boosters: Mega-Lohgock
+    50:
+      name: Karpador
+      rarity: ♢
+      boosters: Mega-Garados
+    51:
+      name: Garados
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    52:
+      name: Mega-Garados-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Garados
+    53:
+      name: Loturzel
+      rarity: ♢
+      boosters: Mega-Altaria
+    54:
+      name: Lombrero
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    55:
+      name: Kappalores
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    56:
+      name: Wailmer
+      rarity: ♢
+      boosters: Mega-Garados
+    57:
+      name: Wailord
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    58:
+      name: Krebscorps
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    59:
+      name: Krebutack
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    60:
+      name: Liebiskus
+      rarity: ♢
+      boosters: Mega-Altaria
+    61:
+      name: Sodamak
+      rarity: ♢
+      boosters: Mega-Altaria
+    62:
+      name: Sodachita
+      rarity: ♢
+      boosters: Mega-Altaria
+    63:
+      name: Schallquap
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    64:
+      name: Mebrana
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    65:
+      name: Branawarz
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    66:
+      name: Galapaflos
+      rarity: ♢♢
+      boosters: Mega-Garados
+    67:
+      name: Karippas
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    68:
+      name: Quabbel
+      rarity: ♢
+      boosters: Mega-Garados
+    69:
+      name: Apoquallyp
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    70:
+      name: Keldeo
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    71:
+      name: Froxy
+      rarity: ♢
+      boosters: Mega-Garados
+    72:
+      name: Amphizel
+      rarity: ♢♢
+      boosters: Mega-Garados
+    73:
+      name: Quajutsu-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Garados
+    74:
+      name: Arktip
+      rarity: ♢
+      boosters: Mega-Garados
+    75:
+      name: Arktilas
+      rarity: ♢♢
+      boosters: Mega-Garados
+    76:
+      name: Kamehaps
+      rarity: ♢
+      boosters: Mega-Garados
+    77:
+      name: Kamalm
+      rarity: ♢♢
+      boosters: Mega-Garados
+    78:
+      name: Pikuda
+      rarity: ♢
+      boosters: Mega-Garados
+    79:
+      name: Barrakiefa
+      rarity: ♢♢
+      boosters: Mega-Garados
+    80:
+      name: Kubuin
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    81:
+      name: Blitza-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Garados
+    82:
+      name: Voltilamm
+      rarity: ♢
+      boosters: Mega-Altaria
+    83:
+      name: Waaty
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    84:
+      name: Ampharos
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    85:
+      name: Mega-Ampharos-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Altaria
+    86:
+      name: Sheinux
+      rarity: ♢
+      boosters: Mega-Lohgock
+    87:
+      name: Luxio
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    88:
+      name: Luxtra
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    89:
+      name: Pachirisu
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    90:
+      name: Elezeba
+      rarity: ♢
+      boosters: Mega-Lohgock
+    91:
+      name: Zebritz
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    92:
+      name: Wattzapf
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    93:
+      name: Voltula
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    94:
+      name: Dedenne
+      rarity: ♢
+      boosters: Mega-Altaria
+    95:
+      name: Voldi
+      rarity: ♢
+      boosters: Mega-Altaria
+    96:
+      name: Bellektro
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    97:
+      name: Natu
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    98:
+      name: Xatu
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    99:
+      name: Traunfugil
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    100:
+      name: Traunmagil
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    101:
+      name: Zobiris
+      rarity: ♢
+      boosters: Mega-Altaria
+    102:
+      name: Mega-Altaria-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Altaria
+    103:
+      name: Zwirrlicht
+      rarity: ♢
+      boosters: Mega-Lohgock
+    104:
+      name: Zwirrklop
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    105:
+      name: Zwirrfinst
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    106:
+      name: Jirachi
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    107:
+      name: Driftlon
+      rarity: ♢
+      boosters: Mega-Altaria
+    108:
+      name: Drifzepeli
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    109:
+      name: Klingplim
+      rarity: ♢♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    110:
+      name: Makabaja
+      rarity: ♢
+      boosters: Mega-Garados
+    111:
+      name: Echnatoll
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    112:
+      name: Mollimorba
+      rarity: ♢
+      boosters: Mega-Altaria
+    113:
+      name: Hypnomorba
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    114:
+      name: Morbitesse
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    115:
+      name: Parfi
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    116:
+      name: Parfinesse
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    117:
+      name: Flauschling
+      rarity: ♢
+      boosters: Mega-Altaria
+    118:
+      name: Sabbaione
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    119:
+      name: Rocara
+      rarity: ♢
+      boosters: Mega-Altaria
+    120:
+      name: Clavion
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    121:
+      name: Servol-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Altaria
+    122:
+      name: Sandan
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    123:
+      name: Sandamer
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    124:
+      name: Nockchan-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Lohgock
+    125:
+      name: Mogelbaum
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    126:
+      name: Makuhita
+      rarity: ♢
+      boosters: Mega-Lohgock
+    127:
+      name: Hariyama
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    128:
+      name: Hippopotas
+      rarity: ♢
+      boosters: Mega-Garados
+    129:
+      name: Hippoterus
+      rarity: ♢♢
+      boosters: Mega-Garados
+    130:
+      name: Ganovil
+      rarity: ♢
+      boosters: Mega-Garados
+    131:
+      name: Rokkaiman
+      rarity: ♢♢
+      boosters: Mega-Garados
+    132:
+      name: Rabigator
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    133:
+      name: Flapteryx
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    134:
+      name: Aeropteryx
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    135:
+      name: Golbit
+      rarity: ♢
+      boosters: Mega-Lohgock
+    136:
+      name: Golgantes
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    137:
+      name: Terrakium
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    138:
+      name: Pam-Pam
+      rarity: ♢
+      boosters: Mega-Garados
+    139:
+      name: Krabbox
+      rarity: ♢
+      boosters: Mega-Lohgock
+    140:
+      name: Krawell
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    141:
+      name: Velursi
+      rarity: ♢
+      boosters: Mega-Lohgock
+    142:
+      name: Kosturso
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    143:
+      name: Sankabuh
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    144:
+      name: Colossand
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    145:
+      name: Klonkett
+      rarity: ♢
+      boosters: Mega-Garados
+    146:
+      name: Wagong
+      rarity: ♢♢
+      boosters: Mega-Garados
+    147:
+      name: Montecarbo
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    148:
+      name: Kramurx
+      rarity: ♢
+      boosters: Mega-Garados
+    149:
+      name: Kramshef
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    150:
+      name: Absol
+      rarity: ♢♢
+      boosters: Mega-Garados
+    151:
+      name: Mega-Absol-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Garados
+    152:
+      name: Pionskora
+      rarity: ♢
+      boosters: Mega-Garados
+    153:
+      name: Piondragi
+      rarity: ♢♢
+      boosters: Mega-Garados
+    154:
+      name: Darkrai
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    155:
+      name: Kapuno
+      rarity: ♢
+      boosters: Mega-Garados
+    156:
+      name: Duodino
+      rarity: ♢♢
+      boosters: Mega-Garados
+    157:
+      name: Trikephalo
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    158:
+      name: Pandagro
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    159:
+      name: Algitt
+      rarity: ♢
+      boosters: Mega-Lohgock
+    160:
+      name: Tandrak-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Lohgock
+    161:
+      name: Garstella
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    162:
+      name: Aggrostella
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    163:
+      name: Bähmon
+      rarity: ♢
+      boosters: Mega-Altaria
+    164:
+      name: Pelzebub
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    165:
+      name: Olangaar
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    166:
+      name: Kastadur
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    167:
+      name: Tentantel
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    168:
+      name: Fermicula
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    169:
+      name: Kobalium
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    170:
+      name: Gramokles
+      rarity: ♢
+      boosters: Mega-Lohgock
+    171:
+      name: Duokles
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    172:
+      name: Durengard
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    173:
+      name: Meltan
+      rarity: ♢
+      boosters: Mega-Garados
+    174:
+      name: Melmetal-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Garados
+    175:
+      name: Krarmor
+      rarity: ♢♢♢
+      boosters: Mega-Lohgock
+    176:
+      name: Shardrago
+      rarity: ♢
+      boosters: Mega-Garados
+    177:
+      name: Viscora
+      rarity: ♢
+      boosters: Mega-Altaria
+    178:
+      name: Viscargot
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    179:
+      name: Viscogon
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    180:
+      name: Taubsi
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    181:
+      name: Tauboga
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    182:
+      name: Tauboss
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    183:
+      name: Tauros-ex
+      rarity: ♢♢♢♢
+      boosters: Mega-Altaria
+    184:
+      name: Evoli
+      rarity: ♢
+      boosters: Mega-Garados
+    185:
+      name: Griffel
+      rarity: ♢
+      boosters: Mega-Altaria
+    186:
+      name: Ambidiffel
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    187:
+      name: Miltank
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    188:
+      name: Zigzachs
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    189:
+      name: Geradaks
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    190:
+      name: Flurmel
+      rarity: ♢
+      boosters: Mega-Garados
+    191:
+      name: Krakeelo
+      rarity: ♢
+      boosters: Mega-Garados
+    192:
+      name: Krawumms
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    193:
+      name: Eneco
+      rarity: ♢
+      boosters: Mega-Garados
+    194:
+      name: Enekoro
+      rarity: ♢♢♢
+      boosters: Mega-Garados
+    195:
+      name: Pandir
+      rarity: ♢
+      boosters: Mega-Altaria
+    196:
+      name: Wablu
+      rarity: ♢
+      boosters: Mega-Altaria
+    197:
+      name: Altaria
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    198:
+      name: Plaudagei
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    199:
+      name: Nagelotz
+      rarity: ♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    200:
+      name: Kukmarda
+      rarity: ♢♢
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    201:
+      name: Yorkleff
+      rarity: ♢
+      boosters: Mega-Altaria
+    202:
+      name: Terribark
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    203:
+      name: Bissbark
+      rarity: ♢♢♢
+      boosters: Mega-Altaria
+    204:
+      name: Geronimatz
+      rarity: ♢
+      boosters: Mega-Lohgock
+    205:
+      name: Washakwil
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    206:
+      name: Coiffwaff
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    207:
+      name: Coiffwaff
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    208:
+      name: Coiffwaff
+      rarity: ♢♢
+      boosters: Mega-Garados
+    209:
+      name: Meikro
+      rarity: ♢
+      boosters: Mega-Lohgock
+    210:
+      name: Kranoviz
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    211:
+      name: Wolly
+      rarity: ♢
+      boosters: Mega-Altaria
+    212:
+      name: Zwollock
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    213:
+      name: Rad des Zufalls
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    214:
+      name: Federfossil
+      rarity: ♢
+      boosters: Mega-Lohgock
+    215:
+      name: Schlagender Hammer
+      rarity: ♢♢
+      boosters: Mega-Garados
+    216:
+      name: Schildfossil
+      rarity: ♢
+      boosters: Mega-Garados
+    217:
+      name: Flammenpflaster
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    218:
+      name: Tsitrubeere
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    219:
+      name: Schwerer Helm
+      rarity: ♢♢
+      boosters: Mega-Garados
+    220:
+      name: Glückshandschuhe
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    221:
+      name: Benson
+      rarity: ♢♢
+      boosters: Mega-Garados
+    222:
+      name: Hala
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    223:
+      name: Maike
+      rarity: ♢♢
+      boosters: Mega-Lohgock
+    224:
+      name: Lamina
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    225:
+      name: Nachahmerin
+      rarity: ♢♢
+      boosters: Mega-Garados
+    226:
+      name: Xenia
+      rarity: ♢♢
+      boosters: Mega-Altaria
+    227:
+      name: Papinella
+      rarity: ☆
+      boosters: Mega-Lohgock
+    228:
+      name: Mähikel
+      rarity: ☆
+      boosters: Mega-Altaria
+    229:
+      name: Gortrom
+      rarity: ☆
+      boosters: Mega-Altaria
+    230:
+      name: Fukano
+      rarity: ☆
+      boosters: Mega-Lohgock
+    231:
+      name: Skelabra
+      rarity: ☆
+      boosters: Mega-Altaria
+    232:
+      name: Karpador
+      rarity: ☆
+      boosters: Mega-Garados
+    233:
+      name: Kappalores
+      rarity: ☆
+      boosters: Mega-Altaria
+    234:
+      name: Apoquallyp
+      rarity: ☆
+      boosters: Mega-Garados
+    235:
+      name: Keldeo
+      rarity: ☆
+      boosters: Mega-Lohgock
+    236:
+      name: Kubuin
+      rarity: ☆
+      boosters: Mega-Altaria
+    237:
+      name: Luxtra
+      rarity: ☆
+      boosters: Mega-Lohgock
+    238:
+      name: Echnatoll
+      rarity: ☆
+      boosters: Mega-Garados
+    239:
+      name: Mollimorba
+      rarity: ☆
+      boosters: Mega-Altaria
+    240:
+      name: Makuhita
+      rarity: ☆
+      boosters: Mega-Lohgock
+    241:
+      name: Hippoterus
+      rarity: ☆
+      boosters: Mega-Garados
+    242:
+      name: Aeropteryx
+      rarity: ☆
+      boosters: Mega-Lohgock
+    243:
+      name: Pam-Pam
+      rarity: ☆
+      boosters: Mega-Garados
+    244:
+      name: Kramshef
+      rarity: ☆
+      boosters: Mega-Garados
+    245:
+      name: Trikephalo
+      rarity: ☆
+      boosters: Mega-Garados
+    246:
+      name: Krarmor
+      rarity: ☆
+      boosters: Mega-Lohgock
+    247:
+      name: Viscora
+      rarity: ☆
+      boosters: Mega-Altaria
+    248:
+      name: Enekoro
+      rarity: ☆
+      boosters: Mega-Garados
+    249:
+      name: Bissbark
+      rarity: ☆
+      boosters: Mega-Altaria
+    250:
+      name: Geronimatz
+      rarity: ☆
+      boosters: Mega-Lohgock
+    251:
+      name: Mega-Pinsir-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    252:
+      name: Elfun-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    253:
+      name: Gallopa-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    254:
+      name: Mega-Lohgock-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    255:
+      name: Mega-Garados-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    256:
+      name: Quajutsu-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    257:
+      name: Blitza-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    258:
+      name: Mega-Ampharos-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    259:
+      name: Mega-Altaria-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    260:
+      name: Servol-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    261:
+      name: Nockchan-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    262:
+      name: Mega-Absol-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    263:
+      name: Tandrak-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    264:
+      name: Melmetal-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    265:
+      name: Tauros-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    266:
+      name: Benson
+      rarity: ☆☆
+      boosters: Mega-Garados
+    267:
+      name: Hala
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    268:
+      name: Maike
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    269:
+      name: Lamina
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    270:
+      name: Nachahmerin
+      rarity: ☆☆
+      boosters: Mega-Garados
+    271:
+      name: Xenia
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    272:
+      name: Mega-Pinsir-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    273:
+      name: Elfun-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    274:
+      name: Gallopa-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    275:
+      name: Quajutsu-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    276:
+      name: Blitza-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    277:
+      name: Mega-Ampharos-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    278:
+      name: Servol-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    279:
+      name: Nockchan-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    280:
+      name: Mega-Absol-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    281:
+      name: Tandrak-ex
+      rarity: ☆☆
+      boosters: Mega-Lohgock
+    282:
+      name: Melmetal-ex
+      rarity: ☆☆
+      boosters: Mega-Garados
+    283:
+      name: Tauros-ex
+      rarity: ☆☆
+      boosters: Mega-Altaria
+    284:
+      name: Mega-Lohgock-ex
+      rarity: ☆☆☆
+      boosters: Mega-Lohgock
+    285:
+      name: Mega-Garados-ex
+      rarity: ☆☆☆
+      boosters: Mega-Garados
+    286:
+      name: Mega-Altaria-ex
+      rarity: ☆☆☆
+      boosters: Mega-Altaria
+    287:
+      name: Knofensa
+      rarity: ✸
+      boosters: Mega-Altaria
+    288:
+      name: Ultrigaria
+      rarity: ✸
+      boosters: Mega-Altaria
+    289:
+      name: Sarzenia
+      rarity: ✸
+      boosters: Mega-Altaria
+    290:
+      name: Bauz
+      rarity: ✸
+      boosters: Mega-Lohgock
+    291:
+      name: Arboretoss
+      rarity: ✸
+      boosters: Mega-Lohgock
+    292:
+      name: Lavados
+      rarity: ✸
+      boosters: Mega-Lohgock
+    293:
+      name: Flamiau
+      rarity: ✸
+      boosters: Mega-Garados
+    294:
+      name: Miezunder
+      rarity: ✸
+      boosters: Mega-Garados
+    295:
+      name: Quapsel
+      rarity: ✸
+      boosters: Mega-Garados
+    296:
+      name: Quaputzi
+      rarity: ✸
+      boosters: Mega-Garados
+    297:
+      name: Quappo
+      rarity: ✸
+      boosters: Mega-Garados
+    298:
+      name: Arktos
+      rarity: ✸
+      boosters: Mega-Altaria
+    299:
+      name: Manaphy
+      rarity: ✸
+      boosters: Mega-Lohgock
+    300:
+      name: Robball
+      rarity: ✸
+      boosters: Mega-Altaria
+    301:
+      name: Marikeck
+      rarity: ✸
+      boosters: Mega-Altaria
+    302:
+      name: Zapdos
+      rarity: ✸
+      boosters: Mega-Garados
+    303:
+      name: Choreogel
+      rarity: ✸
+      boosters: Mega-Garados
+    304:
+      name: Zeraora
+      rarity: ✸
+      boosters: Mega-Altaria
+    305:
+      name: Traumato
+      rarity: ✸
+      boosters: Mega-Garados
+    306:
+      name: Hypno
+      rarity: ✸
+      boosters: Mega-Garados
+    307:
+      name: Kleinstein
+      rarity: ✸
+      boosters: Mega-Lohgock
+    308:
+      name: Georok
+      rarity: ✸
+      boosters: Mega-Lohgock
+    309:
+      name: Geowaz
+      rarity: ✸
+      boosters: Mega-Lohgock
+    310:
+      name: Wuffels
+      rarity: ✸
+      boosters: Mega-Garados
+    311:
+      name: Alola-Digda
+      rarity: ✸
+      boosters: Mega-Lohgock
+    312:
+      name: Mauzi
+      rarity: ✸
+      boosters: Mega-Altaria
+    313:
+      name: Snobilikat
+      rarity: ✸
+      boosters: Mega-Altaria
+    314:
+      name: Dodu
+      rarity: ✸
+      boosters: Mega-Lohgock
+    315:
+      name: Dodri
+      rarity: ✸
+      boosters: Mega-Lohgock
+    316:
+      name: Bidiza
+      rarity: ✸
+      boosters: Mega-Altaria
+    317:
+      name: Silvarro-ex
+      rarity: ✸✸
+      boosters: Mega-Lohgock
+    318:
+      name: Fuegro-ex
+      rarity: ✸✸
+      boosters: Mega-Garados
+    319:
+      name: Palkia-ex
+      rarity: ✸✸
+      boosters: Mega-Lohgock
+    320:
+      name: Primarene-ex
+      rarity: ✸✸
+      boosters: Mega-Altaria
+    321:
+      name: Pikachu-ex
+      rarity: ✸✸
+      boosters: Mega-Garados
+    322:
+      name: Kapu-Riki-ex
+      rarity: ✸✸
+      boosters: Mega-Lohgock
+    323:
+      name: Wolwerock-ex
+      rarity: ✸✸
+      boosters: Mega-Garados
+    324:
+      name: Quartermak-ex
+      rarity: ✸✸
+      boosters: Mega-Altaria
+    325:
+      name: Alola-Digdri-ex
+      rarity: ✸✸
+      boosters: Mega-Lohgock
+    326:
+      name: Dialga-ex
+      rarity: ✸✸
+      boosters: Mega-Altaria
+    327:
+      name: Bidifas-ex
+      rarity: ✸✸
+      boosters: Mega-Altaria
+    328:
+      name: Arceus-ex
+      rarity: ✸✸
+      boosters: Mega-Garados
+    329:
+      name: Dressella
+      rarity: ♛
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    330:
+      name: Clavion
+      rarity: ♛
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria
+    331:
+      name: Flammenpflaster
+      rarity: ♛
+      boosters:
+        - Mega-Garados
+        - Mega-Lohgock
+        - Mega-Altaria

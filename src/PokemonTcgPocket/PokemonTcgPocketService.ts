@@ -50,6 +50,7 @@ interface CardIdentifier {
 
 /** Set key values */
 export const SET_KEY_VALUES = [
+  'P-A',
   'A1',
   'A1a',
   'A2',
@@ -61,7 +62,8 @@ export const SET_KEY_VALUES = [
   'A4',
   'A4a',
   'A4b',
-  'P-A',
+  'P-B',
+  'B1',
 ] as const;
 
 /** Set key type */
@@ -69,6 +71,7 @@ export type SetKey = (typeof SET_KEY_VALUES)[number];
 
 /** Maps set keys to their names */
 export const SET_KEY_NAMES: Record<SetKey, string> = {
+  'P-A': 'PROMO-A',
   A1: 'Unschlagbare Gene',
   A1a: 'Mysteriöse Insel',
   A2: 'Kollision von Raum und Zeit',
@@ -80,7 +83,8 @@ export const SET_KEY_NAMES: Record<SetKey, string> = {
   A4: 'Weisheit von Meer und Himmel',
   A4a: 'Verborgene Quelle',
   A4b: 'Deluxepack-ex',
-  'P-A': 'PROMO-A',
+  'P-B': 'PROMO-B',
+  B1: 'Mega-Aufstieg',
 };
 
 /** Booster values */
@@ -101,6 +105,9 @@ export const BOOSTER_VALUES = [
   'Lugia',
   'Verborgene Quelle',
   'Deluxepack-ex',
+  'Mega-Garados',
+  'Mega-Lohgock',
+  'Mega-Altaria',
 ] as const;
 
 /** Booster type */

@@ -3679,6 +3679,225 @@
             "testStrategy": "Test scripts and tools with new structure; verify migration flag works; confirm backup and removal plan is documented."
           }
         ]
+      },
+      {
+        "id": 72,
+        "title": "Add God Pack Booster Field to Crown Cards Configuration",
+        "description": "Extend the tcgpcards.yaml configuration to include a godPackBooster field for crown cards that specifies which specific booster contains them in god packs, and update probability calculations to account for this constraint.",
+        "details": "This task involves modifying the card configuration structure and probability calculation logic to handle the special case where crown cards in god packs are restricted to specific boosters:\n\n1. **Update YAML Configuration Structure:**\n   - Add a new optional `godPackBooster` field to the card schema in tcgpcards.yaml\n   - This field should only be populated for crown cards and specify which booster contains them in god packs\n   - Example: For a crown card that appears in multiple regular boosters but only in Charizard god packs, set `godPackBooster: \"charizard\"`\n   - Ensure the field is properly documented and validated during YAML parsing\n\n2. **Modify PokemonTcgPocketService.ts:**\n   - Update the card interface/type definitions to include the optional godPackBooster field\n   - Modify the YAML parsing logic to handle the new field\n   - Add validation to ensure godPackBooster is only set for crown cards\n   - Update any card filtering or lookup methods to consider this new field\n\n3. **Update Probability Calculation Logic:**\n   - Modify PokemonTcgPocketProbabilityService.ts to account for god pack booster restrictions\n   - For crown cards with godPackBooster set, adjust god pack probability calculations to only consider the specified booster\n   - Ensure regular booster probabilities remain unchanged (crown cards still appear in all regular boosters)\n   - Update the calculateSingleCardProbability method to handle this special case\n\n4. **Update Related Services:**\n   - Modify any CSV export functionality to include the godPackBooster field when present\n   - Update search and filtering logic to respect god pack booster constraints\n   - Ensure booster sorting algorithms account for the updated probability calculations",
+        "testStrategy": "1. **Configuration Validation Testing:**\n   - Test YAML parsing with crown cards that have godPackBooster field set\n   - Verify validation rejects non-crown cards with godPackBooster field\n   - Test with invalid booster names in godPackBooster field to ensure proper error handling\n\n2. **Probability Calculation Testing:**\n   - Create test cases for crown cards with godPackBooster restrictions\n   - Verify that god pack probabilities are correctly limited to the specified booster\n   - Confirm regular booster probabilities remain unchanged for crown cards\n   - Test edge cases where a crown card's godPackBooster doesn't match any available booster\n\n3. **Integration Testing:**\n   - Test CSV export includes godPackBooster field for applicable cards\n   - Verify booster sorting still works correctly with updated probability calculations\n   - Test search functionality respects god pack booster constraints\n   - Ensure backward compatibility with existing crown cards that don't have godPackBooster set\n\n4. **End-to-End Testing:**\n   - Test complete probability calculations for sets containing crown cards with god pack restrictions\n   - Verify UI displays correct probabilities when godPackBooster constraints are applied\n   - Test that booster recommendations account for god pack booster limitations",
+        "status": "pending",
+        "dependencies": [
+          63,
+          71
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Update tcgpcards.yaml Schema with godPackBooster Field",
+            "description": "Modify the tcgpcards.yaml configuration schema to include an optional godPackBooster field for crown cards.",
+            "dependencies": [],
+            "details": "Add the godPackBooster field to the card schema in tcgpcards.yaml. Ensure it is only allowed for crown cards and document its purpose. Validate the field during YAML parsing.",
+            "status": "pending",
+            "testStrategy": "Test YAML parsing with valid and invalid godPackBooster values, including non-crown cards."
+          },
+          {
+            "id": 2,
+            "title": "Update PokemonTcgPocketService Card Interface",
+            "description": "Extend the card interface/type definitions in PokemonTcgPocketService.ts to include the godPackBooster field.",
+            "dependencies": [
+              1
+            ],
+            "details": "Add the optional godPackBooster field to the card interface. Update YAML parsing logic to handle this field and add validation to ensure it is only set for crown cards.",
+            "status": "pending",
+            "testStrategy": "Unit test interface and parsing logic with various card types and godPackBooster values."
+          },
+          {
+            "id": 3,
+            "title": "Modify Probability Calculation Logic for God Packs",
+            "description": "Update PokemonTcgPocketProbabilityService.ts to account for godPackBooster restrictions in probability calculations.",
+            "dependencies": [
+              2
+            ],
+            "details": "Adjust the probability calculation logic so that for crown cards with godPackBooster set, only the specified booster is considered in god pack calculations. Ensure regular booster probabilities remain unchanged.",
+            "status": "pending",
+            "testStrategy": "Test probability calculations with crown cards in different boosters and god packs."
+          },
+          {
+            "id": 4,
+            "title": "Update CSV Export and Search/Filter Logic",
+            "description": "Modify CSV export and search/filter logic to include and respect the godPackBooster field.",
+            "dependencies": [
+              3
+            ],
+            "details": "Update CSV export functionality to include the godPackBooster field when present. Adjust search and filtering logic to consider god pack booster constraints.",
+            "status": "pending",
+            "testStrategy": "Test CSV export and search/filter with cards having godPackBooster set."
+          },
+          {
+            "id": 5,
+            "title": "Update Booster Sorting Algorithms",
+            "description": "Ensure booster sorting algorithms account for updated probability calculations with godPackBooster field.",
+            "dependencies": [
+              4
+            ],
+            "details": "Modify booster sorting algorithms to reflect the new probability calculations, ensuring boosters with higher new card probabilities are sorted correctly.",
+            "status": "pending",
+            "testStrategy": "Test booster sorting with various user collections and god pack scenarios."
+          },
+          {
+            "id": 6,
+            "title": "Update pokewiki-scraper.ts to Extract and Output godPackBooster Field",
+            "description": "Modify the pokewiki-scraper.ts script to extract and output the godPackBooster field for crown cards when scraping Pokewiki pages.",
+            "details": "Update the pokewiki-scraper.ts script to:\n- Add godPackBooster field to CardEntry interface\n- Extract godPackBooster information from Pokewiki wikitext (if available in the source)\n- Output godPackBooster field in the generated YAML for crown cards\n- Ensure the field is only included for crown cards (rarity: ♛)\n- Handle cases where godPackBooster is not specified (field should be omitted)",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "parentTaskId": 72
+          }
+        ]
+      },
+      {
+        "id": 73,
+        "title": "Implement Set B1 Special Six-Card Pack Probability System with User Confirmation",
+        "description": "Implement a new probability calculation system for set B1 and other non-A sets where six-card packs exclude ✸ and ✸✸ cards from normal distribution, guaranteeing the sixth card is always ✸ or ✸✸ rarity, with comprehensive user confirmation of all probability rates before implementation.",
+        "status": "pending",
+        "dependencies": [
+          60,
+          63,
+          72
+        ],
+        "priority": "high",
+        "details": "This task implements a fundamentally different booster pack probability system for sets that don't start with 'A', with comprehensive user confirmation for all probability aspects:\n\n1. **Comprehensive User Confirmation Process:**\n   - Create an interactive prompt system to confirm ALL probability rates with the user before implementation\n   - **Six-card pack probability:** Ask user to confirm the overall probability of getting a six-card pack vs other pack types\n   - **Sixth card rarity distribution:** Ask user to confirm the specific distribution between ✸ and ✸✸ cards for the guaranteed sixth card\n   - **God pack probability:** Ask user to confirm god pack probability for B1 and non-A sets (✸ and ✸✸ cards are excluded from god packs as well)\n   - **Cards 1-5 probability distribution:** Ask user to confirm the probability distribution for the first five cards (excluding ✸ and ✸✸ rarities)\n   - **Set detection confirmation:** Ask user to confirm that all sets whose key don't start with 'A' should use this new system (note: Promo cards like P-A do not have boosters, so no probabilities are associated with them)\n   - Present clear breakdown of all probability components and allow user to modify rates and confirm final configuration\n\n2. **Update Probability Calculation Logic:**\n   - Modify PokemonTcgPocketProbabilityService to detect set keys that don't start with 'A' (excluding promo sets which don't have boosters)\n   - For these sets, implement separate probability calculation paths:\n     - Cards 1-5: Calculate probabilities excluding all ✸ and ✸✸ cards from the pool\n     - Card 6: Calculate probabilities only from ✸ and ✸✸ cards (100% chance of one of these rarities)\n     - God packs: Implement god pack logic for B1 and non-A sets with ✸ and ✸✸ cards excluded\n   - Maintain existing logic for 'A' sets and existing god pack mechanics\n\n3. **Extend Booster Configuration:**\n   - Add new probabilitiesType enum value: SPECIAL_SIXTH_CARD for this new system\n   - Update booster entities to support this new probability type\n   - Ensure backward compatibility with existing probability systems\n\n4. **Update Card Distribution Logic:**\n   - Modify card slot assignment to respect the new exclusion rules\n   - Ensure ✸ and ✸✸ cards are properly filtered from slots 1-5 calculations\n   - Implement proper weighting for sixth card ✸/✸✸ selection\n   - Handle god pack card distribution with ✸ and ✸✸ exclusions\n\n5. **Integration with Existing Systems:**\n   - Update CSV search probability display to handle the new calculation method\n   - Ensure booster sorting by new card probability works correctly with the new system\n   - Maintain compatibility with god pack mechanics for both old and new systems",
+        "testStrategy": "1. **Comprehensive User Confirmation Testing:**\n   - Test the interactive confirmation system for all probability components: six-card pack probability, sixth card rarity distribution, god pack probability, cards 1-5 distribution, and set detection\n   - Verify proper validation of user-provided rates for each component (sum to 100% where applicable, valid ranges)\n   - Test cancellation and retry flows in the confirmation process for each probability type\n   - Test edge cases like promo sets (P-A) being properly excluded from booster probability calculations\n\n2. **Probability Calculation Verification:**\n   - Unit test the new probability calculation logic with known set B1 configurations\n   - Verify ✸ and ✸✸ cards are completely excluded from slots 1-5 calculations\n   - Test that sixth card probabilities sum to 100% and only include ✸/✸✸ cards\n   - Test god pack probability calculations for non-A sets with ✸ and ✸✸ exclusions\n   - Compare calculated probabilities against manually verified expected values for all components\n\n3. **Set Detection Testing:**\n   - Test set key detection logic with various set names (A1, B1, C2, P-A, etc.)\n   - Verify 'A' sets continue using original probability system\n   - Verify non-'A' sets use the new special sixth card system\n   - Verify promo sets (P-A) are properly excluded from booster probability calculations\n\n4. **Integration Testing:**\n   - Test CSV search results show correct probabilities for both old and new systems\n   - Verify booster sorting works correctly with mixed probability systems\n   - Test god pack probability calculations work correctly for both A and non-A sets\n   - Test that god packs properly exclude ✸ and ✸✸ cards in the new system\n\n5. **Regression Testing:**\n   - Ensure existing 'A' set boosters continue working with original probability calculations\n   - Verify no impact on existing booster pack functionality for sets using DEFAULT or NO_SHINY_RARITY types\n   - Ensure promo sets continue to be handled correctly without booster probability calculations",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Interactive User Confirmation System",
+            "description": "Create an interactive prompt system to confirm all probability rates for the new six-card pack system before implementation.",
+            "dependencies": [],
+            "details": "Develop a user interface or CLI prompts that allow users to confirm six-card pack probability, sixth card rarity distribution, god pack probability, cards 1-5 distribution, and set detection. Present a clear breakdown of all probability components and allow modifications.\n<info added on 2025-11-23T01:43:48.249Z>\nBefore starting implementation, confirm all probability rates in chat:\n- Six-card pack probability\n- Sixth card rarity distribution (✸ vs ✸✸)\n- God pack probability\n- Cards 1-5 probability distribution\n- Set detection confirmation\n\nNo interactive system needs to be built - just ask the user here in chat before proceeding with implementation.\n</info added on 2025-11-23T01:43:48.249Z>\n<info added on 2025-11-23T01:44:00.090Z>\nBefore proceeding with implementation, ask the user in chat to confirm the following probability rates:\n- Six-card pack probability (vs other pack types)\n- Sixth card rarity distribution (✸ vs ✸✸)\n- God pack probability (for B1 and non-A sets)\n- Cards 1-5 probability distribution (excluding ✸ and ✸✸ rarities)\n- Set detection confirmation (all non-A sets, excluding promo sets)\n\nNo interactive system or code needs to be developed - just ask the user here in chat before proceeding with implementation.\n</info added on 2025-11-23T01:44:00.090Z>",
+            "status": "pending",
+            "testStrategy": "Test all prompts for clarity, validation, and correct data capture."
+          },
+          {
+            "id": 2,
+            "title": "Update Probability Calculation Logic",
+            "description": "Modify the probability service to detect non-A sets and implement new calculation paths for six-card packs.",
+            "dependencies": [
+              1
+            ],
+            "details": "Update PokemonTcgPocketProbabilityService to detect set keys not starting with 'A' (excluding promo sets). Implement separate logic for cards 1-5 (excluding ✸ and ✸✸ cards) and card 6 (only ✸ and ✸✸ cards). Maintain existing logic for 'A' sets and god packs.",
+            "status": "pending",
+            "testStrategy": "Test probability calculations for both new and existing systems."
+          },
+          {
+            "id": 3,
+            "title": "Extend Booster Configuration",
+            "description": "Add new probability type and update booster entities to support the special six-card pack system.",
+            "dependencies": [
+              2
+            ],
+            "details": "Add a new probabilitiesType enum value: SPECIAL_SIXTH_CARD. Update booster entities to support this new type and ensure backward compatibility with existing probability systems.\n<info added on 2025-11-23T01:43:52.039Z>\nAdd new probabilitiesType enum value: 'SHINY_AS_POTENTIAL_SIXTH_CARD' (for the new B1 system). Rename existing enum values: 'POTENTIAL_SIXTH_CARD' to 'BABY_AS_POTENTIAL_SIXTH_CARD', 'NO_SHINY_RARITY' to 'FIVE_CARDS_WITHOUT_SHINY', and 'DEFAULT' to 'FIVE_CARDS'. Update all references to these enum values throughout the codebase, including Prisma schema, TypeScript code, and any migrations needed.\n</info added on 2025-11-23T01:43:52.039Z>",
+            "status": "pending",
+            "testStrategy": "Test configuration updates and backward compatibility."
+          },
+          {
+            "id": 4,
+            "title": "Update Card Distribution Logic",
+            "description": "Modify card slot assignment to respect new exclusion rules and proper weighting for sixth card rarity.",
+            "dependencies": [
+              3
+            ],
+            "details": "Ensure ✸ and ✸✸ cards are filtered from slots 1-5 calculations. Implement proper weighting for sixth card ✸/✸✸ selection. Handle god pack card distribution with ✸ and ✸✸ exclusions.",
+            "status": "pending",
+            "testStrategy": "Test card distribution for correct exclusions and weighting."
+          },
+          {
+            "id": 5,
+            "title": "Integrate with Existing Systems",
+            "description": "Update CSV search probability display and booster sorting to handle the new calculation method.",
+            "dependencies": [
+              4
+            ],
+            "details": "Ensure CSV search probability display and booster sorting work correctly with the new system. Maintain compatibility with god pack mechanics for both old and new systems.",
+            "status": "pending",
+            "testStrategy": "Test integration points for correct display and sorting."
+          }
+        ]
+      },
+      {
+        "id": 74,
+        "title": "Remove Unused 'equalTo' Fields from Card Configuration and Tests",
+        "description": "Remove all 'equalTo' fields from the resources/tcgpcards.yaml configuration file and eliminate corresponding test cases, as this functionality was never implemented or used in the application.",
+        "details": "This task involves cleaning up unused configuration fields and associated test code:\n\n1. **Remove equalTo Fields from YAML Configuration:**\n   - Scan through resources/tcgpcards.yaml to identify all instances of 'equalTo' fields across all card entries\n   - Remove these fields completely from the YAML structure\n   - Ensure YAML syntax remains valid after field removal\n   - Verify no other fields reference or depend on equalTo values\n\n2. **Update Configuration Schema/Validation:**\n   - Remove any schema validation rules that check for or validate equalTo fields\n   - Update any TypeScript interfaces or type definitions that include equalTo properties\n   - Remove equalTo from any configuration parsing or loading logic\n\n3. **Clean Up Test Files:**\n   - Search through all test files for references to 'equalTo' functionality\n   - Remove test cases that specifically test equalTo behavior\n   - Remove mock data or fixtures that include equalTo fields\n   - Update any test assertions that check for the presence of equalTo fields\n\n4. **Code Cleanup:**\n   - Search codebase for any references to equalTo in card processing logic\n   - Remove any conditional logic or functions that handle equalTo fields\n   - Clean up any comments or documentation that mention equalTo functionality\n\n5. **Validation and Verification:**\n   - Run YAML validation to ensure file integrity after field removal\n   - Verify application still loads and processes card data correctly\n   - Ensure no broken references or undefined property errors occur",
+        "testStrategy": "1. **Configuration File Validation:**\n   - Parse resources/tcgpcards.yaml after changes to ensure valid YAML syntax\n   - Verify no 'equalTo' fields remain in any card entries across all sets\n   - Test that card loading and parsing functions work correctly without equalTo fields\n\n2. **Application Functionality Testing:**\n   - Run the full application to ensure card data loads without errors\n   - Test card search and filtering functionality to verify no broken references\n   - Verify booster pack generation and probability calculations work normally\n\n3. **Test Suite Validation:**\n   - Run all existing tests to ensure no test failures due to missing equalTo fields\n   - Verify all equalTo-specific test cases have been properly removed\n   - Check that no test fixtures or mock data contain equalTo references\n\n4. **Code Search Verification:**\n   - Perform comprehensive grep/search across codebase for 'equalTo' references\n   - Verify no remaining code attempts to access or use equalTo properties\n   - Ensure TypeScript compilation succeeds without equalTo-related type errors\n\n5. **Regression Testing:**\n   - Test core card functionality (search, display, booster generation) to ensure no regressions\n   - Verify configuration loading performance is not negatively impacted",
+        "status": "pending",
+        "dependencies": [
+          71
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Remove 'equalTo' Fields from YAML Configuration",
+            "description": "Identify and delete all 'equalTo' fields from the resources/tcgpcards.yaml file while maintaining valid YAML syntax and ensuring no other fields depend on 'equalTo'.",
+            "dependencies": [],
+            "details": "Scan the entire resources/tcgpcards.yaml file for any 'equalTo' fields in all card entries. Remove these fields completely without breaking YAML structure or syntax. Validate the YAML file after removal to confirm correctness. Check for any references or dependencies on 'equalTo' fields elsewhere in the YAML and remove or update them accordingly.",
+            "status": "pending",
+            "testStrategy": "Validate YAML syntax after removal using a YAML linter or parser. Confirm no 'equalTo' fields remain by searching the file."
+          },
+          {
+            "id": 2,
+            "title": "Update Configuration Schema and Type Definitions",
+            "description": "Remove 'equalTo' from all schema validation rules, TypeScript interfaces, and configuration parsing logic to reflect the removal from YAML.",
+            "dependencies": [
+              1
+            ],
+            "details": "Locate and remove any schema validation rules that include 'equalTo' fields. Update TypeScript interfaces or types that define card configuration to exclude 'equalTo'. Modify any parsing or loading logic that handles 'equalTo' fields to prevent errors or references to removed properties.",
+            "status": "pending",
+            "testStrategy": "Run type checks and schema validation tests to ensure no references to 'equalTo' remain and no validation errors occur."
+          },
+          {
+            "id": 3,
+            "title": "Remove 'equalTo' References from Test Files",
+            "description": "Identify and delete all test cases, mock data, fixtures, and assertions related to 'equalTo' functionality in the test suite.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Search all test files for 'equalTo' references. Remove test cases that verify 'equalTo' behavior, delete mock data or fixtures containing 'equalTo' fields, and update or remove assertions that check for 'equalTo' presence. Ensure tests remain valid and pass after cleanup.",
+            "status": "pending",
+            "testStrategy": "Run the full test suite to confirm tests pass without 'equalTo' related tests and no failures occur due to missing fields."
+          },
+          {
+            "id": 4,
+            "title": "Clean Up Codebase References to 'equalTo'",
+            "description": "Remove any code logic, functions, comments, or documentation that mention or handle 'equalTo' fields in card processing or related modules.",
+            "dependencies": [
+              2
+            ],
+            "details": "Search the codebase for any references to 'equalTo' in card processing logic or utilities. Remove conditional statements, functions, or handlers that process 'equalTo'. Update or delete comments and documentation that describe 'equalTo' functionality to avoid confusion.",
+            "status": "pending",
+            "testStrategy": "Perform code review and run static analysis tools to ensure no 'equalTo' references remain. Verify application compiles and runs without errors."
+          },
+          {
+            "id": 5,
+            "title": "Validate and Verify Application Stability Post-Removal",
+            "description": "Perform comprehensive validation to ensure YAML integrity, application loading, and processing of card data function correctly without 'equalTo' fields.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Run YAML validation tools to confirm the configuration file is syntactically correct. Start the application and verify it loads card data without errors. Execute integration or system tests to ensure no broken references or runtime errors related to 'equalTo' occur.",
+            "status": "pending",
+            "testStrategy": "Use YAML linters, application startup logs, and integration tests to confirm stability and correctness after removal of 'equalTo'."
+          }
+        ]
       }
     ],
     "metadata": {
@@ -3691,7 +3910,7 @@
       ],
       "created": "2025-11-22T17:28:44.087Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-23T00:51:26.128Z"
+      "updated": "2025-11-23T01:49:37.410Z"
     }
   }
 }
