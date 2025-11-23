@@ -61,6 +61,28 @@ alwaysApply: false
   - **Use descriptive language** that helps identify the problem
   - **Avoid technical jargon** in user-facing error messages
   - **Include suggestions** for resolution when possible
+  - **Split generic errors into specific ones** - When a single error condition covers multiple failure modes, split them into separate checks with distinct error messages
+  - **Include diagnostic information** - When validation fails, include actual vs expected values (e.g., "too short (X characters, expected at least Y)")
+
+**Example - Specific Error Messages:**
+
+```typescript
+// ❌ DON'T: Generic error covering multiple failure modes
+if (typeof textarea !== 'string' || textarea.length < MIN_LENGTH) {
+  throw new Error('Invalid content');
+}
+
+// ✅ DO: Separate checks with specific error messages
+if (typeof textarea !== 'string') {
+  throw new Error('Edit source page did not contain expected textarea element (#wpTextbox1).');
+}
+
+if (textarea.length < MIN_LENGTH) {
+  throw new Error(
+    `Edit source content is too short (${textarea.length} characters, expected at least ${MIN_LENGTH}).`,
+  );
+}
+```
 
 - **Error Handling in Services:**
   ```typescript
@@ -152,6 +174,36 @@ alwaysApply: false
   - **Provide fallback behavior** when possible
   - **Graceful degradation** for non-critical features
   - **User notification** for permanent failures
+  - **Multi-tier fallback systems** - When extracting data from multiple sources, implement a priority order with fallbacks (e.g., primary source → secondary source → default value)
+
+**Example - Fallback Strategy:**
+
+```typescript
+// ✅ DO: Implement prioritized fallback system
+function extractSetInfo(source: string, url: string): SetInfo {
+  // Priority 1: Try primary source (most reliable)
+  const infoboxInfo = extractSetInfoFromInfobox(source);
+  if (infoboxInfo) {
+    return infoboxInfo;
+  }
+
+  // Priority 2: Try secondary source
+  let setName = extractSetName(source);
+  if (setName === 'Unknown Set') {
+    // Priority 3: Fallback to URL-based extraction
+    const urlSetName = extractSetNameFromUrl(url);
+    if (urlSetName) {
+      setName = urlSetName;
+    }
+  }
+
+  // Final fallback: Default values
+  return {
+    setId: 'NEW_SET',
+    setName,
+  };
+}
+```
 
 - **Testing Error Scenarios:**
   - **Test error conditions** explicitly in unit tests

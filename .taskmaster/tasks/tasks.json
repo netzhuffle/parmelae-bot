@@ -3543,6 +3543,142 @@
             "testStrategy": "Test repository performance and validation logic."
           }
         ]
+      },
+      {
+        "id": 70,
+        "title": "Create CLI Script for Pokewiki Card Set Scraping and YAML Generation",
+        "description": "Develop a command-line interface script that scrapes Pokewiki card set pages, extracts card data from Setzeile templates and booster assignments from Setrate/Zeile templates, and outputs properly formatted YAML configuration matching the structure in resources/tcgpcards.yaml.",
+        "details": "1. **CLI Setup and Argument Parsing:**\n   - Create a new CLI script using Bun's native command-line capabilities\n   - Implement argument parsing to accept a Pokewiki URL as a required command-line parameter\n   - Add validation to ensure the provided URL is a valid Pokewiki domain and format\n   - Include help text and usage instructions for the script\n\n2. **Web Scraping Implementation:**\n   - Use Bun's native fetch API to retrieve the Pokewiki page content\n   - Fetch the wiki edit source (raw wikitext) rather than the rendered HTML for easier template parsing\n   - Implement proper error handling for network requests, including timeout and retry logic\n   - Use cheerio for DOM parsing if needed for any HTML content processing\n\n3. **Template Parsing Logic:**\n   - Parse Setzeile templates to extract individual card data including:\n     - Card names, IDs, rarities, and set information\n     - Card types, HP values, and other game mechanics data\n   - Parse Setrate/Zeile templates to extract booster pack assignments and probabilities\n   - Implement robust regex patterns or custom parsers to handle MediaWiki template syntax\n   - Handle edge cases like nested templates, optional parameters, and malformed data\n\n4. **Data Validation and Processing:**\n   - Validate all extracted data against expected formats and constraints\n   - Cross-reference card data with booster assignments to ensure consistency\n   - Implement invariant checks such as:\n     - All referenced cards exist in the card data\n     - Probability distributions sum to expected values\n     - Required fields are present for all cards\n   - Handle duplicate entries and data conflicts gracefully\n\n5. **YAML Output Generation:**\n   - Structure the extracted data to match the exact format of resources/tcgpcards.yaml\n   - Use a YAML library compatible with Bun to generate properly formatted output\n   - Implement proper indentation, key ordering, and data type formatting\n   - Include metadata such as scraping timestamp and source URL in the output\n   - Validate the generated YAML against the existing schema structure\n\n6. **Error Handling and Logging:**\n   - Implement comprehensive error handling for all stages of the process\n   - Provide detailed logging of scraping progress and any issues encountered\n   - Include validation error reporting with specific details about data inconsistencies\n   - Support verbose and quiet modes for different use cases",
+        "testStrategy": "1. **Unit Testing:**\n   - Test URL validation with various valid and invalid Pokewiki URLs\n   - Test template parsing functions with sample wikitext containing Setzeile and Setrate/Zeile templates\n   - Verify data validation functions correctly identify and report various types of data inconsistencies\n   - Test YAML generation with known input data to ensure output matches expected format\n\n2. **Integration Testing:**\n   - Test the complete scraping workflow with a known Pokewiki page that has stable content\n   - Verify the generated YAML can be successfully parsed and matches the structure of resources/tcgpcards.yaml\n   - Test error handling by providing invalid URLs, unreachable pages, and malformed wiki content\n   - Validate that all invariants are properly checked and violations are reported\n\n3. **End-to-End Testing:**\n   - Run the CLI script against multiple different Pokewiki card set pages to ensure robustness\n   - Compare generated YAML output with manually verified data from the same sources\n   - Test the script's performance with large card sets to ensure reasonable execution times\n   - Verify that the generated YAML can be successfully loaded and used by the existing application\n\n4. **Validation Testing:**\n   - Load the generated YAML into the existing card system to verify compatibility\n   - Test that all scraped cards can be properly instantiated and used within the application\n   - Verify booster probability calculations work correctly with the scraped data\n   - Ensure no data corruption or formatting issues affect downstream functionality",
+        "status": "done",
+        "dependencies": [
+          1,
+          58
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up CLI Script and Argument Parsing",
+            "description": "Create a CLI script using Bun's native command-line capabilities that accepts a Pokewiki URL as a required argument, validates the URL format and domain, and provides help text and usage instructions.",
+            "dependencies": [],
+            "details": "Initialize a Bun CLI script with a shebang line. Parse command-line arguments using Bun.argv or a suitable library. Implement validation to ensure the URL is from the Pokewiki domain and properly formatted. Add a --help flag to display usage instructions and examples.",
+            "status": "done",
+            "testStrategy": "Unit test URL validation with various valid and invalid Pokewiki URLs. Test help flag output correctness."
+          },
+          {
+            "id": 2,
+            "title": "Implement Web Scraping to Fetch Raw Wikitext",
+            "description": "Use Bun's fetch API to retrieve the raw wikitext source of the specified Pokewiki card set page, handling network errors, timeouts, and retries.",
+            "dependencies": [
+              1
+            ],
+            "details": "Fetch the wiki edit source page (raw wikitext) instead of rendered HTML for easier parsing. Implement error handling for network failures, including retry logic and timeout management. Optionally use cheerio if any HTML parsing is needed for auxiliary content.",
+            "status": "done",
+            "testStrategy": "Test network request success and failure scenarios, including retries and timeouts. Verify correct retrieval of raw wikitext content."
+          },
+          {
+            "id": 3,
+            "title": "Parse Setzeile and Setrate/Zeile Templates from Wikitext",
+            "description": "Develop robust parsing logic using regex or custom parsers to extract card data from Setzeile templates and booster assignments from Setrate/Zeile templates, handling nested templates and malformed data.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement parsers to extract card names, IDs, rarities, set info, card types, HP, and game mechanics from Setzeile templates. Parse booster pack assignments and probabilities from Setrate/Zeile templates. Handle edge cases such as nested templates, optional parameters, and malformed entries with robust regex or parsing strategies.",
+            "status": "done",
+            "testStrategy": "Unit test parsing functions with sample wikitext containing various template scenarios, including edge cases and malformed data."
+          },
+          {
+            "id": 4,
+            "title": "Validate and Process Extracted Card and Booster Data",
+            "description": "Validate extracted data against expected formats and constraints, cross-reference cards with booster assignments, check invariants, and handle duplicates or conflicts gracefully.",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement validation to ensure all referenced cards exist, probability distributions sum correctly, and required fields are present. Detect and resolve duplicate entries or conflicting data. Ensure consistency between card data and booster assignments.",
+            "status": "done",
+            "testStrategy": "Test validation functions with both valid and invalid data sets to confirm detection of inconsistencies and proper handling of duplicates."
+          },
+          {
+            "id": 5,
+            "title": "Generate and Output YAML Configuration File",
+            "description": "Format the validated data to match the structure of resources/tcgpcards.yaml, generate properly formatted YAML using a compatible library, include metadata, and validate the output against the schema.",
+            "dependencies": [
+              4
+            ],
+            "details": "Use a YAML library compatible with Bun to serialize the data with correct indentation, key ordering, and data types. Include metadata such as scraping timestamp and source URL. Validate the generated YAML against the existing schema to ensure correctness.",
+            "status": "done",
+            "testStrategy": "Verify generated YAML matches the expected schema and formatting. Test inclusion of metadata and correctness of data serialization."
+          }
+        ]
+      },
+      {
+        "id": 71,
+        "title": "Split tcgpcards.yaml into Individual Set Files with Directory Structure",
+        "description": "Refactor the monolithic resources/tcgpcards.yaml file by splitting it into individual YAML files for each set (A1.yaml, A1a.yaml, B1.yaml, P-A.yaml) organized in a dedicated directory structure to improve maintainability and enable easier set-specific operations.",
+        "details": "This task involves restructuring the card data storage from a single large YAML file to a modular directory-based approach:\n\n1. **Create Directory Structure:**\n   - Create a new `resources/sets/` directory to house individual set files\n   - Establish naming convention: set key as filename (e.g., A1.yaml, A1a.yaml, B1.yaml, P-A.yaml)\n   - Ensure directory permissions allow read/write access for the application\n\n2. **Parse and Split Existing YAML:**\n   - Load the current resources/tcgpcards.yaml file\n   - Extract each set's data including metadata (name, release date, etc.) and all associated cards\n   - Maintain the exact same YAML structure for each individual set file\n   - Preserve all card properties, booster assignments, and set-specific configurations\n\n3. **Update PokemonTcgPocketService.ts:**\n   - Modify the YAML loading logic to read from multiple files instead of a single file\n   - Implement directory scanning to automatically discover available set files\n   - Add error handling for missing or malformed individual set files\n   - Ensure backward compatibility during transition period\n   - Update any hardcoded file paths or references\n\n4. **Create Set File Loading Utility:**\n   - Implement a utility function to load all set files and merge them into the expected data structure\n   - Add validation to ensure no duplicate set keys across files\n   - Include performance optimization for lazy loading of sets when needed\n\n5. **Update Related Scripts and Tools:**\n   - Modify any CLI scripts or tools that directly read the YAML file\n   - Update the Pokewiki scraping script output to generate individual set files\n   - Ensure CSV export functionality works with the new file structure\n\n6. **Migration Strategy:**\n   - Keep the original tcgpcards.yaml as a backup during initial deployment\n   - Add configuration flag to switch between old and new loading methods\n   - Plan for eventual removal of the monolithic file once stability is confirmed",
+        "testStrategy": "1. **File Structure Validation:**\n   - Verify all expected set files are created in the resources/sets/ directory\n   - Confirm each set file contains valid YAML syntax and expected structure\n   - Test that file naming convention matches set keys exactly (including P-A for PROMO-A)\n\n2. **Data Integrity Testing:**\n   - Compare card counts between original and split files to ensure no data loss\n   - Verify all card properties, booster assignments, and metadata are preserved\n   - Cross-reference set keys and card IDs to ensure consistency across files\n\n3. **Service Integration Testing:**\n   - Test PokemonTcgPocketService loads all sets correctly from individual files\n   - Verify pokemonCardSearchTool functionality remains unchanged with new file structure\n   - Test CSV export generates identical output compared to monolithic file approach\n\n4. **Performance Testing:**\n   - Measure loading time differences between single file and multiple file approaches\n   - Test memory usage when loading individual sets vs. entire dataset\n   - Verify lazy loading works correctly when accessing specific sets\n\n5. **Error Handling Testing:**\n   - Test behavior when individual set files are missing or corrupted\n   - Verify graceful degradation when directory permissions are restricted\n   - Test recovery mechanisms when YAML parsing fails for specific set files\n\n6. **CLI and Tool Integration:**\n   - Test that Pokewiki scraping script outputs to correct individual set files\n   - Verify any other scripts or tools work with the new directory structure\n   - Confirm backward compatibility mechanisms function as expected",
+        "status": "pending",
+        "dependencies": [
+          67,
+          70
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create sets directory and establish naming convention",
+            "description": "Set up the directory structure for individual set files and define the naming convention for set YAML files.",
+            "dependencies": [],
+            "details": "Create a new directory at resources/sets/ and document the naming convention (e.g., A1.yaml, A1a.yaml, B1.yaml, P-A.yaml). Ensure directory permissions allow read/write access for the application.",
+            "status": "pending",
+            "testStrategy": "Verify directory creation and correct permissions; confirm naming convention is documented."
+          },
+          {
+            "id": 2,
+            "title": "Parse and split tcgpcards.yaml into individual set files",
+            "description": "Extract each set's data from the monolithic YAML file and save it as a separate file in the sets directory.",
+            "dependencies": [
+              1
+            ],
+            "details": "Load resources/tcgpcards.yaml, extract each set's data (including metadata and cards), and write each set to its own file in resources/sets/ using the established naming convention. Preserve all card properties and set configurations.",
+            "status": "pending",
+            "testStrategy": "Validate that all set files are created with correct content and structure; check for missing or malformed data."
+          },
+          {
+            "id": 3,
+            "title": "Update PokemonTcgPocketService.ts to load set files",
+            "description": "Modify the service to read from multiple set files instead of a single YAML file.",
+            "dependencies": [
+              2
+            ],
+            "details": "Change the YAML loading logic to scan the sets directory and load individual set files. Implement error handling for missing or malformed files and update any hardcoded file paths or references.",
+            "status": "pending",
+            "testStrategy": "Test loading of all set files; verify error handling for missing or malformed files."
+          },
+          {
+            "id": 4,
+            "title": "Implement set file loading utility with validation",
+            "description": "Create a utility function to load and merge set files, ensuring no duplicate set keys and optimizing for performance.",
+            "dependencies": [
+              3
+            ],
+            "details": "Develop a utility that loads all set files, merges them into the expected data structure, validates for duplicate set keys, and includes performance optimizations for lazy loading.",
+            "status": "pending",
+            "testStrategy": "Test utility with various set files; verify no duplicates and correct merging; check performance with large numbers of files."
+          },
+          {
+            "id": 5,
+            "title": "Update related scripts and migration strategy",
+            "description": "Modify CLI scripts and tools to work with the new file structure and implement a migration plan.",
+            "dependencies": [
+              4
+            ],
+            "details": "Update any scripts or tools that read the YAML file to use the new directory structure. Keep the original tcgpcards.yaml as a backup, add a configuration flag for switching between old and new methods, and plan for eventual removal of the monolithic file.",
+            "status": "pending",
+            "testStrategy": "Test scripts and tools with new structure; verify migration flag works; confirm backup and removal plan is documented."
+          }
+        ]
       }
     ],
     "metadata": {
@@ -3555,7 +3691,7 @@
       ],
       "created": "2025-11-22T17:28:44.087Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-22T17:52:29.965Z"
+      "updated": "2025-11-23T00:51:26.128Z"
     }
   }
 }

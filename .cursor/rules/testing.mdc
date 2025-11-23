@@ -35,6 +35,51 @@ import { describe, beforeAll, afterAll, beforeEach, afterEach, it, test, expect,
   - Correct return values are returned or set
 - **Avoid testing full, long strings** – test for relevant parts only
 
+## Testing Philosophy: Behavior Over Implementation
+
+- **✅ DO: Test behavior and results** - Verify what functions do, not how they do it
+- **✅ DO: Test through public APIs** - Test exported functions and their observable effects
+- **✅ DO: Test error conditions** - When splitting error handling, ensure test cases exist for all error paths
+- **✅ DO: Test integration points** - Verify that functions work correctly together
+- **✅ DO: Remove useless tests** - If a test only verifies internal constants or implementation details without testing behavior, remove it
+
+- **❌ DON'T: Test internal implementation details** - Don't test private constants, internal variables, or implementation-specific logic
+- **❌ DON'T: Export internals just for testing** - Don't export private constants, types, or functions solely to make them testable
+- **❌ DON'T: Test pure internals** - If testing an internal constant doesn't verify actual behavior, test the function results instead
+- **❌ DON'T: Test implementation details** - Focus on what the code does, not how it does it internally
+
+**Example - Testing Behavior vs Internals:**
+
+```typescript
+// ❌ DON'T: Test internal constants directly
+describe('RARITY_MAP', () => {
+  it('should map rarities correctly', () => {
+    expect(RARITY_MAP['C Pocket']).toBe('♢'); // Testing internal constant
+  });
+});
+
+// ✅ DO: Test behavior through function results
+describe('parseSet', () => {
+  it('should correctly map all Pokewiki rarities to project symbols', async () => {
+    const parsedSet = await parseSet(url);
+    expect(parsedSet.cards[0]?.rarity).toBe('♢'); // Testing actual behavior
+  });
+});
+```
+
+**Example - Error Handling:**
+
+```typescript
+// ✅ DO: Test all error conditions when splitting error handling
+it('should throw error if textarea element is missing', async () => {
+  // Test missing element case
+});
+
+it('should throw error if edit source is too short', async () => {
+  // Test content too short case
+});
+```
+
 ## Test Execution Commands
 
 When done with implementation, test writing, and refactoring, run the full validation suite:
