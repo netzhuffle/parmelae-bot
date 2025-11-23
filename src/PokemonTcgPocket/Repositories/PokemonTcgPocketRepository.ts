@@ -171,6 +171,7 @@ export class PokemonTcgPocketRepository {
     rarity,
     boosterNames,
     isSixPackOnly,
+    godPackBoosterId,
   }: {
     name: string;
     setKey: string;
@@ -178,6 +179,7 @@ export class PokemonTcgPocketRepository {
     rarity: Rarity | null;
     boosterNames: string[];
     isSixPackOnly: boolean;
+    godPackBoosterId?: number;
   }): Promise<PokemonCardModel> {
     try {
       const setId = await this.resolveSetId(setKey);
@@ -194,6 +196,7 @@ export class PokemonTcgPocketRepository {
           number,
           rarity,
           isSixPackOnly,
+          godPackBoosterId,
           boosters: {
             connect: boosterIds.map((id) => ({ id })),
           },
@@ -489,6 +492,7 @@ export class PokemonTcgPocketRepository {
               setId: card.setId,
               rarity: card.rarity,
               isSixPackOnly: card.isSixPackOnly,
+              godPackBoosterId: card.godPackBoosterId,
             },
             ownershipStatus: this.convertToCardOwnershipStatus(
               card.ownership[0]?.status ?? null,
@@ -509,6 +513,7 @@ export class PokemonTcgPocketRepository {
                 setId: card.setId,
                 rarity: card.rarity,
                 isSixPackOnly: card.isSixPackOnly,
+                godPackBoosterId: card.godPackBoosterId,
               },
               ownershipStatus: this.convertToCardOwnershipStatus(
                 card.ownership[0]?.status ?? null,
@@ -673,15 +678,27 @@ export class PokemonTcgPocketRepository {
     try {
       return await this.prisma.pokemonCard.count({
         where: {
-          rarity: {
-            in: GOD_PACK_RARITIES_FOR_PRISMA,
-          },
-          isSixPackOnly: false,
-          boosters: {
-            some: {
-              id: boosterId,
+          AND: [
+            {
+              rarity: {
+                in: GOD_PACK_RARITIES_FOR_PRISMA,
+              },
             },
-          },
+            {
+              isSixPackOnly: false,
+            },
+            {
+              boosters: {
+                some: {
+                  id: boosterId,
+                },
+              },
+            },
+            {
+              // Only count cards where godPackBoosterId is null OR matches this booster
+              OR: [{ godPackBoosterId: null }, { godPackBoosterId: boosterId }],
+            },
+          ],
         },
       });
     } catch (error) {

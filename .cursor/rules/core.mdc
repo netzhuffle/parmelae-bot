@@ -92,7 +92,7 @@ If you discover anything missing in Taskmaster (including if your current task i
 Implement the changes as planned and confirmed by the user.
 
 1. Update all necessary documentation, including Taskmaster, see [taskmaster.mdc](mdc:.cursor/rules/taskmaster/taskmaster.mdc).
-2. Mark the subtask as "in-progress" if it isn’t already.
+2. **CRITICAL**: Mark the subtask as "in-progress" in Taskmaster using `mcp_task-master-ai_set_task_status` if it isn't already. Every time you switch to a new subtask, you MUST mark it as 'in-progress' in Taskmaster before beginning work.
 3. Add all substeps for the current subtask to your to-do list.
 4. Implement all changes for the current task, according to the plan from plan mode, the task and subtask description and details in Taskmaster and on your to-do list.
 5. Self-review your implementation through a high quality code review.

@@ -193,6 +193,12 @@ export interface Card {
    * Also marks the booster as having the possibility of six-card packs.
    */
   isSixPackOnly?: boolean;
+  /**
+   * For crown cards only: specifies which specific booster contains this card in god packs.
+   * If undefined, crown card appears in god packs for all its regular boosters.
+   * Must match one of the booster names this card belongs to.
+   */
+  godPackBooster?: string;
 }
 
 /** Set data from the YAML file */
@@ -1014,6 +1020,53 @@ export class PokemonTcgPocketService {
     const rarity = this.convertSymbolToRarity(cardData.rarity);
     const isSixPackOnly = cardData.isSixPackOnly === true;
 
+    // Validate and resolve godPackBooster
+    let godPackBoosterId: number | undefined = undefined;
+    if (cardData.godPackBooster !== undefined) {
+      // Validate godPackBooster is only set for crown cards
+      if (rarity !== Rarity.CROWN) {
+        throw new Error(
+          `Card ${setKey}/${number} has godPackBooster but is not a crown card (rarity: ${cardData.rarity})`,
+        );
+      }
+
+      // Validate godPackBooster name exists in the set's boosters
+      if (!validBoosterNames.has(cardData.godPackBooster)) {
+        throw new Error(
+          `Card ${setKey}/${number} references non-existent godPackBooster: ${cardData.godPackBooster}`,
+        );
+      }
+
+      // Validate godPackBooster is one of the card's assigned boosters
+      if (!cardBoosterNames.includes(cardData.godPackBooster)) {
+        throw new Error(
+          `Card ${setKey}/${number} godPackBooster "${cardData.godPackBooster}" not in card's boosters: ${cardBoosterNames.join(', ')}`,
+        );
+      }
+
+      // Validate godPackBooster is only set when card is in multiple boosters
+      if (cardBoosterNames.length <= 1) {
+        throw new Error(
+          `Card ${setKey}/${number} has godPackBooster but is only in one booster. godPackBooster should only be set when card is in multiple boosters.`,
+        );
+      }
+
+      // Look up the booster ID
+      const godPackBooster =
+        await this.repository.retrieveBoosterByNameAndSetKey(
+          cardData.godPackBooster,
+          setKey,
+        );
+
+      if (!godPackBooster) {
+        throw new Error(
+          `Card ${setKey}/${number} references non-existent godPackBooster: ${cardData.godPackBooster}`,
+        );
+      }
+
+      godPackBoosterId = godPackBooster.id;
+    }
+
     await this.repository.createCard({
       name: cardData.name,
       setKey,
@@ -1021,6 +1074,7 @@ export class PokemonTcgPocketService {
       rarity,
       boosterNames: cardBoosterNames,
       isSixPackOnly,
+      godPackBoosterId,
     });
   }
 

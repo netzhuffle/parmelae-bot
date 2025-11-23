@@ -387,6 +387,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 1,
           rarity: Rarity.ONE_DIAMOND,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 2,
@@ -395,6 +396,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 2,
           rarity: Rarity.ONE_STAR,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
       ];
       const missingCards: PokemonCardModel[] = [];
@@ -417,6 +419,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 1,
           rarity: Rarity.ONE_DIAMOND,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 2,
@@ -425,6 +428,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 2,
           rarity: Rarity.ONE_STAR,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
       ];
       const missingCards = [
@@ -435,6 +439,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 3,
           rarity: Rarity.TWO_STARS,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 4,
@@ -443,6 +448,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 4,
           rarity: Rarity.THREE_STARS,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
       ];
 
@@ -464,6 +470,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 1,
           rarity: Rarity.ONE_DIAMOND,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 2,
@@ -472,6 +479,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 2,
           rarity: Rarity.TWO_DIAMONDS,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 3,
@@ -480,6 +488,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 3,
           rarity: Rarity.ONE_STAR,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 4,
@@ -488,6 +497,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 4,
           rarity: Rarity.TWO_STARS,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 5,
@@ -496,6 +506,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 5,
           rarity: Rarity.ONE_DIAMOND,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
       ];
       const missingCards = [
@@ -506,6 +517,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 6,
           rarity: Rarity.ONE_DIAMOND,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 7,
@@ -514,6 +526,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 7,
           rarity: Rarity.ONE_STAR,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
       ];
 
@@ -536,6 +549,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 1,
           rarity: Rarity.ONE_DIAMOND,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 2,
@@ -544,6 +558,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 2,
           rarity: Rarity.ONE_STAR,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
       ];
       const missingCards = [
@@ -554,6 +569,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 3,
           rarity: Rarity.ONE_DIAMOND,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
         {
           id: 4,
@@ -562,6 +578,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
           number: 4,
           rarity: Rarity.ONE_STAR,
           isSixPackOnly: false,
+          godPackBoosterId: null,
         },
       ];
 
@@ -586,6 +603,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         number: id,
         rarity,
         isSixPackOnly: true,
+        godPackBoosterId: null,
         boosters: [],
         ownership: [],
         set: { id: 1, key: 'TEST', name: 'Test Set' } as PokemonSetModel,
@@ -915,6 +933,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         rarity: Rarity.ONE_DIAMOND,
         isSixPackOnly: false,
         setId: 1,
+        godPackBoosterId: null,
       };
 
       // 10 ONE_DIAMOND cards total
@@ -939,6 +958,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         rarity: Rarity.ONE_STAR,
         isSixPackOnly: false,
         setId: 1,
+        godPackBoosterId: null,
       };
 
       // 5 ONE_STAR cards for normal slots, 20 god pack eligible total
@@ -965,6 +985,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         rarity: Rarity.ONE_STAR,
         isSixPackOnly: false,
         setId: 1,
+        godPackBoosterId: null,
       };
 
       // Test with god packs
@@ -1002,6 +1023,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         rarity: Rarity.ONE_STAR,
         isSixPackOnly: true,
         setId: 1,
+        godPackBoosterId: null,
       };
 
       // 3 isSixPackOnly ONE_STAR cards
@@ -1027,6 +1049,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         rarity: Rarity.FOUR_DIAMONDS,
         isSixPackOnly: false,
         setId: 1,
+        godPackBoosterId: null,
       };
 
       // 5 FOUR_DIAMONDS cards
@@ -1051,6 +1074,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         rarity: Rarity.ONE_DIAMOND,
         isSixPackOnly: false,
         setId: 1,
+        godPackBoosterId: null,
       };
 
       // No cards of this rarity
@@ -1074,6 +1098,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         rarity: Rarity.ONE_DIAMOND,
         isSixPackOnly: true,
         setId: 1,
+        godPackBoosterId: null,
       };
 
       // Even with ONE_DIAMOND cards, isSixPackOnly should be excluded from slots 1-3
@@ -1106,6 +1131,7 @@ function createTestCards(): PokemonCardWithRelations[] {
         number: id,
         rarity,
         isSixPackOnly: false,
+        godPackBoosterId: null,
         boosters: [],
         ownership: [],
         set: {
@@ -1128,6 +1154,7 @@ function createCard(rarity: Rarity): PokemonCardWithRelations {
     number: 0,
     rarity,
     isSixPackOnly: false,
+    godPackBoosterId: null,
     boosters: [],
     ownership: [],
     set: {
@@ -1146,6 +1173,7 @@ function createTestCard(id: number, rarity: Rarity): PokemonCardWithRelations {
     number: id,
     rarity,
     isSixPackOnly: false,
+    godPackBoosterId: null,
     boosters: [],
     ownership: [],
     set: {

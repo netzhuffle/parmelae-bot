@@ -125,6 +125,7 @@ model PokemonBooster {
   setId             Int
   probabilitiesType BoosterProbabilitiesType @default(NO_SHINY_RARITY)
   cards             PokemonCard[]
+  godPackCards      PokemonCard[]            @relation("GodPackBooster")
 
   @@unique([setId, name])
   @@index([setId])
@@ -133,21 +134,24 @@ model PokemonBooster {
 }
 
 model PokemonCard {
-  id            Int                    @id @default(autoincrement())
-  name          String
-  set           PokemonSet             @relation(fields: [setId], references: [id])
-  setId         Int
-  number        Int
-  rarity        Rarity?
-  isSixPackOnly Boolean                @default(false)
-  boosters      PokemonBooster[]
-  ownership     PokemonCardOwnership[]
+  id               Int                    @id @default(autoincrement())
+  name             String
+  set              PokemonSet             @relation(fields: [setId], references: [id])
+  setId            Int
+  number           Int
+  rarity           Rarity?
+  isSixPackOnly    Boolean                @default(false)
+  godPackBooster   PokemonBooster?        @relation("GodPackBooster", fields: [godPackBoosterId], references: [id])
+  godPackBoosterId Int?
+  boosters         PokemonBooster[]
+  ownership        PokemonCardOwnership[]
 
   @@unique([setId, number])
   @@index([setId])
   @@index([rarity])
   @@index([name])
   @@index([isSixPackOnly])
+  @@index([godPackBoosterId])
 }
 
 model PokemonCardOwnership {

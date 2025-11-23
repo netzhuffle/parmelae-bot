@@ -380,7 +380,8 @@ Once a task has been broken down into subtasks using `expand_task` or similar me
     *   Run `get_task` / `task-master show <subtaskId>` again to confirm that the detailed implementation plan has been successfully appended to the subtask's details.
 
 5.  **Begin Implementation:**
-    *   Set the subtask status using `set_task_status` / `task-master set-status --id=<subtaskId> --status=in-progress`.
+    *   **CRITICAL**: Set the subtask status using `set_task_status` / `task-master set-status --id=<subtaskId> --status=in-progress` in Taskmaster BEFORE starting any implementation work.
+    *   **CRITICAL**: Every time you switch to a new subtask, you MUST mark it as 'in-progress' in Taskmaster using `mcp_task-master-ai_set_task_status` before beginning work.
     *   Start coding based on the logged plan.
 
 6.  **Refine and Log Progress (Iteration 2+):**

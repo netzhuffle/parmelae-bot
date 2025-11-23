@@ -286,6 +286,110 @@ describe('tcgpcards.yaml', () => {
     });
   });
 
+  describe('godPackBooster validation', () => {
+    it('should only be set for crown rarity cards', () => {
+      Object.entries(sets).forEach(([, setData]: [string, SetData]) => {
+        Object.entries(setData.cards).forEach(([, card]: [string, Card]) => {
+          if (card.godPackBooster !== undefined) {
+            expect(card.rarity).toBe('♛');
+          }
+        });
+      });
+    });
+
+    it('should always be set for all crown rarity cards', () => {
+      Object.entries(sets).forEach(([, setData]: [string, SetData]) => {
+        Object.entries(setData.cards).forEach(([, card]: [string, Card]) => {
+          if (card.rarity === '♛') {
+            // Get the list of boosters this card belongs to
+            const cardBoosters =
+              card.boosters === undefined || card.boosters === null
+                ? (setData.boosters ?? [setData.name])
+                : Array.isArray(card.boosters)
+                  ? card.boosters
+                  : [card.boosters];
+
+            // Only require godPackBooster if card is in multiple boosters
+            if (cardBoosters.length > 1) {
+              expect(card.godPackBooster).toBeDefined();
+              expect(typeof card.godPackBooster).toBe('string');
+              expect(card.godPackBooster!.length).toBeGreaterThan(0);
+            }
+          }
+        });
+      });
+    });
+
+    it('should reference a valid booster from the same set', () => {
+      Object.entries(sets).forEach(([, setData]: [string, SetData]) => {
+        // Build list of valid boosters for this set
+        const validBoosters = new Set(setData.boosters ?? [setData.name]);
+
+        Object.entries(setData.cards).forEach(([, card]: [string, Card]) => {
+          if (card.godPackBooster !== undefined) {
+            expect(validBoosters.has(card.godPackBooster)).toBe(true);
+          }
+        });
+      });
+    });
+
+    it('should reference a booster that the card belongs to', () => {
+      Object.entries(sets).forEach(([, setData]: [string, SetData]) => {
+        Object.entries(setData.cards).forEach(([, card]: [string, Card]) => {
+          if (card.godPackBooster !== undefined) {
+            // Get the list of boosters this card belongs to
+            const cardBoosters =
+              card.boosters === undefined || card.boosters === null
+                ? (setData.boosters ?? [setData.name])
+                : Array.isArray(card.boosters)
+                  ? card.boosters
+                  : [card.boosters];
+
+            expect(cardBoosters).toContain(card.godPackBooster);
+          }
+        });
+      });
+    });
+
+    it('should only be set when card is in multiple boosters', () => {
+      Object.entries(sets).forEach(([, setData]: [string, SetData]) => {
+        Object.entries(setData.cards).forEach(([, card]: [string, Card]) => {
+          if (card.godPackBooster !== undefined) {
+            // Get the list of boosters this card belongs to
+            const cardBoosters =
+              card.boosters === undefined || card.boosters === null
+                ? (setData.boosters ?? [setData.name])
+                : Array.isArray(card.boosters)
+                  ? card.boosters
+                  : [card.boosters];
+
+            // godPackBooster should only be set if card is in multiple boosters
+            expect(cardBoosters.length).toBeGreaterThan(1);
+          }
+        });
+      });
+    });
+
+    it('should not be set when card is only in one booster', () => {
+      Object.entries(sets).forEach(([, setData]: [string, SetData]) => {
+        Object.entries(setData.cards).forEach(([, card]: [string, Card]) => {
+          // Get the list of boosters this card belongs to
+          const cardBoosters =
+            card.boosters === undefined || card.boosters === null
+              ? (setData.boosters ?? [setData.name])
+              : Array.isArray(card.boosters)
+                ? card.boosters
+                : [card.boosters];
+
+          // If card is only in one booster, godPackBooster must not be set
+          if (cardBoosters.length <= 1) {
+            expect(card.godPackBooster).toBeUndefined();
+          }
+        });
+      });
+    });
+  });
+
   describe('Service and YAML consistency', () => {
     it('should have matching set keys, names, and booster names between service and YAML', () => {
       // Get all set keys from YAML

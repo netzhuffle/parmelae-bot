@@ -105,6 +105,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     rarity,
     boosterNames,
     isSixPackOnly,
+    godPackBoosterId,
   }: {
     name: string;
     setKey: string;
@@ -112,6 +113,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     rarity: Rarity | null;
     boosterNames: string[];
     isSixPackOnly: boolean;
+    godPackBoosterId?: number;
   }): Promise<PokemonCardModel> {
     const set = this.sets.get(setKey);
     if (!set) {
@@ -125,6 +127,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       number,
       rarity,
       isSixPackOnly,
+      godPackBoosterId: godPackBoosterId ?? null,
     };
     this.cards.set(this.getCardKey(setKey, number), card);
 

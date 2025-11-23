@@ -1273,6 +1273,7 @@ A1:
         - Glurak
         - Mewtu
         - Pikachu
+      godPackBooster: Glurak
     285:
       name: Pikachu-ex
       rarity: ♛
@@ -1280,6 +1281,7 @@ A1:
         - Glurak
         - Mewtu
         - Pikachu
+      godPackBooster: Pikachu
     286:
       name: Mewtu-ex
       rarity: ♛
@@ -1287,6 +1289,7 @@ A1:
         - Glurak
         - Mewtu
         - Pikachu
+      godPackBooster: Mewtu
 A1a:
   name: Mysteriöse Insel
   cards:
@@ -2463,11 +2466,17 @@ A2:
     206:
       name: Palkia-ex
       rarity: ♛
-      boosters: Palkia
+      boosters:
+        - Palkia
+        - Dialga
+      godPackBooster: Palkia
     207:
       name: Dialga-ex
       rarity: ♛
-      boosters: Dialga
+      boosters:
+        - Dialga
+        - Palkia
+      godPackBooster: Dialga
 A2a:
   name: Licht des Triumphs
   cards:
@@ -4133,12 +4142,14 @@ A3:
       boosters:
         - Lunala
         - Solgaleo
+      godPackBooster: Lunala
     239:
       name: Solgaleo-ex
       rarity: ♛
       boosters:
         - Lunala
         - Solgaleo
+      godPackBooster: Solgaleo
 A3a:
   name: Dimensionale Krise
   cards:
@@ -5809,12 +5820,14 @@ A4:
       boosters:
         - Ho-Oh
         - Lugia
+      godPackBooster: Ho-Oh
     241:
       name: Lugia-ex
       rarity: ♛
       boosters:
         - Ho-Oh
         - Lugia
+      godPackBooster: Lugia
 A4a:
   name: Verborgene Quelle
   cards:
@@ -8983,6 +8996,7 @@ B1:
         - Mega-Garados
         - Mega-Lohgock
         - Mega-Altaria
+      godPackBooster: Mega-Altaria
     330:
       name: Clavion
       rarity: ♛
@@ -8990,6 +9004,7 @@ B1:
         - Mega-Garados
         - Mega-Lohgock
         - Mega-Altaria
+      godPackBooster: Mega-Garados
     331:
       name: Flammenpflaster
       rarity: ♛
@@ -8997,3 +9012,4 @@ B1:
         - Mega-Garados
         - Mega-Lohgock
         - Mega-Altaria
+      godPackBooster: Mega-Lohgock

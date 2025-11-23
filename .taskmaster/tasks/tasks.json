@@ -3686,7 +3686,7 @@
         "description": "Extend the tcgpcards.yaml configuration to include a godPackBooster field for crown cards that specifies which specific booster contains them in god packs, and update probability calculations to account for this constraint.",
         "details": "This task involves modifying the card configuration structure and probability calculation logic to handle the special case where crown cards in god packs are restricted to specific boosters:\n\n1. **Update YAML Configuration Structure:**\n   - Add a new optional `godPackBooster` field to the card schema in tcgpcards.yaml\n   - This field should only be populated for crown cards and specify which booster contains them in god packs\n   - Example: For a crown card that appears in multiple regular boosters but only in Charizard god packs, set `godPackBooster: \"charizard\"`\n   - Ensure the field is properly documented and validated during YAML parsing\n\n2. **Modify PokemonTcgPocketService.ts:**\n   - Update the card interface/type definitions to include the optional godPackBooster field\n   - Modify the YAML parsing logic to handle the new field\n   - Add validation to ensure godPackBooster is only set for crown cards\n   - Update any card filtering or lookup methods to consider this new field\n\n3. **Update Probability Calculation Logic:**\n   - Modify PokemonTcgPocketProbabilityService.ts to account for god pack booster restrictions\n   - For crown cards with godPackBooster set, adjust god pack probability calculations to only consider the specified booster\n   - Ensure regular booster probabilities remain unchanged (crown cards still appear in all regular boosters)\n   - Update the calculateSingleCardProbability method to handle this special case\n\n4. **Update Related Services:**\n   - Modify any CSV export functionality to include the godPackBooster field when present\n   - Update search and filtering logic to respect god pack booster constraints\n   - Ensure booster sorting algorithms account for the updated probability calculations",
         "testStrategy": "1. **Configuration Validation Testing:**\n   - Test YAML parsing with crown cards that have godPackBooster field set\n   - Verify validation rejects non-crown cards with godPackBooster field\n   - Test with invalid booster names in godPackBooster field to ensure proper error handling\n\n2. **Probability Calculation Testing:**\n   - Create test cases for crown cards with godPackBooster restrictions\n   - Verify that god pack probabilities are correctly limited to the specified booster\n   - Confirm regular booster probabilities remain unchanged for crown cards\n   - Test edge cases where a crown card's godPackBooster doesn't match any available booster\n\n3. **Integration Testing:**\n   - Test CSV export includes godPackBooster field for applicable cards\n   - Verify booster sorting still works correctly with updated probability calculations\n   - Test search functionality respects god pack booster constraints\n   - Ensure backward compatibility with existing crown cards that don't have godPackBooster set\n\n4. **End-to-End Testing:**\n   - Test complete probability calculations for sets containing crown cards with god pack restrictions\n   - Verify UI displays correct probabilities when godPackBooster constraints are applied\n   - Test that booster recommendations account for god pack booster limitations",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           63,
           71
@@ -3699,7 +3699,7 @@
             "description": "Modify the tcgpcards.yaml configuration schema to include an optional godPackBooster field for crown cards.",
             "dependencies": [],
             "details": "Add the godPackBooster field to the card schema in tcgpcards.yaml. Ensure it is only allowed for crown cards and document its purpose. Validate the field during YAML parsing.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test YAML parsing with valid and invalid godPackBooster values, including non-crown cards."
           },
           {
@@ -3710,7 +3710,7 @@
               1
             ],
             "details": "Add the optional godPackBooster field to the card interface. Update YAML parsing logic to handle this field and add validation to ensure it is only set for crown cards.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Unit test interface and parsing logic with various card types and godPackBooster values."
           },
           {
@@ -3721,7 +3721,7 @@
               2
             ],
             "details": "Adjust the probability calculation logic so that for crown cards with godPackBooster set, only the specified booster is considered in god pack calculations. Ensure regular booster probabilities remain unchanged.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test probability calculations with crown cards in different boosters and god packs."
           },
           {
@@ -3732,7 +3732,7 @@
               3
             ],
             "details": "Update CSV export functionality to include the godPackBooster field when present. Adjust search and filtering logic to consider god pack booster constraints.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test CSV export and search/filter with cards having godPackBooster set."
           },
           {
@@ -3743,7 +3743,7 @@
               4
             ],
             "details": "Modify booster sorting algorithms to reflect the new probability calculations, ensuring boosters with higher new card probabilities are sorted correctly.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test booster sorting with various user collections and god pack scenarios."
           },
           {
@@ -3751,7 +3751,7 @@
             "title": "Update pokewiki-scraper.ts to Extract and Output godPackBooster Field",
             "description": "Modify the pokewiki-scraper.ts script to extract and output the godPackBooster field for crown cards when scraping Pokewiki pages.",
             "details": "Update the pokewiki-scraper.ts script to:\n- Add godPackBooster field to CardEntry interface\n- Extract godPackBooster information from Pokewiki wikitext (if available in the source)\n- Output godPackBooster field in the generated YAML for crown cards\n- Ensure the field is only included for crown cards (rarity: ♛)\n- Handle cases where godPackBooster is not specified (field should be omitted)",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               1
             ],
@@ -3910,7 +3910,7 @@
       ],
       "created": "2025-11-22T17:28:44.087Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-23T14:16:08.392Z"
+      "updated": "2025-11-23T15:19:12.761Z"
     }
   }
 }

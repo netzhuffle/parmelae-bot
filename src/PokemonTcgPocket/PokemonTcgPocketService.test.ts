@@ -161,6 +161,166 @@ describe('PokemonTcgPocketService', () => {
         }
       });
     });
+
+    describe('godPackBooster validation', () => {
+      it('rejects non-crown cards with godPackBooster set', async () => {
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            boosters: ['Booster1'],
+            cards: {
+              1: {
+                name: 'Non-Crown Card',
+                rarity: '♢♢♢♢',
+                boosters: 'Booster1',
+                godPackBooster: 'Booster1',
+              },
+            },
+          },
+        };
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          setsData,
+        );
+
+        try {
+          await service.synchronizeCardDatabaseWithYamlSource();
+          expect.unreachable('Expected promise to reject');
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toContain(
+            'has godPackBooster but is not a crown card',
+          );
+        }
+      });
+
+      it('rejects crown cards with godPackBooster not in their boosters', async () => {
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            boosters: ['Booster1', 'Booster2'],
+            cards: {
+              1: {
+                name: 'Crown Card',
+                rarity: '♛',
+                boosters: 'Booster1',
+                godPackBooster: 'Booster2',
+              },
+            },
+          },
+        };
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          setsData,
+        );
+
+        try {
+          await service.synchronizeCardDatabaseWithYamlSource();
+          expect.unreachable('Expected promise to reject');
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toContain("not in card's boosters");
+        }
+      });
+
+      it('rejects cards with non-existent godPackBooster', async () => {
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            boosters: ['Booster1'],
+            cards: {
+              1: {
+                name: 'Crown Card',
+                rarity: '♛',
+                boosters: 'Booster1',
+                godPackBooster: 'NonExistentBooster',
+              },
+            },
+          },
+        };
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          setsData,
+        );
+
+        try {
+          await service.synchronizeCardDatabaseWithYamlSource();
+          expect.unreachable('Expected promise to reject');
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toContain(
+            'references non-existent godPackBooster',
+          );
+        }
+      });
+
+      it('rejects crown cards with godPackBooster when card is only in one booster', async () => {
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            boosters: ['Booster1', 'Booster2'],
+            cards: {
+              1: {
+                name: 'Crown Card',
+                rarity: '♛',
+                boosters: 'Booster1',
+                godPackBooster: 'Booster1',
+              },
+            },
+          },
+        };
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          setsData,
+        );
+
+        try {
+          await service.synchronizeCardDatabaseWithYamlSource();
+          expect.unreachable('Expected promise to reject');
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toContain('is only in one booster');
+        }
+      });
+
+      it('accepts crown cards with valid godPackBooster', async () => {
+        const setsData: Sets = {
+          TEST: {
+            name: 'Test Set',
+            boosters: ['Booster1', 'Booster2'],
+            cards: {
+              1: {
+                name: 'Crown Card',
+                rarity: '♛',
+                boosters: ['Booster1', 'Booster2'],
+                godPackBooster: 'Booster1',
+              },
+            },
+          },
+        };
+        const probabilityService = new PokemonTcgPocketProbabilityService();
+        const service = new PokemonTcgPocketService(
+          probabilityService,
+          repository,
+          setsData,
+        );
+
+        await service.synchronizeCardDatabaseWithYamlSource();
+
+        const cards = repository.getAllCards();
+        expect(cards).toHaveLength(1);
+        expect(cards[0].name).toBe('Crown Card');
+        expect(cards[0].godPackBoosterId).toBeDefined();
+      });
+    });
   });
 
   describe('Set configuration', () => {

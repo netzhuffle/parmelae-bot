@@ -266,6 +266,45 @@ enum Rarity {
   @@unique([setId, number])
   ```
 
+- **Data Migrations (Updating Existing Records):**
+  - **Use `git diff` to identify all changes** when YAML/config files are updated
+  - **Handle both field updates AND relationship updates** when records change from single to multiple relationships
+  - **Use subqueries to find IDs by business keys** (e.g., set key + card number, set key + booster name)
+  - **Delete and recreate many-to-many relationships** when changing from single to multiple relationships
+  
+  ```sql
+  -- ✅ DO: Use subqueries to find IDs by business keys
+  UPDATE "PokemonCard"
+  SET "godPackBoosterId" = (
+    SELECT pb.id
+    FROM "PokemonBooster" pb
+    INNER JOIN "PokemonSet" ps ON pb."setId" = ps.id
+    WHERE ps.key = 'A1' AND pb.name = 'Glurak'
+  )
+  WHERE "id" = (
+    SELECT pc.id
+    FROM "PokemonCard" pc
+    INNER JOIN "PokemonSet" ps ON pc."setId" = ps.id
+    WHERE ps.key = 'A1' AND pc.number = 284
+  );
+
+  -- ✅ DO: Handle many-to-many relationship updates
+  -- When changing from single to multiple relationships:
+  DELETE FROM "_PokemonBoosterToPokemonCard"
+  WHERE "B" = (SELECT pc.id FROM "PokemonCard" pc INNER JOIN "PokemonSet" ps ON pc."setId" = ps.id WHERE ps.key = 'A2' AND pc.number = 206);
+
+  INSERT INTO "_PokemonBoosterToPokemonCard" ("A", "B")
+  SELECT 
+    pb.id,
+    (SELECT pc.id FROM "PokemonCard" pc INNER JOIN "PokemonSet" ps ON pc."setId" = ps.id WHERE ps.key = 'A2' AND pc.number = 206)
+  FROM "PokemonBooster" pb
+  INNER JOIN "PokemonSet" ps ON pb."setId" = ps.id
+  WHERE ps.key = 'A2' AND pb.name IN ('Palkia', 'Dialga');
+  
+  -- ❌ DON'T: Hardcode IDs or assume record positions
+  UPDATE "PokemonCard" SET "godPackBoosterId" = 5 WHERE "id" = 123; -- Fragile!
+  ```
+
 ## Error Handling Patterns
 
 - **Repository Error Wrapping:**

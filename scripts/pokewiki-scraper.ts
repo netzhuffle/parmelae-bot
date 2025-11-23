@@ -74,6 +74,8 @@ export interface CardEntry {
   name: string;
   rarity: string;
   boosters: string[];
+  isSixPackOnly?: boolean;
+  godPackBooster?: string;
 }
 
 export interface ParsedSet {
@@ -402,6 +404,18 @@ export function formatYaml(
           lines.push(`        - ${escapeYamlString(booster)}`);
         }
       }
+    }
+
+    // isSixPackOnly (only if true)
+    if (card.isSixPackOnly === true) {
+      lines.push('      isSixPackOnly: true');
+    }
+
+    // godPackBooster (only for crown cards, when present)
+    if (card.rarity === '♛' && card.godPackBooster) {
+      lines.push(
+        `      godPackBooster: ${escapeYamlString(card.godPackBooster)}`,
+      );
     }
   }
 
