@@ -3834,7 +3834,7 @@
         "description": "Remove all 'equalTo' fields from the resources/tcgpcards.yaml configuration file and eliminate corresponding test cases, as this functionality was never implemented or used in the application.",
         "details": "This task involves cleaning up unused configuration fields and associated test code:\n\n1. **Remove equalTo Fields from YAML Configuration:**\n   - Scan through resources/tcgpcards.yaml to identify all instances of 'equalTo' fields across all card entries\n   - Remove these fields completely from the YAML structure\n   - Ensure YAML syntax remains valid after field removal\n   - Verify no other fields reference or depend on equalTo values\n\n2. **Update Configuration Schema/Validation:**\n   - Remove any schema validation rules that check for or validate equalTo fields\n   - Update any TypeScript interfaces or type definitions that include equalTo properties\n   - Remove equalTo from any configuration parsing or loading logic\n\n3. **Clean Up Test Files:**\n   - Search through all test files for references to 'equalTo' functionality\n   - Remove test cases that specifically test equalTo behavior\n   - Remove mock data or fixtures that include equalTo fields\n   - Update any test assertions that check for the presence of equalTo fields\n\n4. **Code Cleanup:**\n   - Search codebase for any references to equalTo in card processing logic\n   - Remove any conditional logic or functions that handle equalTo fields\n   - Clean up any comments or documentation that mention equalTo functionality\n\n5. **Validation and Verification:**\n   - Run YAML validation to ensure file integrity after field removal\n   - Verify application still loads and processes card data correctly\n   - Ensure no broken references or undefined property errors occur",
         "testStrategy": "1. **Configuration File Validation:**\n   - Parse resources/tcgpcards.yaml after changes to ensure valid YAML syntax\n   - Verify no 'equalTo' fields remain in any card entries across all sets\n   - Test that card loading and parsing functions work correctly without equalTo fields\n\n2. **Application Functionality Testing:**\n   - Run the full application to ensure card data loads without errors\n   - Test card search and filtering functionality to verify no broken references\n   - Verify booster pack generation and probability calculations work normally\n\n3. **Test Suite Validation:**\n   - Run all existing tests to ensure no test failures due to missing equalTo fields\n   - Verify all equalTo-specific test cases have been properly removed\n   - Check that no test fixtures or mock data contain equalTo references\n\n4. **Code Search Verification:**\n   - Perform comprehensive grep/search across codebase for 'equalTo' references\n   - Verify no remaining code attempts to access or use equalTo properties\n   - Ensure TypeScript compilation succeeds without equalTo-related type errors\n\n5. **Regression Testing:**\n   - Test core card functionality (search, display, booster generation) to ensure no regressions\n   - Verify configuration loading performance is not negatively impacted",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           71
         ],
@@ -3846,7 +3846,7 @@
             "description": "Identify and delete all 'equalTo' fields from the resources/tcgpcards.yaml file while maintaining valid YAML syntax and ensuring no other fields depend on 'equalTo'.",
             "dependencies": [],
             "details": "Scan the entire resources/tcgpcards.yaml file for any 'equalTo' fields in all card entries. Remove these fields completely without breaking YAML structure or syntax. Validate the YAML file after removal to confirm correctness. Check for any references or dependencies on 'equalTo' fields elsewhere in the YAML and remove or update them accordingly.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Validate YAML syntax after removal using a YAML linter or parser. Confirm no 'equalTo' fields remain by searching the file."
           },
           {
@@ -3857,7 +3857,7 @@
               1
             ],
             "details": "Locate and remove any schema validation rules that include 'equalTo' fields. Update TypeScript interfaces or types that define card configuration to exclude 'equalTo'. Modify any parsing or loading logic that handles 'equalTo' fields to prevent errors or references to removed properties.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run type checks and schema validation tests to ensure no references to 'equalTo' remain and no validation errors occur."
           },
           {
@@ -3869,7 +3869,7 @@
               2
             ],
             "details": "Search all test files for 'equalTo' references. Remove test cases that verify 'equalTo' behavior, delete mock data or fixtures containing 'equalTo' fields, and update or remove assertions that check for 'equalTo' presence. Ensure tests remain valid and pass after cleanup.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run the full test suite to confirm tests pass without 'equalTo' related tests and no failures occur due to missing fields."
           },
           {
@@ -3880,7 +3880,7 @@
               2
             ],
             "details": "Search the codebase for any references to 'equalTo' in card processing logic or utilities. Remove conditional statements, functions, or handlers that process 'equalTo'. Update or delete comments and documentation that describe 'equalTo' functionality to avoid confusion.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Perform code review and run static analysis tools to ensure no 'equalTo' references remain. Verify application compiles and runs without errors."
           },
           {
@@ -3894,7 +3894,7 @@
               4
             ],
             "details": "Run YAML validation tools to confirm the configuration file is syntactically correct. Start the application and verify it loads card data without errors. Execute integration or system tests to ensure no broken references or runtime errors related to 'equalTo' occur.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Use YAML linters, application startup logs, and integration tests to confirm stability and correctness after removal of 'equalTo'."
           }
         ]
@@ -3910,7 +3910,7 @@
       ],
       "created": "2025-11-22T17:28:44.087Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-23T01:49:37.410Z"
+      "updated": "2025-11-23T14:16:08.392Z"
     }
   }
 }

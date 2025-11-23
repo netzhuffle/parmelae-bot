@@ -1479,7 +1479,6 @@ A1a:
     63:
       name: Altbernstein
       rarity: ♢
-      equalTo: A1
     64:
       name: Pokémon-Flöte
       rarity: ♢♢
@@ -7296,145 +7295,106 @@ P-A:
       name: Pokédex
     9:
       name: Pikachu
-      equalTo: A1
     10:
       name: Mewtu
-      equalTo: A1
     11:
       name: Chaneira
-      equalTo: A1
     12:
       name: Mauzi
-      equalTo: A1
     13:
       name: Smettbo
-      equalTo: A1
     14:
       name: Lapras-ex
     15:
       name: Pikachu
-      equalTo: A1
     16:
       name: Piepi
-      equalTo: A1
     17:
       name: Menki
     18:
       name: Bisaflor
-      equalTo: A1
     19:
       name: Quajutsu
-      equalTo: A1
     20:
       name: Alpollo
     21:
       name: Onix
-      equalTo: A1
     22:
       name: Pummeluff
     23:
       name: Bisasam
-      equalTo: A1
     24:
       name: Magnetilo
-      equalTo: A1
     25:
       name: Lavados-ex
-      equalTo: A1
     26:
       name: Pikachu
-      equalTo: A1
     27:
       name: Serpifeu
     28:
       name: Ramoth
-      equalTo: A1a
     29:
       name: Turtok
-      equalTo: A1
     30:
       name: Evoli
     31:
       name: Chillabell
-      equalTo: A1
     32:
       name: Glumanda
-      equalTo: A1
     33:
       name: Schiggy
-      equalTo: A1
     34:
       name: Plinfa
-      equalTo: A2
     35:
       name: Chelast
-      equalTo: A2
     36:
       name: Elevoltek
-      equalTo: A2
     37:
       name: Cresselia-ex
     38:
       name: Traunfugil
     39:
       name: Panzaeron
-      equalTo: A2
     40:
       name: Panflam
-      equalTo: A2
     41:
       name: Togepi
-      equalTo: A2
     42:
       name: Darkrai-ex
-      equalTo: A2
     43:
       name: Kinoso
-      equalTo: A2a
     44:
       name: Raichu
-      equalTo: A2a
     45:
       name: Nasgnet
     46:
       name: Kaumalat
-      equalTo: A2a
     47:
       name: Staraptor
     48:
       name: Manaphy
-      equalTo: A2a
     49:
       name: Relaxo
-      equalTo: A2a
     50:
       name: Mewtu-ex
-      equalTo: A1
     51:
       name: Mopex
-      equalTo: A2b
     52:
       name: Felori
-      equalTo: A2b
     53:
       name: Bojelin
     54:
       name: Pamomamo
-      equalTo: A2b
     55:
       name: Machomei
-      equalTo: A2b
     56:
       name: Rettan
     57:
       name: Bidiza
-      equalTo: A2b
     58:
       name: Pachirisu
-      equalTo: A2b
     59:
       name: Riolu
-      equalTo: A2b
     60:
       name: Owei
     61:

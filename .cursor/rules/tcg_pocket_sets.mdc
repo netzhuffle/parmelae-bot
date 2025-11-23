@@ -49,7 +49,7 @@ alwaysApply: true
 
 ### **Promo Sets (PROMO-A)**
 - **Set Level**: `boosters: ~` (null value, means there are no boosters at all)
-- **Card Level**: NO `boosters` field, may include `equalTo` references
+- **Card Level**: NO `boosters` field
 - **Example Structure**:
   ```yaml
   PROMO-A:
@@ -58,7 +58,7 @@ alwaysApply: true
     cards:
       9:
         name: Pikachu
-        equalTo: A1
+        rarity: ♢
   ```
 
 ## **Rarity Symbol Mapping**
@@ -101,16 +101,6 @@ Cards in Pokémon TCG Pocket sets are typically organized by rarity:
   rarity: ♢♢♢
   boosters: Ho-Oh
   isSixPackOnly: true
-```
-
-### **Equal To References (Promo Cards)**
-
-This is deprecated and doesn’t need to be added to newly added cards.
-
-```yaml
-9:
-  name: Pikachu
-  equalTo: A1
 ```
 
 ## **Service Integration Requirements**

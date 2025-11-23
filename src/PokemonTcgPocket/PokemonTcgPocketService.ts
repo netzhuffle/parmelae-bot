@@ -187,8 +187,6 @@ export interface Card {
   rarity?: string;
   /** The booster(s) this card belongs to. If undefined, belongs to all boosters in the set */
   boosters?: string | string[] | null;
-  /** Reference to another set that has a card with the same name that this card is equal to */
-  equalTo?: string;
   /**
    * Whether this card is exclusive to packs with six cards.
    *

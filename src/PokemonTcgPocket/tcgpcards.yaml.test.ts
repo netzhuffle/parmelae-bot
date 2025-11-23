@@ -183,18 +183,6 @@ describe('tcgpcards.yaml', () => {
       });
     });
 
-    it('should have valid equalTo references', () => {
-      const setKeys = new Set(Object.keys(sets));
-
-      Object.values(sets).forEach((setData: SetData) => {
-        Object.values(setData.cards).forEach((card: Card) => {
-          if (card.equalTo) {
-            expect(setKeys.has(card.equalTo)).toBe(true);
-          }
-        });
-      });
-    });
-
     it('should have consistent booster assignments', () => {
       Object.values(sets).forEach((setData: SetData) => {
         // Skip sets with null boosters
