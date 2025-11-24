@@ -10,7 +10,6 @@ import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPoc
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
-import { BoosterCardCountsAdapter } from './Repositories/Types.js';
 import { BOOSTERS_STATS_EXPLANATION, SETS_STATS_EXPLANATION } from './texts.js';
 import assert from 'node:assert/strict';
 import {
@@ -182,26 +181,6 @@ export enum CardOwnershipStatus {
   OWNED = 'OWNED',
   NOT_NEEDED = 'NOT_NEEDED',
   MISSING = 'MISSING',
-}
-
-/** Adapter implementation for count-based probability calculations */
-class RepositoryBoosterCardCountsAdapter implements BoosterCardCountsAdapter {
-  constructor(
-    private readonly repository: PokemonTcgPocketRepository,
-    private readonly boosterId: number,
-  ) {}
-
-  async countByRarity(rarity: Rarity, isSixPackOnly: boolean): Promise<number> {
-    return this.repository.countByBoosterAndRarity(
-      this.boosterId,
-      rarity,
-      isSixPackOnly,
-    );
-  }
-
-  async countGodPackEligible(): Promise<number> {
-    return this.repository.countGodPackEligibleByBooster(this.boosterId);
-  }
 }
 
 /** Symbol for injecting the Pokemon TCG Pocket YAML content */
@@ -402,11 +381,6 @@ export class PokemonTcgPocketService {
     try {
       // Use first booster (probability is same across all boosters for a card)
       const firstBooster = card.boosters[0];
-      const countsAdapter = new RepositoryBoosterCardCountsAdapter(
-        this.repository,
-        firstBooster.id,
-      );
-
       const setKey = card.set.key as SetKey;
       const probabilitiesType = SET_PROBABILITY_STRATEGY[setKey];
       if (!probabilitiesType) {
@@ -416,7 +390,7 @@ export class PokemonTcgPocketService {
       const probability =
         await this.probabilityService.calculateSingleCardProbability(
           card,
-          countsAdapter,
+          firstBooster.id,
           probabilitiesType,
         );
 

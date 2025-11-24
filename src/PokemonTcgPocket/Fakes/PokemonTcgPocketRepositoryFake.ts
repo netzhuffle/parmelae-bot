@@ -650,20 +650,48 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   // Count methods for probability calculations
-  public countByBoosterAndRarityReturnValue = 0;
+  private countsByRarity = new Map<string, number>();
+  private countsIncludingSixPackOnly = new Map<Rarity, number>();
   public countGodPackEligibleByBoosterReturnValue = 0;
+
+  /** Set count for a specific rarity and isSixPackOnly combination (for testing) */
+  setCountByRarity(
+    rarity: Rarity,
+    isSixPackOnly: boolean,
+    count: number,
+  ): void {
+    const key = `${rarity}_${isSixPackOnly}`;
+    this.countsByRarity.set(key, count);
+  }
+
+  /** Set count for a rarity including six-pack-only cards (for testing) */
+  setCountIncludingSixPackOnly(rarity: Rarity, count: number): void {
+    this.countsIncludingSixPackOnly.set(rarity, count);
+  }
 
   /** Count cards by booster, rarity, and six-pack exclusivity for probability calculations */
   async countByBoosterAndRarity(
     _boosterId: number,
-    _rarity: Rarity,
-    _isSixPackOnly: boolean,
+    rarity: Rarity,
+    isSixPackOnly: boolean,
   ): Promise<number> {
-    return Promise.resolve(this.countByBoosterAndRarityReturnValue);
+    const key = `${rarity}_${isSixPackOnly}`;
+    return Promise.resolve(this.countsByRarity.get(key) ?? 0);
+  }
+
+  /** Count cards by rarity, including both regular and isSixPackOnly cards */
+  async countByRarityIncludingSixPackOnly(
+    _boosterId: number,
+    rarity: Rarity,
+  ): Promise<number> {
+    return Promise.resolve(this.countsIncludingSixPackOnly.get(rarity) ?? 0);
   }
 
   /** Count god pack eligible cards in a booster for probability calculations */
-  async countGodPackEligibleByBooster(_boosterId: number): Promise<number> {
+  async countGodPackEligibleByBooster(
+    _boosterId: number,
+    _godPackRarities: ReadonlySet<Rarity>,
+  ): Promise<number> {
     return Promise.resolve(this.countGodPackEligibleByBoosterReturnValue);
   }
 
@@ -674,7 +702,8 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     this.cards.clear();
     this.cardBoosters.clear();
     this.nextId = 1;
-    this.countByBoosterAndRarityReturnValue = 0;
+    this.countsByRarity.clear();
+    this.countsIncludingSixPackOnly.clear();
     this.countGodPackEligibleByBoosterReturnValue = 0;
   }
 }

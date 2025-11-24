@@ -13,14 +13,21 @@ import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveC
 import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
+import { PokemonTcgPocketProbabilityRepositoryFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
+import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
 /** Helper function to create a probability service with all strategies */
-function createProbabilityService(): PokemonTcgPocketProbabilityService {
+function createProbabilityService(
+  probabilityRepository?: PokemonTcgPocketProbabilityRepositoryFake,
+): PokemonTcgPocketProbabilityService {
+  const repo =
+    probabilityRepository ?? new PokemonTcgPocketProbabilityRepositoryFake();
   return new PokemonTcgPocketProbabilityService(
     new FiveCardsWithoutShinyStrategy(),
     new FiveCardsStrategy(),
     new BabyAsPotentialSixthCardStrategy(),
     new FourCardGuaranteedExStrategy(),
+    repo as unknown as PokemonTcgPocketProbabilityRepository,
   );
 }
 
@@ -1451,7 +1458,19 @@ describe('PokemonTcgPocketService', () => {
 
     beforeEach(() => {
       repository = new PokemonTcgPocketRepositoryFake();
-      const probabilityService = createProbabilityService();
+      const probabilityRepository =
+        new PokemonTcgPocketProbabilityRepositoryFake();
+      // Setup probability repository with test data for probability calculations
+      probabilityRepository.setCountByRarity(Rarity.ONE_DIAMOND, false, 10); // Default count
+      probabilityRepository.setCountIncludingSixPackOnly(
+        Rarity.ONE_DIAMOND,
+        10,
+      );
+      probabilityRepository.countGodPackEligibleByBoosterReturnValue = 0; // No god pack by default
+
+      const probabilityService = createProbabilityService(
+        probabilityRepository,
+      );
       const setsData: Sets = {
         TEST: {
           name: 'Test Set',
@@ -1465,10 +1484,6 @@ describe('PokemonTcgPocketService', () => {
         repository,
         setsData,
       );
-
-      // Setup repository with test data for probability calculations
-      repository.countByBoosterAndRarityReturnValue = 10; // Default count
-      repository.countGodPackEligibleByBoosterReturnValue = 0; // No god pack by default
     });
 
     it('should include Probability column in correct position', async () => {

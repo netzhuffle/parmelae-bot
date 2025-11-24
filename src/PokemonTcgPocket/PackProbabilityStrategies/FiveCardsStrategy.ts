@@ -11,7 +11,11 @@ export class FiveCardsStrategy implements PackProbabilityStrategy {
     god: 0.0005,
   } as const;
 
-  private readonly card4Distribution: ReadonlyMap<Rarity, number> = new Map([
+  private readonly slot1To3Distribution = new Map<Rarity, number>([
+    [Rarity.ONE_DIAMOND, 1],
+  ]);
+
+  private readonly slot4Distribution: ReadonlyMap<Rarity, number> = new Map([
     [Rarity.TWO_DIAMONDS, 0.89],
     [Rarity.THREE_DIAMONDS, 0.04952],
     [Rarity.FOUR_DIAMONDS, 0.01666],
@@ -23,7 +27,7 @@ export class FiveCardsStrategy implements PackProbabilityStrategy {
     [Rarity.CROWN, 0.0004],
   ]);
 
-  private readonly card5Distribution: ReadonlyMap<Rarity, number> = new Map([
+  private readonly slot5Distribution: ReadonlyMap<Rarity, number> = new Map([
     [Rarity.TWO_DIAMONDS, 0.56],
     [Rarity.THREE_DIAMONDS, 0.1981],
     [Rarity.FOUR_DIAMONDS, 0.06664],
@@ -35,19 +39,22 @@ export class FiveCardsStrategy implements PackProbabilityStrategy {
     [Rarity.CROWN, 0.0016],
   ]);
 
-  getSlotDistribution(slot: number): ReadonlyMap<Rarity, number> {
-    if (slot >= 1 && slot <= 3) {
-      // Slots 1-3: 100% ONE_DIAMOND
-      return new Map([[Rarity.ONE_DIAMOND, 1]]);
-    }
-    if (slot === 4) {
-      return this.card4Distribution;
-    }
-    if (slot === 5) {
-      return this.card5Distribution;
-    }
-    throw new Error(
-      `Invalid slot ${slot} for FiveCardsStrategy (expected 1-5)`,
-    );
-  }
+  readonly slotDistributions = {
+    1: this.slot1To3Distribution,
+    2: this.slot1To3Distribution,
+    3: this.slot1To3Distribution,
+    4: this.slot4Distribution,
+    5: this.slot5Distribution,
+  } as const;
+
+  readonly godPackRarities = new Set<Rarity>([
+    Rarity.ONE_STAR,
+    Rarity.TWO_STARS,
+    Rarity.THREE_STARS,
+    Rarity.ONE_SHINY,
+    Rarity.TWO_SHINY,
+    Rarity.CROWN,
+  ]);
+
+  // No sixthCardFilterMode (no sixth card)
 }

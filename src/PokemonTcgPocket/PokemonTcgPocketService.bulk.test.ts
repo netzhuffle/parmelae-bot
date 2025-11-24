@@ -7,6 +7,7 @@ import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveC
 import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
+import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
 describe('PokemonTcgPocketService bulk operations', () => {
   let service: PokemonTcgPocketService;
@@ -20,6 +21,7 @@ describe('PokemonTcgPocketService bulk operations', () => {
       new FiveCardsStrategy(),
       new BabyAsPotentialSixthCardStrategy(),
       new FourCardGuaranteedExStrategy(),
+      undefined as unknown as PokemonTcgPocketProbabilityRepository,
     );
     service = new PokemonTcgPocketService(
       probabilityService,

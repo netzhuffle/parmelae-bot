@@ -3,55 +3,48 @@ import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
 import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
 import { Rarity } from '../generated/prisma/enums.js';
 import { BoosterProbabilitiesType } from './PokemonTcgPocketService.js';
-import {
-  PokemonTcgPocketProbabilityService,
-  GOD_PACK_RARITIES,
-} from './PokemonTcgPocketProbabilityService.js';
-import { BoosterCardCountsAdapter } from './Repositories/Types.js';
+import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
+import { PokemonTcgPocketProbabilityRepositoryFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
 import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
+import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
-/** Fake adapter for testing single card probability calculations */
-class FakeBoosterCardCountsAdapter implements BoosterCardCountsAdapter {
-  private counts = new Map<string, number>();
-  private godPackEligibleCount = 0;
-
-  setCount(rarity: Rarity, isSixPackOnly: boolean, count: number): void {
-    const key = `${rarity}_${isSixPackOnly}`;
-    this.counts.set(key, count);
-  }
-
-  setGodPackEligibleCount(count: number): void {
-    this.godPackEligibleCount = count;
-  }
-
-  countByRarity(rarity: Rarity, isSixPackOnly: boolean): Promise<number> {
-    const key = `${rarity}_${isSixPackOnly}`;
-    return Promise.resolve(this.counts.get(key) ?? 0);
-  }
-
-  countGodPackEligible(): Promise<number> {
-    return Promise.resolve(this.godPackEligibleCount);
-  }
-
-  reset(): void {
-    this.counts.clear();
-    this.godPackEligibleCount = 0;
-  }
+/** Helper to set up probability repository for testing single card probability calculations */
+function setupRepositoryForProbabilityTests(
+  repository: PokemonTcgPocketProbabilityRepositoryFake,
+): {
+  setCount: (rarity: Rarity, isSixPackOnly: boolean, count: number) => void;
+  setCountIncludingSixPackOnly: (rarity: Rarity, count: number) => void;
+  setGodPackEligibleCount: (count: number) => void;
+} {
+  return {
+    setCount(rarity: Rarity, isSixPackOnly: boolean, count: number): void {
+      repository.setCountByRarity(rarity, isSixPackOnly, count);
+    },
+    setCountIncludingSixPackOnly(rarity: Rarity, count: number): void {
+      repository.setCountIncludingSixPackOnly(rarity, count);
+    },
+    setGodPackEligibleCount(count: number): void {
+      repository.countGodPackEligibleByBoosterReturnValue = count;
+    },
+  };
 }
 
 describe('PokemonTcgPocketProbabilityService', () => {
   let service: PokemonTcgPocketProbabilityService;
 
   beforeEach(() => {
+    const probabilityRepository =
+      new PokemonTcgPocketProbabilityRepositoryFake();
     service = new PokemonTcgPocketProbabilityService(
       new FiveCardsWithoutShinyStrategy(),
       new FiveCardsStrategy(),
       new BabyAsPotentialSixthCardStrategy(),
       new FourCardGuaranteedExStrategy(),
+      probabilityRepository as unknown as PokemonTcgPocketProbabilityRepository,
     );
   });
 
@@ -274,8 +267,11 @@ describe('PokemonTcgPocketProbabilityService', () => {
 
     it('should handle missing only god pack cards', () => {
       const boosterCards = createTestCards();
+      const fiveCardsWithoutShinyStrategy = new FiveCardsWithoutShinyStrategy();
       const missingCards = boosterCards.filter(
-        (card) => card.rarity !== null && GOD_PACK_RARITIES.has(card.rarity),
+        (card) =>
+          card.rarity !== null &&
+          fiveCardsWithoutShinyStrategy.godPackRarities.has(card.rarity),
       );
 
       const probability = service.calculateNewCardProbability(
@@ -865,8 +861,16 @@ describe('PokemonTcgPocketProbabilityService', () => {
       expect(godPackProbability).toBeLessThan(normalPackProbability);
     });
 
-    it('should exclude isSixPackOnly cards from four-card god packs', () => {
+    it('should ignore isSixPackOnly flag for four-card packs', () => {
       const cards = createTestCardsWithFoilRarities();
+
+      // Remove the regular ONE_STAR card to ensure only six-pack-only ONE_STAR exists
+      const regularOneStarIndex = cards.findIndex(
+        (c) => c.rarity === Rarity.ONE_STAR && !c.isSixPackOnly,
+      );
+      if (regularOneStarIndex !== -1) {
+        cards.splice(regularOneStarIndex, 1);
+      }
 
       // Add a six-pack-only card
       const sixPackOnlyCard = createTestCard(998, Rarity.ONE_STAR);
@@ -881,8 +885,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
         BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
       );
 
-      // Should be 0 since six-pack-only cards are excluded from god packs
-      expect(probability).toBe(0);
+      // Should be non-zero since isSixPackOnly flag is ignored when sixthCardFilterMode is undefined
+      expect(probability).toBeGreaterThan(0);
     });
 
     it('should allow TWO_SHINY in normal four-card flow per slot distribution', () => {
@@ -904,10 +908,21 @@ describe('PokemonTcgPocketProbabilityService', () => {
   });
 
   describe('calculateSingleCardProbability', () => {
-    let adapter: FakeBoosterCardCountsAdapter;
+    let probabilityRepository: PokemonTcgPocketProbabilityRepositoryFake;
+    let setup: ReturnType<typeof setupRepositoryForProbabilityTests>;
+    const BOOSTER_ID = 1;
 
     beforeEach(() => {
-      adapter = new FakeBoosterCardCountsAdapter();
+      probabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
+      setup = setupRepositoryForProbabilityTests(probabilityRepository);
+      // Update service with new repository instance
+      service = new PokemonTcgPocketProbabilityService(
+        new FiveCardsWithoutShinyStrategy(),
+        new FiveCardsStrategy(),
+        new BabyAsPotentialSixthCardStrategy(),
+        new FourCardGuaranteedExStrategy(),
+        probabilityRepository as unknown as PokemonTcgPocketProbabilityRepository,
+      );
     });
 
     it('should calculate correct probability for ONE_DIAMOND card in normal pack', async () => {
@@ -922,12 +937,13 @@ describe('PokemonTcgPocketProbabilityService', () => {
       };
 
       // 10 ONE_DIAMOND cards total
-      adapter.setCount(Rarity.ONE_DIAMOND, false, 10);
-      adapter.setGodPackEligibleCount(0); // No god pack eligible cards
+      setup.setCount(Rarity.ONE_DIAMOND, false, 10);
+      setup.setCountIncludingSixPackOnly(Rarity.ONE_DIAMOND, 10); // For undefined mode
+      setup.setGodPackEligibleCount(0); // No god pack eligible cards
 
       const probability = await service.calculateSingleCardProbability(
         targetCard,
-        adapter,
+        BOOSTER_ID,
         BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
@@ -947,12 +963,13 @@ describe('PokemonTcgPocketProbabilityService', () => {
       };
 
       // 5 ONE_STAR cards for normal slots, 20 god pack eligible total
-      adapter.setCount(Rarity.ONE_STAR, false, 5);
-      adapter.setGodPackEligibleCount(20);
+      setup.setCount(Rarity.ONE_STAR, false, 5);
+      setup.setCountIncludingSixPackOnly(Rarity.ONE_STAR, 5); // For undefined mode
+      setup.setGodPackEligibleCount(20);
 
       const probability = await service.calculateSingleCardProbability(
         targetCard,
-        adapter,
+        BOOSTER_ID,
         BoosterProbabilitiesType.FIVE_CARDS,
       );
 
@@ -974,21 +991,22 @@ describe('PokemonTcgPocketProbabilityService', () => {
       };
 
       // Test with god packs
-      adapter.setCount(Rarity.ONE_STAR, false, 5);
-      adapter.setGodPackEligibleCount(20);
+      setup.setCount(Rarity.ONE_STAR, false, 5);
+      setup.setCountIncludingSixPackOnly(Rarity.ONE_STAR, 5); // For undefined mode
+      setup.setGodPackEligibleCount(20);
       const probabilityWithGodPacks =
         await service.calculateSingleCardProbability(
           targetCard,
-          adapter,
+          BOOSTER_ID,
           BoosterProbabilitiesType.FIVE_CARDS,
         );
 
       // Test without god packs (no god pack eligible cards)
-      adapter.setGodPackEligibleCount(0);
+      setup.setGodPackEligibleCount(0);
       const probabilityWithoutGodPacks =
         await service.calculateSingleCardProbability(
           targetCard,
-          adapter,
+          BOOSTER_ID,
           BoosterProbabilitiesType.FIVE_CARDS,
         );
 
@@ -1012,12 +1030,12 @@ describe('PokemonTcgPocketProbabilityService', () => {
       };
 
       // 3 isSixPackOnly ONE_STAR cards
-      adapter.setCount(Rarity.ONE_STAR, true, 3);
-      adapter.setGodPackEligibleCount(0); // isSixPackOnly cards not in god packs
+      setup.setCount(Rarity.ONE_STAR, true, 3);
+      setup.setGodPackEligibleCount(0); // isSixPackOnly cards not in god packs
 
       const probability = await service.calculateSingleCardProbability(
         targetCard,
-        adapter,
+        BOOSTER_ID,
         BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
       );
 
@@ -1038,12 +1056,13 @@ describe('PokemonTcgPocketProbabilityService', () => {
       };
 
       // 5 FOUR_DIAMONDS cards
-      adapter.setCount(Rarity.FOUR_DIAMONDS, false, 5);
-      adapter.setGodPackEligibleCount(0);
+      setup.setCount(Rarity.FOUR_DIAMONDS, false, 5);
+      setup.setCountIncludingSixPackOnly(Rarity.FOUR_DIAMONDS, 5); // For undefined mode
+      setup.setGodPackEligibleCount(0);
 
       const probability = await service.calculateSingleCardProbability(
         targetCard,
-        adapter,
+        BOOSTER_ID,
         BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
       );
 
@@ -1063,19 +1082,20 @@ describe('PokemonTcgPocketProbabilityService', () => {
       };
 
       // No cards of this rarity
-      adapter.setCount(Rarity.ONE_DIAMOND, false, 0);
-      adapter.setGodPackEligibleCount(0);
+      setup.setCount(Rarity.ONE_DIAMOND, false, 0);
+      setup.setCountIncludingSixPackOnly(Rarity.ONE_DIAMOND, 0); // For undefined mode
+      setup.setGodPackEligibleCount(0);
 
       const probability = await service.calculateSingleCardProbability(
         targetCard,
-        adapter,
+        BOOSTER_ID,
         BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);
     });
 
-    it('should exclude isSixPackOnly cards from normal slots', async () => {
+    it('should ignore isSixPackOnly flag for strategies without sixthCardFilterMode', async () => {
       const targetCard: PokemonCardModel = {
         id: 1,
         name: 'Six Pack Card',
@@ -1086,17 +1106,188 @@ describe('PokemonTcgPocketProbabilityService', () => {
         godPackBoosterId: null,
       };
 
-      // Even with ONE_DIAMOND cards, isSixPackOnly should be excluded from slots 1-3
-      adapter.setCount(Rarity.ONE_DIAMOND, false, 10);
-      adapter.setGodPackEligibleCount(0);
+      // For undefined mode, isSixPackOnly flag is ignored, so card should be included
+      setup.setCount(Rarity.ONE_DIAMOND, false, 10);
+      setup.setCountIncludingSixPackOnly(Rarity.ONE_DIAMOND, 10); // Total count (including isSixPackOnly)
+      setup.setGodPackEligibleCount(0);
 
       const probability = await service.calculateSingleCardProbability(
         targetCard,
-        adapter,
+        BOOSTER_ID,
         BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
-      expect(probability).toBe(0);
+      // Should be greater than 0 because isSixPackOnly flag is ignored when sixthCardFilterMode is undefined
+      expect(probability).toBeGreaterThan(0);
+    });
+  });
+
+  describe('sixthCardFilterMode behavior', () => {
+    describe('flag-based filtering (BabyAsPotentialSixthCardStrategy)', () => {
+      it('should exclude isSixPackOnly cards from normal pack slots 1-5', async () => {
+        const testProbabilityRepository =
+          new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(
+          testProbabilityRepository,
+        );
+        const TEST_BOOSTER_ID = 1;
+        const testService = new PokemonTcgPocketProbabilityService(
+          new FiveCardsWithoutShinyStrategy(),
+          new FiveCardsStrategy(),
+          new BabyAsPotentialSixthCardStrategy(),
+          new FourCardGuaranteedExStrategy(),
+          testProbabilityRepository as unknown as PokemonTcgPocketProbabilityRepository,
+        );
+        const targetCard: PokemonCardModel = {
+          id: 1,
+          name: 'Test Card',
+          number: 1,
+          rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: true,
+          setId: 1,
+          godPackBoosterId: null,
+        };
+
+        // Set up counts: 10 regular ONE_DIAMOND cards, 5 isSixPackOnly ONE_DIAMOND cards
+        testSetup.setCount(Rarity.ONE_DIAMOND, false, 10);
+        testSetup.setCount(Rarity.ONE_DIAMOND, true, 5);
+        testSetup.setGodPackEligibleCount(0);
+
+        const probability = await testService.calculateSingleCardProbability(
+          targetCard,
+          TEST_BOOSTER_ID,
+          BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
+        );
+
+        // Should be 0 because isSixPackOnly cards are excluded from slots 1-5 in flag-based mode
+        expect(probability).toBe(0);
+      });
+
+      it('should exclude isSixPackOnly cards from god packs', async () => {
+        const testProbabilityRepository =
+          new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(
+          testProbabilityRepository,
+        );
+        const TEST_BOOSTER_ID = 1;
+        const testService = new PokemonTcgPocketProbabilityService(
+          new FiveCardsWithoutShinyStrategy(),
+          new FiveCardsStrategy(),
+          new BabyAsPotentialSixthCardStrategy(),
+          new FourCardGuaranteedExStrategy(),
+          testProbabilityRepository as unknown as PokemonTcgPocketProbabilityRepository,
+        );
+        // Use TWO_STARS which is in god pack rarities but NOT in slot 6 distribution
+        const targetCard: PokemonCardModel = {
+          id: 1,
+          name: 'Test Card',
+          number: 1,
+          rarity: Rarity.TWO_STARS,
+          isSixPackOnly: true,
+          setId: 1,
+          godPackBoosterId: null,
+        };
+
+        // Set up counts: 10 regular TWO_STARS cards, 5 isSixPackOnly TWO_STARS cards
+        testSetup.setCount(Rarity.TWO_STARS, false, 10);
+        testSetup.setCount(Rarity.TWO_STARS, true, 5);
+        // Only count regular cards as god pack eligible (excluding isSixPackOnly)
+        testSetup.setGodPackEligibleCount(10);
+
+        const probability = await testService.calculateSingleCardProbability(
+          targetCard,
+          TEST_BOOSTER_ID,
+          BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
+        );
+
+        // Should be 0 because:
+        // - isSixPackOnly cards are excluded from normal pack slots 1-5 (flag-based mode)
+        // - isSixPackOnly cards are excluded from god packs (flag-based mode)
+        // - TWO_STARS is not in slot 6 distribution, so no slot 6 probability
+        expect(probability).toBe(0);
+      });
+
+      it('should include regular cards (not isSixPackOnly) in normal pack slots 1-5', async () => {
+        const testProbabilityRepository =
+          new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(
+          testProbabilityRepository,
+        );
+        const TEST_BOOSTER_ID = 1;
+        const testService = new PokemonTcgPocketProbabilityService(
+          new FiveCardsWithoutShinyStrategy(),
+          new FiveCardsStrategy(),
+          new BabyAsPotentialSixthCardStrategy(),
+          new FourCardGuaranteedExStrategy(),
+          testProbabilityRepository as unknown as PokemonTcgPocketProbabilityRepository,
+        );
+        const targetCard: PokemonCardModel = {
+          id: 1,
+          name: 'Test Card',
+          number: 1,
+          rarity: Rarity.ONE_DIAMOND,
+          isSixPackOnly: false,
+          setId: 1,
+          godPackBoosterId: null,
+        };
+
+        // Set up counts: 10 regular ONE_DIAMOND cards, 5 isSixPackOnly ONE_DIAMOND cards
+        testSetup.setCount(Rarity.ONE_DIAMOND, false, 10);
+        testSetup.setCount(Rarity.ONE_DIAMOND, true, 5);
+        testSetup.setGodPackEligibleCount(0);
+
+        const probability = await testService.calculateSingleCardProbability(
+          targetCard,
+          TEST_BOOSTER_ID,
+          BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
+        );
+
+        // Should be greater than 0 because regular cards are included in slots 1-5
+        expect(probability).toBeGreaterThan(0);
+      });
+    });
+
+    describe('undefined sixthCardFilterMode (strategies without sixth card)', () => {
+      it('should ignore isSixPackOnly flag for four-card packs', async () => {
+        const testProbabilityRepository =
+          new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(
+          testProbabilityRepository,
+        );
+        const TEST_BOOSTER_ID = 1;
+        const targetCard: PokemonCardModel = {
+          id: 1,
+          name: 'Test Card',
+          number: 1,
+          rarity: Rarity.ONE_STAR,
+          isSixPackOnly: true,
+          setId: 1,
+          godPackBoosterId: null,
+        };
+
+        // Set up counts: 10 regular ONE_STAR cards, 5 isSixPackOnly ONE_STAR cards
+        testSetup.setCount(Rarity.ONE_STAR, false, 10);
+        testSetup.setCount(Rarity.ONE_STAR, true, 5);
+        testSetup.setCountIncludingSixPackOnly(Rarity.ONE_STAR, 15); // Total count
+        // For undefined mode, god pack eligible should include all cards
+        testSetup.setGodPackEligibleCount(15);
+
+        const testService = new PokemonTcgPocketProbabilityService(
+          new FiveCardsWithoutShinyStrategy(),
+          new FiveCardsStrategy(),
+          new BabyAsPotentialSixthCardStrategy(),
+          new FourCardGuaranteedExStrategy(),
+          testProbabilityRepository as unknown as PokemonTcgPocketProbabilityRepository,
+        );
+        const probability = await testService.calculateSingleCardProbability(
+          targetCard,
+          TEST_BOOSTER_ID,
+          BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+        );
+
+        // Should be greater than 0 because isSixPackOnly flag is ignored when sixthCardFilterMode is undefined
+        expect(probability).toBeGreaterThan(0);
+      });
     });
   });
 });

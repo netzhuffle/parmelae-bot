@@ -13,7 +13,6 @@ import {
   CardOwnershipStatus,
 } from '../PokemonTcgPocketService.js';
 import { NotExhaustiveSwitchError } from '../../NotExhaustiveSwitchError.js';
-import { GOD_PACK_RARITIES_FOR_PRISMA } from '../PokemonTcgPocketProbabilityService.js';
 
 /** Repository for Pokémon TCG Pocket data */
 @injectable()
@@ -569,7 +568,6 @@ export class PokemonTcgPocketRepository {
     const set = await this.retrieveSetByKey(key);
     return set?.id ?? null;
   }
-
   private async resolveBoosterIds(
     setKey: string,
     names: string[],
@@ -594,96 +592,6 @@ export class PokemonTcgPocketRepository {
     );
 
     return ids;
-  }
-
-  /**
-   * Count cards by booster, rarity, and six-pack exclusivity for probability calculations.
-   *
-   * Provides efficient count queries for specific rarity and six-pack combinations
-   * within a booster context. Used by probability calculations to determine
-   * slot distributions without fetching full card lists.
-   *
-   * @param boosterId - The booster to count cards in
-   * @param rarity - The specific rarity to count
-   * @param isSixPackOnly - Whether to count only six-pack-only cards (true) or exclude them (false)
-   * @returns Promise resolving to the count of matching cards
-   * @throws PokemonTcgPocketDatabaseError when database operation fails
-   */
-  async countByBoosterAndRarity(
-    boosterId: number,
-    rarity: Rarity,
-    isSixPackOnly: boolean,
-  ): Promise<number> {
-    try {
-      return await this.prisma.pokemonCard.count({
-        where: {
-          rarity,
-          isSixPackOnly,
-          boosters: {
-            some: {
-              id: boosterId,
-            },
-          },
-        },
-      });
-    } catch (error) {
-      throw new PokemonTcgPocketDatabaseError(
-        'count',
-        'cards by booster and rarity',
-        this.formatError(error),
-      );
-    }
-  }
-
-  /**
-   * Count god pack eligible cards in a booster for probability calculations.
-   *
-   * Counts cards that can appear in god packs, which are limited to specific rarities
-   * and exclude six-pack-only cards. God pack rarities are: ONE_STAR, TWO_STARS,
-   * THREE_STARS, ONE_SHINY, TWO_SHINY, CROWN.
-   *
-   * Exclusion rules:
-   * - isSixPackOnly cards are excluded from god packs
-   * - Only god pack rarities are counted
-   *
-   * @param boosterId - The booster to count god pack eligible cards in
-   * @returns Promise resolving to the count of god pack eligible cards
-   * @throws PokemonTcgPocketDatabaseError when database operation fails
-   */
-  async countGodPackEligibleByBooster(boosterId: number): Promise<number> {
-    try {
-      return await this.prisma.pokemonCard.count({
-        where: {
-          AND: [
-            {
-              rarity: {
-                in: GOD_PACK_RARITIES_FOR_PRISMA,
-              },
-            },
-            {
-              isSixPackOnly: false,
-            },
-            {
-              boosters: {
-                some: {
-                  id: boosterId,
-                },
-              },
-            },
-            {
-              // Only count cards where godPackBoosterId is null OR matches this booster
-              OR: [{ godPackBoosterId: null }, { godPackBoosterId: boosterId }],
-            },
-          ],
-        },
-      });
-    } catch (error) {
-      throw new PokemonTcgPocketDatabaseError(
-        'count',
-        'god pack eligible cards',
-        this.formatError(error),
-      );
-    }
   }
 
   /** Converts an unknown error to a string or Error */

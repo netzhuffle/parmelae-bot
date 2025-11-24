@@ -12,6 +12,7 @@ import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabili
 import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
 import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
+import { PokemonTcgPocketProbabilityRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketProbabilityRepository.js';
 
 describe('pokemonCardAdd', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -25,6 +26,7 @@ describe('pokemonCardAdd', () => {
       new FiveCardsStrategy(),
       new BabyAsPotentialSixthCardStrategy(),
       new FourCardGuaranteedExStrategy(),
+      undefined as unknown as PokemonTcgPocketProbabilityRepository,
     );
     config = createTestToolConfig({
       userId: BigInt(1),

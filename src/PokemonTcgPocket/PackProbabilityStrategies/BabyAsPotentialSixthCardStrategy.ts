@@ -14,7 +14,11 @@ export class BabyAsPotentialSixthCardStrategy
     six: 0.0833,
   } as const;
 
-  private readonly card4Distribution: ReadonlyMap<Rarity, number> = new Map([
+  private readonly slot1To3Distribution = new Map<Rarity, number>([
+    [Rarity.ONE_DIAMOND, 1],
+  ]);
+
+  private readonly slot4Distribution: ReadonlyMap<Rarity, number> = new Map([
     [Rarity.TWO_DIAMONDS, 0.89],
     [Rarity.THREE_DIAMONDS, 0.04952],
     [Rarity.FOUR_DIAMONDS, 0.01666],
@@ -26,7 +30,7 @@ export class BabyAsPotentialSixthCardStrategy
     [Rarity.CROWN, 0.0004],
   ]);
 
-  private readonly card5Distribution: ReadonlyMap<Rarity, number> = new Map([
+  private readonly slot5Distribution: ReadonlyMap<Rarity, number> = new Map([
     [Rarity.TWO_DIAMONDS, 0.56],
     [Rarity.THREE_DIAMONDS, 0.1981],
     [Rarity.FOUR_DIAMONDS, 0.06664],
@@ -43,26 +47,23 @@ export class BabyAsPotentialSixthCardStrategy
     [Rarity.THREE_DIAMONDS, 0.871],
   ]);
 
-  readonly sixPackConfig = {
-    useIsSixPackOnly: true,
+  readonly slotDistributions = {
+    1: this.slot1To3Distribution,
+    2: this.slot1To3Distribution,
+    3: this.slot1To3Distribution,
+    4: this.slot4Distribution,
+    5: this.slot5Distribution,
+    6: this.slot6Distribution,
   } as const;
 
-  getSlotDistribution(slot: number): ReadonlyMap<Rarity, number> {
-    if (slot >= 1 && slot <= 3) {
-      // Slots 1-3: 100% ONE_DIAMOND
-      return new Map([[Rarity.ONE_DIAMOND, 1]]);
-    }
-    if (slot === 4) {
-      return this.card4Distribution;
-    }
-    if (slot === 5) {
-      return this.card5Distribution;
-    }
-    if (slot === 6) {
-      return this.slot6Distribution;
-    }
-    throw new Error(
-      `Invalid slot ${slot} for BabyAsPotentialSixthCardStrategy (expected 1-6)`,
-    );
-  }
+  readonly godPackRarities = new Set<Rarity>([
+    Rarity.ONE_STAR,
+    Rarity.TWO_STARS,
+    Rarity.THREE_STARS,
+    Rarity.ONE_SHINY,
+    Rarity.TWO_SHINY,
+    Rarity.CROWN,
+  ]);
+
+  readonly sixthCardFilterMode = 'flag-based' as const;
 }

@@ -7,24 +7,8 @@ import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveC
 import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
-import { BoosterCardCountsAdapter } from './Repositories/Types.js';
 import { BoosterProbabilitiesType } from './PokemonTcgPocketService.js';
-
-/** Array of rarities that can appear in god packs */
-const GOD_PACK_RARITIES_ARRAY: Rarity[] = [
-  Rarity.ONE_STAR,
-  Rarity.TWO_STARS,
-  Rarity.THREE_STARS,
-  Rarity.ONE_SHINY,
-  Rarity.TWO_SHINY,
-  Rarity.CROWN,
-];
-
-/** Set of rarities that can appear in god packs */
-export const GOD_PACK_RARITIES = new Set<Rarity>(GOD_PACK_RARITIES_ARRAY);
-
-/** Array of rarities that can appear in god packs (for Prisma queries) */
-export const GOD_PACK_RARITIES_FOR_PRISMA = GOD_PACK_RARITIES_ARRAY;
+import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
 /**
  * Service for calculating Pokemon TCG Pocket card probabilities.
@@ -64,6 +48,7 @@ export class PokemonTcgPocketProbabilityService {
     private readonly fiveCardsStrategy: FiveCardsStrategy,
     private readonly babyAsPotentialSixthCardStrategy: BabyAsPotentialSixthCardStrategy,
     private readonly fourCardStrategy: FourCardGuaranteedExStrategy,
+    private readonly repository: PokemonTcgPocketProbabilityRepository,
   ) {}
 
   /**
@@ -175,27 +160,27 @@ export class PokemonTcgPocketProbabilityService {
    * 5. Combine using appropriate weights and composition rules
    *
    * @param targetCard - The specific card to calculate probability for
-   * @param countsAdapter - Adapter providing efficient count queries for the booster
+   * @param boosterId - The booster ID to calculate probability for
    * @param probabilitiesType - The booster's probability calculation type
    * @returns Probability (0.0-1.0) of drawing the target card in one pack, or 0 if no eligible counts
    * @throws NotExhaustiveSwitchError for unexpected probabilitiesType values
    */
   async calculateSingleCardProbability(
     targetCard: PokemonCardModel,
-    countsAdapter: BoosterCardCountsAdapter,
+    boosterId: number,
     probabilitiesType: BoosterProbabilitiesType,
   ): Promise<number> {
     const strategy = this.getStrategy(probabilitiesType);
 
     const normalProb = await this.calculateNormalPackSingleCardProbability(
       targetCard,
-      countsAdapter,
+      boosterId,
       strategy,
     );
     const godProb = await this.calculateGodPackSingleCardProbability(
       targetCard,
-      countsAdapter,
-      strategy.cardsPerPack,
+      boosterId,
+      strategy,
     );
 
     // Handle six-card packs
@@ -203,7 +188,7 @@ export class PokemonTcgPocketProbabilityService {
       strategy.packWeights.six !== undefined
         ? await this.calculateSixPackSingleCardProbability(
             targetCard,
-            countsAdapter,
+            boosterId,
             strategy,
           )
         : undefined;
@@ -244,7 +229,7 @@ export class PokemonTcgPocketProbabilityService {
     const godPackChance = this.computeGodPackChance(
       filteredBoosterCards,
       filteredMissingCards,
-      strategy.cardsPerPack,
+      strategy,
     );
 
     // Handle six-card packs
@@ -298,11 +283,18 @@ export class PokemonTcgPocketProbabilityService {
   ): number {
     let probabilityNoNewCard = 1.0;
     for (let slot = 1; slot <= strategy.cardsPerPack; slot++) {
-      const distribution = strategy.getSlotDistribution(slot);
+      const distribution =
+        strategy.slotDistributions[
+          slot as keyof typeof strategy.slotDistributions
+        ];
+      if (!distribution) {
+        throw new Error(`Slot ${slot} not defined for strategy`);
+      }
       const pNoNewInSlot = this.computeNoNewCardProbabilityForSlot(
         distribution,
         boosterCards,
         missingCards,
+        strategy,
       );
       probabilityNoNewCard *= pNoNewInSlot;
     }
@@ -339,22 +331,23 @@ export class PokemonTcgPocketProbabilityService {
   /**
    * Calculates the probability of getting at least one new card in a god pack.
    * In a god pack:
-   * - All cards are from {⭐️, ⭐️⭐️, ⭐️⭐️⭐️, ✴️, ✴️✴️, 👑}
+   * - All cards are from the strategy's godPackRarities
    * - Each eligible card has equal probability
    *
    * @param boosterCards - All cards available in this booster
    * @param missingCards - Cards the user doesn't own yet
-   * @param cardsPerPack - Number of cards in the pack
+   * @param strategy - The pack probability strategy
    * @returns Probability of getting at least one new card in a god pack
    */
   private computeGodPackChance(
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
-    cardsPerPack: number,
+    strategy: PackProbabilityStrategy,
   ): number {
     const { godPackCards, missingGodPackCards } = this.filterGodPackCards(
       boosterCards,
       missingCards,
+      strategy,
     );
 
     if (godPackCards.length === 0 || missingGodPackCards.length === 0) {
@@ -366,7 +359,7 @@ export class PokemonTcgPocketProbabilityService {
     const probabilityNoNewCardInOneSlot = 1.0 - probabilityNewCardInOneSlot;
     const probabilityNoNewCardInPack = Math.pow(
       probabilityNoNewCardInOneSlot,
-      cardsPerPack,
+      strategy.cardsPerPack,
     );
 
     return 1.0 - probabilityNoNewCardInPack;
@@ -378,58 +371,79 @@ export class PokemonTcgPocketProbabilityService {
   private filterGodPackCards(
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
+    strategy: PackProbabilityStrategy,
   ): {
     godPackCards: PokemonCardModel[];
     missingGodPackCards: PokemonCardModel[];
   } {
     const godPackCards = boosterCards.filter((card) =>
-      this.isGodPackCard(card),
+      this.isGodPackCard(card, strategy),
     );
     const missingGodPackCards = missingCards.filter((card) =>
-      this.isGodPackCard(card),
+      this.isGodPackCard(card, strategy),
     );
 
     return { godPackCards, missingGodPackCards };
   }
 
   /**
-   * Checks if a card is eligible for god packs
+   * Checks if a card is eligible for god packs based on the strategy's configuration
    */
-  private isGodPackCard(card: PokemonCardModel): boolean {
-    return (
-      card.rarity !== null &&
-      GOD_PACK_RARITIES.has(card.rarity) &&
-      !card.isSixPackOnly
-    );
+  private isGodPackCard(
+    card: PokemonCardModel,
+    strategy: PackProbabilityStrategy,
+  ): boolean {
+    // Check if card's rarity is in strategy's god pack rarities
+    if (card.rarity === null || !strategy.godPackRarities.has(card.rarity)) {
+      return false;
+    }
+
+    // For flag-based filtering, exclude isSixPackOnly cards from god packs
+    // For rarity-based filtering, ignore the isSixPackOnly flag
+    if (strategy.sixthCardFilterMode === 'flag-based' && card.isSixPackOnly) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
    * Computes probability of a new card in the sixth slot of a six-card pack.
-   * Uses the strategy's slot 6 distribution and sixPackConfig to determine eligibility.
+   * Uses the strategy's slot 6 distribution and sixthCardFilterMode to determine eligibility.
    */
   private computeNewCardProbabilityInSixthSlot(
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
     strategy: PackProbabilityStrategy,
   ): number {
-    if (!strategy.sixPackConfig) {
+    if (!strategy.sixthCardFilterMode) {
       return 0.0;
     }
 
-    const slot6Distribution = strategy.getSlotDistribution(6);
+    const slot6Distribution = strategy.slotDistributions[6];
+    if (!slot6Distribution) {
+      return 0.0;
+    }
+
     let probabilityNewCard = 0.0;
 
     for (const [rarity, weight] of slot6Distribution) {
-      const allCards = boosterCards.filter(
-        (c) =>
-          c.isSixPackOnly === strategy.sixPackConfig!.useIsSixPackOnly &&
-          c.rarity === rarity,
-      );
-      const missingCardsInRarity = missingCards.filter(
-        (c) =>
-          c.isSixPackOnly === strategy.sixPackConfig!.useIsSixPackOnly &&
-          c.rarity === rarity,
-      );
+      let allCards: PokemonCardModel[];
+      let missingCardsInRarity: PokemonCardModel[];
+
+      if (strategy.sixthCardFilterMode === 'flag-based') {
+        // Filter by isSixPackOnly flag
+        allCards = boosterCards.filter(
+          (c) => c.isSixPackOnly === true && c.rarity === rarity,
+        );
+        missingCardsInRarity = missingCards.filter(
+          (c) => c.isSixPackOnly === true && c.rarity === rarity,
+        );
+      } else {
+        // rarity-based: Use all cards of this rarity
+        allCards = boosterCards.filter((c) => c.rarity === rarity);
+        missingCardsInRarity = missingCards.filter((c) => c.rarity === rarity);
+      }
 
       if (allCards.length > 0) {
         probabilityNewCard +=
@@ -449,14 +463,22 @@ export class PokemonTcgPocketProbabilityService {
     rarity: Rarity,
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
+    strategy: PackProbabilityStrategy,
   ): number {
-    // Treat isSixPackOnly cards as non-existent for slots 1–5 and god packs
-    const cardsInRarity = boosterCards.filter(
-      (card) => card.rarity === rarity && !card.isSixPackOnly,
-    );
-    const missingCardsInRarity = missingCards.filter(
-      (card) => card.rarity === rarity && !card.isSixPackOnly,
-    );
+    // For flag-based filtering, exclude isSixPackOnly cards
+    // For rarity-based filtering or strategies without sixth card, ignore the isSixPackOnly flag
+    const isFlagBasedFiltering = strategy.sixthCardFilterMode === 'flag-based';
+
+    const rarityMatches = (card: PokemonCardModel) => card.rarity === rarity;
+    const rarityMatchesAndNotSixPackOnly = (card: PokemonCardModel) =>
+      card.rarity === rarity && !card.isSixPackOnly;
+
+    const cardFilter = isFlagBasedFiltering
+      ? rarityMatchesAndNotSixPackOnly
+      : rarityMatches;
+
+    const cardsInRarity = boosterCards.filter(cardFilter);
+    const missingCardsInRarity = missingCards.filter(cardFilter);
 
     if (cardsInRarity.length === 0) {
       return 0.0;
@@ -473,13 +495,19 @@ export class PokemonTcgPocketProbabilityService {
     distribution: ReadonlyMap<Rarity, number>,
     boosterCards: PokemonCardModel[],
     missingCards: PokemonCardModel[],
+    strategy: PackProbabilityStrategy,
   ): number {
     let probabilityNoNewCard = 0.0;
 
     for (const [rarity, probability] of distribution) {
       const probabilityNoNewCardInRarity =
         1.0 -
-        this.probabilityOfNewCardInRarity(rarity, boosterCards, missingCards);
+        this.probabilityOfNewCardInRarity(
+          rarity,
+          boosterCards,
+          missingCards,
+          strategy,
+        );
       probabilityNoNewCard += probability * probabilityNoNewCardInRarity;
     }
 
@@ -492,17 +520,24 @@ export class PokemonTcgPocketProbabilityService {
    */
   private async calculateNormalPackSingleCardProbability(
     targetCard: PokemonCardModel,
-    countsAdapter: BoosterCardCountsAdapter,
+    boosterId: number,
     strategy: PackProbabilityStrategy,
   ): Promise<number> {
     let probabilityNoTarget = 1.0;
 
     for (let slot = 1; slot <= strategy.cardsPerPack; slot++) {
-      const distribution = strategy.getSlotDistribution(slot);
+      const distribution =
+        strategy.slotDistributions[
+          slot as keyof typeof strategy.slotDistributions
+        ];
+      if (!distribution) {
+        throw new Error(`Slot ${slot} not defined for strategy`);
+      }
       const slotProb = await this.calculateSlotProbabilityFromDistribution(
         targetCard,
         distribution,
-        countsAdapter,
+        boosterId,
+        strategy,
       );
       probabilityNoTarget *= 1.0 - slotProb;
     }
@@ -515,25 +550,25 @@ export class PokemonTcgPocketProbabilityService {
    */
   private async calculateGodPackSingleCardProbability(
     targetCard: PokemonCardModel,
-    countsAdapter: BoosterCardCountsAdapter,
-    cardsPerPack: number,
+    boosterId: number,
+    strategy: PackProbabilityStrategy,
   ): Promise<number> {
-    // Check if target card can appear in god packs
-    if (
-      !targetCard.rarity ||
-      !GOD_PACK_RARITIES.has(targetCard.rarity) ||
-      targetCard.isSixPackOnly
-    ) {
+    // Check if target card can appear in god packs using strategy's configuration
+    if (!this.isGodPackCard(targetCard, strategy)) {
       return 0.0;
     }
 
-    const godPackEligibleCount = await countsAdapter.countGodPackEligible();
+    const godPackEligibleCount =
+      await this.repository.countGodPackEligibleByBooster(
+        boosterId,
+        strategy.godPackRarities,
+      );
     if (godPackEligibleCount === 0) return 0.0;
 
     // Probability = 1 - (probability of NOT getting target card in any slot)
     const probNotGettingCard = Math.pow(
       (godPackEligibleCount - 1) / godPackEligibleCount,
-      cardsPerPack,
+      strategy.cardsPerPack,
     );
 
     return 1.0 - probNotGettingCard;
@@ -545,7 +580,7 @@ export class PokemonTcgPocketProbabilityService {
    */
   private async calculateSixPackSingleCardProbability(
     targetCard: PokemonCardModel,
-    countsAdapter: BoosterCardCountsAdapter,
+    boosterId: number,
     strategy: PackProbabilityStrategy,
   ): Promise<number> {
     // Probability of no target card in slots 1–5 (reuse normal pack logic)
@@ -553,16 +588,16 @@ export class PokemonTcgPocketProbabilityService {
       1.0 -
       (await this.calculateNormalPackSingleCardProbability(
         targetCard,
-        countsAdapter,
+        boosterId,
         strategy,
       ));
 
     // Probability of target card in slot 6
     let slot6Prob = 0.0;
-    if (strategy.sixPackConfig) {
+    if (strategy.sixthCardFilterMode) {
       slot6Prob = await this.calculateSixthSlotProbability(
         targetCard,
-        countsAdapter,
+        boosterId,
         strategy,
       );
     }
@@ -577,10 +612,19 @@ export class PokemonTcgPocketProbabilityService {
   private async calculateSlotProbabilityFromDistribution(
     targetCard: PokemonCardModel,
     distribution: ReadonlyMap<Rarity, number>,
-    countsAdapter: BoosterCardCountsAdapter,
+    boosterId: number,
+    strategy: PackProbabilityStrategy,
   ): Promise<number> {
-    if (targetCard.isSixPackOnly || !targetCard.rarity) {
-      return 0.0; // Excluded from normal slots
+    if (!targetCard.rarity) {
+      return 0.0;
+    }
+
+    // For flag-based filtering, exclude isSixPackOnly cards from slots 1-5
+    // For rarity-based filtering, ignore the isSixPackOnly flag
+    const shouldExcludeSixPackOnly =
+      strategy.sixthCardFilterMode === 'flag-based';
+    if (shouldExcludeSixPackOnly && targetCard.isSixPackOnly) {
+      return 0.0; // Excluded from normal slots in flag-based mode
     }
 
     const rarityWeight = distribution.get(targetCard.rarity);
@@ -588,7 +632,16 @@ export class PokemonTcgPocketProbabilityService {
       return 0.0; // Rarity not in this slot's distribution
     }
 
-    const count = await countsAdapter.countByRarity(targetCard.rarity, false);
+    const count = shouldExcludeSixPackOnly
+      ? await this.repository.countByBoosterRarityFilteringSixPackFlag(
+          boosterId,
+          targetCard.rarity,
+          false,
+        )
+      : await this.repository.countByBoosterRarity(
+          boosterId,
+          targetCard.rarity,
+        );
     return count > 0 ? rarityWeight * (1.0 / count) : 0.0;
   }
 
@@ -597,28 +650,40 @@ export class PokemonTcgPocketProbabilityService {
    */
   private async calculateSixthSlotProbability(
     targetCard: PokemonCardModel,
-    countsAdapter: BoosterCardCountsAdapter,
+    boosterId: number,
     strategy: PackProbabilityStrategy,
   ): Promise<number> {
-    if (!targetCard.rarity || !strategy.sixPackConfig) {
+    if (!targetCard.rarity) {
       return 0.0;
     }
 
-    // Check if card matches the sixth card eligibility criteria
-    if (strategy.sixPackConfig.useIsSixPackOnly && !targetCard.isSixPackOnly) {
+    const slot6Distribution = strategy.slotDistributions[6];
+    if (!slot6Distribution) {
       return 0.0;
     }
 
-    const slot6Distribution = strategy.getSlotDistribution(6);
     const rarityWeight = slot6Distribution.get(targetCard.rarity);
     if (!rarityWeight || rarityWeight === 0.0) {
       return 0.0; // Rarity not eligible for slot 6
     }
 
-    const count = await countsAdapter.countByRarity(
-      targetCard.rarity,
-      strategy.sixPackConfig.useIsSixPackOnly,
-    );
+    let count: number;
+    if (strategy.sixthCardFilterMode === 'flag-based') {
+      // Only count cards where isSixPackOnly=true
+      if (!targetCard.isSixPackOnly) return 0.0;
+      count = await this.repository.countByBoosterRarityFilteringSixPackFlag(
+        boosterId,
+        targetCard.rarity,
+        true,
+      );
+    } else {
+      // rarity-based: Count all cards of this rarity (including isSixPackOnly)
+      count = await this.repository.countByBoosterRarity(
+        boosterId,
+        targetCard.rarity,
+      );
+    }
+
     return count > 0 ? rarityWeight * (1.0 / count) : 0.0;
   }
 }
