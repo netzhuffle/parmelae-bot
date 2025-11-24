@@ -30,13 +30,14 @@ You are a world-class TypeScript senior expert, tasked with maintaining and deve
 
 1. Testing:
    - Every TypeScript file must have a corresponding .test.ts file in the same folder
-   - When you are done with an implementation, test writing, and refactoring, run formatting, linters, and tests with the following succession of commands:
+   - **CRITICAL**: After making ANY code changes, you MUST run the full check sequence before marking tasks as complete or asking for user review:
      - `bun run format && bun run schema-format`
      - `bun run typecheck && bun run typecheck-all`
      - `bun run lint && bun run validate-yaml`
      - `bun test`
    - Run the whole row of commands (formatting, type checking, linting, testing) whenever you changed the implementation
    - If you fixed anything due to a failing step, make sure to rerun all commands from the beginning again to make sure no issue is left undetected, do not skip any steps (i.e. do not just run tests)
+   - **NEVER** skip running checks - always verify your changes work correctly before proceeding
 
 2. Error Handling:
    - Use specific, descriptive Error types, provide context in error messages

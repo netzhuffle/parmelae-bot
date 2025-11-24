@@ -30,6 +30,39 @@ alwaysApply: false
   }
   ```
 
+## Inversify Autobind Configuration
+
+The project uses `autobind: true` in the Inversify container configuration.
+
+**What this means:**
+- Classes decorated with `@injectable()` are **automatically registered** in the container
+- No explicit `container.bind()` call is needed for these classes
+- Constructor dependencies are automatically resolved
+
+**When explicit binding IS needed:**
+- Binding interfaces to concrete implementations
+- Using factory functions or dynamic values (e.g., `toDynamicValue()`)
+- Binding constants or symbols (e.g., `POKEMON_TCGP_YAML_SYMBOL`)
+- Overriding default autobind behavior
+
+**Example - Autobind (no manual binding):**
+```typescript
+@injectable()
+export class PokemonTcgPocketService {
+  constructor(private readonly repo: PokemonTcgPocketRepository) {}
+}
+// ✓ Both classes automatically registered, no container.bind() needed
+```
+
+**Example - Manual binding (dynamic value):**
+```typescript
+container.bind(POKEMON_TCGP_YAML_SYMBOL).toDynamicValue(async () => {
+  const { default: sets } = await import('../resources/tcgpcards.yaml');
+  return sets;
+});
+// ✓ Manual binding needed for dynamic import
+```
+
 ## Common Anti-Patterns
 
 - ❌ **DON'T:** Create dependencies manually with `new`
