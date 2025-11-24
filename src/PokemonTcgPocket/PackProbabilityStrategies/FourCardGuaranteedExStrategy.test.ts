@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, expect } from 'bun:test';
 import { FourCardGuaranteedExStrategy } from './FourCardGuaranteedExStrategy.js';
-import { Rarity } from '../generated/prisma/enums.js';
+import { Rarity } from '../../generated/prisma/enums.js';
 
 describe('FourCardGuaranteedExStrategy', () => {
   let strategy: FourCardGuaranteedExStrategy;
@@ -16,13 +16,13 @@ describe('FourCardGuaranteedExStrategy', () => {
 
     it('should validate all distributions sum to 1.0', () => {
       // If constructor doesn't throw, distributions are valid
-      expect(strategy.getCardsPerPack()).toBe(4);
+      expect(strategy.cardsPerPack).toBe(4);
     });
   });
 
-  describe('getCardsPerPack', () => {
-    it('should return 4', () => {
-      expect(strategy.getCardsPerPack()).toBe(4);
+  describe('cardsPerPack', () => {
+    it('should be 4', () => {
+      expect(strategy.cardsPerPack).toBe(4);
     });
   });
 

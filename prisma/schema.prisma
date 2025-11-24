@@ -119,18 +119,15 @@ model PokemonSet {
 }
 
 model PokemonBooster {
-  id                Int                      @id @default(autoincrement())
-  name              String
-  set               PokemonSet               @relation(fields: [setId], references: [id])
-  setId             Int
-  probabilitiesType BoosterProbabilitiesType @default(NO_SHINY_RARITY)
-  cards             PokemonCard[]
-  godPackCards      PokemonCard[]            @relation("GodPackBooster")
+  id           Int           @id @default(autoincrement())
+  name         String
+  set          PokemonSet    @relation(fields: [setId], references: [id])
+  setId        Int
+  cards        PokemonCard[]
+  godPackCards PokemonCard[] @relation("GodPackBooster")
 
   @@unique([setId, name])
   @@index([setId])
-  @@index([probabilitiesType])
-  @@index([setId, probabilitiesType])
 }
 
 model PokemonCard {
@@ -204,22 +201,6 @@ enum Rarity {
   TWO_SHINY
   /// Crown rare (symbol: ♛)
   CROWN
-}
-
-/// Booster pack probability calculation types.
-/// Determines pack structure, card counts, and probability distributions.
-enum BoosterProbabilitiesType {
-  /// Standard 5-card packs without shiny rarities, has god pack mechanics
-  NO_SHINY_RARITY
-  /// Standard 5-card packs with shiny rarities and god pack mechanics
-  DEFAULT
-  /// 5-card packs with potential 6th card from six-pack-only pool, has god pack mechanics
-  POTENTIAL_SIXTH_CARD
-  /// 4-card packs with guaranteed EX cards and foil rarities
-  /// - Always exactly 4 cards (not 5)
-  /// - Triggered by presence of foil rarity cards
-  /// - Uses FourCardGuaranteedExStrategy for probability calculations
-  FOUR_CARDS_WITH_GUARANTEED_EX
 }
 
 enum OwnershipStatus {

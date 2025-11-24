@@ -10,13 +10,22 @@ import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 import { ToolContext } from '../ChatGptAgentService.js';
 import { createTestToolConfig } from '../ChatGptAgentService.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
+import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
+import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 
 describe('pokemonCardSearch', () => {
   let repository: PokemonTcgPocketRepositoryFake;
   let config: { configurable: ToolContext };
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
-    const probabilityService = new PokemonTcgPocketProbabilityService();
+    const probabilityService = new PokemonTcgPocketProbabilityService(
+      new FiveCardsWithoutShinyStrategy(),
+      new FiveCardsStrategy(),
+      new BabyAsPotentialSixthCardStrategy(),
+      new FourCardGuaranteedExStrategy(),
+    );
     const service = new PokemonTcgPocketService(
       probabilityService,
       repository as unknown as PokemonTcgPocketRepository,

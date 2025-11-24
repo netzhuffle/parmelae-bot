@@ -8,6 +8,10 @@ import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonT
 import { pokemonCardRangeAddTool } from './pokemonCardRangeAddTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { OwnershipStatus } from '../generated/prisma/enums.js';
+import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
+import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 
 describe('pokemonCardRangeAdd', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -16,7 +20,12 @@ describe('pokemonCardRangeAdd', () => {
 
   beforeEach(async () => {
     repository = new PokemonTcgPocketRepositoryFake();
-    probabilityService = new PokemonTcgPocketProbabilityService();
+    probabilityService = new PokemonTcgPocketProbabilityService(
+      new FiveCardsWithoutShinyStrategy(),
+      new FiveCardsStrategy(),
+      new BabyAsPotentialSixthCardStrategy(),
+      new FourCardGuaranteedExStrategy(),
+    );
     config = createTestToolConfig({
       userId: BigInt(1),
       pokemonTcgPocketService: new PokemonTcgPocketService(

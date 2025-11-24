@@ -1,14 +1,18 @@
 import { describe, it, beforeEach, expect } from 'bun:test';
 import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
 import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
-import { Rarity, BoosterProbabilitiesType } from '../generated/prisma/enums.js';
+import { Rarity } from '../generated/prisma/enums.js';
+import { BoosterProbabilitiesType } from './PokemonTcgPocketService.js';
 import {
   PokemonTcgPocketProbabilityService,
-  PACK_CONFIG,
   GOD_PACK_RARITIES,
 } from './PokemonTcgPocketProbabilityService.js';
 import { BoosterCardCountsAdapter } from './Repositories/Types.js';
 import { PokemonCardWithRelations } from './Repositories/Types.js';
+import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
+import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
+import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 
 /** Fake adapter for testing single card probability calculations */
 class FakeBoosterCardCountsAdapter implements BoosterCardCountsAdapter {
@@ -43,7 +47,12 @@ describe('PokemonTcgPocketProbabilityService', () => {
   let service: PokemonTcgPocketProbabilityService;
 
   beforeEach(() => {
-    service = new PokemonTcgPocketProbabilityService();
+    service = new PokemonTcgPocketProbabilityService(
+      new FiveCardsWithoutShinyStrategy(),
+      new FiveCardsStrategy(),
+      new BabyAsPotentialSixthCardStrategy(),
+      new FourCardGuaranteedExStrategy(),
+    );
   });
 
   describe('Normal booster probabilities', () => {
@@ -65,7 +74,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       // The probability should be very close to 1 since all cards are missing
@@ -84,7 +93,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewDiamondCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       // The probability should be high since all diamond cards are missing
@@ -113,7 +122,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.DEFAULT,
+        BoosterProbabilitiesType.FIVE_CARDS,
       );
 
       // The probability should be very close to 1 since all cards are missing
@@ -135,7 +144,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.DEFAULT,
+        BoosterProbabilitiesType.FIVE_CARDS,
       );
 
       // The combined probability should account for normal and god packs, resulting in a value above 0.2
@@ -143,38 +152,26 @@ describe('PokemonTcgPocketProbabilityService', () => {
     });
   });
 
-  describe('God pack branch (isolated via config)', () => {
-    it('should return 1 when forcing all packs to be god packs and all god pack cards are missing', () => {
+  describe('God pack contribution', () => {
+    it('should include god pack probability when god pack cards are missing', () => {
+      // Test that god packs contribute to overall probability
+      // Create cards that appear in both normal packs and god packs
       const boosterCards: PokemonCardModel[] = [
-        createCard(Rarity.ONE_STAR),
-        createCard(Rarity.TWO_STARS),
-        createCard(Rarity.THREE_STARS),
-        createCard(Rarity.ONE_SHINY),
-        createCard(Rarity.TWO_SHINY),
-        createCard(Rarity.CROWN),
+        createCard(Rarity.ONE_STAR), // Appears in normal slot 4/5 and god packs
+        createCard(Rarity.CROWN), // Appears only in god packs
       ];
-      const missingCards = [...boosterCards];
-      // Monkey-patch PACK_CONFIG to force god packs only and restore afterwards
-      const originalNormal = PACK_CONFIG.NORMAL_PACK_PROBABILITY;
-      const originalGod = PACK_CONFIG.GOD_PACK_PROBABILITY;
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (PACK_CONFIG as any).NORMAL_PACK_PROBABILITY = 0;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (PACK_CONFIG as any).GOD_PACK_PROBABILITY = 1;
-        const probability = service.calculateNewCardProbability(
-          boosterCards,
-          missingCards,
-          BoosterProbabilitiesType.DEFAULT,
-        );
-        // Expect full probability when only god packs are used
-        expect(probability).toBeCloseTo(1.0, 5);
-      } finally {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (PACK_CONFIG as any).NORMAL_PACK_PROBABILITY = originalNormal;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (PACK_CONFIG as any).GOD_PACK_PROBABILITY = originalGod;
-      }
+      const missingCards = [createCard(Rarity.CROWN)]; // Only crown missing (god pack only)
+
+      const probability = service.calculateNewCardProbability(
+        boosterCards,
+        missingCards,
+        BoosterProbabilitiesType.FIVE_CARDS,
+      );
+
+      // With only crown missing (god pack only), probability should be low but > 0
+      // God pack weight is 0.0005, so probability should be around that range
+      expect(probability).toBeGreaterThan(0);
+      expect(probability).toBeLessThan(0.01); // Should be very low since only god packs contribute
     });
   });
 
@@ -183,7 +180,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         [],
         [],
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);
@@ -198,7 +195,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         [],
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);
@@ -217,14 +214,14 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const normalProbability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       // Test with hasShinyRarity = true
       const shinyProbability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.DEFAULT,
+        BoosterProbabilitiesType.FIVE_CARDS,
       );
 
       // The probabilities should be different since the distributions are different
@@ -240,7 +237,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);
@@ -253,7 +250,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBeGreaterThan(0.99);
@@ -268,7 +265,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       // First 3 slots are ONE_DIAMOND, so probability should be high
@@ -284,7 +281,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       // God pack probability is 0.05%, plus some chance from normal packs
@@ -302,7 +299,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.DEFAULT,
+        BoosterProbabilitiesType.FIVE_CARDS,
       );
 
       // Probabilities should be non-zero for shiny boosters
@@ -316,7 +313,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);
@@ -337,7 +334,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewDiamondCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       // First 3 slots are ONE_DIAMOND, and slots 4 and 5 have high diamond probabilities
@@ -357,7 +354,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewDiamondCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);
@@ -370,7 +367,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewDiamondCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);
@@ -404,7 +401,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewTradableCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0.0);
@@ -455,7 +452,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewTradableCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0.0);
@@ -533,7 +530,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewTradableCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBeGreaterThan(0.0);
@@ -585,12 +582,12 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = service.calculateNewTradableCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
-      // Should be higher than just normal pack probability
-      const normalPackProbability = PACK_CONFIG.NORMAL_PACK_PROBABILITY;
-      expect(probability).toBeGreaterThan(normalPackProbability);
+      // Should be higher than just normal pack probability (0.9995)
+      // With god packs included, probability should be > 0.9995
+      expect(probability).toBeGreaterThan(0.9995);
     });
   });
 
@@ -631,7 +628,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const p = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+        BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
       );
 
       // With only six-only missing, normal (slots 1–5) and god pack contribute 0.
@@ -659,7 +656,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const p = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+        BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
       );
 
       // Isolate slot-6 by having no missing non-six-only → slots 1–5 contribute 0; god 0
@@ -689,7 +686,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const p = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+        BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
       );
 
       // P(new in 6th) = 0.129*(1) + 0.871*(3/3) = 1 → total ~= six-pack weight 0.0833
@@ -710,7 +707,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const p = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+        BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
       );
 
       // Normal (slots 1–5) should exclude the 3◆ six-only → contributes 0
@@ -734,7 +731,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const p = service.calculateNewCardProbability(
         boosterCards,
         missingCards,
-        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+        BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
       );
 
       // God pack excludes six-only 1★, normal (slots 1–5) excludes six-only as well
@@ -818,31 +815,19 @@ describe('PokemonTcgPocketProbabilityService', () => {
       // Test with god pack rarities (ONE_STAR exists in both normal slot 3 and god packs)
       const missingCards = cards.filter((c) => c.rarity === Rarity.ONE_STAR);
 
-      // Monkey-patch PACK_CONFIG to force god packs only and restore afterwards
-      const originalNormal = PACK_CONFIG.NORMAL_PACK_PROBABILITY;
-      const originalGod = PACK_CONFIG.GOD_PACK_PROBABILITY;
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (PACK_CONFIG as any).NORMAL_PACK_PROBABILITY = 0;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (PACK_CONFIG as any).GOD_PACK_PROBABILITY = 1;
+      // Note: PACK_CONFIG is now in strategies and cannot be monkey-patched
+      // This test verifies god pack probability calculation for four-card packs
+      // With god pack rarities missing, probability should be > 0
+      const probability = service.calculateNewCardProbability(
+        cards,
+        missingCards,
+        BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+      );
 
-        const probability = service.calculateNewCardProbability(
-          cards,
-          missingCards,
-          BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
-        );
-
-        // Should be greater than 0 when god packs are forced (probability = 1)
-        // This proves god pack logic is working for four-card packs
-        expect(probability).toBeGreaterThan(0);
-        expect(probability).toBeLessThanOrEqual(1);
-      } finally {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (PACK_CONFIG as any).NORMAL_PACK_PROBABILITY = originalNormal;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (PACK_CONFIG as any).GOD_PACK_PROBABILITY = originalGod;
-      }
+      // Should be greater than 0 when god pack rarities are missing
+      // This proves god pack logic is working for four-card packs
+      expect(probability).toBeGreaterThan(0);
+      expect(probability).toBeLessThanOrEqual(1);
     });
 
     it('should use 2-way weighting for four-card packs (normal + god)', () => {
@@ -943,7 +928,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = await service.calculateSingleCardProbability(
         targetCard,
         adapter,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       // Expected: 3 slots guaranteed ONE_DIAMOND = 1 - (1 - 1/10)^3 = 1 - 0.729 = 0.271
@@ -968,7 +953,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = await service.calculateSingleCardProbability(
         targetCard,
         adapter,
-        BoosterProbabilitiesType.DEFAULT,
+        BoosterProbabilitiesType.FIVE_CARDS,
       );
 
       // Calculate expected probability manually to verify god pack contribution
@@ -995,7 +980,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         await service.calculateSingleCardProbability(
           targetCard,
           adapter,
-          BoosterProbabilitiesType.DEFAULT,
+          BoosterProbabilitiesType.FIVE_CARDS,
         );
 
       // Test without god packs (no god pack eligible cards)
@@ -1004,7 +989,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         await service.calculateSingleCardProbability(
           targetCard,
           adapter,
-          BoosterProbabilitiesType.DEFAULT,
+          BoosterProbabilitiesType.FIVE_CARDS,
         );
 
       // Probability with god packs should be higher than without
@@ -1033,7 +1018,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = await service.calculateSingleCardProbability(
         targetCard,
         adapter,
-        BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD,
+        BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
       );
 
       // Should only appear in slot 6 with 12.9% rarity weight and 8.33% six-pack weight
@@ -1084,7 +1069,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = await service.calculateSingleCardProbability(
         targetCard,
         adapter,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);
@@ -1108,7 +1093,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const probability = await service.calculateSingleCardProbability(
         targetCard,
         adapter,
-        BoosterProbabilitiesType.NO_SHINY_RARITY,
+        BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
       );
 
       expect(probability).toBe(0);

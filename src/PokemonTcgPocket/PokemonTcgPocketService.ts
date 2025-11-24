@@ -1,10 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
-import {
-  Rarity,
-  OwnershipStatus,
-  BoosterProbabilitiesType,
-} from '../generated/prisma/enums.js';
+import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
 import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
 import { PokemonBoosterModel } from '../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
@@ -31,6 +27,24 @@ import {
   NO_CARDS_FOUND_MESSAGE,
 } from './texts.js';
 
+/**
+ * Booster pack probability calculation types (TypeScript-only enum).
+ *
+ * Determines pack structure, card counts, and probability distributions.
+ * This enum is no longer persisted in the database; strategy selection
+ * is now based on set keys via SET_DEFINITIONS.
+ */
+export enum BoosterProbabilitiesType {
+  /** Standard 5-card packs without shiny rarities */
+  FIVE_CARDS_WITHOUT_SHINY = 'FIVE_CARDS_WITHOUT_SHINY',
+  /** Standard 5-card packs with shiny rarities */
+  FIVE_CARDS = 'FIVE_CARDS',
+  /** 5-card packs with potential 6th card from baby-exclusive pool */
+  BABY_AS_POTENTIAL_SIXTH_CARD = 'BABY_AS_POTENTIAL_SIXTH_CARD',
+  /** 4-card packs with guaranteed EX cards and foil rarities */
+  FOUR_CARDS_WITH_GUARANTEED_EX = 'FOUR_CARDS_WITH_GUARANTEED_EX',
+}
+
 /** Card ID regex pattern */
 const CARD_ID_PATTERN = /^([A-Za-z0-9-]+)-(\d{1,3})$/;
 
@@ -48,70 +62,109 @@ interface CardIdentifier {
   cardName?: string;
 }
 
-/** Set key values */
-export const SET_KEY_VALUES = [
-  'P-A',
-  'A1',
-  'A1a',
-  'A2',
-  'A2a',
-  'A2b',
-  'A3',
-  'A3a',
-  'A3b',
-  'A4',
-  'A4a',
-  'A4b',
-  'P-B',
-  'B1',
-] as const;
+/**
+ * Single source of truth for all set-level configuration.
+ *
+ * Contains set names, booster lists, and probability strategy types.
+ * All other set-related constants are derived from this configuration.
+ */
+export const SET_DEFINITIONS = {
+  'P-A': {
+    name: 'PROMO-A',
+    boosters: [] as const,
+  },
+  A1: {
+    name: 'Unschlagbare Gene',
+    boosters: ['Glurak', 'Mewtu', 'Pikachu'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
+  },
+  A1a: {
+    name: 'Mysteriöse Insel',
+    boosters: ['Mysteriöse Insel'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
+  },
+  A2: {
+    name: 'Kollision von Raum und Zeit',
+    boosters: ['Dialga', 'Palkia'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
+  },
+  A2a: {
+    name: 'Licht des Triumphs',
+    boosters: ['Licht des Triumphs'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS_WITHOUT_SHINY,
+  },
+  A2b: {
+    name: 'Glänzendes Festival',
+    boosters: ['Glänzendes Festival'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS,
+  },
+  A3: {
+    name: 'Hüter des Firmaments',
+    boosters: ['Solgaleo', 'Lunala'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS,
+  },
+  A3a: {
+    name: 'Dimensionale Krise',
+    boosters: ['Dimensionale Krise'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS,
+  },
+  A3b: {
+    name: 'Evoli-Hain',
+    boosters: ['Evoli-Hain'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS,
+  },
+  A4: {
+    name: 'Weisheit von Meer und Himmel',
+    boosters: ['Ho-Oh', 'Lugia'] as const,
+    probabilitiesType: BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
+  },
+  A4a: {
+    name: 'Verborgene Quelle',
+    boosters: ['Verborgene Quelle'] as const,
+    probabilitiesType: BoosterProbabilitiesType.BABY_AS_POTENTIAL_SIXTH_CARD,
+  },
+  A4b: {
+    name: 'Deluxepack-ex',
+    boosters: ['Deluxepack-ex'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX,
+  },
+  'P-B': {
+    name: 'PROMO-B',
+    boosters: [] as const,
+  },
+  B1: {
+    name: 'Mega-Aufstieg',
+    boosters: ['Mega-Garados', 'Mega-Lohgock', 'Mega-Altaria'] as const,
+    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS,
+  },
+} as const;
 
 /** Set key type */
-export type SetKey = (typeof SET_KEY_VALUES)[number];
+export type SetKey = keyof typeof SET_DEFINITIONS;
 
-/** Maps set keys to their names */
-export const SET_KEY_NAMES: Record<SetKey, string> = {
-  'P-A': 'PROMO-A',
-  A1: 'Unschlagbare Gene',
-  A1a: 'Mysteriöse Insel',
-  A2: 'Kollision von Raum und Zeit',
-  A2a: 'Licht des Triumphs',
-  A2b: 'Glänzendes Festival',
-  A3: 'Hüter des Firmaments',
-  A3a: 'Dimensionale Krise',
-  A3b: 'Evoli-Hain',
-  A4: 'Weisheit von Meer und Himmel',
-  A4a: 'Verborgene Quelle',
-  A4b: 'Deluxepack-ex',
-  'P-B': 'PROMO-B',
-  B1: 'Mega-Aufstieg',
-};
+/** Set key values (derived from SET_DEFINITIONS) */
+export const SET_KEY_VALUES = Object.keys(SET_DEFINITIONS) as SetKey[];
 
-/** Booster values */
+/** Maps set keys to their names (derived from SET_DEFINITIONS) */
+export const SET_KEY_NAMES: Record<SetKey, string> = Object.fromEntries(
+  Object.entries(SET_DEFINITIONS).map(([key, def]) => [key, def.name]),
+) as Record<SetKey, string>;
+
+/** Booster values (derived from SET_DEFINITIONS) */
 export const BOOSTER_VALUES = [
-  'Glurak',
-  'Mewtu',
-  'Pikachu',
-  'Mysteriöse Insel',
-  'Dialga',
-  'Palkia',
-  'Licht des Triumphs',
-  'Glänzendes Festival',
-  'Solgaleo',
-  'Lunala',
-  'Dimensionale Krise',
-  'Evoli-Hain',
-  'Ho-Oh',
-  'Lugia',
-  'Verborgene Quelle',
-  'Deluxepack-ex',
-  'Mega-Garados',
-  'Mega-Lohgock',
-  'Mega-Altaria',
+  ...new Set(Object.values(SET_DEFINITIONS).flatMap((def) => def.boosters)),
 ] as const;
 
-/** Booster type */
-export type Booster = (typeof BOOSTER_VALUES)[number];
+/** Maps set keys to their probability strategy types (derived from SET_DEFINITIONS) */
+export const SET_PROBABILITY_STRATEGY: Record<
+  SetKey,
+  BoosterProbabilitiesType | undefined
+> = Object.fromEntries(
+  Object.entries(SET_DEFINITIONS).map(([key, def]) => [
+    key,
+    'probabilitiesType' in def ? def.probabilitiesType : undefined,
+  ]),
+) as Record<SetKey, BoosterProbabilitiesType | undefined>;
 
 /** Ownership filter values */
 export const OWNERSHIP_FILTER_VALUES = [
@@ -123,31 +176,6 @@ export const OWNERSHIP_FILTER_VALUES = [
 
 /** Ownership filter type */
 export type OwnershipFilter = (typeof OWNERSHIP_FILTER_VALUES)[number];
-
-/**
- * Foil rarities for detection and classification.
- *
- * These rarities use the ✦ symbol suffix and trigger the
- * FOUR_CARDS_WITH_GUARANTEED_EX probabilitiesType when detected
- * in YAML data during booster synchronization.
- *
- * **Precedence:** Foil rarities have the highest precedence in booster type
- * determination, overriding shiny and six-pack mechanics.
- *
- * **Exclusions:** Boosters with foil cards cannot contain:
- * - ONE_SHINY rarity cards
- * - Six-pack-only cards (isSixPackOnly: true)
- * - God pack mechanics
- *
- * @see RARITY_MAP for symbol mappings (♢✦, ♢♢✦, ♢♢♢✦)
- * @see determineProbabilitiesType for precedence logic
- * @see FourCardGuaranteedExStrategy for four-card pack implementation
- */
-const FOIL_RARITIES = new Set<Rarity>([
-  Rarity.ONE_DIAMOND_FOIL, // ♢✦
-  Rarity.TWO_DIAMONDS_FOIL, // ♢♢✦
-  Rarity.THREE_DIAMONDS_FOIL, // ♢♢♢✦
-]);
 
 /** Service-layer ownership status with explicit missing state */
 export enum CardOwnershipStatus {
@@ -227,7 +255,6 @@ export type Sets = Record<string, SetData>;
  * **Foil Detection:** The presence of foil symbols (✦ suffix) triggers
  * the FOUR_CARDS_WITH_GUARANTEED_EX probabilitiesType during synchronization.
  *
- * @see FOIL_RARITIES for foil detection logic
  * @see Rarity enum for complete rarity definitions
  */
 export const RARITY_MAP: Record<string, Rarity> = {
@@ -380,11 +407,17 @@ export class PokemonTcgPocketService {
         firstBooster.id,
       );
 
+      const setKey = card.set.key as SetKey;
+      const probabilitiesType = SET_PROBABILITY_STRATEGY[setKey];
+      if (!probabilitiesType) {
+        // Set not in SET_DEFINITIONS (e.g., test sets), return N/A
+        return 'N/A';
+      }
       const probability =
         await this.probabilityService.calculateSingleCardProbability(
           card,
           countsAdapter,
-          firstBooster.probabilitiesType,
+          probabilitiesType,
         );
 
       return probability > 0 ? `${(probability * 100).toFixed(2)}%` : 'N/A';
@@ -579,92 +612,103 @@ export class PokemonTcgPocketService {
         };
       }),
       boosters: rawStats.sets
-        .flatMap(({ boosters }) =>
-          boosters.map(({ booster, cards }) => {
-            const cardsWithServiceStatus: CardWithOwnership[] = cards.map(
-              ({ card, ownershipStatus }) => ({
-                card,
-                ownershipStatus,
-              }),
-            );
+        .flatMap(({ set, boosters }) =>
+          boosters
+            .map(({ booster, cards }) => {
+              const cardsWithServiceStatus: CardWithOwnership[] = cards.map(
+                ({ card, ownershipStatus }) => ({
+                  card,
+                  ownershipStatus,
+                }),
+              );
 
-            const missingCards = cardsWithServiceStatus
-              .filter(
-                ({ ownershipStatus }) =>
-                  ownershipStatus !== CardOwnershipStatus.OWNED &&
-                  ownershipStatus !== CardOwnershipStatus.NOT_NEEDED,
-              )
-              .map(({ card }) => card);
-            const allCards = cardsWithServiceStatus.map(({ card }) => card);
+              const missingCards = cardsWithServiceStatus
+                .filter(
+                  ({ ownershipStatus }) =>
+                    ownershipStatus !== CardOwnershipStatus.OWNED &&
+                    ownershipStatus !== CardOwnershipStatus.NOT_NEEDED,
+                )
+                .map(({ card }) => card);
+              const allCards = cardsWithServiceStatus.map(({ card }) => card);
 
-            const diamondCards = cardsWithServiceStatus.filter(({ card }) =>
-              this.isCardOfRarity(card, [
-                Rarity.ONE_DIAMOND,
-                Rarity.TWO_DIAMONDS,
-                Rarity.THREE_DIAMONDS,
-                Rarity.FOUR_DIAMONDS,
-              ]),
-            );
+              const diamondCards = cardsWithServiceStatus.filter(({ card }) =>
+                this.isCardOfRarity(card, [
+                  Rarity.ONE_DIAMOND,
+                  Rarity.TWO_DIAMONDS,
+                  Rarity.THREE_DIAMONDS,
+                  Rarity.FOUR_DIAMONDS,
+                ]),
+              );
 
-            const tradableCards = cardsWithServiceStatus.filter(({ card }) =>
-              this.isCardOfRarity(card, [
-                Rarity.ONE_DIAMOND,
-                Rarity.TWO_DIAMONDS,
-                Rarity.THREE_DIAMONDS,
-                Rarity.FOUR_DIAMONDS,
-                Rarity.ONE_STAR,
-              ]),
-            );
+              const tradableCards = cardsWithServiceStatus.filter(({ card }) =>
+                this.isCardOfRarity(card, [
+                  Rarity.ONE_DIAMOND,
+                  Rarity.TWO_DIAMONDS,
+                  Rarity.THREE_DIAMONDS,
+                  Rarity.FOUR_DIAMONDS,
+                  Rarity.ONE_STAR,
+                ]),
+              );
 
-            return {
-              name: booster.name,
-              diamondOwned: diamondCards.filter(
-                ({ ownershipStatus }) =>
-                  ownershipStatus === CardOwnershipStatus.OWNED,
-              ).length,
-              diamondNotNeeded: diamondCards.filter(
-                ({ ownershipStatus }) =>
-                  ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
-              ).length,
-              diamondTotal: diamondCards.length,
-              newDiamondCardProbability:
-                this.probabilityService.calculateNewDiamondCardProbability(
-                  allCards,
-                  missingCards,
-                  booster.probabilitiesType,
-                ) * 100,
-              tradableOwned: tradableCards.filter(
-                ({ ownershipStatus }) =>
-                  ownershipStatus === CardOwnershipStatus.OWNED,
-              ).length,
-              tradableNotNeeded: tradableCards.filter(
-                ({ ownershipStatus }) =>
-                  ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
-              ).length,
-              tradableTotal: tradableCards.length,
-              newTradableCardProbability:
-                this.probabilityService.calculateNewTradableCardProbability(
-                  allCards,
-                  missingCards,
-                  booster.probabilitiesType,
-                ) * 100,
-              allOwned: cardsWithServiceStatus.filter(
-                ({ ownershipStatus }) =>
-                  ownershipStatus === CardOwnershipStatus.OWNED,
-              ).length,
-              allNotNeeded: cardsWithServiceStatus.filter(
-                ({ ownershipStatus }) =>
-                  ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
-              ).length,
-              allTotal: cardsWithServiceStatus.length,
-              newCardProbability:
-                this.probabilityService.calculateNewCardProbability(
-                  allCards,
-                  missingCards,
-                  booster.probabilitiesType,
-                ) * 100,
-            };
-          }),
+              const setKey = set.key as SetKey;
+              const probabilitiesType = SET_PROBABILITY_STRATEGY[setKey];
+              // Skip boosters from sets not in SET_DEFINITIONS (e.g., test sets)
+              if (!probabilitiesType) {
+                return null;
+              }
+              return {
+                name: booster.name,
+                diamondOwned: diamondCards.filter(
+                  ({ ownershipStatus }) =>
+                    ownershipStatus === CardOwnershipStatus.OWNED,
+                ).length,
+                diamondNotNeeded: diamondCards.filter(
+                  ({ ownershipStatus }) =>
+                    ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+                ).length,
+                diamondTotal: diamondCards.length,
+                newDiamondCardProbability:
+                  this.probabilityService.calculateNewDiamondCardProbability(
+                    allCards,
+                    missingCards,
+                    probabilitiesType,
+                  ) * 100,
+                tradableOwned: tradableCards.filter(
+                  ({ ownershipStatus }) =>
+                    ownershipStatus === CardOwnershipStatus.OWNED,
+                ).length,
+                tradableNotNeeded: tradableCards.filter(
+                  ({ ownershipStatus }) =>
+                    ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+                ).length,
+                tradableTotal: tradableCards.length,
+                newTradableCardProbability:
+                  this.probabilityService.calculateNewTradableCardProbability(
+                    allCards,
+                    missingCards,
+                    probabilitiesType,
+                  ) * 100,
+                allOwned: cardsWithServiceStatus.filter(
+                  ({ ownershipStatus }) =>
+                    ownershipStatus === CardOwnershipStatus.OWNED,
+                ).length,
+                allNotNeeded: cardsWithServiceStatus.filter(
+                  ({ ownershipStatus }) =>
+                    ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+                ).length,
+                allTotal: cardsWithServiceStatus.length,
+                newCardProbability:
+                  this.probabilityService.calculateNewCardProbability(
+                    allCards,
+                    missingCards,
+                    probabilitiesType,
+                  ) * 100,
+              };
+            })
+            .filter(
+              (booster): booster is NonNullable<typeof booster> =>
+                booster !== null,
+            ),
         )
         .sort((a, b) => b.newCardProbability - a.newCardProbability),
     };
@@ -851,72 +895,6 @@ export class PokemonTcgPocketService {
     return boosters.filter((b): b is NonNullable<typeof b> => b !== null);
   }
 
-  /**
-   * Determines the booster probabilities type based on card content analysis.
-   *
-   * **Precedence Order (highest to lowest):**
-   * 1. **Foil cards** → `FOUR_CARDS_WITH_GUARANTEED_EX`
-   * 2. **Six-pack cards** → `POTENTIAL_SIXTH_CARD` (if also has shiny)
-   * 3. **Shiny cards** → `DEFAULT` (if no six-pack)
-   * 4. **Neither** → `NO_SHINY_RARITY`
-   *
-   * **Four-Card Pack Logic:**
-   * When foil rarities are detected, the booster uses a completely different
-   * pack structure with 4 cards instead of 5 and specific
-   * slot distributions that include foil rarities.
-   *
-   * **Exclusion Rules:**
-   * - Foil + Six-pack: Foil wins (four-card packs don't support six-pack mechanics)
-   * - Foil + Shiny: Foil wins (four-card packs take precedence)
-   * - Six-pack without Shiny: Invalid combination (throws error)
-   *
-   * @param hasShiny - Whether booster contains shiny rarity cards (✸, ✸✸)
-   * @param hasSix - Whether booster contains six-pack-only cards (isSixPackOnly: true)
-   * @param hasFoil - Whether booster contains foil rarity cards (♢✦, ♢♢✦, ♢♢♢✦)
-   * @returns The appropriate BoosterProbabilitiesType for probability calculations
-   *
-   * @example
-   * ```typescript
-   * // Foil cards always win precedence
-   * determineProbabilitiesType(true, true, true)
-   * // → FOUR_CARDS_WITH_GUARANTEED_EX
-   *
-   * // Standard shiny booster
-   * determineProbabilitiesType(true, false, false)
-   * // → DEFAULT
-   *
-   * // Six-pack booster (requires shiny)
-   * determineProbabilitiesType(true, true, false)
-   * // → POTENTIAL_SIXTH_CARD
-   * ```
-   *
-   * @throws {Error} When hasSix=true but hasShiny=false (invalid combination)
-   * @see FOIL_RARITIES for foil detection logic
-   * @see FourCardGuaranteedExStrategy for four-card pack implementation
-   * @see Task 61 for four-card pack requirements
-   */
-  private determineProbabilitiesType(
-    hasShiny: boolean,
-    hasSix: boolean,
-    hasFoil: boolean,
-  ): BoosterProbabilitiesType {
-    // Foil cards indicate four-card packs with guaranteed EX (highest precedence)
-    if (hasFoil) {
-      return BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX;
-    }
-
-    if (!hasShiny && !hasSix) return BoosterProbabilitiesType.NO_SHINY_RARITY;
-    if (hasShiny && !hasSix) return BoosterProbabilitiesType.DEFAULT;
-    if (hasShiny && hasSix)
-      return BoosterProbabilitiesType.POTENTIAL_SIXTH_CARD;
-
-    // This should never happen according to requirements, but throw a descriptive error
-    throw new Error(
-      `Invalid combination: hasShiny=${hasShiny}, hasSix=${hasSix}. ` +
-        'The combination of hasShiny=false and hasSix=true is not allowed.',
-    );
-  }
-
   private async synchronizeCards(
     setKey: string,
     setData: SetData,
@@ -925,66 +903,7 @@ export class PokemonTcgPocketService {
     // Create a set of valid booster names for this set
     const validBoosterNames = new Set(boosters.map((b) => b.name));
 
-    // Track which boosters contain shiny cards, foil cards, and can have packs with six cards
-    const boostersWithShinyCards = new Set<string>();
-    const boostersWithSixCardPacks = new Set<string>();
-    const boostersWithFoilCards = new Set<string>();
-
-    // First pass: Process all cards and track which boosters contain shiny cards and can have packs with six cards
-    for (const [cardNumberString, card] of Object.entries(setData.cards)) {
-      const cardNumber = parseInt(cardNumberString, 10);
-      if (isNaN(cardNumber)) {
-        throw new PokemonTcgPocketInvalidCardNumberError(
-          setKey,
-          cardNumberString,
-        );
-      }
-
-      const cardBoosterNames = this.convertToBoosterNameArray(
-        card,
-        validBoosterNames,
-        setKey,
-      );
-
-      // If card has shiny rarity, mark its boosters
-      if (card.rarity === '✸' || card.rarity === '✸✸') {
-        cardBoosterNames.forEach((name) => boostersWithShinyCards.add(name));
-      }
-
-      // If card has foil rarity, mark its boosters
-      if (card.rarity) {
-        const convertedRarity = RARITY_MAP[card.rarity];
-        if (convertedRarity && FOIL_RARITIES.has(convertedRarity)) {
-          cardBoosterNames.forEach((name) => boostersWithFoilCards.add(name));
-        }
-      }
-
-      // If card is exclusive to six-card packs, mark its boosters
-      if (card.isSixPackOnly === true) {
-        cardBoosterNames.forEach((name) => boostersWithSixCardPacks.add(name));
-      }
-    }
-
-    // Update probabilitiesType for boosters based on their characteristics
-    await Promise.all(
-      boosters.map((booster) => {
-        const hasShiny = boostersWithShinyCards.has(booster.name);
-        const hasSix = boostersWithSixCardPacks.has(booster.name);
-        const hasFoil = boostersWithFoilCards.has(booster.name);
-        const probabilitiesType = this.determineProbabilitiesType(
-          hasShiny,
-          hasSix,
-          hasFoil,
-        );
-
-        return this.repository.updateBoosterProbabilitiesType(
-          booster.id,
-          probabilitiesType,
-        );
-      }),
-    );
-
-    // Second pass: Create all cards
+    // Process all cards and create them
     for (const [cardNumberString, card] of Object.entries(setData.cards)) {
       const cardNumber = parseInt(cardNumberString, 10);
       if (isNaN(cardNumber)) {

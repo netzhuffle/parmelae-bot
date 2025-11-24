@@ -2,11 +2,7 @@ import { PrismaClient } from '../../generated/prisma/client.js';
 import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
 import { PokemonBoosterModel } from '../../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../../generated/prisma/models/PokemonCard.js';
-import {
-  Rarity,
-  OwnershipStatus,
-  BoosterProbabilitiesType,
-} from '../../generated/prisma/enums.js';
+import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
 import { injectable } from 'inversify';
 import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 import { PokemonTcgPocketNotFoundError } from '../Errors/PokemonTcgPocketNotFoundError.js';
@@ -503,7 +499,6 @@ export class PokemonTcgPocketRepository {
               id: booster.id,
               name: booster.name,
               setId: booster.setId,
-              probabilitiesType: booster.probabilitiesType,
             },
             cards: booster.cards.map((card) => ({
               card: {
@@ -560,25 +555,6 @@ export class PokemonTcgPocketRepository {
       throw new PokemonTcgPocketDatabaseError(
         'remove',
         `card ${cardId} from user ${userId}'s collection`,
-        this.formatError(error),
-      );
-    }
-  }
-
-  /** Updates the probabilitiesType field of a booster */
-  async updateBoosterProbabilitiesType(
-    boosterId: number,
-    probabilitiesType: BoosterProbabilitiesType,
-  ): Promise<PokemonBoosterModel> {
-    try {
-      return this.prisma.pokemonBooster.update({
-        where: { id: boosterId },
-        data: { probabilitiesType },
-      });
-    } catch (error) {
-      throw new PokemonTcgPocketDatabaseError(
-        'update',
-        `booster ${boosterId} probabilities type`,
         this.formatError(error),
       );
     }

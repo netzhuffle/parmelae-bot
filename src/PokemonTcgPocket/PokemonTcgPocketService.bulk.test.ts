@@ -3,6 +3,10 @@ import { PokemonTcgPocketService, Sets } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { OwnershipStatus } from '../generated/prisma/enums.js';
+import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
+import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
+import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 
 describe('PokemonTcgPocketService bulk operations', () => {
   let service: PokemonTcgPocketService;
@@ -11,7 +15,12 @@ describe('PokemonTcgPocketService bulk operations', () => {
 
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
-    probabilityService = new PokemonTcgPocketProbabilityService();
+    probabilityService = new PokemonTcgPocketProbabilityService(
+      new FiveCardsWithoutShinyStrategy(),
+      new FiveCardsStrategy(),
+      new BabyAsPotentialSixthCardStrategy(),
+      new FourCardGuaranteedExStrategy(),
+    );
     service = new PokemonTcgPocketService(
       probabilityService,
       repository,

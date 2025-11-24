@@ -8,6 +8,10 @@ import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
 import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
+import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
+import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 
 describe('pokemonCardStats', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -17,7 +21,12 @@ describe('pokemonCardStats', () => {
     config = createTestToolConfig({
       userId: BigInt(1),
       pokemonTcgPocketService: new PokemonTcgPocketService(
-        new PokemonTcgPocketProbabilityService(),
+        new PokemonTcgPocketProbabilityService(
+          new FiveCardsWithoutShinyStrategy(),
+          new FiveCardsStrategy(),
+          new BabyAsPotentialSixthCardStrategy(),
+          new FourCardGuaranteedExStrategy(),
+        ),
         repository,
         {} as Sets,
       ),

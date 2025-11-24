@@ -1,8 +1,4 @@
-import {
-  Rarity,
-  OwnershipStatus,
-  BoosterProbabilitiesType,
-} from '../../generated/prisma/enums.js';
+import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
 import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
 import { PokemonBoosterModel } from '../../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../../generated/prisma/models/PokemonCard.js';
@@ -14,7 +10,6 @@ import {
   OwnershipFilter,
   CardOwnershipStatus,
 } from '../PokemonTcgPocketService.js';
-import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
 export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
@@ -91,7 +86,6 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       id: this.nextId++,
       name,
       setId: set.id,
-      probabilitiesType: BoosterProbabilitiesType.NO_SHINY_RARITY,
     };
     this.boosters.set(`${set.id}_${name}`, booster);
     return Promise.resolve(booster);
@@ -653,25 +647,6 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     };
 
     return Promise.resolve(result);
-  }
-
-  /** Updates the probabilitiesType field of a booster */
-  async updateBoosterProbabilitiesType(
-    boosterId: number,
-    probabilitiesType: BoosterProbabilitiesType,
-  ): Promise<PokemonBoosterModel> {
-    const booster = Array.from(this.boosters.values()).find(
-      (b) => b.id === boosterId,
-    );
-    if (!booster) {
-      throw new PokemonTcgPocketDatabaseError(
-        'update',
-        `booster ${boosterId} probabilities type`,
-        'Booster not found',
-      );
-    }
-    booster.probabilitiesType = probabilitiesType;
-    return await Promise.resolve(booster);
   }
 
   // Count methods for probability calculations

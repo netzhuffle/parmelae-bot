@@ -1,12 +1,6 @@
-import { Rarity } from '../generated/prisma/enums.js';
-
-/** Interface for four-card pack probability strategies */
-export interface FourCardPackProbabilityStrategy {
-  /** Gets the number of cards per pack */
-  getCardsPerPack(): 4;
-  /** Gets the rarity distribution for a specific slot (1-4) */
-  getSlotDistribution(slot: 1 | 2 | 3 | 4): ReadonlyMap<Rarity, number>;
-}
+import { Rarity } from '../../generated/prisma/enums.js';
+import { injectable } from 'inversify';
+import { PackProbabilityStrategy } from './PackProbabilityStrategy.js';
 
 /**
  * Strategy for four-card packs with guaranteed EX cards.
@@ -38,14 +32,14 @@ export interface FourCardPackProbabilityStrategy {
  * - All slot distributions must sum to 1.0 (validated in constructor)
  * - No negative probabilities allowed
  *
- * @see BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX
- * @see FourCardPackProbabilityStrategy interface
- * @see Task 61 for implementation requirements
- * @see Task 53 for probability calculation patterns
  */
-export class FourCardGuaranteedExStrategy
-  implements FourCardPackProbabilityStrategy
-{
+@injectable()
+export class FourCardGuaranteedExStrategy implements PackProbabilityStrategy {
+  readonly cardsPerPack = 4;
+  readonly packWeights = {
+    normal: 0.9995,
+    god: 0.0005,
+  } as const;
   /** Slot 1: 100% ONE_DIAMOND */
   private readonly SLOT1_DISTRIBUTION = new Map<Rarity, number>([
     [Rarity.ONE_DIAMOND, 1.0],
@@ -83,11 +77,7 @@ export class FourCardGuaranteedExStrategy
     this.validateDistribution(this.SLOT4_DISTRIBUTION, 'Slot 4');
   }
 
-  getCardsPerPack(): 4 {
-    return 4;
-  }
-
-  getSlotDistribution(slot: 1 | 2 | 3 | 4): ReadonlyMap<Rarity, number> {
+  getSlotDistribution(slot: number): ReadonlyMap<Rarity, number> {
     switch (slot) {
       case 1:
         return this.SLOT1_DISTRIBUTION;
@@ -97,6 +87,10 @@ export class FourCardGuaranteedExStrategy
         return this.SLOT3_DISTRIBUTION;
       case 4:
         return this.SLOT4_DISTRIBUTION;
+      default:
+        throw new Error(
+          `Invalid slot ${slot} for FourCardGuaranteedExStrategy (expected 1-4)`,
+        );
     }
   }
 
