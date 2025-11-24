@@ -3763,7 +3763,7 @@
         "id": 73,
         "title": "Implement Set B1 Special Six-Card Pack Probability System with User Confirmation",
         "description": "Implement a new probability calculation system for set B1 and other non-A sets where six-card packs exclude ✸ and ✸✸ cards from normal distribution, guaranteeing the sixth card is always ✸ or ✸✸ rarity, with comprehensive user confirmation of all probability rates before implementation.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           60,
           63,
@@ -3779,7 +3779,7 @@
             "description": "Create an interactive prompt system to confirm all probability rates for the new six-card pack system before implementation.",
             "dependencies": [],
             "details": "Develop a user interface or CLI prompts that allow users to confirm six-card pack probability, sixth card rarity distribution, god pack probability, cards 1-5 distribution, and set detection. Present a clear breakdown of all probability components and allow modifications.\n<info added on 2025-11-23T01:43:48.249Z>\nBefore starting implementation, confirm all probability rates in chat:\n- Six-card pack probability\n- Sixth card rarity distribution (✸ vs ✸✸)\n- God pack probability\n- Cards 1-5 probability distribution\n- Set detection confirmation\n\nNo interactive system needs to be built - just ask the user here in chat before proceeding with implementation.\n</info added on 2025-11-23T01:43:48.249Z>\n<info added on 2025-11-23T01:44:00.090Z>\nBefore proceeding with implementation, ask the user in chat to confirm the following probability rates:\n- Six-card pack probability (vs other pack types)\n- Sixth card rarity distribution (✸ vs ✸✸)\n- God pack probability (for B1 and non-A sets)\n- Cards 1-5 probability distribution (excluding ✸ and ✸✸ rarities)\n- Set detection confirmation (all non-A sets, excluding promo sets)\n\nNo interactive system or code needs to be developed - just ask the user here in chat before proceeding with implementation.\n</info added on 2025-11-23T01:44:00.090Z>",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test all prompts for clarity, validation, and correct data capture."
           },
           {
@@ -3790,7 +3790,7 @@
               1
             ],
             "details": "Update PokemonTcgPocketProbabilityService to detect set keys not starting with 'A' (excluding promo sets). Implement separate logic for cards 1-5 (excluding ✸ and ✸✸ cards) and card 6 (only ✸ and ✸✸ cards). Maintain existing logic for 'A' sets and god packs.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test probability calculations for both new and existing systems."
           },
           {
@@ -3801,7 +3801,7 @@
               2
             ],
             "details": "Add a new probabilitiesType enum value: SPECIAL_SIXTH_CARD. Update booster entities to support this new type and ensure backward compatibility with existing probability systems.\n<info added on 2025-11-23T01:43:52.039Z>\nAdd new probabilitiesType enum value: 'SHINY_AS_POTENTIAL_SIXTH_CARD' (for the new B1 system). Rename existing enum values: 'POTENTIAL_SIXTH_CARD' to 'BABY_AS_POTENTIAL_SIXTH_CARD', 'NO_SHINY_RARITY' to 'FIVE_CARDS_WITHOUT_SHINY', and 'DEFAULT' to 'FIVE_CARDS'. Update all references to these enum values throughout the codebase, including Prisma schema, TypeScript code, and any migrations needed.\n</info added on 2025-11-23T01:43:52.039Z>",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test configuration updates and backward compatibility."
           },
           {
@@ -3812,7 +3812,7 @@
               3
             ],
             "details": "Ensure ✸ and ✸✸ cards are filtered from slots 1-5 calculations. Implement proper weighting for sixth card ✸/✸✸ selection. Handle god pack card distribution with ✸ and ✸✸ exclusions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test card distribution for correct exclusions and weighting."
           },
           {
@@ -3823,7 +3823,7 @@
               4
             ],
             "details": "Ensure CSV search probability display and booster sorting work correctly with the new system. Maintain compatibility with god pack mechanics for both old and new systems.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test integration points for correct display and sorting."
           }
         ]
@@ -3910,7 +3910,7 @@
       ],
       "created": "2025-11-22T17:28:44.087Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-23T15:19:12.761Z"
+      "updated": "2025-11-24T20:47:27.522Z"
     }
   }
 }

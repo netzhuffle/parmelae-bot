@@ -7,6 +7,7 @@ import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveC
 import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
+import { ShinyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
 import { BoosterProbabilitiesType } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
@@ -48,6 +49,7 @@ export class PokemonTcgPocketProbabilityService {
     private readonly fiveCardsStrategy: FiveCardsStrategy,
     private readonly babyAsPotentialSixthCardStrategy: BabyAsPotentialSixthCardStrategy,
     private readonly fourCardStrategy: FourCardGuaranteedExStrategy,
+    private readonly shinyAsPotentialSixthCardStrategy: ShinyAsPotentialSixthCardStrategy,
     private readonly repository: PokemonTcgPocketProbabilityRepository,
   ) {}
 
@@ -66,6 +68,8 @@ export class PokemonTcgPocketProbabilityService {
         return this.babyAsPotentialSixthCardStrategy;
       case BoosterProbabilitiesType.FOUR_CARDS_WITH_GUARANTEED_EX:
         return this.fourCardStrategy;
+      case BoosterProbabilitiesType.SHINY_AS_POTENTIAL_SIXTH_CARD:
+        return this.shinyAsPotentialSixthCardStrategy;
       default:
         throw new NotExhaustiveSwitchError(probabilitiesType);
     }

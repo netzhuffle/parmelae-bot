@@ -42,6 +42,8 @@ export enum BoosterProbabilitiesType {
   BABY_AS_POTENTIAL_SIXTH_CARD = 'BABY_AS_POTENTIAL_SIXTH_CARD',
   /** 4-card packs with guaranteed EX cards and foil rarities */
   FOUR_CARDS_WITH_GUARANTEED_EX = 'FOUR_CARDS_WITH_GUARANTEED_EX',
+  /** 5-card packs with potential 6th card from shiny rarities (B1 and future non-A sets) */
+  SHINY_AS_POTENTIAL_SIXTH_CARD = 'SHINY_AS_POTENTIAL_SIXTH_CARD',
 }
 
 /** Card ID regex pattern */
@@ -134,7 +136,7 @@ export const SET_DEFINITIONS = {
   B1: {
     name: 'Mega-Aufstieg',
     boosters: ['Mega-Garados', 'Mega-Lohgock', 'Mega-Altaria'] as const,
-    probabilitiesType: BoosterProbabilitiesType.FIVE_CARDS,
+    probabilitiesType: BoosterProbabilitiesType.SHINY_AS_POTENTIAL_SIXTH_CARD,
   },
 } as const;
 

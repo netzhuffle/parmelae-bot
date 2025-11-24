@@ -13,6 +13,7 @@ import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveC
 import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
+import { ShinyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
 import { PokemonTcgPocketProbabilityRepositoryFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
@@ -27,6 +28,7 @@ function createProbabilityService(
     new FiveCardsStrategy(),
     new BabyAsPotentialSixthCardStrategy(),
     new FourCardGuaranteedExStrategy(),
+    new ShinyAsPotentialSixthCardStrategy(),
     repo as unknown as PokemonTcgPocketProbabilityRepository,
   );
 }
