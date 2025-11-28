@@ -60,7 +60,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -90,7 +90,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'Test Card',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -128,7 +128,7 @@ describe('pokemonCardAdd', () => {
         {
           card: null,
           rarity: '♢',
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -166,7 +166,7 @@ describe('pokemonCardAdd', () => {
         {
           card: null,
           rarity: '♢',
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: true,
@@ -198,7 +198,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -211,7 +211,7 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain('no card was added');
     });
 
-    it('should mark a card as not needed when markAsNotNeeded is true', async () => {
+    it('should mark a card as not needed when operation is mark-as-not-needed', async () => {
       await repository.createSet('A1', 'Test Set');
       await repository.createCard({
         name: 'Test Card',
@@ -226,16 +226,15 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'mark-as-not-needed',
           setKey: null,
           booster: null,
           bulkOperation: false,
-          markAsNotNeeded: true,
         },
         config,
       );
 
-      expect(result).toContain('added card to @test1');
+      expect(result).toContain('marked as not needed card in @test1');
       expect(result).toContain(
         'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1',
       );
@@ -273,7 +272,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -296,7 +295,7 @@ describe('pokemonCardAdd', () => {
       expect(cards[0].ownership[0].status).toBe(OwnershipStatus.OWNED);
     });
 
-    it('should ignore markAsNotNeeded when removing cards', async () => {
+    it('should remove card marked as not needed', async () => {
       await repository.createSet('A1', 'Test Set');
       const card = await repository.createCard({
         name: 'Test Card',
@@ -315,12 +314,11 @@ describe('pokemonCardAdd', () => {
       const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
-          remove: true,
+          operation: 'remove',
           rarity: null,
           setKey: null,
           booster: null,
           bulkOperation: false,
-          markAsNotNeeded: true, // Should be ignored for remove operations
         },
         config,
       );
@@ -346,7 +344,7 @@ describe('pokemonCardAdd', () => {
       const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
-          remove: true,
+          operation: 'remove',
           rarity: null,
           setKey: null,
           booster: null,
@@ -387,7 +385,7 @@ describe('pokemonCardAdd', () => {
         {
           card: null,
           rarity: '♢',
-          remove: true,
+          operation: 'remove',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -434,7 +432,7 @@ describe('pokemonCardAdd', () => {
         {
           card: null,
           rarity: '♢',
-          remove: true,
+          operation: 'remove',
           setKey: null,
           booster: null,
           bulkOperation: true,
@@ -462,7 +460,7 @@ describe('pokemonCardAdd', () => {
       const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
-          remove: true,
+          operation: 'remove',
           rarity: null,
           setKey: null,
           booster: null,
@@ -475,6 +473,179 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,N/A,No');
       expect(result).toContain('no card was removed');
     });
+
+    it('should bulk remove cards marked as not needed', async () => {
+      await repository.createSet('A1', 'Test Set');
+      const card1 = await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      const card2 = await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.addCardToCollection(
+        card1.id,
+        BigInt(1),
+        OwnershipStatus.NOT_NEEDED,
+      );
+      await repository.addCardToCollection(
+        card2.id,
+        BigInt(1),
+        OwnershipStatus.NOT_NEEDED,
+      );
+
+      const result = await pokemonCardAddTool.invoke(
+        {
+          card: null,
+          rarity: '♢',
+          operation: 'remove',
+          setKey: null,
+          booster: null,
+          bulkOperation: true,
+        },
+        config,
+      );
+
+      expect(result).toContain('removed 2 cards from @test1');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1',
+      );
+    });
+  });
+
+  describe('marking cards as not needed', () => {
+    it('should mark a single missing card as not needed', async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+
+      const result = await pokemonCardAddTool.invoke(
+        {
+          card: 'A1-001',
+          rarity: null,
+          operation: 'mark-as-not-needed',
+          setKey: null,
+          booster: null,
+          bulkOperation: false,
+        },
+        config,
+      );
+
+      expect(result).toContain('marked as not needed card in @test1');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain(
+        'A1-001,Test Card,♢,Test Set,,N/A,No,No (marked as not needed)',
+      );
+
+      const cards = await repository.searchCards({
+        userId: BigInt(1),
+      });
+      expect(cards[0].ownership).toHaveLength(1);
+      expect(cards[0].ownership[0].status).toBe(OwnershipStatus.NOT_NEEDED);
+    });
+
+    it('should refuse to mark owned card as not needed', async () => {
+      await repository.createSet('A1', 'Test Set');
+      const card = await repository.createCard({
+        name: 'Test Card',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.addCardToCollection(card.id, BigInt(1));
+
+      const result = await pokemonCardAddTool.invoke(
+        {
+          card: 'A1-001',
+          rarity: null,
+          operation: 'mark-as-not-needed',
+          setKey: null,
+          booster: null,
+          bulkOperation: false,
+        },
+        config,
+      );
+
+      expect(result).toContain('Cannot mark owned cards as');
+      expect(result).toContain('not needed');
+      expect(result).toContain('directly');
+      expect(result).toContain('already owned by @test1');
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,N/A,No,Yes');
+      expect(result).toContain(
+        'Please ask the user if they want to remove these cards first',
+      );
+    });
+
+    it('should bulk mark multiple missing cards as not needed', async () => {
+      await repository.createSet('A1', 'Test Set');
+      await repository.createCard({
+        name: 'Test Card 1',
+        setKey: 'A1',
+        number: 1,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+      await repository.createCard({
+        name: 'Test Card 2',
+        setKey: 'A1',
+        number: 2,
+        rarity: Rarity.ONE_DIAMOND,
+        boosterNames: [],
+        isSixPackOnly: false,
+      });
+
+      const result = await pokemonCardAddTool.invoke(
+        {
+          card: null,
+          rarity: '♢',
+          operation: 'mark-as-not-needed',
+          setKey: null,
+          booster: null,
+          bulkOperation: true,
+        },
+        config,
+      );
+
+      expect(result).toContain('marked as not needed 2 cards in @test1');
+      expect(result).toContain(
+        'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1',
+      );
+      expect(result).toContain(
+        'A1-001,Test Card 1,♢,Test Set,,N/A,No,No (marked as not needed)',
+      );
+      expect(result).toContain(
+        'A1-002,Test Card 2,♢,Test Set,,N/A,No,No (marked as not needed)',
+      );
+
+      const cards = await repository.searchCards({
+        userId: BigInt(1),
+      });
+      expect(cards).toHaveLength(2);
+      cards.forEach((card) => {
+        expect(card.ownership).toHaveLength(1);
+        expect(card.ownership[0].status).toBe(OwnershipStatus.NOT_NEEDED);
+      });
+    });
   });
 
   describe('error handling', () => {
@@ -483,7 +654,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'NonexistentCard',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -511,7 +682,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -538,7 +709,7 @@ describe('pokemonCardAdd', () => {
       const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
-          remove: true,
+          operation: 'remove',
           rarity: null,
           setKey: null,
           booster: null,
@@ -570,7 +741,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -599,7 +770,7 @@ describe('pokemonCardAdd', () => {
       const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
-          remove: true,
+          operation: 'remove',
           rarity: null,
           setKey: null,
           booster: null,
@@ -632,7 +803,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -664,7 +835,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -706,7 +877,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: null,
           rarity: '♢',
-          remove: false,
+          operation: 'add',
           bulkOperation: true,
         },
         config,
@@ -736,7 +907,7 @@ describe('pokemonCardAdd', () => {
       const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
-          remove: true,
+          operation: 'remove',
           rarity: null,
           setKey: null,
           booster: null,
@@ -782,7 +953,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: null,
           rarity: null,
-          remove: true,
+          operation: 'remove',
           bulkOperation: true,
         },
         config,
@@ -813,7 +984,7 @@ describe('pokemonCardAdd', () => {
         {
           card: 'A1-001',
           rarity: null,
-          remove: false,
+          operation: 'add',
           setKey: null,
           booster: null,
           bulkOperation: false,
@@ -841,7 +1012,7 @@ describe('pokemonCardAdd', () => {
       const result = await pokemonCardAddTool.invoke(
         {
           card: 'A1-001',
-          remove: true,
+          operation: 'remove',
           rarity: null,
           setKey: null,
           booster: null,
@@ -880,7 +1051,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: null,
           rarity: '♢',
-          remove: false,
+          operation: 'add',
           bulkOperation: true,
         },
         config,
@@ -916,7 +1087,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: null,
           rarity: '♢',
-          remove: false,
+          operation: 'add',
           bulkOperation: true,
         },
         config,
@@ -957,7 +1128,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: null,
           rarity: '♢',
-          remove: true,
+          operation: 'remove',
           bulkOperation: true,
         },
         config,
@@ -992,7 +1163,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: null,
           rarity: '✸',
-          remove: false,
+          operation: 'add',
           bulkOperation: false,
         },
         config,
@@ -1021,7 +1192,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: null,
           rarity: '☆', // Wrong rarity
-          remove: true,
+          operation: 'remove',
           bulkOperation: false,
         },
         config,
@@ -1050,7 +1221,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: 'Glurak', // Wrong booster
           rarity: '♢♢', // Wrong rarity
-          remove: false,
+          operation: 'add',
           bulkOperation: false,
         },
         config,
@@ -1080,7 +1251,7 @@ describe('pokemonCardAdd', () => {
           setKey: null,
           booster: null,
           rarity: null,
-          remove: false,
+          operation: 'add',
           bulkOperation: false,
         },
         config,

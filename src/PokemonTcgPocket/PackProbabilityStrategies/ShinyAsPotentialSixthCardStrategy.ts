@@ -12,9 +12,7 @@ import { PackProbabilityStrategy } from './PackProbabilityStrategy.js';
  * - Uses rarity-based filtering (no isSixPackOnly flag needed)
  */
 @injectable()
-export class ShinyAsPotentialSixthCardStrategy
-  implements PackProbabilityStrategy
-{
+export class ShinyAsPotentialSixthCardStrategy implements PackProbabilityStrategy {
   readonly cardsPerPack = 5;
 
   readonly packWeights = {

@@ -4,9 +4,7 @@ import { PackProbabilityStrategy } from './PackProbabilityStrategy.js';
 
 /** Strategy for 5-card packs with potential 6th card from baby-exclusive pool */
 @injectable()
-export class BabyAsPotentialSixthCardStrategy
-  implements PackProbabilityStrategy
-{
+export class BabyAsPotentialSixthCardStrategy implements PackProbabilityStrategy {
   readonly cardsPerPack = 5;
   readonly packWeights = {
     normal: 0.9162,

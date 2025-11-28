@@ -4,6 +4,8 @@
  * Own file because LLMs tend to mess up the ’ signs.
  */
 
+import type { PokemonCardOperation } from './PokemonTcgPocketService.js';
+
 export const SETS_STATS_EXPLANATION =
   '(♦️ is the number of different cards in the user’s collection with rarities ♢, ♢♢, ♢♢♢, and ♢♢♢♢ followed by the total of these rarities in the set after the slash, ' +
   '⭐️ is the number of different cards in the user’s collection with rarities ☆, ☆☆, and ☆☆☆, ' +
@@ -39,10 +41,21 @@ export const LIMITED_RESULTS_MESSAGE = (
 ) =>
   `\n\nLimited list above to first 20 cards to save token usage. Tell the user there are ${additionalCount} additional cards matching the search query (${totalCount} total).`;
 
-export const NO_CARDS_IN_DB_MESSAGE = (remove: boolean) =>
-  `No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was ${
-    remove ? 'removed from' : 'added to'
-  } the user’s collection.`;
+export const NO_CARDS_IN_DB_MESSAGE = (operation: PokemonCardOperation) => {
+  const actionMap: Record<
+    PokemonCardOperation,
+    { past: string; preposition: string }
+  > = {
+    add: { past: 'added to', preposition: 'to' },
+    remove: { past: 'removed from', preposition: 'from' },
+    'mark-as-not-needed': {
+      past: 'marked as not needed in',
+      preposition: 'in',
+    },
+  };
+  const { past } = actionMap[operation];
+  return `No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was ${past} the user's collection.`;
+};
 
 export const NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE = (
   displayName: string,
@@ -64,7 +77,7 @@ export const BULK_OPERATION_WARNING_MESSAGE = (
   `${header}\n${csv}\nIf these aren’t the cards the user was asking for, you passed the wrong parameters. If so, please inform the user about your mistake and let them decide what to do.\n\nUpdated statistics of ${stats}`;
 
 export const POKEMON_CARD_ADD_TOOL_DESCRIPTION =
-  'Add or remove Pokémon TCG Pocket cards to/from the collection of the user who wrote the last message in the chat. Returns a CSV with the card info. If a user shares an image of a Pokémon card without context in this chat (especially if it shows “new”), they likely want you to add it to their collection. Generally pass null to filters the user did not tell you to filter by and make sure to only add/remove 1 card unless the user explictly asks you to add/remove multiple cards – there is no undo!';
+  'Add, remove, or mark Pokémon TCG Pocket cards in the collection of the user who wrote the last message in the chat. Use operation "add" to add cards (marks as owned), "remove" to remove cards from collection, or "mark-as-not-needed" to mark cards as not needed (excluded from probability calculations). Returns a CSV with the card info. If a user shares an image of a Pokémon card without context in this chat (especially if it shows "new"), they likely want you to add it to their collection. Generally pass null to filters the user did not tell you to filter by and make sure to only operate on 1 card unless the user explictly asks you to operate on multiple cards – there is no undo!';
 
 // Card operation messages
 export const MULTIPLE_MATCHES_MESSAGE = (csv: string) =>
@@ -89,5 +102,17 @@ export const SINGLE_OPERATION_HEADER_MESSAGE = (
 export const UPDATED_STATS_MESSAGE = (stats: string) =>
   `\n\nUpdated statistics (after the change) of ${stats}`;
 
-export const OPERATION_RESULT_MESSAGE = (remove: boolean) =>
-  `\n\nThus no card was ${remove ? 'removed from' : 'added to'} the user’s collection.`;
+export const OPERATION_RESULT_MESSAGE = (operation: PokemonCardOperation) => {
+  const actionMap: Record<PokemonCardOperation, string> = {
+    add: 'added to',
+    remove: 'removed from',
+    'mark-as-not-needed': 'marked as not needed in',
+  };
+  return `\n\nThus no card was ${actionMap[operation]} the user’s collection.`;
+};
+
+export const OWNED_CARDS_CANNOT_BE_MARKED_AS_NOT_NEEDED_MESSAGE = (
+  displayName: string,
+  cardDetails: string,
+) =>
+  `Cannot mark owned cards as ‘not needed’ directly. The following cards are already owned by ${displayName}:\n${cardDetails}\nPlease ask the user if they want to remove these cards first before marking them as not needed. If they want to keep them as owned, do not mark them as not needed.`;

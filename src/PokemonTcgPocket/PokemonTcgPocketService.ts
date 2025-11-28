@@ -14,15 +14,11 @@ import { BOOSTERS_STATS_EXPLANATION, SETS_STATS_EXPLANATION } from './texts.js';
 import assert from 'node:assert/strict';
 import {
   CARD_EXISTS_BUT_NO_MATCH_MESSAGE,
-  NO_CARDS_IN_DB_MESSAGE,
-  NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE,
-  NO_MATCHING_MISSING_CARDS_MESSAGE,
   MULTIPLE_MATCHES_MESSAGE,
   BULK_OPERATION_HEADER_MESSAGE,
   BULK_OPERATION_WARNING_MESSAGE,
   SINGLE_OPERATION_HEADER_MESSAGE,
   UPDATED_STATS_MESSAGE,
-  OPERATION_RESULT_MESSAGE,
   NO_CARDS_FOUND_MESSAGE,
 } from './texts.js';
 
@@ -177,6 +173,9 @@ export const OWNERSHIP_FILTER_VALUES = [
 
 /** Ownership filter type */
 export type OwnershipFilter = (typeof OWNERSHIP_FILTER_VALUES)[number];
+
+/** Card operation type for add/remove/mark-as-not-needed operations */
+export type PokemonCardOperation = 'add' | 'remove' | 'mark-as-not-needed';
 
 /** Service-layer ownership status with explicit missing state */
 export enum CardOwnershipStatus {
@@ -1132,59 +1131,23 @@ export class PokemonTcgPocketService {
     return cardDetails;
   }
 
-  /** Handles the case when no cards are found for add/remove operations */
-  async handleNoCardsFoundForAddRemove(
-    searchParams: Record<string, unknown>,
-    userId: bigint,
-    remove: boolean,
-    idInfo?: CardIdInfo,
-  ): Promise<string> {
-    const displayName = await this.getDisplayName(userId);
-
-    // Search if the cards would exist without the ownership filter
-    const existingCards = await this.searchCards(searchParams);
-
-    if (existingCards.length === 0) {
-      // If we have a card ID and still no results, try searching with just the ID
-      if (idInfo) {
-        const idOnlyCards = await this.searchCards({
-          setKey: idInfo.setKey,
-          cardNumber: idInfo.cardNumber,
-        });
-
-        if (idOnlyCards.length > 0) {
-          const cardDetails = await this.formatCardsAsCsv(idOnlyCards, userId);
-          return (
-            CARD_EXISTS_BUT_NO_MATCH_MESSAGE(
-              idInfo.setKey,
-              idInfo.cardNumber,
-              cardDetails,
-            ) + OPERATION_RESULT_MESSAGE(remove)
-          );
-        }
-      }
-
-      return NO_CARDS_IN_DB_MESSAGE(remove);
-    }
-
-    const cardDetails = await this.formatCardsAsCsv(existingCards, userId);
-    if (remove) {
-      return NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE(displayName, cardDetails);
-    }
-    return NO_MATCHING_MISSING_CARDS_MESSAGE(displayName, cardDetails);
-  }
-
-  /** Processes multiple cards for add/remove operations */
+  /** Processes multiple cards for add/remove/mark-as-not-needed operations */
   async processCards(
     cards: PokemonCardWithRelations[],
     userId: bigint,
-    remove: boolean,
+    operation: PokemonCardOperation,
     bulkOperation: boolean,
-    ownershipStatus: OwnershipStatus = OwnershipStatus.OWNED,
   ): Promise<string> {
     const displayName = await this.getDisplayName(userId);
-    const operation = remove ? 'removed' : 'added';
-    const preposition = remove ? 'from' : 'to';
+    const operationMap: Record<
+      PokemonCardOperation,
+      { verb: string; preposition: string }
+    > = {
+      add: { verb: 'added', preposition: 'to' },
+      remove: { verb: 'removed', preposition: 'from' },
+      'mark-as-not-needed': { verb: 'marked as not needed', preposition: 'in' },
+    };
+    const { verb, preposition } = operationMap[operation];
 
     if (!bulkOperation && cards.length > 1) {
       return MULTIPLE_MATCHES_MESSAGE(
@@ -1194,15 +1157,28 @@ export class PokemonTcgPocketService {
 
     if (cards.length > 1 && bulkOperation) {
       const updatedCards = await Promise.all(
-        cards.map((card) =>
-          remove
-            ? this.removeCardFromCollection(card.id, userId)
-            : this.addCardToCollection(card.id, userId, ownershipStatus),
-        ),
+        cards.map((card) => {
+          if (operation === 'remove') {
+            return this.removeCardFromCollection(card.id, userId);
+          } else if (operation === 'add') {
+            return this.addCardToCollection(
+              card.id,
+              userId,
+              OwnershipStatus.OWNED,
+            );
+          } else {
+            // mark-as-not-needed
+            return this.addCardToCollection(
+              card.id,
+              userId,
+              OwnershipStatus.NOT_NEEDED,
+            );
+          }
+        }),
       );
 
       const header = BULK_OPERATION_HEADER_MESSAGE(
-        operation,
+        verb,
         cards.length,
         preposition,
         displayName,
@@ -1215,12 +1191,26 @@ export class PokemonTcgPocketService {
     // Process single card
     assert(cards.length === 1);
     const card = cards[0];
-    const updatedCard = remove
-      ? await this.removeCardFromCollection(card.id, userId)
-      : await this.addCardToCollection(card.id, userId, ownershipStatus);
+    let updatedCard: PokemonCardWithRelations;
+    if (operation === 'remove') {
+      updatedCard = await this.removeCardFromCollection(card.id, userId);
+    } else if (operation === 'add') {
+      updatedCard = await this.addCardToCollection(
+        card.id,
+        userId,
+        OwnershipStatus.OWNED,
+      );
+    } else {
+      // mark-as-not-needed
+      updatedCard = await this.addCardToCollection(
+        card.id,
+        userId,
+        OwnershipStatus.NOT_NEEDED,
+      );
+    }
 
     const header = SINGLE_OPERATION_HEADER_MESSAGE(
-      operation,
+      verb,
       preposition,
       displayName,
     );

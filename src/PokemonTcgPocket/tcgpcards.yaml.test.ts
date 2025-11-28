@@ -35,9 +35,8 @@ describe('tcgpcards.yaml', () => {
   let sets: Sets;
 
   beforeAll(async () => {
-    const result = (await import(
-      '../../resources/tcgpcards.yaml'
-    )) as YamlImportResult;
+    const result =
+      (await import('../../resources/tcgpcards.yaml')) as YamlImportResult;
     sets = result.default;
   });
 
