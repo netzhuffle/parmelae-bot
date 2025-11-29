@@ -191,7 +191,7 @@ export const POKEMON_TCGP_YAML_SYMBOL = Symbol('PokemonTcgPocketYaml');
 export interface Card {
   /** The name of the card */
   name: string;
-  /** The rarity of the card: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ☆☆☆☆, ✸, ✸✸, or ♛ */
+  /** The rarity of the card: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ✸, ✸✸, or ♛ */
   rarity?: string;
   /** The booster(s) this card belongs to. If undefined, belongs to all boosters in the set */
   boosters?: string | string[] | null;
@@ -228,7 +228,7 @@ export type Sets = Record<string, SetData>;
  * **Symbol Categories:**
  * - Diamond rarities: ♢, ♢♢, ♢♢♢, ♢♢♢♢
  * - Foil rarities: ♢✦, ♢♢✦, ♢♢♢✦ (trigger FOUR_CARDS_WITH_GUARANTEED_EX)
- * - Star rarities: ☆, ☆☆, ☆☆☆, ☆☆☆☆
+ * - Star rarities: ☆, ☆☆, ☆☆☆
  * - Shiny rarities: ✸, ✸✸
  * - Crown rarity: ♛
  *
@@ -248,7 +248,6 @@ export const RARITY_MAP: Record<string, Rarity> = {
   '☆': Rarity.ONE_STAR,
   '☆☆': Rarity.TWO_STARS,
   '☆☆☆': Rarity.THREE_STARS,
-  '☆☆☆☆': Rarity.FOUR_STARS,
   '✸': Rarity.ONE_SHINY,
   '✸✸': Rarity.TWO_SHINY,
   '♛': Rarity.CROWN,
@@ -266,7 +265,6 @@ const RARITY_REVERSE_MAP: Record<Rarity, string> = {
   [Rarity.ONE_STAR]: '☆',
   [Rarity.TWO_STARS]: '☆☆',
   [Rarity.THREE_STARS]: '☆☆☆',
-  [Rarity.FOUR_STARS]: '☆☆☆☆',
   [Rarity.ONE_SHINY]: '✸',
   [Rarity.TWO_SHINY]: '✸✸',
   [Rarity.CROWN]: '♛',
@@ -716,7 +714,6 @@ export class PokemonTcgPocketService {
           Rarity.ONE_STAR,
           Rarity.TWO_STARS,
           Rarity.THREE_STARS,
-          Rarity.FOUR_STARS,
         ]),
       ),
       shinies: this.calculateCardGroup(cards, (card) =>

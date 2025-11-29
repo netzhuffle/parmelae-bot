@@ -193,8 +193,6 @@ enum Rarity {
   TWO_STARS
   /// Immersive special illustration (symbol: ☆☆☆)
   THREE_STARS
-  /// Crown rare variant (symbol: ☆☆☆☆)
-  FOUR_STARS
   /// Shiny rare (symbol: ✸)
   ONE_SHINY
   /// Higher tier shiny (symbol: ✸✸)

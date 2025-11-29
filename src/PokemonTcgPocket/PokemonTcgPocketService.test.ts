@@ -83,8 +83,7 @@ describe('PokemonTcgPocketService', () => {
               5: { name: 'One Star', rarity: '☆' },
               6: { name: 'Two Stars', rarity: '☆☆' },
               7: { name: 'Three Stars', rarity: '☆☆☆' },
-              8: { name: 'Four Stars', rarity: '☆☆☆☆' },
-              9: { name: 'One Shiny', rarity: '✸' },
+              8: { name: 'One Shiny', rarity: '✸' },
               10: { name: 'Two Shiny', rarity: '✸✸' },
               11: { name: 'Crown', rarity: '♛' },
               12: { name: 'No Rarity' },
@@ -101,7 +100,7 @@ describe('PokemonTcgPocketService', () => {
 
         // Verify all cards were created with correct rarities
         const cards = repository.getAllCards();
-        expect(cards).toHaveLength(12);
+        expect(cards).toHaveLength(11);
 
         const rarityMap = new Map(cards.map((c) => [c.name, c.rarity]));
         expect(rarityMap.get('One Diamond')).toBe(Rarity.ONE_DIAMOND);
@@ -111,7 +110,6 @@ describe('PokemonTcgPocketService', () => {
         expect(rarityMap.get('One Star')).toBe(Rarity.ONE_STAR);
         expect(rarityMap.get('Two Stars')).toBe(Rarity.TWO_STARS);
         expect(rarityMap.get('Three Stars')).toBe(Rarity.THREE_STARS);
-        expect(rarityMap.get('Four Stars')).toBe(Rarity.FOUR_STARS);
         expect(rarityMap.get('One Shiny')).toBe(Rarity.ONE_SHINY);
         expect(rarityMap.get('Two Shiny')).toBe(Rarity.TWO_SHINY);
         expect(rarityMap.get('Crown')).toBe(Rarity.CROWN);

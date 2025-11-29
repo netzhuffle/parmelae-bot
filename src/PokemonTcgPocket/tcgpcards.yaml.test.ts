@@ -25,7 +25,6 @@ const VALID_RARITY_SYMBOLS = new Set([
   '☆',
   '☆☆',
   '☆☆☆',
-  '☆☆☆☆',
   '✸',
   '✸✸',
   '♛',
