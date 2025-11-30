@@ -40,7 +40,7 @@
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "eslint-plugin-promise": "^7.2.1",
-    "prettier": "^3.7.1",
+    "prettier": "^3.7.3",
     "prisma": "^6.19.0",
     "task-master-ai": "^0.36.0",
     "typescript": "^5.9.3",
