@@ -13,6 +13,7 @@ import { Config } from './Config.js';
 import { SchiParmelaeIdentity } from './MessageGenerators/Identities/SchiParmelaeIdentity.js';
 import { EmulatorIdentity } from './MessageGenerators/Identities/EmulatorIdentity.js';
 import { Identity } from './MessageGenerators/Identities/Identity.js';
+import { IdentityResolverService } from './MessageGenerators/Identities/IdentityResolverService.js';
 import { SCHEDULE_MESSAGE_TOOL_NAME } from './Tools/ScheduleMessageTool.js';
 import { INTERMEDIATE_ANSWER_TOOL_NAME } from './Tools/IntermediateAnswerTool.js';
 import { StructuredTool, Tool } from '@langchain/core/tools';
@@ -57,6 +58,7 @@ export interface ToolContext {
     schiParmelae: SchiParmelaeIdentity;
     emulator: EmulatorIdentity;
   };
+  identityResolver: IdentityResolverService;
 }
 
 function assertIsToolContext(value: unknown): asserts value is ToolContext {
@@ -70,6 +72,7 @@ function assertIsToolContext(value: unknown): asserts value is ToolContext {
   assert('pokemonTcgPocketService' in value);
   assert('identityByChatId' in value);
   assert('identities' in value);
+  assert('identityResolver' in value);
 }
 
 /**
@@ -103,6 +106,7 @@ export function createTestToolConfig(context: Partial<ToolContext>): {
         schiParmelae: SchiParmelaeIdentity;
         emulator: EmulatorIdentity;
       },
+      identityResolver: undefined as unknown as IdentityResolverService,
       ...context,
     },
   };
@@ -133,6 +137,7 @@ export class ChatGptAgentService {
     private readonly pokemonTcgPocketService: PokemonTcgPocketService,
     private readonly schiParmelaeIdentity: SchiParmelaeIdentity,
     private readonly emulatorIdentity: EmulatorIdentity,
+    private readonly identityResolver: IdentityResolverService,
     private readonly intermediateAnswerToolFactory: IntermediateAnswerToolFactory,
     private readonly scheduleMessageToolFactory: ScheduleMessageToolFactory,
     googleSearchToolFactory: GoogleSearchToolFactory,
@@ -274,6 +279,7 @@ export class ChatGptAgentService {
             schiParmelae: this.schiParmelaeIdentity,
             emulator: this.emulatorIdentity,
           },
+          identityResolver: this.identityResolver,
         } satisfies ToolContext,
         callbacks: [this.callbackHandler],
       },

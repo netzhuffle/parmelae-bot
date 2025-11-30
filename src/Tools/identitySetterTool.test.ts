@@ -4,6 +4,7 @@ import { SchiParmelaeIdentity } from '../MessageGenerators/Identities/SchiParmel
 import { EmulatorIdentity } from '../MessageGenerators/Identities/EmulatorIdentity.js';
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { Identity } from '../MessageGenerators/Identities/Identity.js';
+import { IdentityResolverService } from '../MessageGenerators/Identities/IdentityResolverService.js';
 
 const TEST_CHAT_ID_1 = '123456789';
 const TEST_CHAT_ID_2 = '987654321';
@@ -12,12 +13,17 @@ describe('identitySetterTool', () => {
   let identityByChatId: Map<bigint, Identity>;
   let schiParmelaeIdentity: SchiParmelaeIdentity;
   let emulatorIdentity: EmulatorIdentity;
+  let identityResolver: IdentityResolverService;
   let config: { configurable: ToolContext };
 
   beforeEach(() => {
     identityByChatId = new Map<bigint, Identity>();
     schiParmelaeIdentity = new SchiParmelaeIdentity();
     emulatorIdentity = new EmulatorIdentity();
+    identityResolver = new IdentityResolverService(
+      schiParmelaeIdentity,
+      emulatorIdentity,
+    );
 
     config = createTestToolConfig({
       chatId: BigInt(TEST_CHAT_ID_1),
@@ -26,6 +32,7 @@ describe('identitySetterTool', () => {
         schiParmelae: schiParmelaeIdentity,
         emulator: emulatorIdentity,
       },
+      identityResolver,
     });
   });
 
@@ -74,18 +81,16 @@ describe('identitySetterTool', () => {
         config,
       );
 
-      expect(result).toBe(
-        'Error: Unknown identity. Use "Schi Parmelä" or "Emulator".',
-      );
+      expect(result).toContain('Error: Unknown identity "Unknown Identity"');
+      expect(result).toContain('Available identities:');
       expect(identityByChatId.has(BigInt(TEST_CHAT_ID_1))).toBe(false);
     });
 
     it('should return error message for empty identity', async () => {
       const result = await identitySetterTool.invoke({ identity: '' }, config);
 
-      expect(result).toBe(
-        'Error: Unknown identity. Use "Schi Parmelä" or "Emulator".',
-      );
+      expect(result).toContain('Error: Unknown identity ""');
+      expect(result).toContain('Available identities:');
       expect(identityByChatId.has(BigInt(TEST_CHAT_ID_1))).toBe(false);
     });
 
@@ -95,22 +100,23 @@ describe('identitySetterTool', () => {
         config,
       );
 
-      expect(result).toBe(
-        'Error: Unknown identity. Use "Schi Parmelä" or "Emulator".',
-      );
+      // Whitespace is trimmed by identitySetterTool before passing to resolver
+      expect(result).toContain('Error: Unknown identity ""');
+      expect(result).toContain('Available identities:');
       expect(identityByChatId.has(BigInt(TEST_CHAT_ID_1))).toBe(false);
     });
 
-    it('should return error message for case-sensitive mismatch', async () => {
+    it('should accept case-insensitive identity names', async () => {
       const result = await identitySetterTool.invoke(
         { identity: 'schi parmelä' },
         config,
       );
 
-      expect(result).toBe(
-        'Error: Unknown identity. Use "Schi Parmelä" or "Emulator".',
+      // Output uses resolved identity's original name, not the input casing
+      expect(result).toBe('Success: Schi Parmelä will be used from now on.');
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
+        schiParmelaeIdentity,
       );
-      expect(identityByChatId.has(BigInt(TEST_CHAT_ID_1))).toBe(false);
     });
   });
 
@@ -127,6 +133,7 @@ describe('identitySetterTool', () => {
           schiParmelae: schiParmelaeIdentity,
           emulator: emulatorIdentity,
         },
+        identityResolver,
       });
 
       // Verify first chat has the identity set

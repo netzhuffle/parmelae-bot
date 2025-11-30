@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { tool } from '@langchain/core/tools';
 import * as z from 'zod';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
@@ -23,18 +24,14 @@ export const identitySetterTool = tool(
     const chatId = context.chatId;
     const identityName = identity.trim();
 
-    switch (identityName) {
-      case context.identities.schiParmelae.name:
-        context.identityByChatId.set(chatId, context.identities.schiParmelae);
-        break;
-      case context.identities.emulator.name:
-        context.identityByChatId.set(chatId, context.identities.emulator);
-        break;
-      default:
-        return `Error: Unknown identity. Use "${context.identities.schiParmelae.name}" or "${context.identities.emulator.name}".`;
+    try {
+      const resolvedIdentity = context.identityResolver.resolve(identityName);
+      context.identityByChatId.set(chatId, resolvedIdentity);
+      return `Success: ${resolvedIdentity.name} will be used from now on.`;
+    } catch (error) {
+      assert(error instanceof Error);
+      return `Error: ${error.message}`;
     }
-
-    return `Success: ${identityName} will be used from now on.`;
   },
   {
     name: 'identity-set',
