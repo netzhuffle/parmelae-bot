@@ -253,6 +253,11 @@ export const RARITY_MAP: Record<string, Rarity> = {
   '♛': Rarity.CROWN,
 };
 
+/** Array of all valid rarity symbols (derived from RARITY_MAP keys) */
+export const RARITY_SYMBOLS: readonly string[] = Object.keys(
+  RARITY_MAP,
+) as readonly string[];
+
 /** Maps database enum values to rarity symbols */
 const RARITY_REVERSE_MAP: Record<Rarity, string> = {
   [Rarity.ONE_DIAMOND]: '♢',
@@ -269,6 +274,45 @@ const RARITY_REVERSE_MAP: Record<Rarity, string> = {
   [Rarity.TWO_SHINY]: '✸✸',
   [Rarity.CROWN]: '♛',
 };
+
+/** Array of all diamond rarities (including foil variants) */
+export const DIAMOND_RARITIES: readonly Rarity[] = [
+  Rarity.ONE_DIAMOND,
+  Rarity.ONE_DIAMOND_FOIL,
+  Rarity.TWO_DIAMONDS,
+  Rarity.TWO_DIAMONDS_FOIL,
+  Rarity.THREE_DIAMONDS,
+  Rarity.THREE_DIAMONDS_FOIL,
+  Rarity.FOUR_DIAMONDS,
+] as const;
+
+/**
+ * Array of all tradable rarities (diamond rarities + ONE_STAR).
+ *
+ * Tradable cards are those that can be traded in-game. This includes all diamond
+ * rarities (including foil variants) plus ONE_STAR illustration rares, as defined
+ * by the Pokemon TCG Pocket game mechanics.
+ */
+export const TRADABLE_RARITIES: readonly Rarity[] = [
+  ...DIAMOND_RARITIES,
+  Rarity.ONE_STAR,
+] as const;
+
+/** Array of all star rarities */
+const STAR_RARITIES: readonly Rarity[] = [
+  Rarity.ONE_STAR,
+  Rarity.TWO_STARS,
+  Rarity.THREE_STARS,
+] as const;
+
+/** Array of all shiny rarities */
+const SHINY_RARITIES: readonly Rarity[] = [
+  Rarity.ONE_SHINY,
+  Rarity.TWO_SHINY,
+] as const;
+
+/** Array of crown rarity */
+const CROWN_RARITIES: readonly Rarity[] = [Rarity.CROWN] as const;
 
 /** Card with ownership information */
 interface CardWithOwnership {
@@ -605,22 +649,11 @@ export class PokemonTcgPocketService {
               const allCards = cardsWithServiceStatus.map(({ card }) => card);
 
               const diamondCards = cardsWithServiceStatus.filter(({ card }) =>
-                this.isCardOfRarity(card, [
-                  Rarity.ONE_DIAMOND,
-                  Rarity.TWO_DIAMONDS,
-                  Rarity.THREE_DIAMONDS,
-                  Rarity.FOUR_DIAMONDS,
-                ]),
+                this.isCardOfRarity(card, DIAMOND_RARITIES),
               );
 
               const tradableCards = cardsWithServiceStatus.filter(({ card }) =>
-                this.isCardOfRarity(card, [
-                  Rarity.ONE_DIAMOND,
-                  Rarity.TWO_DIAMONDS,
-                  Rarity.THREE_DIAMONDS,
-                  Rarity.FOUR_DIAMONDS,
-                  Rarity.ONE_STAR,
-                ]),
+                this.isCardOfRarity(card, TRADABLE_RARITIES),
               );
 
               const setKey = set.key as SetKey;
@@ -688,8 +721,11 @@ export class PokemonTcgPocketService {
   }
 
   /** Checks if a card has a specific rarity */
-  private isCardOfRarity(card: PokemonCardModel, rarities: Rarity[]): boolean {
-    return rarities.includes(card.rarity!);
+  private isCardOfRarity(
+    card: PokemonCardModel,
+    rarities: readonly Rarity[],
+  ): boolean {
+    return card.rarity !== null && rarities.includes(card.rarity);
   }
 
   /** Calculates statistics for a set */
@@ -702,25 +738,16 @@ export class PokemonTcgPocketService {
   } {
     return {
       diamonds: this.calculateCardGroup(cards, (card) =>
-        this.isCardOfRarity(card, [
-          Rarity.ONE_DIAMOND,
-          Rarity.TWO_DIAMONDS,
-          Rarity.THREE_DIAMONDS,
-          Rarity.FOUR_DIAMONDS,
-        ]),
+        this.isCardOfRarity(card, DIAMOND_RARITIES),
       ),
       stars: this.calculateCardGroup(cards, (card) =>
-        this.isCardOfRarity(card, [
-          Rarity.ONE_STAR,
-          Rarity.TWO_STARS,
-          Rarity.THREE_STARS,
-        ]),
+        this.isCardOfRarity(card, STAR_RARITIES),
       ),
       shinies: this.calculateCardGroup(cards, (card) =>
-        this.isCardOfRarity(card, [Rarity.ONE_SHINY, Rarity.TWO_SHINY]),
+        this.isCardOfRarity(card, SHINY_RARITIES),
       ),
       crowns: this.calculateCardGroup(cards, (card) =>
-        this.isCardOfRarity(card, [Rarity.CROWN]),
+        this.isCardOfRarity(card, CROWN_RARITIES),
       ),
       promos: this.calculateCardGroup(cards, (card) => card.rarity === null),
     };

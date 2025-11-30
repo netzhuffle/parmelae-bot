@@ -8,7 +8,11 @@ import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 import { ShinyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
-import { BoosterProbabilitiesType } from './PokemonTcgPocketService.js';
+import {
+  BoosterProbabilitiesType,
+  DIAMOND_RARITIES as DIAMOND_RARITIES_ARRAY,
+  TRADABLE_RARITIES as TRADABLE_RARITIES_ARRAY,
+} from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
 /**
@@ -22,27 +26,10 @@ import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcg
  */
 @injectable()
 export class PokemonTcgPocketProbabilityService {
-  /** Set of diamond rarities */
-  private readonly DIAMOND_RARITIES = new Set<Rarity>([
-    Rarity.ONE_DIAMOND,
-    Rarity.ONE_DIAMOND_FOIL,
-    Rarity.TWO_DIAMONDS,
-    Rarity.TWO_DIAMONDS_FOIL,
-    Rarity.THREE_DIAMONDS,
-    Rarity.THREE_DIAMONDS_FOIL,
-    Rarity.FOUR_DIAMONDS,
-  ]);
+  /** Set of diamond rarities (converted from shared constant for efficient lookups) */
+  private readonly DIAMOND_RARITIES = new Set<Rarity>(DIAMOND_RARITIES_ARRAY);
 
-  private readonly TRADABLE_RARITIES = new Set<Rarity>([
-    Rarity.ONE_DIAMOND,
-    Rarity.ONE_DIAMOND_FOIL,
-    Rarity.TWO_DIAMONDS,
-    Rarity.TWO_DIAMONDS_FOIL,
-    Rarity.THREE_DIAMONDS,
-    Rarity.THREE_DIAMONDS_FOIL,
-    Rarity.FOUR_DIAMONDS,
-    Rarity.ONE_STAR,
-  ]);
+  private readonly TRADABLE_RARITIES = new Set<Rarity>(TRADABLE_RARITIES_ARRAY);
 
   constructor(
     private readonly fiveCardsWithoutShinyStrategy: FiveCardsWithoutShinyStrategy,
@@ -111,7 +98,7 @@ export class PokemonTcgPocketProbabilityService {
 
   /**
    * Calculates the probability of getting at least one new tradable card from a booster pack.
-   * This considers only cards with rarities ♢, ♢♢, ♢♢♢, ♢♢♢♢, and ☆.
+   * This considers cards with diamond rarities (including foil variants: ♢, ♢✦, ♢♢, ♢♢✦, ♢♢♢, ♢♢♢✦, ♢♢♢♢) and ☆.
    */
   calculateNewTradableCardProbability(
     boosterCards: PokemonCardModel[],

@@ -7,6 +7,7 @@ import {
   SET_KEY_NAMES,
   BOOSTER_VALUES,
   SetKey,
+  RARITY_SYMBOLS,
 } from './PokemonTcgPocketService.js';
 
 interface YamlImportResult {
@@ -14,21 +15,7 @@ interface YamlImportResult {
 }
 
 /** Maps rarity symbols to database enum values */
-const VALID_RARITY_SYMBOLS = new Set([
-  '♢',
-  '♢✦',
-  '♢♢',
-  '♢♢✦',
-  '♢♢♢',
-  '♢♢♢✦',
-  '♢♢♢♢',
-  '☆',
-  '☆☆',
-  '☆☆☆',
-  '✸',
-  '✸✸',
-  '♛',
-]);
+const VALID_RARITY_SYMBOLS = new Set(RARITY_SYMBOLS);
 
 describe('tcgpcards.yaml', () => {
   let sets: Sets;

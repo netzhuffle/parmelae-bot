@@ -5,6 +5,7 @@ import {
   SET_KEY_NAMES,
   BOOSTER_VALUES,
   OWNERSHIP_FILTER_VALUES,
+  RARITY_SYMBOLS,
 } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { getToolContext } from '../ChatGptAgentService.js';
@@ -36,10 +37,10 @@ const schema = z.object({
       'Booster to filter by. Pass value null instead of a string unless the user specifically asks you to filter by a booster name.',
     ),
   rarity: z
-    .enum(['♢', '♢♢', '♢♢♢', '♢♢♢♢', '☆', '☆☆', '☆☆☆', '✸', '✸✸', '♛'])
+    .enum([...RARITY_SYMBOLS] as [string, ...string[]])
     .nullish()
     .describe(
-      'Card rarity symbol to filter by: ♢, ♢♢, ♢♢♢, ♢♢♢♢, ☆, ☆☆, ☆☆☆, ✸, ✸✸, or ♛. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ✸ instead of ✴️, and ♛ instead of 👑. Pass value null instead of a string unless the user specifically asks you to filter by rarity.',
+      `Card rarity symbol to filter by: ${RARITY_SYMBOLS.join(', ')}. Must use ♢ instead of ♦️, ☆ instead of ⭐️, ✸ instead of ✴️, and ♛ instead of 👑. Pass value null instead of a string unless the user specifically asks you to filter by rarity.`,
     ),
   ownershipFilter: z
     .enum(OWNERSHIP_FILTER_VALUES)
