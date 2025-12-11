@@ -12,12 +12,12 @@ export const GptModels = {
 
 export const GptModelsSettings = {
   [GptModels.Cheap]: {
-    model: GptModels.Cheap,
+    model: GptModels.Cheap + '/openai',
     reasoning: { effort: 'minimal' },
     verbosity: 'low',
   },
   [GptModels.Advanced]: {
-    model: GptModels.Advanced,
+    model: GptModels.Advanced + '/openai',
     reasoning: { effort: 'none' },
     verbosity: 'low',
   },
