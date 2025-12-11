@@ -7,7 +7,7 @@ export const GptModels = {
   /** Cheap model to use in most cases. Needs text & image inputs, text outputs, function calling. */
   Cheap: 'gpt-5-mini',
   /** Advanced model to use when asked explicitly. Needs text & image inputs, text outputs, function calling. */
-  Advanced: 'gpt-5.1',
+  Advanced: 'gpt-5.2',
 } as const;
 
 export const GptModelsSettings = {
