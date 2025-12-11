@@ -109,8 +109,12 @@ export class MessageRepositoryFake {
     return Promise.reject(new Error('store not implemented in fake'));
   }
 
+  public deleteOldCallArgs: unknown[] = [];
+  public deleteOldReturnData: MessageWithUser[] = [];
+
   async deleteOld(): Promise<MessageWithUser[]> {
-    return Promise.reject(new Error('deleteOld not implemented in fake'));
+    this.deleteOldCallArgs.push(null);
+    return Promise.resolve([...this.deleteOldReturnData]);
   }
 
   reset(): void {
@@ -118,6 +122,8 @@ export class MessageRepositoryFake {
     this.getCallArgs = [];
     this.getPreviousChatMessageCallArgs = [];
     this.updateToolCallsCallArgs = [];
+    this.deleteOldCallArgs = [];
+    this.deleteOldReturnData = [];
     this.nextId = 1;
   }
 }

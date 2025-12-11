@@ -130,10 +130,47 @@ alwaysApply: false
   - **Test helper methods** for adding test data
 
 - **Error Simulation:**
-  - **Provide methods** to simulate error conditions
-  - **Support conditional failures** based on input parameters
-  - **Throw realistic errors** that match real service behavior
-  - **Allow error state reset** for test isolation
+  - **Use boolean flags and error fields** per method for error simulation
+  - **Pattern**: `methodNameShouldThrow: boolean` and `methodNameError: Error | null`
+  - **Check flags in method implementation** before processing
+  - **Reset error flags** in `reset()` method for test isolation
+  - **Example:**
+  ```typescript
+  // ✅ DO: Per-method error simulation flags
+  export class RepositoryFake {
+    public createShouldThrow = false;
+    public createError: Error | null = null;
+    
+    async create(...args): Promise<Entity> {
+      this.createCallArgs.push(...args);
+      
+      if (this.createShouldThrow) {
+        const error = this.createError ?? new Error('Create failed');
+        return Promise.reject(error);
+      }
+      
+      // Normal implementation
+    }
+    
+    reset(): void {
+      this.createShouldThrow = false;
+      this.createError = null;
+    }
+  }
+  
+  // ✅ DO: Use flags in tests instead of method overrides
+  it('should handle create errors', async () => {
+    repositoryFake.createShouldThrow = true;
+    repositoryFake.createError = new Error('Database error');
+    // Test error handling
+  });
+  
+  // ❌ DON'T: Override methods in tests
+  repositoryFake.create = async () => {
+    repositoryFake.createCallArgs.push(...);
+    throw new Error('Database error');
+  };
+  ```
 
 - **Performance Considerations:**
   - **Keep fakes lightweight** - avoid complex business logic
@@ -149,12 +186,26 @@ alwaysApply: false
 
 - **Common Fake Patterns:**
   ```typescript
+  // ✅ DO: Per-method error simulation with flags
+  async create(...args): Promise<Entity> {
+    this.createCallArgs.push(...args);
+    
+    if (this.createShouldThrow) {
+      const error = this.createError ?? new Error('Create failed');
+      return Promise.reject(error);
+    }
+    
+    // Normal implementation
+    return Promise.resolve(entity);
+  }
+  
   // ✅ DO: Conditional behavior based on input
   async get(id: number): Promise<Entity | null> {
-    this.getCallArgs = id;
+    this.getCallArgs.push(id);
     
-    if (this.shouldThrowError) {
-      throw new Error('Simulated error');
+    if (this.getShouldThrow) {
+      const error = this.getError ?? new Error('Get failed');
+      return Promise.reject(error);
     }
     
     return this.entities.find(e => e.id === id) ?? null;

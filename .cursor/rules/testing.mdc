@@ -80,13 +80,104 @@ it('should throw error if edit source is too short', async () => {
 });
 ```
 
+## Fake Timers for Timer-Based Code (Bun 1.3.4+)
+
+**Use fake timers** to test code that relies on `setTimeout`, `setInterval`, and other timer-based APIs without waiting for real time to pass.
+
+```typescript
+// ✅ DO: Use fake timers for timer-based code
+import { describe, it, expect, jest, beforeEach, afterEach } from 'bun:test';
+
+describe('ServiceWithTimers', () => {
+  beforeEach(() => {
+    // Call useFakeTimers() once - do not call it again in individual tests
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('should schedule correctly', () => {
+    // Set time using setSystemTime() - do not call useFakeTimers() again
+    jest.setSystemTime(new Date('2024-01-15T12:00:00Z'));
+    
+    // Trigger code that uses setTimeout
+    service.scheduleAction();
+    
+    // Verify timer was scheduled
+    const timerCount = jest.getTimerCount();
+    expect(timerCount).toBeGreaterThan(0);
+    
+    // Advance time and verify behavior
+    jest.advanceTimersByTime(5000); // Advance 5 seconds
+    jest.runAllTimers(); // Run all pending timers
+    
+    // Assertions
+  });
+});
+```
+
+**Available fake timer methods:**
+- `jest.useFakeTimers(options?)` - Enable fake timers, optionally setting current time with `{ now: number | Date }`. **Call this once in `beforeEach`, not in individual tests.**
+- `jest.setSystemTime(date)` - Set the current time for fake timers. **Use this in individual tests to change time, not `useFakeTimers()` again.**
+- `jest.useRealTimers()` - Restore real timers
+- `jest.advanceTimersByTime(ms)` - Advance all timers by specified milliseconds
+- `jest.advanceTimersToNextTimer()` - Advance to the next scheduled timer
+- `jest.runAllTimers()` - Run all pending timers
+- `jest.runOnlyPendingTimers()` - Run only currently pending timers
+- `jest.getTimerCount()` - Get the number of pending timers
+- `jest.clearAllTimers()` - Clear all pending timers
+- `jest.isFakeTimers()` - Check if fake timers are active
+
+**Important Pattern:**
+```typescript
+// ✅ DO: Call useFakeTimers() once in beforeEach
+beforeEach(() => {
+  jest.useFakeTimers();
+});
+
+// ✅ DO: Use setSystemTime() in individual tests to change time
+it('should work at specific time', () => {
+  jest.setSystemTime(new Date('2024-01-15T12:00:00Z'));
+  // Test code
+});
+
+// ❌ DON'T: Call useFakeTimers() multiple times with different options
+beforeEach(() => {
+  jest.useFakeTimers(); // First call
+});
+
+it('should work', () => {
+  jest.useFakeTimers({ now: date }); // ❌ Don't call again!
+});
+```
+
+**Promise Chain Handling:**
+When testing code that uses `.then()` chains with fake timers, wait for promise microtasks to complete:
+
+```typescript
+// ✅ DO: Wait for promise chains after advancing timers
+jest.runAllTimers();
+await new Promise<void>((resolve) => {
+  setImmediate(() => {
+    setImmediate(() => {
+      resolve();
+    });
+  });
+});
+
+// Now assertions will see completed promise chains
+expect(fake.methodCallArgs.length).toBeGreaterThan(0);
+```
+
 ## Test Execution Commands
 
 When done with implementation, test writing, and refactoring, run the full validation suite:
 
 ```bash
 bun run format && bun run schema-format
-bun run build  
+bun run typecheck && bun run typecheck-all
 bun run lint && bun run validate-yaml
 bun test
 ```

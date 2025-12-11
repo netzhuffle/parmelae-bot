@@ -21,6 +21,13 @@ export class TelegramServiceFake extends TelegramService {
         caption: string;
         chatId: string;
       };
+  public sendCallArgs: {
+    message: string | import('../Sticker.js').Sticker;
+    chatId: bigint;
+  }[] = [];
+  public sendReturnData: number[] = [];
+  public sendShouldThrow = false;
+  public sendError: Error | null = null;
 
   constructor() {
     super(
@@ -64,5 +71,29 @@ export class TelegramServiceFake extends TelegramService {
 
   async getFileUrl(fileId: string): Promise<string> {
     return Promise.resolve(`https://fake-telegram-file-url.com/${fileId}`);
+  }
+
+  async send(
+    message: string | import('../Sticker.js').Sticker,
+    chatId: bigint,
+  ): Promise<number> {
+    this.sendCallArgs.push({ message, chatId });
+
+    if (this.sendShouldThrow) {
+      const error = this.sendError ?? new Error('Send failed');
+      return Promise.reject(error);
+    }
+
+    const returnValue = this.sendReturnData.shift() ?? 123;
+    return Promise.resolve(returnValue);
+  }
+
+  reset(): void {
+    this.sendCallArgs = [];
+    this.sendReturnData = [];
+    this.sendShouldThrow = false;
+    this.sendError = null;
+    this.request = undefined;
+    this.result = undefined;
   }
 }
