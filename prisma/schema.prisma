@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./sqlite.db"
 }
 
 model Chat {

@@ -29,6 +29,7 @@
   },
   "include": [
     "src/**/*",
-    "scripts/**/*"
+    "scripts/**/*",
+    "prisma.config.ts"
   ]
 }
