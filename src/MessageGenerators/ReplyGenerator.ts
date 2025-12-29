@@ -39,7 +39,9 @@ export class ReplyGenerator {
     announceToolCall: (text: string) => Promise<number | null>,
   ): Promise<ReplyGeneratorResponse> {
     const identity = this.getIdentityForChat(message.chatId);
-    const botContext: BotIdentityContext = { username: this.config.username };
+    const botContext: BotIdentityContext = {
+      username: this.config.primaryBot.username,
+    };
     const conversation = await this.conversation.getConversation(
       message.id,
       identity.conversationLength,

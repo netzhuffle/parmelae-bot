@@ -309,7 +309,7 @@
         "dependencies": [
           "9"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -377,7 +377,8 @@
             "status": "pending",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2025-12-29T14:51:21.042Z"
       },
       {
         "id": "18",
@@ -3070,11 +3071,12 @@
             "id": 17,
             "title": "Refactor Dependency Injection for Multi-Bot Configuration",
             "description": "Update inversify.config.ts to support multiple bot configurations while maintaining backwards compatibility with existing single-bot DI patterns.",
-            "details": "Modify inversify container configuration to handle multiple Telegraf instances and bot configurations. Ensure Config singleton provides both single-bot (backwards compatible) and multi-bot access patterns. This affects Telegraf binding and any services that depend on single-bot assumptions.",
-            "status": "pending",
+            "details": "Modify inversify container configuration to handle multiple Telegraf instances and bot configurations. Ensure Config singleton provides both single-bot (backwards compatible) and multi-bot access patterns. This affects Telegraf binding and any services that depend on single-bot assumptions.\n<info added on 2025-12-29T14:11:21.556Z>\nFixed DI breakage introduced by interface-typed config deps.\n\nRoot cause:\n- Inversify autobind relies on runtime constructor metadata.\n- `BotManager`, `TelegramMessageService`, and `GitHubService` were updated to depend on `BotConfig`/`GitHubConfig` (interfaces). Interfaces are erased at runtime, so Inversify saw missing metadata and failed resolving `BotManager` (surfaced by `src/index.test.ts`).\n\nFix:\n- Keep the narrow interface types for better type hygiene, but add explicit Inversify injection token using the concrete runtime class `Config`:\n  - `BotManager`: `constructor(@inject(Config) private readonly config: BotConfig)`\n  - `TelegramMessageService`: `constructor(..., @inject(Config) private readonly config: BotConfig)`\n  - `GitHubService`: `constructor(..., @inject(Config) private readonly config: GitHubConfig)`\n\nValidation:\n- Ran full required check sequence successfully:\n  - `bun run format && bun run schema-format`\n  - `bun run typecheck && bun run typecheck-all`\n  - `bun run lint && bun run validate-yaml`\n  - `bun test`\n- Test suite now passes; the previous `Application Startup > should resolve Bot service from container` failure is resolved.\n</info added on 2025-12-29T14:11:21.556Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 59,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-12-29T14:51:32.229Z"
           },
           {
             "id": 18,
@@ -3090,7 +3092,7 @@
         "complexity": 9,
         "recommendedSubtasks": 20,
         "expansionPrompt": "Break down this complex multi-bot system into granular implementation steps covering environment configuration, bot lifecycle management, message routing coordination, identity resolution, tool system integration, dependency injection refactoring, database schema updates, concurrency handling, testing strategies, and documentation. Each subtask should be independently testable and have clear acceptance criteria.",
-        "updatedAt": "2025-11-30T01:13:16.247Z"
+        "updatedAt": "2025-12-29T14:51:32.229Z"
       },
       {
         "id": "60",
@@ -3950,9 +3952,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-11-30T01:13:16.251Z",
+      "lastModified": "2025-12-29T14:51:32.233Z",
       "taskCount": 75,
-      "completedCount": 51,
+      "completedCount": 52,
       "tags": [
         "master"
       ]

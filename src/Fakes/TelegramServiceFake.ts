@@ -1,6 +1,7 @@
 import { TelegramService } from '../TelegramService.js';
 import { TelegramMessageService } from '../TelegramMessageService.js';
-import { Telegraf } from 'telegraf';
+import { BotManagerFake } from './BotManagerFake.js';
+import { ConfigFake } from './ConfigFake.js';
 import * as Typegram from '@telegraf/types';
 import assert from 'node:assert/strict';
 
@@ -30,10 +31,9 @@ export class TelegramServiceFake extends TelegramService {
   public sendError: Error | null = null;
 
   constructor() {
-    super(
-      undefined as unknown as Telegraf,
-      undefined as unknown as TelegramMessageService,
-    );
+    const configFake = new ConfigFake();
+    const botManagerFake = new BotManagerFake(configFake);
+    super(botManagerFake, undefined as unknown as TelegramMessageService);
   }
 
   async sendDice(

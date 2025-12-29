@@ -3,7 +3,6 @@ import { ConversationService } from './ConversationService.js';
 import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageHistoryServiceFake } from './Fakes/MessageHistoryServiceFake.js';
 import { TelegramServiceFake } from './Fakes/TelegramServiceFake.js';
-import { ConfigFake } from './Fakes/ConfigFake.js';
 import { BotIdentityContext } from './BotIdentityContext.js';
 import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
 import { MessageWithUserAndToolMessages } from './Repositories/Types.js';
@@ -12,18 +11,15 @@ describe('ConversationService', () => {
   let service: ConversationService;
   let messageHistory: MessageHistoryServiceFake;
   let telegram: TelegramServiceFake;
-  let config: ConfigFake;
   let botContext: BotIdentityContext;
 
   beforeEach(() => {
     messageHistory = new MessageHistoryServiceFake();
     telegram = new TelegramServiceFake();
-    config = new ConfigFake();
     botContext = { username: 'testbot' };
     service = new ConversationService(
       messageHistory as unknown as MessageHistoryService,
       telegram,
-      config,
     );
   });
 

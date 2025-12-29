@@ -1,7 +1,8 @@
 import { Octokit } from 'octokit';
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import { DateTimeSettingRepository } from './Repositories/DateTimeSettingRepository.js';
 import { TelegramService } from './TelegramService.js';
+import type { GitHubConfig } from './ConfigInterfaces.js';
 import { Config } from './Config.js';
 import { RequestError } from '@octokit/request-error';
 import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
@@ -27,7 +28,7 @@ export class GitHubService {
     private readonly dateTimeSettingRepository: DateTimeSettingRepository,
     private readonly gitCommitAnnounceGenerator: GitCommitAnnouncementGenerator,
     private readonly telegramService: TelegramService,
-    private readonly config: Config,
+    @inject(Config) private readonly config: GitHubConfig,
   ) {}
 
   /**

@@ -8,7 +8,7 @@ import { TelegramMessageService } from './TelegramMessageService.js';
 import { ReplyStrategyFinder } from './ReplyStrategyFinder.js';
 import { ScheduledMessageService } from './ScheduledMessageService.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
-import { Telegraf } from 'telegraf';
+import { BotManager } from './BotManager.js';
 import { message } from 'telegraf/filters';
 import * as Typegram from '@telegraf/types';
 import { ErrorService } from './ErrorService.js';
@@ -17,7 +17,7 @@ import { ErrorService } from './ErrorService.js';
 @injectable()
 export class Bot {
   constructor(
-    private readonly telegraf: Telegraf,
+    private readonly botManager: BotManager,
     private readonly config: Config,
     private readonly messageStorage: MessageStorageService,
     private readonly gitHub: GitHubService,
@@ -30,15 +30,16 @@ export class Bot {
 
   /** Sets the handler to listen to messages. */
   start(): void {
-    this.telegraf.on(message(), (context) => {
+    const primaryTelegraf = this.botManager.getPrimaryBot();
+    primaryTelegraf.on(message(), (context) => {
       this.handleMessage(context.message).catch(ErrorService.log);
     });
-    this.telegraf.catch(ErrorService.log);
-    this.telegraf
+    primaryTelegraf.catch(ErrorService.log);
+    primaryTelegraf
       .launch()
-      .then(() => this.telegraf.telegram.getMyName())
+      .then(() => primaryTelegraf.telegram.getMyName())
       .then((me) => {
-        assert(me.name === this.config.username);
+        assert(me.name === this.config.primaryBot.username);
       })
       .catch(ErrorService.log);
     this.messageStorage.startDailyDeletion(this.oldMessageReplyService);

@@ -88,12 +88,12 @@ export class OldMessageReplyService {
       return false;
     }
 
-    if (message.from.username === this.config.username) {
-      // Don’t reply to own messages.
+    if (message.from.username === this.config.primaryBot.username) {
+      // Don't reply to own messages.
       return false;
     }
 
-    if (message.text.includes('@' + this.config.username)) {
+    if (message.text.includes('@' + this.config.primaryBot.username)) {
       // Message that mentions the bot already received a reply.
       return false;
     }

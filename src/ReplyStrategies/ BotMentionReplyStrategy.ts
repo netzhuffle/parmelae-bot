@@ -25,8 +25,8 @@ export class BotMentionReplyStrategy extends AllowlistedReplyStrategy {
 
   willHandleAllowlisted(message: TelegramMessageWithRelations): boolean {
     return (
-      message.text.includes(`@${this.config.username}`) ||
-      message.replyToMessage?.from.username === this.config.username
+      message.text.includes(`@${this.config.primaryBot.username}`) ||
+      message.replyToMessage?.from.username === this.config.primaryBot.username
     );
   }
 

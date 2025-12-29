@@ -11,7 +11,6 @@ import { Octokit } from 'octokit';
 import { PrismaClient } from './generated/prisma/client.js';
 import { PrismaBunSQLite } from '@synapsenwerkstatt/prisma-bun-sqlite-adapter';
 import { Config } from './Config.js';
-import { Telegraf } from 'telegraf';
 import {
   POKEMON_TCGP_YAML_SYMBOL,
   Sets,
@@ -81,8 +80,5 @@ container.bind(PrismaClient).toDynamicValue(() => {
     errorFormat: 'pretty',
   });
 });
-container
-  .bind(Telegraf)
-  .toDynamicValue((context) => new Telegraf(context.get(Config).telegramToken));
 
 export default container;

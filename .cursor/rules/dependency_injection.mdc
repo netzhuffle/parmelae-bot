@@ -63,14 +63,82 @@ container.bind(POKEMON_TCGP_YAML_SYMBOL).toDynamicValue(async () => {
 // ✓ Manual binding needed for dynamic import
 ```
 
+## Interface-Typed Dependencies with Inversify
+
+When using TypeScript interfaces as constructor parameter types, **interfaces are erased at runtime**. Inversify needs a **runtime token** to resolve dependencies.
+
+**Pattern: Use narrow interfaces for type safety + explicit injection token**
+
+```typescript
+// ✅ DO: Use import type for interfaces (type-only modules)
+import type { BotConfig } from './ConfigInterfaces.js';
+import { Config } from './Config.js';
+import { injectable, inject } from 'inversify';
+
+@injectable()
+export class BotManager {
+  constructor(@inject(Config) private readonly config: BotConfig) {
+    // Inversify resolves using Config (runtime token)
+    // TypeScript enforces BotConfig interface (compile-time type)
+  }
+}
+```
+
+**Why this pattern:**
+- **Type safety:** Narrow interfaces (`BotConfig`, `GitHubConfig`) provide better type hygiene than full `Config` class
+- **Runtime resolution:** `@inject(Config)` provides the concrete class token Inversify needs
+- **Testability:** Tests can use fakes that implement the narrow interface
+
+**Type-Only Module Pattern:**
+```typescript
+// ConfigInterfaces.ts - type-only module
+/**
+ * Type-only module: All exports are TypeScript interfaces that are erased at runtime.
+ * Always use `import type` when importing from this module to avoid runtime import errors.
+ */
+export interface BotConfig { ... }
+export interface GitHubConfig { ... }
+```
+
+**Critical Rules:**
+- ✅ **DO:** Always use `import type` when importing from type-only modules (interfaces only)
+- ✅ **DO:** Add `@inject(<concrete class>)` when constructor parameter is typed as an interface
+- ❌ **DON'T:** Use regular `import` for interfaces from type-only modules (causes Bun runtime errors)
+- ❌ **DON'T:** Rely on Inversify metadata alone for interface-typed dependencies (interfaces don't exist at runtime)
+
+**Example - Multiple Services:**
+```typescript
+// BotManager.ts
+import type { BotConfig } from './ConfigInterfaces.js';
+import { Config } from './Config.js';
+
+@injectable()
+export class BotManager {
+  constructor(@inject(Config) private readonly config: BotConfig) {}
+}
+
+// GitHubService.ts
+import type { GitHubConfig } from './ConfigInterfaces.js';
+import { Config } from './Config.js';
+
+@injectable()
+export class GitHubService {
+  constructor(@inject(Config) private readonly config: GitHubConfig) {}
+}
+```
+
 ## Common Anti-Patterns
 
 - ❌ **DON'T:** Create dependencies manually with `new`
 - ❌ **DON'T:** Use service locator pattern
 - ❌ **DON'T:** Create circular dependencies
 - ❌ **DON'T:** Inject too many dependencies (>5-7 suggests refactoring needed)
+- ❌ **DON'T:** Use regular `import` for interfaces from type-only modules
+- ❌ **DON'T:** Rely on Inversify autobind metadata for interface-typed dependencies
 
 - ✅ **DO:** Use constructor injection for all dependencies
 - ✅ **DO:** Keep dependencies focused and minimal
 - ✅ **DO:** Use interfaces for better testability when appropriate
 - ✅ **DO:** Follow single responsibility principle
+- ✅ **DO:** Use `import type` for interfaces from type-only modules
+- ✅ **DO:** Add `@inject(<concrete class>)` when constructor parameter is typed as an interface

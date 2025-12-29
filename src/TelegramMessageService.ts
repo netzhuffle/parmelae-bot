@@ -1,7 +1,8 @@
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import { MessageStorageService } from './MessageStorageService.js';
 import { ChatModel } from './generated/prisma/models/Chat.js';
 import { UserModel } from './generated/prisma/models/User.js';
+import type { BotConfig } from './ConfigInterfaces.js';
 import { Config } from './Config.js';
 import assert from 'node:assert/strict';
 import {
@@ -37,7 +38,7 @@ type ImageAttachmentMessage =
 export class TelegramMessageService {
   constructor(
     private readonly messageStorage: MessageStorageService,
-    private readonly config: Config,
+    @inject(Config) private readonly config: BotConfig,
   ) {}
 
   /** Stores a message sent to or coming from Telegram. */
@@ -117,7 +118,7 @@ export class TelegramMessageService {
    * Converts Telegram User to UserModel with invariant enforcement.
    *
    * **Enforced Invariants:**
-   * - Configured bot (matching config.username) must have `is_bot=true` in Telegram API
+   * - Configured bot (matching config.primaryBot.username) must have `is_bot=true` in Telegram API
    * - All bots must have non-empty `username` in Telegram API
    *
    * These invariants ensure bot identity can be reliably tracked across
@@ -133,11 +134,11 @@ export class TelegramMessageService {
     // Invariant: configured bot must be marked as bot in Telegram API
     const isConfiguredBot =
       normalizeUsername(telegramUser.username ?? '') ===
-      normalizeUsername(this.config.username);
+      normalizeUsername(this.config.primaryBot.username);
     if (isConfiguredBot) {
       assert(
         isBot,
-        `Configured bot ${this.config.username} must have isBot=true in Telegram API`,
+        `Configured bot ${this.config.primaryBot.username} must have isBot=true in Telegram API`,
       );
     }
 

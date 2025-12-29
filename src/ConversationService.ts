@@ -1,5 +1,4 @@
 import { MessageHistoryService } from './MessageHistoryService.js';
-import { Config } from './Config.js';
 import { ChatGptService } from './ChatGptService.js';
 import {
   AIMessage,
@@ -25,7 +24,6 @@ export class ConversationService {
   constructor(
     private readonly messageHistory: MessageHistoryService,
     private readonly telegram: TelegramService,
-    private readonly config: Config,
   ) {}
 
   /**

@@ -21,7 +21,7 @@ export class CommentReplyStrategy extends AllowlistedReplyStrategy {
   ) {
     super(config);
     this.onlyUsernameRegExp = new RegExp(
-      `^\\w*@${this.config.username}\\w*$`,
+      `^\\w*@${this.config.primaryBot.username}\\w*$`,
       'is',
     );
   }

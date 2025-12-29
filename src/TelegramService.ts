@@ -5,14 +5,19 @@ import assert from 'node:assert/strict';
 import { Telegraf } from 'telegraf';
 import * as Typegram from '@telegraf/types';
 import { TelegramMessage } from './Repositories/Types.js';
+import { BotManager } from './BotManager.js';
 
 /** Service to interact with Telegram. */
 @injectable()
 export class TelegramService {
+  private readonly primaryTelegraf: Telegraf;
+
   constructor(
-    private readonly telegraf: Telegraf,
+    private readonly botManager: BotManager,
     private readonly messageService: TelegramMessageService,
-  ) {}
+  ) {
+    this.primaryTelegraf = this.botManager.getPrimaryBot();
+  }
 
   /**
    * Display typing.
@@ -20,7 +25,10 @@ export class TelegramService {
    * @param chat - The chat to be typing in.
    */
   async sendTyping(chatId: bigint): Promise<void> {
-    await this.telegraf.telegram.sendChatAction(chatId.toString(), 'typing');
+    await this.primaryTelegraf.telegram.sendChatAction(
+      chatId.toString(),
+      'typing',
+    );
   }
 
   /**
@@ -47,12 +55,15 @@ export class TelegramService {
     chatId: bigint,
   ): Promise<Typegram.Message.StickerMessage | Typegram.Message.TextMessage> {
     if (message instanceof Sticker) {
-      return this.telegraf.telegram.sendSticker(
+      return this.primaryTelegraf.telegram.sendSticker(
         chatId.toString(),
         message.fileId,
       );
     } else {
-      return this.telegraf.telegram.sendMessage(chatId.toString(), message);
+      return this.primaryTelegraf.telegram.sendMessage(
+        chatId.toString(),
+        message,
+      );
     }
   }
 
@@ -69,7 +80,7 @@ export class TelegramService {
     chatId: bigint,
   ): Promise<Typegram.Message.DiceMessage> {
     assert(['🎲', '🎯', '🏀', '⚽', '🎳', '🎰'].includes(emoji));
-    const sentMessage = await this.telegraf.telegram.sendDice(
+    const sentMessage = await this.primaryTelegraf.telegram.sendDice(
       chatId.toString(),
       {
         emoji,
@@ -94,7 +105,7 @@ export class TelegramService {
       | Typegram.Message.TextMessage
       | Typegram.Message.StickerMessage;
     if (reply instanceof Sticker) {
-      sentMessage = await this.telegraf.telegram.sendSticker(
+      sentMessage = await this.primaryTelegraf.telegram.sendSticker(
         message.chatId.toString(),
         reply.fileId,
         {
@@ -104,7 +115,7 @@ export class TelegramService {
         },
       );
     } else {
-      sentMessage = await this.telegraf.telegram.sendMessage(
+      sentMessage = await this.primaryTelegraf.telegram.sendMessage(
         message.chatId.toString(),
         reply,
         {
@@ -130,7 +141,7 @@ export class TelegramService {
     caption: string,
     chatId: bigint,
   ): Promise<void> {
-    const sentMessage = await this.telegraf.telegram.sendPhoto(
+    const sentMessage = await this.primaryTelegraf.telegram.sendPhoto(
       chatId.toString(),
       url,
       {
@@ -142,7 +153,7 @@ export class TelegramService {
 
   /** Returns the URL for a Telegram file id. */
   async getFileUrl(fileId: string): Promise<string> {
-    const link = await this.telegraf.telegram.getFileLink(fileId);
+    const link = await this.primaryTelegraf.telegram.getFileLink(fileId);
     return link.href;
   }
 }

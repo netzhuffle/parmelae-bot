@@ -6,6 +6,7 @@ import { Octokit } from 'octokit';
 import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
 import { TelegramService } from './TelegramService.js';
 import { ConfigFake } from './Fakes/ConfigFake.js';
+import type { GitHubConfig } from './ConfigInterfaces.js';
 
 describe('GitHubService', () => {
   let service: GitHubService;
@@ -13,7 +14,7 @@ describe('GitHubService', () => {
   let octokit: Octokit;
   let gitCommitAnnounceGenerator: GitCommitAnnouncementGenerator;
   let telegramService: TelegramService;
-  let config: ConfigFake;
+  let config: GitHubConfig;
   let listCommitsMock: ReturnType<typeof mock>;
   let generateMock: ReturnType<typeof mock>;
   let sendMock: ReturnType<typeof mock>;

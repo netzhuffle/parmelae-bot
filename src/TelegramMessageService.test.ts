@@ -1,7 +1,8 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
 import { TelegramMessageService } from './TelegramMessageService.js';
 import { MessageStorageService } from './MessageStorageService.js';
-import { Config } from './Config.js';
+import type { BotConfig } from './ConfigInterfaces.js';
+import { ConfigFake } from './Fakes/ConfigFake.js';
 import { UserModel } from './generated/prisma/models/User.js';
 import * as Typegram from '@telegraf/types';
 
@@ -13,13 +14,27 @@ interface TelegramMessageServiceWithPrivates {
 describe('TelegramMessageService', () => {
   let service: TelegramMessageService;
   let mockMessageStorage: MessageStorageService;
-  let mockConfig: Config;
+  let mockConfig: BotConfig;
 
   beforeEach(() => {
     mockMessageStorage = {} as MessageStorageService;
-    mockConfig = {
+    const configFake = new ConfigFake();
+    // Create a custom config with the username needed for these tests
+    const primaryBot = {
       username: 'config_bot',
-    } as Config;
+      telegramToken: 'fake-token',
+      defaultIdentity: null,
+    };
+    mockConfig = {
+      ...configFake,
+      primaryBot,
+      bots: [primaryBot],
+      getBotByUsername: configFake.getBotByUsername.bind({
+        ...configFake,
+        primaryBot,
+        bots: [primaryBot],
+      }),
+    };
     service = new TelegramMessageService(mockMessageStorage, mockConfig);
   });
 
@@ -29,7 +44,7 @@ describe('TelegramMessageService', () => {
         id: 123,
         is_bot: true, // Configured bot must be marked as bot in Telegram API
         first_name: 'ConfigBot',
-        username: 'config_bot', // Same as config.username
+        username: 'config_bot', // Same as config.primaryBot.username
       };
 
       const result = (
@@ -47,7 +62,7 @@ describe('TelegramMessageService', () => {
         id: 123,
         is_bot: false, // This violates the invariant
         first_name: 'ConfigBot',
-        username: 'config_bot', // Same as config.username
+        username: 'config_bot', // Same as config.primaryBot.username
       };
 
       expect(() =>

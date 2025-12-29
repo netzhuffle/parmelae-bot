@@ -2,21 +2,27 @@ import assert from 'assert';
 import { injectable } from 'inversify';
 import { GptModel, GptModels } from './GptModelsProvider.js';
 import { Identity } from './MessageGenerators/Identities/Identity.js';
+import { normalizeUsername } from './BotIdentityContext.js';
+import type {
+  BotConfig,
+  BotConfiguration,
+  GitHubConfig,
+} from './ConfigInterfaces.js';
 
 /** The configuration options, taken from .env */
 @injectable()
-export class Config {
+export class Config implements BotConfig, GitHubConfig {
   /** Which GPT language model to use for LangChain agent and tools. */
   public gptModel: GptModel = GptModels.Advanced;
 
   /** The identity to use to reply to messages for each chat. */
   public identityByChatId = new Map<bigint, Identity>();
 
-  /** The bot's Telegram username (without @). */
-  public readonly username: string;
+  /** The primary bot configuration (reads messages). */
+  public readonly primaryBot: BotConfiguration;
 
-  /** The Telegram API auth token. */
-  public readonly telegramToken: string;
+  /** All configured bots (includes primary bot as first element). */
+  public readonly bots: readonly BotConfiguration[];
 
   /** The OpenAI API auth key. */
   public readonly openAiKey: string;
@@ -48,11 +54,11 @@ export class Config {
   public readonly newCommitAnnouncementChats: readonly bigint[];
 
   constructor() {
-    assert(Bun.env.USERNAME, 'You must define USERNAME in .env');
-    this.username = Bun.env.USERNAME;
-
-    assert(Bun.env.TELEGRAM_TOKEN, 'You must define TELEGRAM_TOKEN in .env');
-    this.telegramToken = Bun.env.TELEGRAM_TOKEN;
+    // Parse bot configurations
+    const bots = this.parseBotConfigurations();
+    assert(bots.length > 0, 'At least one bot must be configured');
+    this.bots = bots;
+    this.primaryBot = bots[0];
 
     assert(Bun.env.OPENAI_API_KEY, 'You must define OPENAI_API_KEY in .env');
     this.openAiKey = Bun.env.OPENAI_API_KEY;
@@ -101,6 +107,84 @@ export class Config {
           );
         }
       },
+    );
+  }
+
+  /**
+   * Parses bot configurations from environment variables.
+   * Primary bot uses USERNAME, TELEGRAM_TOKEN, DEFAULT_IDENTITY.
+   * Additional bots use USERNAME_2-9, TELEGRAM_TOKEN_2-9, DEFAULT_IDENTITY_2-9.
+   *
+   * @returns Array of bot configurations, with primary bot first
+   * @throws {Error} If partial bot configurations are found or duplicate usernames exist
+   */
+  private parseBotConfigurations(): BotConfiguration[] {
+    const bots: BotConfiguration[] = [];
+    const seenUsernames = new Set<string>();
+
+    // Parse primary bot (bot 1)
+    const primaryUsername = Bun.env.USERNAME;
+    const primaryToken = Bun.env.TELEGRAM_TOKEN;
+    const primaryIdentity = Bun.env.DEFAULT_IDENTITY ?? null;
+
+    if (primaryUsername && primaryToken) {
+      const normalized = normalizeUsername(primaryUsername);
+      assert(
+        !seenUsernames.has(normalized),
+        `Duplicate bot username: ${primaryUsername}`,
+      );
+      seenUsernames.add(normalized);
+      bots.push({
+        username: primaryUsername,
+        telegramToken: primaryToken,
+        defaultIdentity: primaryIdentity,
+      });
+    } else if (primaryUsername || primaryToken) {
+      assert(
+        false,
+        'Primary bot requires both USERNAME and TELEGRAM_TOKEN to be set',
+      );
+    }
+
+    // Parse additional bots (2-9)
+    for (let i = 2; i <= 9; i++) {
+      const username = Bun.env[`USERNAME_${i}`];
+      const token = Bun.env[`TELEGRAM_TOKEN_${i}`];
+      const identity = Bun.env[`DEFAULT_IDENTITY_${i}`] ?? null;
+
+      if (username && token) {
+        const normalized = normalizeUsername(username);
+        assert(
+          !seenUsernames.has(normalized),
+          `Duplicate bot username: ${username}`,
+        );
+        seenUsernames.add(normalized);
+        bots.push({
+          username,
+          telegramToken: token,
+          defaultIdentity: identity,
+        });
+      } else if (username || token) {
+        assert(
+          false,
+          `Bot ${i} requires both USERNAME_${i} and TELEGRAM_TOKEN_${i} to be set`,
+        );
+      }
+    }
+
+    return bots;
+  }
+
+  /**
+   * Get bot configuration by username.
+   *
+   * @param username - Bot username (case-insensitive)
+   * @returns Bot configuration or undefined if not found
+   */
+  getBotByUsername(username: string): BotConfiguration | undefined {
+    const normalized = normalizeUsername(username);
+    return this.bots.find(
+      (bot) => normalizeUsername(bot.username) === normalized,
     );
   }
 }

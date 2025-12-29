@@ -3,7 +3,6 @@ import { ConversationService } from './ConversationService.js';
 import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageRepositoryFake } from './Fakes/MessageRepositoryFake.js';
 import { TelegramServiceFake } from './Fakes/TelegramServiceFake.js';
-import { ConfigFake } from './Fakes/ConfigFake.js';
 import { BotIdentityContext } from './BotIdentityContext.js';
 import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
 import { MessageRepository } from './Repositories/MessageRepository.js';
@@ -13,13 +12,11 @@ describe('ConversationService Integration', () => {
   let messageHistoryService: MessageHistoryService;
   let messageRepository: MessageRepositoryFake;
   let telegramService: TelegramServiceFake;
-  let config: ConfigFake;
   let botContext: BotIdentityContext;
 
   beforeEach(() => {
     messageRepository = new MessageRepositoryFake();
     telegramService = new TelegramServiceFake();
-    config = new ConfigFake();
     botContext = { username: 'testbot' };
 
     // Use real services for integration testing
@@ -29,7 +26,6 @@ describe('ConversationService Integration', () => {
     conversationService = new ConversationService(
       messageHistoryService,
       telegramService,
-      config,
     );
   });
 
