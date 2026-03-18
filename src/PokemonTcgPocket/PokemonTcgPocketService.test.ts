@@ -838,7 +838,6 @@ describe('PokemonTcgPocketService', () => {
         promos: { cards: [], owned: 0, notNeeded: 0, total: 0 },
       };
 
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       const formatted = service['formatSetStats'](stats);
       expect(formatted).toEqual(['♦️ 2/5', '⭐️ 3', '✴️ 1', '👑 1']);
     });
@@ -859,7 +858,6 @@ describe('PokemonTcgPocketService', () => {
         promos: { cards: [], owned: 0, notNeeded: 0, total: 0 },
       };
 
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       const formatted = service['formatSetStats'](stats);
       expect(formatted).toEqual(['♦️ 2/5', '✴️ 1']);
     });
@@ -880,7 +878,6 @@ describe('PokemonTcgPocketService', () => {
         promos: { cards: [], owned: 3, notNeeded: 0, total: 5 },
       };
 
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       const formatted = service['formatSetStats'](stats);
       expect(formatted).toEqual(['3']);
     });

@@ -17,7 +17,6 @@ const container = new Container({
 
 // Bind Pokemon TCG Pocket YAML file
 container.bind(POKEMON_TCGP_YAML_SYMBOL).toDynamicValue(async (): Promise<Sets> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { default: sets } = await import('../resources/tcgpcards.yaml');
   return sets as Sets;
 });

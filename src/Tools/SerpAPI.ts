@@ -287,7 +287,6 @@ type UrlParameters = Record<string, string | number | boolean | undefined | null
 
 function buildUrl<P extends UrlParameters>(path: string, parameters: P): string {
   const nonUndefinedParams: [string, string][] = Object.entries(parameters)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .filter(([_, value]) => value !== undefined)
     .map(([key, value]) => [key, `${value}`]);
   const searchParams = new URLSearchParams(nonUndefinedParams);

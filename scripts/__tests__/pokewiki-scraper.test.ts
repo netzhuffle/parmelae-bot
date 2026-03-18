@@ -127,12 +127,12 @@ describe('Pokewiki Scraper', () => {
       // Test that fetchWikitext validates URLs
       // Invalid domain
       const invalidDomainPromise = fetchWikitext('https://example.com/Some_Page');
-      // eslint-disable-next-line @typescript-eslint/await-thenable
+      // oxlint-disable-next-line @typescript-eslint/await-thenable -- Bun's rejects matcher is awaitable, but Oxlint does not recognize it as thenable
       await expect(invalidDomainPromise).rejects.toThrow('URL must be from');
 
       // Invalid URL format
       const invalidUrlPromise = fetchWikitext('not-a-url');
-      // eslint-disable-next-line @typescript-eslint/await-thenable
+      // oxlint-disable-next-line @typescript-eslint/await-thenable -- Bun's rejects matcher is awaitable, but Oxlint does not recognize it as thenable
       await expect(invalidUrlPromise).rejects.toThrow('Invalid URL');
     });
   });
@@ -185,7 +185,7 @@ describe('Pokewiki Scraper', () => {
 
       const url = 'https://www.pokewiki.de/Test_Set';
 
-      // eslint-disable-next-line @typescript-eslint/await-thenable
+      // oxlint-disable-next-line @typescript-eslint/await-thenable -- Bun's rejects matcher is awaitable, but Oxlint does not recognize it as thenable
       await expect(fetchWikitext(url)).rejects.toThrow(
         'Edit source page did not contain expected textarea element',
       );
@@ -208,7 +208,7 @@ describe('Pokewiki Scraper', () => {
 
       const url = 'https://www.pokewiki.de/Test_Set';
 
-      // eslint-disable-next-line @typescript-eslint/await-thenable
+      // oxlint-disable-next-line @typescript-eslint/await-thenable -- Bun's rejects matcher is awaitable, but Oxlint does not recognize it as thenable
       await expect(fetchWikitext(url)).rejects.toThrow('Edit source content is too short');
     });
 
@@ -224,7 +224,7 @@ describe('Pokewiki Scraper', () => {
 
       const url = 'https://www.pokewiki.de/Test_Set';
 
-      // eslint-disable-next-line @typescript-eslint/await-thenable
+      // oxlint-disable-next-line @typescript-eslint/await-thenable -- Bun's rejects matcher is awaitable, but Oxlint does not recognize it as thenable
       await expect(fetchWikitext(url)).rejects.toThrow('Failed to fetch edit source');
     });
   });

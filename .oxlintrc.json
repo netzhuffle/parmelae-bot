@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "options": {
+    "reportUnusedDisableDirectives": "error",
     "typeAware": true,
     "typeCheck": true
   },
@@ -48,7 +49,7 @@
     "no-prototype-builtins": "error",
     "no-regex-spaces": "error",
     "no-self-assign": "error",
-    "no-await-in-loop": "off",
+    "no-await-in-loop": "error",
     "no-shadow": "error",
     "no-shadow-restricted-names": "error",
     "no-sparse-arrays": "error",
@@ -128,6 +129,14 @@
       ],
       "rules": {
         "import/no-unassigned-import": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.test.ts"
+      ],
+      "rules": {
+        "no-await-in-loop": "off"
       }
     }
   ]

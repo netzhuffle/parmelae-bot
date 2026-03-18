@@ -11,12 +11,9 @@ import {
   MessageGetPayload,
 } from '../generated/prisma/models/Message.js';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-type HasTelegramMessageId = {
+interface HasTelegramMessageId {
   telegramMessageId: NonNullable<MessageModel['telegramMessageId']>;
-};
+}
 
 /** Message coming from Telegram. */
 export type TelegramMessage = MessageModel & HasTelegramMessageId;

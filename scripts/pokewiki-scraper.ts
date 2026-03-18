@@ -14,6 +14,26 @@ const MIN_WIKITEXT_LENGTH = 500;
 /** Pokewiki base URL for validation */
 const POKEWIKI_BASE_URL = 'https://www.pokewiki.de';
 
+const YAML_SPECIAL_CHARACTERS = [
+  ':',
+  '#',
+  '@',
+  '`',
+  '|',
+  '>',
+  '[',
+  ']',
+  '{',
+  '}',
+  '&',
+  '*',
+  '!',
+  '?',
+  '%',
+  "'",
+  '"',
+] as const;
+
 /**
  * Maps Pokewiki rarity codes to project rarity symbols.
  *
@@ -326,8 +346,7 @@ function extractSetName(source: string): string {
  */
 export function escapeYamlString(str: string): string {
   // If string contains special characters, wrap in quotes
-  // eslint-disable-next-line no-useless-escape
-  if (/[:#@`|>\]\[{}&*!?%'"]/.test(str) || str.includes('\n')) {
+  if (YAML_SPECIAL_CHARACTERS.some((character) => str.includes(character)) || str.includes('\n')) {
     // Escape quotes and backslashes
     return `"${str.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
   }

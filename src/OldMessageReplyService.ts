@@ -42,6 +42,7 @@ export class OldMessageReplyService {
         continue;
       }
       if (Math.random() < OLD_MESSAGE_REPLY_PROBABILITY) {
+        // oxlint-disable-next-line no-await-in-loop -- replies should stay throttled to one random message at a time
         await this.replyToMessage(randomMessage);
       }
       replyCandidates = replyCandidates.filter(

@@ -57,6 +57,7 @@ export class GitHubService {
     const commits = await this.pollCommits();
     commits.reverse();
     for (const commit of commits) {
+      // oxlint-disable-next-line no-await-in-loop -- commit handling must stay chronological for date tracking and announcements
       await this.handleCommit(commit);
     }
   }

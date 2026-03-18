@@ -11,7 +11,6 @@ import {
 } from '../../generated/prisma/models/PokemonCard.js';
 
 /** Type value for a Pokemon card including set, boosters, and ownership relations. */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const POKEMON_CARD_WITH_RELATIONS = {
   include: {
     set: true,

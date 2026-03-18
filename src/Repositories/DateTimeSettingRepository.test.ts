@@ -135,7 +135,7 @@ describe('DateTimeSettingRepository', () => {
     it('should throw error when newDate is invalid', async () => {
       const invalidDate = new Date(NaN);
 
-      // eslint-disable-next-line @typescript-eslint/await-thenable
+      // oxlint-disable-next-line @typescript-eslint/await-thenable -- Bun's rejects matcher is awaitable, but Oxlint does not recognize it as thenable
       await expect(repository.update('test-setting', invalidDate)).rejects.toThrow(
         'Cannot update setting',
       );

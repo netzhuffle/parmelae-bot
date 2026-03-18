@@ -2,6 +2,7 @@ import { describe, beforeEach, it, expect } from 'bun:test';
 
 import { MessageRepositoryFake } from './Fakes/MessageRepositoryFake.js';
 import { MessageHistoryService } from './MessageHistoryService.js';
+import type { MessageRepository } from './Repositories/MessageRepository.js';
 import { MessageWithUserAndToolMessages } from './Repositories/Types.js';
 
 describe('MessageHistoryService', () => {
@@ -10,8 +11,7 @@ describe('MessageHistoryService', () => {
 
   beforeEach(() => {
     repository = new MessageRepositoryFake();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-    service = new MessageHistoryService(repository as any);
+    service = new MessageHistoryService(repository as unknown as MessageRepository);
   });
 
   describe('getHistory', () => {

@@ -379,6 +379,7 @@ export class PokemonTcgPocketService {
   /** Synchronizes the database with the YAML source file. */
   async synchronizeCardDatabaseWithYamlSource(): Promise<void> {
     for (const [setKey, setData] of Object.entries(this.setsData)) {
+      // oxlint-disable-next-line no-await-in-loop -- set synchronization should stay serialized to keep DB writes predictable
       await this.synchronizeSet(setKey, setData);
     }
   }
@@ -829,6 +830,7 @@ export class PokemonTcgPocketService {
         throw new PokemonTcgPocketInvalidCardNumberError(setKey, cardNumberString);
       }
 
+      // oxlint-disable-next-line no-await-in-loop -- card synchronization should stay serialized to avoid write-order surprises
       await this.synchronizeCard(setKey, cardNumber, card, validBoosterNames);
     }
   }

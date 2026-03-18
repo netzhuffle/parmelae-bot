@@ -41,7 +41,6 @@ describe('ScheduleMessageTool', () => {
       const messageText = 'Test reminder';
       const input = `${seconds},${messageText}`;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result: string = await scheduleMessageTool.invoke(input);
 
       // Should create scheduled message in repository
@@ -65,7 +64,6 @@ describe('ScheduleMessageTool', () => {
     it('should return error for input without comma', async () => {
       const input = '60Test reminder';
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result: string = await scheduleMessageTool.invoke(input);
 
       expect(result).toBe(
@@ -77,7 +75,6 @@ describe('ScheduleMessageTool', () => {
     it('should return error for non-numeric first argument', async () => {
       const input = 'not-a-number,Test reminder';
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result: string = await scheduleMessageTool.invoke(input);
 
       expect(result).toBe(
@@ -89,7 +86,6 @@ describe('ScheduleMessageTool', () => {
     it('should return error for negative number', async () => {
       const input = '-60,Test reminder';
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result: string = await scheduleMessageTool.invoke(input);
 
       expect(result).toBe(
@@ -135,7 +131,6 @@ describe('ScheduleMessageTool', () => {
       repository.createShouldThrow = true;
       repository.createError = new Error('Database error');
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result: string = await scheduleMessageTool.invoke(input);
 
       expect(result).toBe('Error: Failed scheduling the message.');
