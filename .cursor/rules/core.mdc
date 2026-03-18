@@ -62,6 +62,8 @@ You are a world-class TypeScript senior expert, tasked with maintaining and deve
    - Prefer composition over inheritance
    - Minimize function complexity, prefer early returns, extract complex logic to utility functions
    - Use clear variable names, avoid abbreviations in variable names
+   - Every hand-written `oxlint-disable` directive must include a concrete reason
+   - Avoid `await` inside loops unless the work is intentionally sequential; when sequential awaiting is required, add an inline `oxlint-disable-next-line` comment with a concrete reason
    - Document public methods and exported classes with JSDoc
      - Keep documentation concise
      - Do not document obvious parameters (but do document non-obvious ones)

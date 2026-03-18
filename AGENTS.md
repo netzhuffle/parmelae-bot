@@ -13,6 +13,8 @@
 - Keep touched documentation aligned with the implemented behavior.
 - Do not edit generated artifacts unless the task explicitly requires it.
 - Preserve unrelated user changes in the worktree.
+- Every hand-written `oxlint-disable` directive must include a concrete reason.
+- Avoid `await` inside loops unless the work is intentionally sequential. When sequential awaiting is required, add an inline `oxlint-disable-next-line` with a concrete reason.
 - Before handoff on implementation changes, run `bun run checks`.
 
 ## Project Structure & Conventions

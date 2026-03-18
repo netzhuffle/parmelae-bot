@@ -11,6 +11,7 @@ alwaysApply: false
 - **Only fake I/O operations** (DB, network); unit and integration test all business logic
 - **Keep fakes simple** and void of any business logic (because there are no tests for tests!)
 - **Test files should follow pattern**: `[originalFileName].test.ts`
+- **Every hand-written `oxlint-disable` directive must include a concrete reason**
 
 ## Bun:Test Implementation
 
@@ -29,6 +30,7 @@ import { describe, beforeAll, afterAll, beforeEach, afterEach, it, test, expect,
 - **Follow arrange, act, assert pattern**
 - **Keep tests simple** for easy correctness judgment
 - **No business logic in tests** - repetition is fine, focus on readability
+- **Sequential awaits in tests are acceptable** when they make setup or verification clearer; `no-await-in-loop` is not enforced for `*.test.ts`
 - **Always verify:**
   - Code runs without errors
   - Correct methods are called with correct arguments
