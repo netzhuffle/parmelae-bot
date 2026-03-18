@@ -1,10 +1,12 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { TelegramMessageService } from './TelegramMessageService.js';
-import { MessageStorageService } from './MessageStorageService.js';
+
+import * as Typegram from '@telegraf/types';
+
 import type { BotConfig } from './ConfigInterfaces.js';
 import { ConfigFake } from './Fakes/ConfigFake.js';
 import { UserModel } from './generated/prisma/models/User.js';
-import * as Typegram from '@telegraf/types';
+import { MessageStorageService } from './MessageStorageService.js';
+import { TelegramMessageService } from './TelegramMessageService.js';
 
 // Interface for accessing private methods in tests
 interface TelegramMessageServiceWithPrivates {
@@ -47,9 +49,7 @@ describe('TelegramMessageService', () => {
         username: 'config_bot', // Same as config.primaryBot.username
       };
 
-      const result = (
-        service as unknown as TelegramMessageServiceWithPrivates
-      ).getUser(configBot);
+      const result = (service as unknown as TelegramMessageServiceWithPrivates).getUser(configBot);
 
       expect(result.isBot).toBe(true);
       expect(result.username).toBe('config_bot');
@@ -66,12 +66,8 @@ describe('TelegramMessageService', () => {
       };
 
       expect(() =>
-        (service as unknown as TelegramMessageServiceWithPrivates).getUser(
-          configBotWithWrongFlag,
-        ),
-      ).toThrow(
-        'Configured bot config_bot must have isBot=true in Telegram API',
-      );
+        (service as unknown as TelegramMessageServiceWithPrivates).getUser(configBotWithWrongFlag),
+      ).toThrow('Configured bot config_bot must have isBot=true in Telegram API');
     });
 
     it('should keep isBot=true for regular bots', () => {
@@ -82,9 +78,7 @@ describe('TelegramMessageService', () => {
         username: 'regular_bot',
       };
 
-      const result = (
-        service as unknown as TelegramMessageServiceWithPrivates
-      ).getUser(regularBot);
+      const result = (service as unknown as TelegramMessageServiceWithPrivates).getUser(regularBot);
 
       expect(result.isBot).toBe(true);
       expect(result.username).toBe('regular_bot');
@@ -99,9 +93,7 @@ describe('TelegramMessageService', () => {
         username: 'john_doe',
       };
 
-      const result = (
-        service as unknown as TelegramMessageServiceWithPrivates
-      ).getUser(humanUser);
+      const result = (service as unknown as TelegramMessageServiceWithPrivates).getUser(humanUser);
 
       expect(result.isBot).toBe(false);
       expect(result.username).toBe('john_doe');
@@ -117,9 +109,7 @@ describe('TelegramMessageService', () => {
       };
 
       expect(() =>
-        (service as unknown as TelegramMessageServiceWithPrivates).getUser(
-          botWithoutUsername,
-        ),
+        (service as unknown as TelegramMessageServiceWithPrivates).getUser(botWithoutUsername),
       ).toThrow('Bot user 999 must have a username in Telegram API');
     });
 
@@ -132,9 +122,7 @@ describe('TelegramMessageService', () => {
       };
 
       expect(() =>
-        (service as unknown as TelegramMessageServiceWithPrivates).getUser(
-          botWithEmptyUsername,
-        ),
+        (service as unknown as TelegramMessageServiceWithPrivates).getUser(botWithEmptyUsername),
       ).toThrow('Bot user 888 must have a username in Telegram API');
     });
 
@@ -146,9 +134,9 @@ describe('TelegramMessageService', () => {
         // No last_name, username, or language_code
       };
 
-      const result = (
-        service as unknown as TelegramMessageServiceWithPrivates
-      ).getUser(userWithOptionalFields);
+      const result = (service as unknown as TelegramMessageServiceWithPrivates).getUser(
+        userWithOptionalFields,
+      );
 
       expect(result.isBot).toBe(false);
       expect(result.firstName).toBe('MinimalUser');

@@ -1,4 +1,5 @@
 import { injectable } from 'inversify';
+
 import { MessageRepository } from './Repositories/MessageRepository.js';
 import {
   MessageWithUserAndToolMessages,
@@ -25,12 +26,8 @@ export class MessageHistoryService {
     messageCount: number,
   ): Promise<MessageWithUserAndToolMessages[]> {
     const message = await this.messageRepository.get(toMessageId);
-    const messageWithToolCallMessages =
-      this.expandMessageWithToolCallMessages(message);
-    return this.getHistoryForMessages(
-      [...messageWithToolCallMessages],
-      messageCount,
-    );
+    const messageWithToolCallMessages = this.expandMessageWithToolCallMessages(message);
+    return this.getHistoryForMessages([...messageWithToolCallMessages], messageCount);
   }
 
   /** Recursively fetches older messages until enough messages are found or there are no more old messages. */
@@ -46,9 +43,7 @@ export class MessageHistoryService {
 
     // If the oldest message is a reply, then the preceding message is the message replied to.
     if (oldestMessage.replyToMessage) {
-      const messageRepliedTo = await this.messageRepository.get(
-        oldestMessage.replyToMessage.id,
-      );
+      const messageRepliedTo = await this.messageRepository.get(oldestMessage.replyToMessage.id);
       const messageRepliedToAndToolCallMessages =
         this.expandMessageWithToolCallMessages(messageRepliedTo);
       return this.getHistoryForMessages(
@@ -58,11 +53,10 @@ export class MessageHistoryService {
     }
 
     // Fallback to previous message in chat if there is one.
-    const precedingMessage =
-      await this.messageRepository.getPreviousChatMessage(
-        oldestMessage.chatId,
-        oldestMessage.id,
-      );
+    const precedingMessage = await this.messageRepository.getPreviousChatMessage(
+      oldestMessage.chatId,
+      oldestMessage.id,
+    );
     if (precedingMessage) {
       const precedingMessageAndToolCallMessages =
         this.expandMessageWithToolCallMessages(precedingMessage);
@@ -88,9 +82,7 @@ export class MessageHistoryService {
     // Add any tool call messages that this message is based on
     if (message.toolCallMessages.length > 0) {
       // Sort tool call messages by ID to ensure chronological order
-      const sortedToolCallMessages = [...message.toolCallMessages].sort(
-        (a, b) => a.id - b.id,
-      );
+      const sortedToolCallMessages = [...message.toolCallMessages].sort((a, b) => a.id - b.id);
 
       // Add each tool call message to the expanded list
       expandedMessages.push(...sortedToolCallMessages);

@@ -2,19 +2,14 @@ import { describe, it, expect, setSystemTime } from 'bun:test';
 import { existsSync, mkdirSync } from 'fs';
 
 // Import the backup script functions
-import {
-  createBackupFilename,
-  ensureBackupDirectory,
-} from '../backup-database.ts';
+import { createBackupFilename, ensureBackupDirectory } from '../backup-database.ts';
 
 describe('Backup Database Script', () => {
   describe('createBackupFilename', () => {
     it('should create filename with correct format', () => {
       const filename = createBackupFilename();
 
-      expect(filename).toMatch(
-        /^sqlite-backup-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.db$/,
-      );
+      expect(filename).toMatch(/^sqlite-backup-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.db$/);
     });
 
     it('should create unique filenames for different times', () => {

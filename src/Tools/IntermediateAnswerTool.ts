@@ -1,5 +1,6 @@
-import { TelegramService } from '../TelegramService.js';
 import { Tool } from '@langchain/core/tools';
+
+import { TelegramService } from '../TelegramService.js';
 
 export const INTERMEDIATE_ANSWER_TOOL_NAME = 'intermediate-answer';
 

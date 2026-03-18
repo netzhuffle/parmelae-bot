@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 
-import { $ } from 'bun';
 import { join } from 'path';
+
+import { $ } from 'bun';
 
 // Configuration
 const DB_PATH = join(import.meta.dir, '../../prisma/sqlite.db');
@@ -13,20 +14,14 @@ const BACKUP_PREFIX = 'sqlite-backup';
  */
 export function createBackupFilename(): string {
   const now = new Date();
-  const timestamp = now
-    .toISOString()
-    .replace(/T/, '-')
-    .replace(/\..+/, '')
-    .replace(/:/g, '-');
+  const timestamp = now.toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/:/g, '-');
   return `${BACKUP_PREFIX}-${timestamp}.db`;
 }
 
 /**
  * Ensure backup directory exists
  */
-export async function ensureBackupDirectory(
-  dir: string = BACKUP_DIR,
-): Promise<void> {
+export async function ensureBackupDirectory(dir: string = BACKUP_DIR): Promise<void> {
   const dirExists = await Bun.file(dir).exists();
   if (!dirExists) {
     console.log(`Creating backup directory: ${dir}`);
@@ -60,8 +55,7 @@ async function createBackup(): Promise<string> {
 
     // Verify backup integrity using sqlite3 CLI
     console.log('Verifying backup...');
-    const integrity =
-      await $`sqlite3 -readonly ${backupPath} "PRAGMA integrity_check;"`.text();
+    const integrity = await $`sqlite3 -readonly ${backupPath} "PRAGMA integrity_check;"`.text();
     if (integrity.trim() !== 'ok') {
       throw new Error(`Backup verification failed: ${integrity.trim()}`);
     }

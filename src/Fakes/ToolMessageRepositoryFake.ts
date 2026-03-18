@@ -13,11 +13,7 @@ export class ToolMessageRepositoryFake {
     messageId: number;
   }[] = [];
 
-  store(data: {
-    toolCallId: string;
-    text: string;
-    messageId: number;
-  }): Promise<void> {
+  store(data: { toolCallId: string; text: string; messageId: number }): Promise<void> {
     this.storeCallArgs.push(data);
     this.toolMessages.push({
       id: this.nextId++,

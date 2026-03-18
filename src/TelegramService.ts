@@ -1,11 +1,13 @@
+import assert from 'node:assert/strict';
+
+import * as Typegram from '@telegraf/types';
 import { injectable } from 'inversify';
+import { Telegraf } from 'telegraf';
+
+import { BotManager } from './BotManager.js';
+import { TelegramMessage } from './Repositories/Types.js';
 import { Sticker } from './Sticker.js';
 import { TelegramMessageService } from './TelegramMessageService.js';
-import assert from 'node:assert/strict';
-import { Telegraf } from 'telegraf';
-import * as Typegram from '@telegraf/types';
-import { TelegramMessage } from './Repositories/Types.js';
-import { BotManager } from './BotManager.js';
 
 /** Service to interact with Telegram. */
 @injectable()
@@ -25,10 +27,7 @@ export class TelegramService {
    * @param chat - The chat to be typing in.
    */
   async sendTyping(chatId: bigint): Promise<void> {
-    await this.primaryTelegraf.telegram.sendChatAction(
-      chatId.toString(),
-      'typing',
-    );
+    await this.primaryTelegraf.telegram.sendChatAction(chatId.toString(), 'typing');
   }
 
   /**
@@ -55,15 +54,9 @@ export class TelegramService {
     chatId: bigint,
   ): Promise<Typegram.Message.StickerMessage | Typegram.Message.TextMessage> {
     if (message instanceof Sticker) {
-      return this.primaryTelegraf.telegram.sendSticker(
-        chatId.toString(),
-        message.fileId,
-      );
+      return this.primaryTelegraf.telegram.sendSticker(chatId.toString(), message.fileId);
     } else {
-      return this.primaryTelegraf.telegram.sendMessage(
-        chatId.toString(),
-        message,
-      );
+      return this.primaryTelegraf.telegram.sendMessage(chatId.toString(), message);
     }
   }
 
@@ -75,17 +68,11 @@ export class TelegramService {
    *
    * @return The sent message.
    */
-  async sendDice(
-    emoji: string,
-    chatId: bigint,
-  ): Promise<Typegram.Message.DiceMessage> {
+  async sendDice(emoji: string, chatId: bigint): Promise<Typegram.Message.DiceMessage> {
     assert(['🎲', '🎯', '🏀', '⚽', '🎳', '🎰'].includes(emoji));
-    const sentMessage = await this.primaryTelegraf.telegram.sendDice(
-      chatId.toString(),
-      {
-        emoji,
-      },
-    );
+    const sentMessage = await this.primaryTelegraf.telegram.sendDice(chatId.toString(), {
+      emoji,
+    });
     await this.messageService.store(sentMessage);
     return sentMessage;
   }
@@ -97,13 +84,8 @@ export class TelegramService {
    * @param message - The message to reply to.
    * @return The database message ID of the reply.
    */
-  async reply(
-    reply: string | Sticker,
-    message: TelegramMessage,
-  ): Promise<number> {
-    let sentMessage:
-      | Typegram.Message.TextMessage
-      | Typegram.Message.StickerMessage;
+  async reply(reply: string | Sticker, message: TelegramMessage): Promise<number> {
+    let sentMessage: Typegram.Message.TextMessage | Typegram.Message.StickerMessage;
     if (reply instanceof Sticker) {
       sentMessage = await this.primaryTelegraf.telegram.sendSticker(
         message.chatId.toString(),
@@ -136,18 +118,10 @@ export class TelegramService {
    * @param caption - The image caption.
    * @param message - The message to reply to.
    */
-  async replyWithImage(
-    url: string,
-    caption: string,
-    chatId: bigint,
-  ): Promise<void> {
-    const sentMessage = await this.primaryTelegraf.telegram.sendPhoto(
-      chatId.toString(),
-      url,
-      {
-        caption: caption,
-      },
-    );
+  async replyWithImage(url: string, caption: string, chatId: bigint): Promise<void> {
+    const sentMessage = await this.primaryTelegraf.telegram.sendPhoto(chatId.toString(), url, {
+      caption: caption,
+    });
     await this.messageService.store(sentMessage);
   }
 

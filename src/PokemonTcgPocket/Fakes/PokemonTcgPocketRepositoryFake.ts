@@ -1,15 +1,12 @@
+import { PrismaClient } from '../../generated/prisma/client.js';
 import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
-import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
 import { PokemonBoosterModel } from '../../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../../generated/prisma/models/PokemonCard.js';
-import { PrismaClient } from '../../generated/prisma/client.js';
-import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
+import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
 import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
+import { OwnershipFilter, CardOwnershipStatus } from '../PokemonTcgPocketService.js';
+import { PokemonTcgPocketRepository } from '../Repositories/PokemonTcgPocketRepository.js';
 import { PokemonCardWithRelations } from '../Repositories/Types.js';
-import {
-  OwnershipFilter,
-  CardOwnershipStatus,
-} from '../PokemonTcgPocketService.js';
 
 /** Fake repository for testing Pokemon TCG Pocket functionality */
 export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
@@ -52,16 +49,11 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Retrieves a card by its number and set key, or null if it doesn't exist */
-  retrieveCardByNumberAndSetKey(
-    number: number,
-    setKey: string,
-  ): Promise<PokemonCardModel | null> {
+  retrieveCardByNumberAndSetKey(number: number, setKey: string): Promise<PokemonCardModel | null> {
     const set = this.sets.get(setKey);
     if (!set) return Promise.resolve(null);
 
-    return Promise.resolve(
-      this.cards.get(this.getCardKey(setKey, number)) ?? null,
-    );
+    return Promise.resolve(this.cards.get(this.getCardKey(setKey, number)) ?? null);
   }
 
   /** Creates a new set */
@@ -175,8 +167,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
 
     // If we have both cardNumber and setKey, we're searching by ID
     const isIdSearch =
-      searchCriteria?.cardNumber !== undefined &&
-      searchCriteria?.setKey !== undefined;
+      searchCriteria?.cardNumber !== undefined && searchCriteria?.setKey !== undefined;
     const hasOtherCriteria =
       searchCriteria?.cardName !== undefined ||
       searchCriteria?.setName !== undefined ||
@@ -188,14 +179,10 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       const setKey = searchCriteria.setKey;
       const cardNumber = searchCriteria.cardNumber;
       cards = cards.filter((card) => {
-        const cardKey = Array.from(this.cards.entries()).find(
-          ([_, c]) => c.id === card.id,
-        )?.[0];
+        const cardKey = Array.from(this.cards.entries()).find(([_, c]) => c.id === card.id)?.[0];
         if (!cardKey) return false;
         const [cardSetKey, cardNumberStr] = cardKey.split('_');
-        return (
-          cardSetKey === setKey && parseInt(cardNumberStr, 10) === cardNumber
-        );
+        return cardSetKey === setKey && parseInt(cardNumberStr, 10) === cardNumber;
       });
     }
 
@@ -207,9 +194,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     // Apply basic name filtering
     const searchName = searchCriteria?.cardName;
     if (searchName) {
-      cards = cards.filter((card) =>
-        card.name.toLowerCase().includes(searchName.toLowerCase()),
-      );
+      cards = cards.filter((card) => card.name.toLowerCase().includes(searchName.toLowerCase()));
     }
 
     // Only apply userId filtering as it's critical for ownership tests
@@ -242,14 +227,10 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     return Promise.resolve(
       cards.map((card) => {
         // Find the set by looking up the card's setId in the sets map
-        const set = Array.from(this.sets.values()).find(
-          (s) => s.id === card.setId,
-        );
+        const set = Array.from(this.sets.values()).find((s) => s.id === card.setId);
         if (!set) {
           // Find the set by key instead since that's what we use in tests
-          const cardKey = Array.from(this.cards.entries()).find(
-            ([_, c]) => c.id === card.id,
-          )?.[0];
+          const cardKey = Array.from(this.cards.entries()).find(([_, c]) => c.id === card.id)?.[0];
           if (!cardKey) {
             throw new Error(`Card ${card.id} not found in lookup map`);
           }
@@ -262,37 +243,11 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
             ...card,
             set: setByKey,
             boosters: this.getCardBoosters(card.id),
-            ownership: Array.from(this.cardOwners.get(card.id) ?? []).map(
-              (userId) => ({
-                id: this.nextId++, // ownership record id
-                cardId: card.id,
-                userId: userId,
-                status: OwnershipStatus.OWNED,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                user: {
-                  id: userId,
-                  isBot: false,
-                  firstName: 'Test' + userId,
-                  lastName: null,
-                  username: Number(userId) % 2 === 0 ? null : 'test' + userId,
-                  languageCode: null,
-                },
-              }),
-            ),
-          };
-        }
-        const boosters = this.getCardBoosters(card.id);
-        const ownership = Array.from(this.cardOwners.get(card.id) ?? []).map(
-          (userId) => {
-            const statusKey = `${card.id}_${userId}`;
-            const ownershipStatus =
-              this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
-            return {
+            ownership: Array.from(this.cardOwners.get(card.id) ?? []).map((userId) => ({
               id: this.nextId++, // ownership record id
               cardId: card.id,
               userId: userId,
-              status: ownershipStatus,
+              status: OwnershipStatus.OWNED,
               createdAt: new Date(),
               updatedAt: new Date(),
               user: {
@@ -303,9 +258,30 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
                 username: Number(userId) % 2 === 0 ? null : 'test' + userId,
                 languageCode: null,
               },
-            };
-          },
-        );
+            })),
+          };
+        }
+        const boosters = this.getCardBoosters(card.id);
+        const ownership = Array.from(this.cardOwners.get(card.id) ?? []).map((userId) => {
+          const statusKey = `${card.id}_${userId}`;
+          const ownershipStatus = this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+          return {
+            id: this.nextId++, // ownership record id
+            cardId: card.id,
+            userId: userId,
+            status: ownershipStatus,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            user: {
+              id: userId,
+              isBot: false,
+              firstName: 'Test' + userId,
+              lastName: null,
+              username: Number(userId) % 2 === 0 ? null : 'test' + userId,
+              languageCode: null,
+            },
+          };
+        });
         return {
           ...card,
           set,
@@ -338,14 +314,11 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     const statusKey = `${cardId}_${userId}`;
     this.cardOwnershipStatus.set(statusKey, status);
 
-    const set = Array.from(this.sets.values()).find(
-      (s) => s.id === card.setId,
-    )!;
+    const set = Array.from(this.sets.values()).find((s) => s.id === card.setId)!;
     const boosters = this.getCardBoosters(card.id);
     const ownership = Array.from(owners).map((ownerId) => {
       const statusKey = `${card.id}_${ownerId}`;
-      const ownershipStatus =
-        this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+      const ownershipStatus = this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
       return {
         id: this.nextId++,
         cardId: card.id,
@@ -373,11 +346,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Get card IDs within a number range in a specific set */
-  getCardIdsInRange(
-    setKey: string,
-    startNumber: number,
-    endNumber: number,
-  ): Promise<number[]> {
+  getCardIdsInRange(setKey: string, startNumber: number, endNumber: number): Promise<number[]> {
     const cards = Array.from(this.cards.values());
     const set = Array.from(this.sets.values()).find((s) => s.key === setKey);
 
@@ -396,9 +365,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     });
 
     // Return just the card IDs, sorted by number
-    const cardIds = filteredCards
-      .sort((a, b) => a.number - b.number)
-      .map((card) => card.id);
+    const cardIds = filteredCards.sort((a, b) => a.number - b.number).map((card) => card.id);
 
     return Promise.resolve(cardIds);
   }
@@ -427,14 +394,11 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       const statusKey = `${cardId}_${userId}`;
       this.cardOwnershipStatus.set(statusKey, OwnershipStatus.OWNED);
 
-      const set = Array.from(this.sets.values()).find(
-        (s) => s.id === card.setId,
-      )!;
+      const set = Array.from(this.sets.values()).find((s) => s.id === card.setId)!;
       const boosters = this.getCardBoosters(card.id);
       const ownership = Array.from(owners).map((ownerId) => {
         const statusKey = `${card.id}_${ownerId}`;
-        const ownershipStatus =
-          this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+        const ownershipStatus = this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
         return {
           id: this.nextId++,
           cardId: card.id,
@@ -462,17 +426,12 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     }
 
     return Promise.resolve(
-      result.sort(
-        (a, b) => a.set.key.localeCompare(b.set.key) || a.number - b.number,
-      ),
+      result.sort((a, b) => a.set.key.localeCompare(b.set.key) || a.number - b.number),
     );
   }
 
   /** Removes a card from a user's collection */
-  removeCardFromCollection(
-    cardId: number,
-    userId: bigint,
-  ): Promise<PokemonCardWithRelations> {
+  removeCardFromCollection(cardId: number, userId: bigint): Promise<PokemonCardWithRelations> {
     const card = this.findCardById(cardId);
     if (!card) {
       throw new Error(`Card ${cardId} not found`);
@@ -483,14 +442,11 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       owners.delete(userId);
     }
 
-    const set = Array.from(this.sets.values()).find(
-      (s) => s.id === card.setId,
-    )!;
+    const set = Array.from(this.sets.values()).find((s) => s.id === card.setId)!;
     const boosters = this.getCardBoosters(card.id);
     const ownership = Array.from(owners ?? []).map((ownerId) => {
       const statusKey = `${card.id}_${ownerId}`;
-      const ownershipStatus =
-        this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+      const ownershipStatus = this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
       return {
         id: this.nextId++,
         cardId: card.id,
@@ -520,9 +476,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   /** Gets boosters for a card */
   getCardBoosters(cardId: number): PokemonBoosterModel[] {
     const boosterIds = this.cardBoosters.get(cardId) ?? new Set<number>();
-    return Array.from(this.boosters.values()).filter((b) =>
-      boosterIds.has(b.id),
-    );
+    return Array.from(this.boosters.values()).filter((b) => boosterIds.has(b.id));
   }
 
   /** Gets all stored sets */
@@ -588,9 +542,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     const sets = Array.from(this.sets.values());
     const result = {
       sets: sets.map((set) => {
-        const setCards = Array.from(this.cards.values()).filter(
-          (card) => card.setId === set.id,
-        );
+        const setCards = Array.from(this.cards.values()).filter((card) => card.setId === set.id);
         const setBoosterIds = new Set<number>();
         setCards.forEach((card) => {
           const boosterIds = this.cardBoosters.get(card.id);
@@ -598,47 +550,36 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
             boosterIds.forEach((id) => setBoosterIds.add(id));
           }
         });
-        const setBoosters = Array.from(this.boosters.values()).filter(
-          (booster) => setBoosterIds.has(booster.id),
+        const setBoosters = Array.from(this.boosters.values()).filter((booster) =>
+          setBoosterIds.has(booster.id),
         );
 
         return {
           set,
           cards: setCards.map((card) => {
-            const hasOwnership = (
-              this.cardOwners.get(card.id) ?? new Set()
-            ).has(userId);
+            const hasOwnership = (this.cardOwners.get(card.id) ?? new Set()).has(userId);
             const statusKey = `${card.id}_${userId}`;
             const dbOwnershipStatus = hasOwnership
-              ? (this.cardOwnershipStatus.get(statusKey) ??
-                OwnershipStatus.OWNED)
+              ? (this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED)
               : null;
             return {
               card,
-              ownershipStatus:
-                this.convertToCardOwnershipStatus(dbOwnershipStatus),
+              ownershipStatus: this.convertToCardOwnershipStatus(dbOwnershipStatus),
             };
           }),
           boosters: setBoosters.map((booster) => ({
             booster,
             cards: setCards
-              .filter(
-                (card) =>
-                  this.cardBoosters.get(card.id)?.has(booster.id) ?? false,
-              )
+              .filter((card) => this.cardBoosters.get(card.id)?.has(booster.id) ?? false)
               .map((card) => {
-                const hasOwnership = (
-                  this.cardOwners.get(card.id) ?? new Set()
-                ).has(userId);
+                const hasOwnership = (this.cardOwners.get(card.id) ?? new Set()).has(userId);
                 const statusKey = `${card.id}_${userId}`;
                 const dbOwnershipStatus = hasOwnership
-                  ? (this.cardOwnershipStatus.get(statusKey) ??
-                    OwnershipStatus.OWNED)
+                  ? (this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED)
                   : null;
                 return {
                   card,
-                  ownershipStatus:
-                    this.convertToCardOwnershipStatus(dbOwnershipStatus),
+                  ownershipStatus: this.convertToCardOwnershipStatus(dbOwnershipStatus),
                 };
               }),
           })),
@@ -655,11 +596,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   public countGodPackEligibleByBoosterReturnValue = 0;
 
   /** Set count for a specific rarity and isSixPackOnly combination (for testing) */
-  setCountByRarity(
-    rarity: Rarity,
-    isSixPackOnly: boolean,
-    count: number,
-  ): void {
+  setCountByRarity(rarity: Rarity, isSixPackOnly: boolean, count: number): void {
     const key = `${rarity}_${isSixPackOnly}`;
     this.countsByRarity.set(key, count);
   }
@@ -680,10 +617,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Count cards by rarity, including both regular and isSixPackOnly cards */
-  async countByRarityIncludingSixPackOnly(
-    _boosterId: number,
-    rarity: Rarity,
-  ): Promise<number> {
+  async countByRarityIncludingSixPackOnly(_boosterId: number, rarity: Rarity): Promise<number> {
     return Promise.resolve(this.countsIncludingSixPackOnly.get(rarity) ?? 0);
   }
 

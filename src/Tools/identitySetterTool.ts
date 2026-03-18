@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
+
 import { tool } from '@langchain/core/tools';
-import * as z from 'zod';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import * as z from 'zod';
+
 import { getToolContext } from '../ChatGptAgentService.js';
 
 const schema = z.object({
-  identity: z
-    .string()
-    .describe('Identity name to set: "Schi Parmelä" or "Emulator"'),
+  identity: z.string().describe('Identity name to set: "Schi Parmelä" or "Emulator"'),
 });
 
 type IdentitySetterInput = z.infer<typeof schema>;
@@ -16,10 +16,7 @@ type IdentitySetterInput = z.infer<typeof schema>;
  * Tool to set which bot identity should be used for a chat.
  */
 export const identitySetterTool = tool(
-  (
-    { identity }: IdentitySetterInput,
-    config: LangGraphRunnableConfig,
-  ): string => {
+  ({ identity }: IdentitySetterInput, config: LangGraphRunnableConfig): string => {
     const context = getToolContext(config);
     const chatId = context.chatId;
     const identityName = identity.trim();

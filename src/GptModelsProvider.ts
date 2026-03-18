@@ -1,6 +1,7 @@
 import { ChatOpenAI, ChatOpenAIFields } from '@langchain/openai';
-import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
 import { OpenAIEmbeddings } from '@langchain/openai';
+
+import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
 
 /** Enum of GPT language models to use. */
 export const GptModels = {

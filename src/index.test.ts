@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import container from './inversify.config.js';
+
 import { Bot } from './Bot.js';
+import container from './inversify.config.js';
 
 describe('Application Startup', () => {
   beforeEach(() => {

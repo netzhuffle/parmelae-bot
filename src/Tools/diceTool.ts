@@ -1,8 +1,9 @@
 import { tool } from '@langchain/core/tools';
-import * as z from 'zod';
-import { NotExhaustiveSwitchError } from '../NotExhaustiveSwitchError.js';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import * as z from 'zod';
+
 import { getToolContext } from '../ChatGptAgentService.js';
+import { NotExhaustiveSwitchError } from '../NotExhaustiveSwitchError.js';
 
 function handleDie(value: number): string {
   return `Your six sided die rolled a ${value}.`;
@@ -32,8 +33,7 @@ function handleDarts(value: number): string {
 function handleBasketball(value: number): string {
   if (value === 1) return 'Game 🏀: Missed!';
   if (value === 2) return 'Game 🏀: Hit the rim and missed!';
-  if (value === 3)
-    return 'Game 🏀: Stuck between the basket rim and the backboard!';
+  if (value === 3) return 'Game 🏀: Stuck between the basket rim and the backboard!';
   if (value === 4) return 'Game 🏀: Barely in!';
   return 'Game 🏀: Perfect goal!';
 }
@@ -42,8 +42,7 @@ function handleSoccer(value: number): string {
   if (value === 1) return 'Game ⚽: Missed!';
   if (value === 2) return 'Game ⚽: Hit the goalpost and missed!';
   if (value === 3) return 'Game ⚽: Goal (right in the middle)!';
-  if (value === 4)
-    return 'Game ⚽: Tricky goal (hit both sideposts and went in)!';
+  if (value === 4) return 'Game ⚽: Tricky goal (hit both sideposts and went in)!';
   return 'Game ⚽: Perfect corner goal and hard to catch!';
 }
 
@@ -58,10 +57,7 @@ const diceParametersSchema = z.object({
 type DiceInput = z.infer<typeof diceParametersSchema>;
 
 export const diceTool = tool(
-  async (
-    { type }: DiceInput,
-    config: LangGraphRunnableConfig,
-  ): Promise<string> => {
+  async ({ type }: DiceInput, config: LangGraphRunnableConfig): Promise<string> => {
     const context = getToolContext(config);
     const chatId = context.chatId;
     const telegram = context.telegramService;

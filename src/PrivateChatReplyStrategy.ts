@@ -1,9 +1,7 @@
 import { injectable } from 'inversify';
+
 import { ReplyStrategy } from './ReplyStrategy.js';
-import {
-  TelegramMessage,
-  TelegramMessageWithRelations,
-} from './Repositories/Types.js';
+import { TelegramMessage, TelegramMessageWithRelations } from './Repositories/Types.js';
 
 /** Abstract ReplyStrategy for private chats only */
 @injectable()

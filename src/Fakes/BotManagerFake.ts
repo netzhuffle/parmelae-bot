@@ -1,9 +1,11 @@
+import assert from 'node:assert/strict';
+
+import { Telegraf } from 'telegraf';
+
+import { normalizeUsername } from '../BotIdentityContext.js';
 import { BotManager } from '../BotManager.js';
 import type { BotConfig } from '../ConfigInterfaces.js';
-import { Telegraf } from 'telegraf';
-import { normalizeUsername } from '../BotIdentityContext.js';
 import { TelegrafStub } from './TelegrafStub.js';
-import assert from 'node:assert/strict';
 
 /**
  * Fake implementation of BotManager for testing.

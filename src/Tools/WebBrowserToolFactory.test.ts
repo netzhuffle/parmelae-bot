@@ -1,7 +1,8 @@
 import { describe, test, expect, expectTypeOf, beforeEach } from 'bun:test';
+
+import packageJson from '../../package.json' with { type: 'json' };
 import container from '../inversify.config.js';
 import { WebBrowserToolFactory } from './WebBrowserToolFactory.js';
-import packageJson from '../../package.json' with { type: 'json' };
 
 describe('WebBrowserToolFactory', () => {
   let factory: WebBrowserToolFactory;
@@ -63,8 +64,7 @@ describe('WebBrowserToolFactory', () => {
     // Cheerio exports a default function (load) or named exports
     // Verify the module has the expected structure
     const module = cheerioModule as Record<string, unknown>;
-    const hasDefaultExport =
-      'default' in module && typeof module.default === 'function';
+    const hasDefaultExport = 'default' in module && typeof module.default === 'function';
     const hasLoadExport = 'load' in module && typeof module.load === 'function';
 
     expect(hasDefaultExport || hasLoadExport).toBe(true);

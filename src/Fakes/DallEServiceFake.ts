@@ -1,5 +1,6 @@
-import { DallEService } from '../DallEService.js';
 import { DallEAPIWrapper } from '@langchain/openai';
+
+import { DallEService } from '../DallEService.js';
 
 export class DallEServiceFake extends DallEService {
   request?: { prompt: string };

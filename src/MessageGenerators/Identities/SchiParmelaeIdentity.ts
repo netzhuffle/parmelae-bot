@@ -1,9 +1,10 @@
 import { injectable } from 'inversify';
-import { Identity } from './Identity.js';
+
 import { dallETool } from '../../Tools/dallETool.js';
-import { minecraftStatusTool } from '../../Tools/minecraftStatusTool.js';
 import { minecraftStartTool } from '../../Tools/minecraftStartTool.js';
+import { minecraftStatusTool } from '../../Tools/minecraftStatusTool.js';
 import { minecraftStopTool } from '../../Tools/minecraftStopTool.js';
+import { Identity } from './Identity.js';
 
 const dateTime = new Date().toLocaleString('de-CH', {
   timeZone: 'Europe/Zurich',
@@ -76,12 +77,7 @@ Antwortlängen entsprechen üblicher Chatkommunikation: maximal zwei kurze Absä
 
 Es folgt die eigentliche Konversation:`;
 
-const tools = [
-  dallETool,
-  minecraftStatusTool,
-  minecraftStartTool,
-  minecraftStopTool,
-];
+const tools = [dallETool, minecraftStatusTool, minecraftStartTool, minecraftStopTool];
 
 /** Schi Parmelae is a helpful Swiss federal council. */
 @injectable()

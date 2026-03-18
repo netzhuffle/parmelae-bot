@@ -1,11 +1,12 @@
 import { injectable } from 'inversify';
-import { ChatGptAgentService } from '../ChatGptAgentService.js';
-import { MessageModel } from '../generated/prisma/models/Message.js';
-import { ConversationService } from '../ConversationService.js';
-import { Config } from '../Config.js';
+
 import { BotIdentityContext } from '../BotIdentityContext.js';
-import { SchiParmelaeIdentity } from './Identities/SchiParmelaeIdentity.js';
+import { ChatGptAgentService } from '../ChatGptAgentService.js';
+import { Config } from '../Config.js';
+import { ConversationService } from '../ConversationService.js';
+import { MessageModel } from '../generated/prisma/models/Message.js';
 import { Identity } from './Identities/Identity.js';
+import { SchiParmelaeIdentity } from './Identities/SchiParmelaeIdentity.js';
 
 /** Enhanced response from ReplyGenerator including tool call message IDs */
 export interface ReplyGeneratorResponse {
@@ -63,8 +64,6 @@ export class ReplyGenerator {
    * Gets the appropriate identity for a given chat, falling back to default if none set.
    */
   private getIdentityForChat(chatId: bigint): Identity {
-    return (
-      this.config.identityByChatId.get(chatId) ?? this.schiParmelaeIdentity
-    );
+    return this.config.identityByChatId.get(chatId) ?? this.schiParmelaeIdentity;
   }
 }

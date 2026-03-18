@@ -1,19 +1,17 @@
 import { describe, beforeEach, it, afterEach, expect } from 'bun:test';
-import {
-  PokemonTcgPocketService,
-  Sets,
-} from '../PokemonTcgPocket/PokemonTcgPocketService.js';
-import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
-import { pokemonCardRangeAddTool } from './pokemonCardRangeAddTool.js';
+
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { OwnershipStatus } from '../generated/prisma/enums.js';
-import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
 import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 import { ShinyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
+import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
+import { PokemonTcgPocketService, Sets } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketProbabilityRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketProbabilityRepository.js';
+import { pokemonCardRangeAddTool } from './pokemonCardRangeAddTool.js';
 
 describe('pokemonCardRangeAdd', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -186,11 +184,7 @@ describe('pokemonCardRangeAdd', () => {
         setKey: 'A1',
         cardNumber: 2,
       });
-      await repository.addCardToCollection(
-        cards[0].id,
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
+      await repository.addCardToCollection(cards[0].id, BigInt(1), OwnershipStatus.NOT_NEEDED);
 
       const result = await pokemonCardRangeAddTool.invoke(
         {
@@ -210,9 +204,7 @@ describe('pokemonCardRangeAdd', () => {
         setKey: 'A1',
         cardNumber: 2,
       });
-      const ownership = updatedCards[0].ownership.find(
-        (o) => o.userId === BigInt(1),
-      );
+      const ownership = updatedCards[0].ownership.find((o) => o.userId === BigInt(1));
       expect(ownership?.status).toBe(OwnershipStatus.OWNED);
     });
 
@@ -260,9 +252,7 @@ describe('pokemonCardRangeAdd', () => {
           setKey: 'A1',
           cardNumber: i,
         });
-        const ownership = updatedCards[0].ownership.find(
-          (o) => o.userId === BigInt(1),
-        );
+        const ownership = updatedCards[0].ownership.find((o) => o.userId === BigInt(1));
         expect(ownership?.status).toBe(OwnershipStatus.OWNED);
       }
     });

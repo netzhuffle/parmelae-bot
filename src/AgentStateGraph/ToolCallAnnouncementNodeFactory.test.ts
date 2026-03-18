@@ -1,7 +1,9 @@
 import { describe, beforeEach, it, expect, mock, Mock } from 'bun:test';
-import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
-import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
+
 import { AIMessage } from '@langchain/core/messages';
+
+import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
+import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
 
 describe('ToolCallAnnouncementNodeFactory', () => {
   let announceToolCall: Mock<() => Promise<number>>;
@@ -43,9 +45,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       }),
     ];
     await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
-    expect(announceToolCall).toHaveBeenCalledWith(
-      '[TestTool: {value: plain text}]',
-    );
+    expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {value: plain text}]');
   });
 
   it('announces multiple tool calls except IntermediateAnswerTool', async () => {
@@ -114,9 +114,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       }),
     ];
     await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
-    expect(announceToolCall).toHaveBeenCalledWith(
-      '[TestTool: {foo: 1, bar: 2}]',
-    );
+    expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {foo: 1, bar: 2}]');
   });
 
   it('announces a tool call with object args, null/false parameters are omitted', async () => {
@@ -124,15 +122,11 @@ describe('ToolCallAnnouncementNodeFactory', () => {
     const messages = [
       new AIMessage({
         content: '',
-        tool_calls: [
-          { name: 'TestTool', args: { foo: 1, bar: null, baz: false, qux: 2 } },
-        ],
+        tool_calls: [{ name: 'TestTool', args: { foo: 1, bar: null, baz: false, qux: 2 } }],
       }),
     ];
     await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
-    expect(announceToolCall).toHaveBeenCalledWith(
-      '[TestTool: {foo: 1, qux: 2}]',
-    );
+    expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {foo: 1, qux: 2}]');
   });
 
   it('announces a tool call with object args, empty object', async () => {
@@ -151,16 +145,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
     const node = factory.create(announceToolCall);
     const messages = [
       new AIMessage({
-        contentBlocks: [
-          { type: 'tool_call', name: 'TestTool', args: undefined },
-        ],
+        contentBlocks: [{ type: 'tool_call', name: 'TestTool', args: undefined }],
       }),
     ];
-    return node({ messages, toolExecution: {}, toolCallMessageIds: [] }).then(
-      () => {
-        expect(announceToolCall).toHaveBeenCalledWith('[TestTool]');
-      },
-    );
+    return node({ messages, toolExecution: {}, toolCallMessageIds: [] }).then(() => {
+      expect(announceToolCall).toHaveBeenCalledWith('[TestTool]');
+    });
   });
 
   it('announces multiple tool calls in a single message, separated by newlines', async () => {
@@ -204,9 +194,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       }),
     ];
     await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
-    expect(announceToolCall).toHaveBeenCalledWith(
-      'Only content, no tool calls.',
-    );
+    expect(announceToolCall).toHaveBeenCalledWith('Only content, no tool calls.');
   });
 
   it('does not announce if there is no content and no tool calls', async () => {
@@ -254,9 +242,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       }),
     ];
     await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
-    expect(announceToolCall).toHaveBeenCalledWith(
-      '[TestTool: {a: 1, b: 2, c: 3}]',
-    );
+    expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {a: 1, b: 2, c: 3}]');
   });
 
   it('stores tool execution context when tool calls exist and announcement succeeds', async () => {
@@ -280,9 +266,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       toolCallMessageIds: [],
     });
 
-    expect(announceToolCall).toHaveBeenCalledWith(
-      'Test content\n[TestTool: {foo: 1}]',
-    );
+    expect(announceToolCall).toHaveBeenCalledWith('Test content\n[TestTool: {foo: 1}]');
     expect(result).toEqual({
       toolExecution: {
         announcementMessageId: 123,
@@ -308,9 +292,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       toolCallMessageIds: [],
     });
 
-    expect(announceToolCall).toHaveBeenCalledWith(
-      'Only content, no tool calls.',
-    );
+    expect(announceToolCall).toHaveBeenCalledWith('Only content, no tool calls.');
     expect(result).toEqual({});
   });
 

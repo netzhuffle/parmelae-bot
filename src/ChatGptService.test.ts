@@ -1,21 +1,19 @@
 import { test, expect, describe } from 'bun:test';
-import { ChatGptService } from './ChatGptService.js';
-import { ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
-import { GptModels, GptModelsProvider } from './GptModelsProvider.js';
-import { ChatOpenAI } from '@langchain/openai';
-import {
-  AIMessage,
-  HumanMessage,
-  SystemMessage,
-} from '@langchain/core/messages';
+
+import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 import {
   AIMessagePromptTemplate,
   ChatPromptTemplate,
   HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
 } from '@langchain/core/prompts';
-import { ChatOpenAiFake } from './Fakes/ChatOpenAiFake.js';
+import { ChatOpenAI } from '@langchain/openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
+
+import { ChatGptService } from './ChatGptService.js';
+import { ChatOpenAiFake } from './Fakes/ChatOpenAiFake.js';
+import { GptModels, GptModelsProvider } from './GptModelsProvider.js';
+import { ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
 
 describe('ChatGptService', () => {
   test('generate message', async () => {

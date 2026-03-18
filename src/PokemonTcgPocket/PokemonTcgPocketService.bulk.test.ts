@@ -1,13 +1,14 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { PokemonTcgPocketService, Sets } from './PokemonTcgPocketService.js';
-import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
-import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+
 import { OwnershipStatus } from '../generated/prisma/enums.js';
-import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
+import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
+import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 import { ShinyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
+import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+import { PokemonTcgPocketService, Sets } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
 describe('PokemonTcgPocketService bulk operations', () => {
@@ -25,11 +26,7 @@ describe('PokemonTcgPocketService bulk operations', () => {
       new ShinyAsPotentialSixthCardStrategy(),
       undefined as unknown as PokemonTcgPocketProbabilityRepository,
     );
-    service = new PokemonTcgPocketService(
-      probabilityService,
-      repository,
-      {} as Sets,
-    );
+    service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
   });
 
   describe('getCardIdsInRange', () => {
@@ -160,16 +157,8 @@ describe('PokemonTcgPocketService bulk operations', () => {
 
     it('should update NOT_NEEDED cards to OWNED', async () => {
       // Set cards 1 and 2 as NOT_NEEDED
-      await repository.addCardToCollection(
-        cardIds[0],
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
-      await repository.addCardToCollection(
-        cardIds[1],
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
+      await repository.addCardToCollection(cardIds[0], BigInt(1), OwnershipStatus.NOT_NEEDED);
+      await repository.addCardToCollection(cardIds[1], BigInt(1), OwnershipStatus.NOT_NEEDED);
 
       // Now add them again (always sets to OWNED status)
       const result = await service.addMultipleCardsToCollection(

@@ -1,7 +1,9 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
+
+import { Telegraf } from 'telegraf';
+
 import { BotManager } from './BotManager.js';
 import { Config } from './Config.js';
-import { Telegraf } from 'telegraf';
 
 function resetTestEnv(): void {
   Object.keys(Bun.env).forEach((key) => {

@@ -1,7 +1,8 @@
-import { injectable } from 'inversify';
-import { GptModelsProvider } from '../GptModelsProvider.js';
 import { WebBrowser } from '@langchain/classic/tools/webbrowser';
+import { injectable } from 'inversify';
+
 import { Config } from '../Config.js';
+import { GptModelsProvider } from '../GptModelsProvider.js';
 
 @injectable()
 export class WebBrowserToolFactory {

@@ -51,9 +51,7 @@ export class ScheduledMessageRepositoryFake {
 
     const index = this.scheduledMessages.findIndex((m) => m.id === id);
     if (index === -1) {
-      return Promise.reject(
-        new Error(`ScheduledMessage with id ${id} not found`),
-      );
+      return Promise.reject(new Error(`ScheduledMessage with id ${id} not found`));
     }
 
     const message = this.scheduledMessages[index];
@@ -68,9 +66,7 @@ export class ScheduledMessageRepositoryFake {
   }
 
   /** Test helper to add scheduled messages directly. */
-  addScheduledMessage(
-    message: Partial<ScheduledMessageModel>,
-  ): ScheduledMessageModel {
+  addScheduledMessage(message: Partial<ScheduledMessageModel>): ScheduledMessageModel {
     const fullMessage: ScheduledMessageModel = {
       id: message.id ?? this.nextId++,
       chatId: message.chatId ?? BigInt(456),

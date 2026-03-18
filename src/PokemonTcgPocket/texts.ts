@@ -25,27 +25,16 @@ export const BOOSTERS_STATS_EXPLANATION =
 // Tool messages
 export const CARD_ID_MISMATCH_MESSAGE =
   'Card ID and set key do not match. Please ask the user which one is incorrect.';
-export const NO_CARDS_FOUND_MESSAGE =
-  'No cards found matching the search criteria.';
-export const CARD_EXISTS_BUT_NO_MATCH_MESSAGE = (
-  setKey: string,
-  cardNumber: number,
-  csv: string,
-) =>
+export const NO_CARDS_FOUND_MESSAGE = 'No cards found matching the search criteria.';
+export const CARD_EXISTS_BUT_NO_MATCH_MESSAGE = (setKey: string, cardNumber: number, csv: string) =>
   `Card with ID ${setKey}-${cardNumber.toString().padStart(3, '0')} exists but does not match the additional search criteria:\n${csv}`;
 
 // Additional messages
-export const LIMITED_RESULTS_MESSAGE = (
-  additionalCount: number,
-  totalCount: number,
-) =>
+export const LIMITED_RESULTS_MESSAGE = (additionalCount: number, totalCount: number) =>
   `\n\nLimited list above to first 20 cards to save token usage. Tell the user there are ${additionalCount} additional cards matching the search query (${totalCount} total).`;
 
 export const NO_CARDS_IN_DB_MESSAGE = (operation: PokemonCardOperation) => {
-  const actionMap: Record<
-    PokemonCardOperation,
-    { past: string; preposition: string }
-  > = {
+  const actionMap: Record<PokemonCardOperation, { past: string; preposition: string }> = {
     add: { past: 'added to', preposition: 'to' },
     remove: { past: 'removed from', preposition: 'from' },
     'mark-as-not-needed': {
@@ -57,23 +46,13 @@ export const NO_CARDS_IN_DB_MESSAGE = (operation: PokemonCardOperation) => {
   return `No cards exist in the database matching these search criteria. Please verify the card details and try again. Thus no card was ${past} the user's collection.`;
 };
 
-export const NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE = (
-  displayName: string,
-  cardDetails: string,
-) =>
+export const NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE = (displayName: string, cardDetails: string) =>
   `No matching cards found in ${displayName}’s collection. The cards exist but ${displayName} does not own them. The following cards were found:\n${cardDetails}\nThus no card was removed from the user’s collection.`;
 
-export const NO_MATCHING_MISSING_CARDS_MESSAGE = (
-  displayName: string,
-  cardDetails: string,
-) =>
+export const NO_MATCHING_MISSING_CARDS_MESSAGE = (displayName: string, cardDetails: string) =>
   `No matching cards found that ${displayName} is missing. The cards exist but ${displayName} already owns them. The following cards were found:\n${cardDetails}\nThus no card was added to the user’s collection.`;
 
-export const BULK_OPERATION_WARNING_MESSAGE = (
-  header: string,
-  csv: string,
-  stats: string,
-) =>
+export const BULK_OPERATION_WARNING_MESSAGE = (header: string, csv: string, stats: string) =>
   `${header}\n${csv}\nIf these aren’t the cards the user was asking for, you passed the wrong parameters. If so, please inform the user about your mistake and let them decide what to do.\n\nUpdated statistics of ${stats}`;
 
 export const POKEMON_CARD_ADD_TOOL_DESCRIPTION =
@@ -89,15 +68,13 @@ export const BULK_OPERATION_HEADER_MESSAGE = (
   count: number,
   preposition: string,
   displayName: string,
-) =>
-  `Successfully ${operation} ${count} cards ${preposition} ${displayName}’s collection:`;
+) => `Successfully ${operation} ${count} cards ${preposition} ${displayName}’s collection:`;
 
 export const SINGLE_OPERATION_HEADER_MESSAGE = (
   operation: string,
   preposition: string,
   displayName: string,
-) =>
-  `Successfully ${operation} card ${preposition} ${displayName}’s collection:`;
+) => `Successfully ${operation} card ${preposition} ${displayName}’s collection:`;
 
 export const UPDATED_STATS_MESSAGE = (stats: string) =>
   `\n\nUpdated statistics (after the change) of ${stats}`;

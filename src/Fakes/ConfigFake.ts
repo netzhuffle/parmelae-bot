@@ -1,10 +1,6 @@
-import { GptModels } from '../GptModelsProvider.js';
 import { normalizeUsername } from '../BotIdentityContext.js';
-import type {
-  BotConfig,
-  BotConfiguration,
-  GitHubConfig,
-} from '../ConfigInterfaces.js';
+import type { BotConfig, BotConfiguration, GitHubConfig } from '../ConfigInterfaces.js';
+import { GptModels } from '../GptModelsProvider.js';
 
 /**
  * Fake implementation of Config for testing.
@@ -31,8 +27,6 @@ export class ConfigFake implements BotConfig, GitHubConfig {
 
   getBotByUsername(username: string): BotConfiguration | undefined {
     const normalized = normalizeUsername(username);
-    return this.bots.find(
-      (bot) => normalizeUsername(bot.username) === normalized,
-    );
+    return this.bots.find((bot) => normalizeUsername(bot.username) === normalized);
   }
 }

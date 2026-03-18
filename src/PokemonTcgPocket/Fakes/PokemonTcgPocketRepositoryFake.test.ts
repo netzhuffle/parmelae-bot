@@ -1,6 +1,7 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { PokemonTcgPocketRepositoryFake } from './PokemonTcgPocketRepositoryFake.js';
+
 import { Rarity } from '../../generated/prisma/enums.js';
+import { PokemonTcgPocketRepositoryFake } from './PokemonTcgPocketRepositoryFake.js';
 
 describe('PokemonTcgPocketRepositoryFake', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -25,10 +26,7 @@ describe('PokemonTcgPocketRepositoryFake', () => {
       });
 
       // Act - Retrieve the same card
-      const retrievedCard = await repository.retrieveCardByNumberAndSetKey(
-        1,
-        'TEST',
-      );
+      const retrievedCard = await repository.retrieveCardByNumberAndSetKey(1, 'TEST');
 
       // Assert
       expect(retrievedCard).not.toBeNull();
@@ -43,10 +41,7 @@ describe('PokemonTcgPocketRepositoryFake', () => {
       await repository.createSet('TEST', 'Test Set');
 
       // Act
-      const retrievedCard = await repository.retrieveCardByNumberAndSetKey(
-        999,
-        'TEST',
-      );
+      const retrievedCard = await repository.retrieveCardByNumberAndSetKey(999, 'TEST');
 
       // Assert
       expect(retrievedCard).toBeNull();
@@ -54,10 +49,7 @@ describe('PokemonTcgPocketRepositoryFake', () => {
 
     it('should return null for cards in non-existent sets', async () => {
       // Act
-      const retrievedCard = await repository.retrieveCardByNumberAndSetKey(
-        1,
-        'NONEXISTENT',
-      );
+      const retrievedCard = await repository.retrieveCardByNumberAndSetKey(1, 'NONEXISTENT');
 
       // Assert
       expect(retrievedCard).toBeNull();
@@ -81,10 +73,7 @@ describe('PokemonTcgPocketRepositoryFake', () => {
       repository.reset();
 
       // Assert
-      const retrievedCard = await repository.retrieveCardByNumberAndSetKey(
-        1,
-        'TEST',
-      );
+      const retrievedCard = await repository.retrieveCardByNumberAndSetKey(1, 'TEST');
       expect(retrievedCard).toBeNull();
     });
   });

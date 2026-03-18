@@ -1,20 +1,17 @@
-import { MessageHistoryService } from './MessageHistoryService.js';
-import { ChatGptService } from './ChatGptService.js';
-import {
-  AIMessage,
-  MessageContent,
-  ToolMessage,
-} from '@langchain/core/messages';
+import { AIMessage, MessageContent, ToolMessage } from '@langchain/core/messages';
 import type { ToolCall } from '@langchain/core/messages/tool';
 import { injectable } from 'inversify';
-import { TelegramService } from './TelegramService.js';
-import { Conversation } from './Conversation.js';
+
 import {
   BotIdentityContext,
   validateBotIdentityContext,
   normalizeUsername,
 } from './BotIdentityContext.js';
+import { ChatGptService } from './ChatGptService.js';
+import { Conversation } from './Conversation.js';
+import { MessageHistoryService } from './MessageHistoryService.js';
 import type { MessageWithUserAndToolMessages } from './Repositories/Types.js';
+import { TelegramService } from './TelegramService.js';
 
 /**
  * Service to create a conversation for LangChain from history.
@@ -43,10 +40,7 @@ export class ConversationService {
     respondingBot: BotIdentityContext,
   ): Promise<Conversation> {
     validateBotIdentityContext(respondingBot);
-    const historyMessages = await this.messageHistory.getHistory(
-      messageId,
-      messageCount,
-    );
+    const historyMessages = await this.messageHistory.getHistory(messageId, messageCount);
 
     const allMessages = [];
 
@@ -79,8 +73,7 @@ export class ConversationService {
 
     return (
       message.imageFileId === null &&
-      (!message.text ||
-        message.text.length >= ChatGptService.MAX_INPUT_TEXT_LENGTH)
+      (!message.text || message.text.length >= ChatGptService.MAX_INPUT_TEXT_LENGTH)
     );
   }
 
@@ -141,10 +134,7 @@ export class ConversationService {
     const messages: (AIMessage | ToolMessage)[] = [];
 
     const hasToolCalls = Boolean(message.toolCalls);
-    const cleanContent = this.extractAIMessageContent(
-      message.text,
-      hasToolCalls,
-    );
+    const cleanContent = this.extractAIMessageContent(message.text, hasToolCalls);
 
     const aiMessageOptions: {
       content: MessageContent;

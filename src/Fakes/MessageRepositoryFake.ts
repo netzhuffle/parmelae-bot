@@ -10,8 +10,7 @@ import {
  * Fake implementation of MessageRepository for testing.
  */
 export class MessageRepositoryFake {
-  private messages: MessageWithUserReplyToToolMessagesAndToolCallMessages[] =
-    [];
+  private messages: MessageWithUserReplyToToolMessagesAndToolCallMessages[] = [];
   private nextId = 1;
 
   public getCallArgs: number[] = [];
@@ -24,9 +23,7 @@ export class MessageRepositoryFake {
     toolCalls: Prisma.JsonValue;
   }[] = [];
 
-  get(
-    id: number,
-  ): Promise<MessageWithUserReplyToToolMessagesAndToolCallMessages> {
+  get(id: number): Promise<MessageWithUserReplyToToolMessagesAndToolCallMessages> {
     this.getCallArgs.push(id);
     const message = this.messages.find((m) => m.id === id);
     if (!message) {
@@ -48,10 +45,7 @@ export class MessageRepositoryFake {
     return Promise.resolve(messagesInChat[0] ?? null);
   }
 
-  updateToolCalls(
-    messageId: number,
-    toolCalls: Prisma.JsonValue,
-  ): Promise<void> {
+  updateToolCalls(messageId: number, toolCalls: Prisma.JsonValue): Promise<void> {
     this.updateToolCallsCallArgs.push({ messageId, toolCalls });
     const message = this.messages.find((m) => m.id === messageId);
     if (message) {
@@ -103,9 +97,7 @@ export class MessageRepositoryFake {
 
   // Additional methods required by MessageRepository interface
 
-  async store(
-    _message: UnstoredMessageWithRelations,
-  ): Promise<TelegramMessageWithRelations> {
+  async store(_message: UnstoredMessageWithRelations): Promise<TelegramMessageWithRelations> {
     return Promise.reject(new Error('store not implemented in fake'));
   }
 

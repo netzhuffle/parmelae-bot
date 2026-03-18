@@ -1,12 +1,14 @@
-import { injectable } from 'inversify';
 import assert from 'assert';
+
+import { injectable } from 'inversify';
+
 import { AllowlistedReplyStrategy } from '../AllowlistedReplyStrategy.js';
+import { Command, Commands } from '../Command.js';
 import { CommandService } from '../CommandService.js';
 import { Config } from '../Config.js';
-import { Command, Commands } from '../Command.js';
-import { TelegramService } from '../TelegramService.js';
 import { MessageModel } from '../generated/prisma/models/Message.js';
 import { TelegramMessageWithReplyTo } from '../Repositories/Types.js';
+import { TelegramService } from '../TelegramService.js';
 
 /** Regex matching the command name. */
 const COMMAND_NAME = /^\/(.*)@/;

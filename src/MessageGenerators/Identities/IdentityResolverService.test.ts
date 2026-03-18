@@ -1,7 +1,8 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
+
+import { EmulatorIdentity } from './EmulatorIdentity.js';
 import { IdentityResolverService } from './IdentityResolverService.js';
 import { SchiParmelaeIdentity } from './SchiParmelaeIdentity.js';
-import { EmulatorIdentity } from './EmulatorIdentity.js';
 
 describe('IdentityResolverService', () => {
   let resolver: IdentityResolverService;
@@ -11,10 +12,7 @@ describe('IdentityResolverService', () => {
   beforeEach(() => {
     schiParmelaeIdentity = new SchiParmelaeIdentity();
     emulatorIdentity = new EmulatorIdentity();
-    resolver = new IdentityResolverService(
-      schiParmelaeIdentity,
-      emulatorIdentity,
-    );
+    resolver = new IdentityResolverService(schiParmelaeIdentity, emulatorIdentity);
   });
 
   describe('resolve', () => {

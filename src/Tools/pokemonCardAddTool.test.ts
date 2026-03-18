@@ -1,19 +1,17 @@
 import { describe, beforeEach, it, afterEach, expect, spyOn } from 'bun:test';
-import {
-  PokemonTcgPocketService,
-  Sets,
-} from '../PokemonTcgPocket/PokemonTcgPocketService.js';
-import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
-import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
-import { pokemonCardAddTool } from './pokemonCardAddTool.js';
+
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
-import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
+import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
 import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 import { ShinyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
+import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
+import { PokemonTcgPocketService, Sets } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketProbabilityRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketProbabilityRepository.js';
+import { pokemonCardAddTool } from './pokemonCardAddTool.js';
 
 describe('pokemonCardAdd', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -238,9 +236,7 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain(
         'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1',
       );
-      expect(result).toContain(
-        'A1-001,Test Card,♢,Test Set,,N/A,No,No (marked as not needed)',
-      );
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,N/A,No,No (marked as not needed)');
 
       // Verify the card was marked with NOT_NEEDED status
       const cards = await repository.searchCards({
@@ -262,11 +258,7 @@ describe('pokemonCardAdd', () => {
       });
 
       // Precondition: card is present with NOT_NEEDED status
-      await repository.addCardToCollection(
-        card.id,
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
+      await repository.addCardToCollection(card.id, BigInt(1), OwnershipStatus.NOT_NEEDED);
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -305,11 +297,7 @@ describe('pokemonCardAdd', () => {
         boosterNames: [],
         isSixPackOnly: false,
       });
-      await repository.addCardToCollection(
-        card.id,
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
+      await repository.addCardToCollection(card.id, BigInt(1), OwnershipStatus.NOT_NEEDED);
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -492,16 +480,8 @@ describe('pokemonCardAdd', () => {
         boosterNames: [],
         isSixPackOnly: false,
       });
-      await repository.addCardToCollection(
-        card1.id,
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
-      await repository.addCardToCollection(
-        card2.id,
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
+      await repository.addCardToCollection(card1.id, BigInt(1), OwnershipStatus.NOT_NEEDED);
+      await repository.addCardToCollection(card2.id, BigInt(1), OwnershipStatus.NOT_NEEDED);
 
       const result = await pokemonCardAddTool.invoke(
         {
@@ -550,9 +530,7 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain(
         'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1',
       );
-      expect(result).toContain(
-        'A1-001,Test Card,♢,Test Set,,N/A,No,No (marked as not needed)',
-      );
+      expect(result).toContain('A1-001,Test Card,♢,Test Set,,N/A,No,No (marked as not needed)');
 
       const cards = await repository.searchCards({
         userId: BigInt(1),
@@ -590,9 +568,7 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain('directly');
       expect(result).toContain('already owned by @test1');
       expect(result).toContain('A1-001,Test Card,♢,Test Set,,N/A,No,Yes');
-      expect(result).toContain(
-        'Please ask the user if they want to remove these cards first',
-      );
+      expect(result).toContain('Please ask the user if they want to remove these cards first');
     });
 
     it('should bulk mark multiple missing cards as not needed', async () => {
@@ -630,12 +606,8 @@ describe('pokemonCardAdd', () => {
       expect(result).toContain(
         'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by @test1',
       );
-      expect(result).toContain(
-        'A1-001,Test Card 1,♢,Test Set,,N/A,No,No (marked as not needed)',
-      );
-      expect(result).toContain(
-        'A1-002,Test Card 2,♢,Test Set,,N/A,No,No (marked as not needed)',
-      );
+      expect(result).toContain('A1-001,Test Card 1,♢,Test Set,,N/A,No,No (marked as not needed)');
+      expect(result).toContain('A1-002,Test Card 2,♢,Test Set,,N/A,No,No (marked as not needed)');
 
       const cards = await repository.searchCards({
         userId: BigInt(1),
@@ -1146,13 +1118,7 @@ describe('pokemonCardAdd', () => {
   describe('card ID exists but additional criteria do not match', () => {
     beforeEach(async () => {
       await repository.createSet('A1', 'Test Set');
-      await repository.createIdOnlyCard(
-        'Test Card',
-        'A1',
-        1,
-        Rarity.ONE_DIAMOND,
-        [],
-      );
+      await repository.createIdOnlyCard('Test Card', 'A1', 1, Rarity.ONE_DIAMOND, []);
       spyOn(repository, 'searchCards');
     });
 
@@ -1257,9 +1223,7 @@ describe('pokemonCardAdd', () => {
         config,
       );
 
-      expect(result).toContain(
-        'No cards exist in the database matching these search criteria',
-      );
+      expect(result).toContain('No cards exist in the database matching these search criteria');
       expect(result).toContain('no card was added');
       expect(repository.searchCards).toHaveBeenCalledWith({
         setKey: 'A2',

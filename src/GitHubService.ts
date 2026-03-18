@@ -1,11 +1,12 @@
-import { Octokit } from 'octokit';
+import { RequestError } from '@octokit/request-error';
 import { injectable, inject } from 'inversify';
+import { Octokit } from 'octokit';
+
+import { Config } from './Config.js';
+import type { GitHubConfig } from './ConfigInterfaces.js';
+import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
 import { DateTimeSettingRepository } from './Repositories/DateTimeSettingRepository.js';
 import { TelegramService } from './TelegramService.js';
-import type { GitHubConfig } from './ConfigInterfaces.js';
-import { Config } from './Config.js';
-import { RequestError } from '@octokit/request-error';
-import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
 
 interface Commit {
   commit: {
@@ -104,8 +105,7 @@ export class GitHubService {
       return;
     }
 
-    const announcementText =
-      await this.gitCommitAnnounceGenerator.generate(commitMessage);
+    const announcementText = await this.gitCommitAnnounceGenerator.generate(commitMessage);
     const promises: Promise<number>[] = [];
     this.config.newCommitAnnouncementChats.forEach((chat) => {
       promises.push(this.telegramService.send(announcementText, chat));
@@ -116,18 +116,13 @@ export class GitHubService {
   private async updateSettingIfNewer(date: Date): Promise<void> {
     // Validate date before processing
     if (!this.isValidDate(date)) {
-      console.warn(
-        `Cannot update lastCommitDateTime: provided date is invalid.`,
-      );
+      console.warn(`Cannot update lastCommitDateTime: provided date is invalid.`);
       return;
     }
 
     if (this.lastCommitDateTime && date > this.lastCommitDateTime) {
       this.lastCommitDateTime = date;
-      await this.dateTimeSettingRepository.update(
-        LAST_COMMIT_DATE_TIME_SETTING,
-        date,
-      );
+      await this.dateTimeSettingRepository.update(LAST_COMMIT_DATE_TIME_SETTING, date);
     }
   }
 

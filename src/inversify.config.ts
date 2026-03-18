@@ -1,20 +1,14 @@
 import 'reflect-metadata/lite';
-import { Container } from 'inversify';
-import {
-  GptModels,
-  GptModelsProvider,
-  GptModelsSettings,
-} from './GptModelsProvider.js';
 import { ChatOpenAI, DallEAPIWrapper } from '@langchain/openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
-import { Octokit } from 'octokit';
-import { PrismaClient } from './generated/prisma/client.js';
 import { PrismaBunSQLite } from '@synapsenwerkstatt/prisma-bun-sqlite-adapter';
+import { Container } from 'inversify';
+import { Octokit } from 'octokit';
+
 import { Config } from './Config.js';
-import {
-  POKEMON_TCGP_YAML_SYMBOL,
-  Sets,
-} from './PokemonTcgPocket/PokemonTcgPocketService.js';
+import { PrismaClient } from './generated/prisma/client.js';
+import { GptModels, GptModelsProvider, GptModelsSettings } from './GptModelsProvider.js';
+import { POKEMON_TCGP_YAML_SYMBOL, Sets } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 
 const container = new Container({
   defaultScope: 'Singleton',
@@ -22,13 +16,11 @@ const container = new Container({
 });
 
 // Bind Pokemon TCG Pocket YAML file
-container
-  .bind(POKEMON_TCGP_YAML_SYMBOL)
-  .toDynamicValue(async (): Promise<Sets> => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { default: sets } = await import('../resources/tcgpcards.yaml');
-    return sets as Sets;
-  });
+container.bind(POKEMON_TCGP_YAML_SYMBOL).toDynamicValue(async (): Promise<Sets> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { default: sets } = await import('../resources/tcgpcards.yaml');
+  return sets as Sets;
+});
 
 container.bind(GptModelsProvider).toDynamicValue(
   (context) =>

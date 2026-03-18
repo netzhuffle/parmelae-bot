@@ -1,10 +1,12 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
+
+import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
+
+import { BotIdentityContext } from './BotIdentityContext.js';
 import { ConversationService } from './ConversationService.js';
-import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageHistoryServiceFake } from './Fakes/MessageHistoryServiceFake.js';
 import { TelegramServiceFake } from './Fakes/TelegramServiceFake.js';
-import { BotIdentityContext } from './BotIdentityContext.js';
-import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
+import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageWithUserAndToolMessages } from './Repositories/Types.js';
 
 describe('ConversationService', () => {
@@ -17,10 +19,7 @@ describe('ConversationService', () => {
     messageHistory = new MessageHistoryServiceFake();
     telegram = new TelegramServiceFake();
     botContext = { username: 'testbot' };
-    service = new ConversationService(
-      messageHistory as unknown as MessageHistoryService,
-      telegram,
-    );
+    service = new ConversationService(messageHistory as unknown as MessageHistoryService, telegram);
   });
 
   describe('getConversation', () => {
@@ -95,9 +94,7 @@ describe('ConversationService', () => {
     });
 
     it('should convert bot message with tool calls to AIMessage with tool_calls', async () => {
-      const toolCalls = [
-        { id: 'call-123', name: 'search_tool', args: { query: 'test' } },
-      ];
+      const toolCalls = [{ id: 'call-123', name: 'search_tool', args: { query: 'test' } }];
       const messages: MessageWithUserAndToolMessages[] = [
         {
           id: 1,
@@ -135,9 +132,7 @@ describe('ConversationService', () => {
     });
 
     it('should extract clean AI content when message has tool calls with announcements', async () => {
-      const toolCalls = [
-        { id: 'call-123', name: 'search_tool', args: { query: 'test' } },
-      ];
+      const toolCalls = [{ id: 'call-123', name: 'search_tool', args: { query: 'test' } }];
       const messages: MessageWithUserAndToolMessages[] = [
         {
           id: 1,
@@ -216,9 +211,7 @@ describe('ConversationService', () => {
     });
 
     it('should handle whitespace-only content when message has tool calls', async () => {
-      const toolCalls = [
-        { id: 'call-123', name: 'search_tool', args: { query: 'test' } },
-      ];
+      const toolCalls = [{ id: 'call-123', name: 'search_tool', args: { query: 'test' } }];
       const messages: MessageWithUserAndToolMessages[] = [
         {
           id: 1,
@@ -256,12 +249,8 @@ describe('ConversationService', () => {
     });
 
     it('should add ToolMessage instances for tool responses', async () => {
-      const toolCalls = [
-        { id: 'call-123', name: 'search_tool', args: { query: 'test' } },
-      ];
-      const toolMessages = [
-        { id: 1, messageId: 1, toolCallId: 'call-123', text: 'Search result' },
-      ];
+      const toolCalls = [{ id: 'call-123', name: 'search_tool', args: { query: 'test' } }];
+      const toolMessages = [{ id: 1, messageId: 1, toolCallId: 'call-123', text: 'Search result' }];
       const messages: MessageWithUserAndToolMessages[] = [
         {
           id: 1,
@@ -425,9 +414,7 @@ describe('ConversationService', () => {
 
     it('should not skip messages with tool calls even if text is too long', async () => {
       const longText = 'a'.repeat(10000); // Text that would normally be skipped
-      const toolCalls = [
-        { id: 'call-123', name: 'search_tool', args: { query: 'test' } },
-      ];
+      const toolCalls = [{ id: 'call-123', name: 'search_tool', args: { query: 'test' } }];
       const messages: MessageWithUserAndToolMessages[] = [
         {
           id: 1,
@@ -464,9 +451,7 @@ describe('ConversationService', () => {
     });
 
     it('should not skip messages with tool calls even if text is empty', async () => {
-      const toolCalls = [
-        { id: 'call-123', name: 'search_tool', args: { query: 'test' } },
-      ];
+      const toolCalls = [{ id: 'call-123', name: 'search_tool', args: { query: 'test' } }];
       const messages: MessageWithUserAndToolMessages[] = [
         {
           id: 1,
@@ -633,9 +618,7 @@ describe('ConversationService', () => {
       expect(aiMessages[0]?.content).toBe('I am the assistant');
 
       // Other bot and human messages should be HumanMessage
-      const humanMessages = result.messages.filter(
-        (m) => m instanceof HumanMessage,
-      );
+      const humanMessages = result.messages.filter((m) => m instanceof HumanMessage);
       expect(humanMessages).toHaveLength(2);
 
       // Verify the human messages contain the expected content
@@ -712,11 +695,7 @@ describe('ConversationService', () => {
       // Bot context with lowercase username
       const caseInsensitiveBotContext = { username: 'testbot' };
 
-      const conversation = await service.getConversation(
-        2,
-        2,
-        caseInsensitiveBotContext,
-      );
+      const conversation = await service.getConversation(2, 2, caseInsensitiveBotContext);
 
       expect(conversation.messages).toHaveLength(2);
       expect(conversation.messages[0].constructor.name).toBe('HumanMessage');

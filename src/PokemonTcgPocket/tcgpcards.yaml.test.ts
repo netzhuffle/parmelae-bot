@@ -1,4 +1,5 @@
 import { describe, it, beforeAll, expect } from 'bun:test';
+
 import {
   Card,
   SetData,
@@ -21,8 +22,7 @@ describe('tcgpcards.yaml', () => {
   let sets: Sets;
 
   beforeAll(async () => {
-    const result =
-      (await import('../../resources/tcgpcards.yaml')) as YamlImportResult;
+    const result = (await import('../../resources/tcgpcards.yaml')) as YamlImportResult;
     sets = result.default;
   });
 
@@ -155,9 +155,7 @@ describe('tcgpcards.yaml', () => {
         Object.values(setData.cards).forEach((card: Card) => {
           if (card.boosters === undefined || card.boosters === null) return;
 
-          const boosterList = Array.isArray(card.boosters)
-            ? card.boosters
-            : [card.boosters];
+          const boosterList = Array.isArray(card.boosters) ? card.boosters : [card.boosters];
 
           boosterList.forEach((booster: string) => {
             if (setData.boosters !== null) {
@@ -177,9 +175,7 @@ describe('tcgpcards.yaml', () => {
           if (card.boosters === undefined) return;
           if (card.boosters === null) return;
 
-          const boosterList = Array.isArray(card.boosters)
-            ? card.boosters
-            : [card.boosters];
+          const boosterList = Array.isArray(card.boosters) ? card.boosters : [card.boosters];
 
           // Check for duplicate booster assignments
           const uniqueBoosters = new Set(boosterList);
@@ -412,9 +408,7 @@ describe('tcgpcards.yaml', () => {
 
       // Verify all YAML booster names exist in service
       yamlBoosterNames.forEach((name) => {
-        expect(BOOSTER_VALUES).toContain(
-          name as (typeof BOOSTER_VALUES)[number],
-        );
+        expect(BOOSTER_VALUES).toContain(name as (typeof BOOSTER_VALUES)[number]);
       });
 
       // Verify all service booster names exist in YAML

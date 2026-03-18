@@ -108,7 +108,7 @@ This project maintains high code quality standards:
 
 - **TypeScript strict mode** with comprehensive type safety
 - **100% test coverage requirement** - every `.ts` file has a corresponding `.test.ts`
-- **ESLint + Prettier** for consistent code formatting
+- **ESLint + oxfmt** for consistent code formatting
 - **Custom fake pattern** for isolated unit testing
 - **Dependency injection** for testable, modular code
 

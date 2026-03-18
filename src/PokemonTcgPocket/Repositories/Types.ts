@@ -25,6 +25,4 @@ const POKEMON_CARD_WITH_RELATIONS = {
 } satisfies PokemonCardDefaultArgs;
 
 /** Pokemon card including set, boosters, and ownership relations. */
-export type PokemonCardWithRelations = PokemonCardGetPayload<
-  typeof POKEMON_CARD_WITH_RELATIONS
->;
+export type PokemonCardWithRelations = PokemonCardGetPayload<typeof POKEMON_CARD_WITH_RELATIONS>;

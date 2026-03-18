@@ -1,6 +1,7 @@
 import { describe, it, beforeEach, expect } from 'bun:test';
-import { FourCardGuaranteedExStrategy } from './FourCardGuaranteedExStrategy.js';
+
 import { Rarity } from '../../generated/prisma/enums.js';
+import { FourCardGuaranteedExStrategy } from './FourCardGuaranteedExStrategy.js';
 
 describe('FourCardGuaranteedExStrategy', () => {
   let strategy: FourCardGuaranteedExStrategy;
@@ -55,10 +56,7 @@ describe('FourCardGuaranteedExStrategy', () => {
         const distribution = strategy.slotDistributions[slot as 1 | 2 | 3 | 4];
         expect(distribution).toBeDefined();
         if (!distribution) continue;
-        const sum = Array.from(distribution.values()).reduce(
-          (acc, prob) => acc + prob,
-          0,
-        );
+        const sum = Array.from(distribution.values()).reduce((acc, prob) => acc + prob, 0);
 
         expect(Math.abs(sum - 1.0)).toBeLessThan(tolerance);
       }

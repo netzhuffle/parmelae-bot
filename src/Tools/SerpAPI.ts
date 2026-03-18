@@ -283,15 +283,9 @@ interface GoogleParameters extends BaseParameters {
   ijn?: string;
 }
 
-type UrlParameters = Record<
-  string,
-  string | number | boolean | undefined | null
->;
+type UrlParameters = Record<string, string | number | boolean | undefined | null>;
 
-function buildUrl<P extends UrlParameters>(
-  path: string,
-  parameters: P,
-): string {
+function buildUrl<P extends UrlParameters>(path: string, parameters: P): string {
   const nonUndefinedParams: [string, string][] = Object.entries(parameters)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .filter(([_, value]) => value !== undefined)

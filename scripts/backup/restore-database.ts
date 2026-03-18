@@ -1,8 +1,9 @@
 #!/usr/bin/env bun
 
-import { $ } from 'bun';
 import { join } from 'path';
 import { createInterface } from 'readline';
+
+import { $ } from 'bun';
 
 // Configuration
 const BACKUP_DIR = join(import.meta.dir, '../../backups');
@@ -22,8 +23,7 @@ interface BackupFile {
 async function getAvailableBackups(): Promise<BackupFile[]> {
   try {
     // Use Bun's shell to list files
-    const result =
-      await $`find ${BACKUP_DIR} -name "${BACKUP_PREFIX}*.db" -type f`.text();
+    const result = await $`find ${BACKUP_DIR} -name "${BACKUP_PREFIX}*.db" -type f`.text();
     const files = result.trim().split('\n').filter(Boolean);
 
     const fileStats = await Promise.all(
@@ -81,10 +81,7 @@ function verifyBackup(backupPath: string): boolean {
  */
 async function backupCurrentDatabase() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const currentBackupPath = join(
-    BACKUP_DIR,
-    `pre-restore-backup-${timestamp}.db`,
-  );
+  const currentBackupPath = join(BACKUP_DIR, `pre-restore-backup-${timestamp}.db`);
 
   try {
     const dbFile = Bun.file(DB_PATH);
@@ -169,25 +166,22 @@ async function selectBackup(): Promise<BackupFile | null> {
   });
 
   return new Promise((resolve) => {
-    rl.question(
-      `\nSelect backup to restore (1-${backups.length}) or 'q' to quit: `,
-      (answer) => {
-        rl.close();
+    rl.question(`\nSelect backup to restore (1-${backups.length}) or 'q' to quit: `, (answer) => {
+      rl.close();
 
-        if (answer.toLowerCase() === 'q') {
-          resolve(null);
-          return;
-        }
+      if (answer.toLowerCase() === 'q') {
+        resolve(null);
+        return;
+      }
 
-        const selection = parseInt(answer) - 1;
-        if (selection >= 0 && selection < backups.length) {
-          resolve(backups[selection]);
-        } else {
-          console.log(`❌ Invalid selection. Please try again.`);
-          resolve(null);
-        }
-      },
-    );
+      const selection = parseInt(answer) - 1;
+      if (selection >= 0 && selection < backups.length) {
+        resolve(backups[selection]);
+      } else {
+        console.log(`❌ Invalid selection. Please try again.`);
+        resolve(null);
+      }
+    });
   });
 }
 

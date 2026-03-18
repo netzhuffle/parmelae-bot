@@ -40,23 +40,16 @@ const MESSAGE_WITH_RELATIONS = {
 } satisfies MessageDefaultArgs;
 
 /** Message including relations. */
-export type MessageWithRelations = MessageGetPayload<
-  typeof MESSAGE_WITH_RELATIONS
->;
+export type MessageWithRelations = MessageGetPayload<typeof MESSAGE_WITH_RELATIONS>;
 
 /** Telegram message including relations. */
 export type TelegramMessageWithRelations = MessageWithRelations &
   HasTelegramMessageId & {
-    replyToMessage:
-      | (MessageWithRelations['replyToMessage'] & HasTelegramMessageId)
-      | null;
+    replyToMessage: (MessageWithRelations['replyToMessage'] & HasTelegramMessageId) | null;
   };
 
 /** Message including relations without id field. */
-export type UnstoredMessageWithRelations = Omit<
-  MessageWithRelations,
-  'id' | 'replyToMessage'
-> &
+export type UnstoredMessageWithRelations = Omit<MessageWithRelations, 'id' | 'replyToMessage'> &
   HasTelegramMessageId & {
     replyToMessage: (Omit<MessageModel, 'id'> & HasTelegramMessageId) | null;
   };
@@ -69,9 +62,7 @@ const MESSAGE_WITH_USER_RELATION = {
 } satisfies MessageDefaultArgs;
 
 /** Message including the user relation. */
-export type MessageWithUser = MessageGetPayload<
-  typeof MESSAGE_WITH_USER_RELATION
->;
+export type MessageWithUser = MessageGetPayload<typeof MESSAGE_WITH_USER_RELATION>;
 
 /** Type value for a message including the reply-to relation. */
 const MESSAGE_WITH_REPLY_TO_RELATION = {
@@ -81,9 +72,7 @@ const MESSAGE_WITH_REPLY_TO_RELATION = {
 } satisfies MessageDefaultArgs;
 
 /** Telegram message including the reply-to relation. */
-export type TelegramMessageWithReplyTo = MessageGetPayload<
-  typeof MESSAGE_WITH_REPLY_TO_RELATION
-> &
+export type TelegramMessageWithReplyTo = MessageGetPayload<typeof MESSAGE_WITH_REPLY_TO_RELATION> &
   HasTelegramMessageId;
 
 /** Type value for a message including user and tool messages relations. */
@@ -130,7 +119,6 @@ const MESSAGE_WITH_USER_REPLY_TO_TOOL_MESSAGES_AND_TOOL_CALL_MESSAGES = {
 } satisfies MessageDefaultArgs;
 
 /** Message including user, reply-to, tool messages, and tool call messages relations. */
-export type MessageWithUserReplyToToolMessagesAndToolCallMessages =
-  MessageGetPayload<
-    typeof MESSAGE_WITH_USER_REPLY_TO_TOOL_MESSAGES_AND_TOOL_CALL_MESSAGES
-  >;
+export type MessageWithUserReplyToToolMessagesAndToolCallMessages = MessageGetPayload<
+  typeof MESSAGE_WITH_USER_REPLY_TO_TOOL_MESSAGES_AND_TOOL_CALL_MESSAGES
+>;

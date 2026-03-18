@@ -1,12 +1,14 @@
 import { describe, beforeEach, it, expect, mock, spyOn } from 'bun:test';
-import { GitHubService } from './GitHubService.js';
-import { DateTimeSettingRepositoryFake } from './Fakes/DateTimeSettingRepositoryFake.js';
-import { DateTimeSettingRepository } from './Repositories/DateTimeSettingRepository.js';
+
 import { Octokit } from 'octokit';
-import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
-import { TelegramService } from './TelegramService.js';
-import { ConfigFake } from './Fakes/ConfigFake.js';
+
 import type { GitHubConfig } from './ConfigInterfaces.js';
+import { ConfigFake } from './Fakes/ConfigFake.js';
+import { DateTimeSettingRepositoryFake } from './Fakes/DateTimeSettingRepositoryFake.js';
+import { GitHubService } from './GitHubService.js';
+import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
+import { DateTimeSettingRepository } from './Repositories/DateTimeSettingRepository.js';
+import { TelegramService } from './TelegramService.js';
 
 describe('GitHubService', () => {
   let service: GitHubService;
@@ -60,9 +62,7 @@ describe('GitHubService', () => {
       await service.announceNewCommits();
 
       expect(dateTimeRepository.getCallArgs).toHaveLength(1);
-      expect(dateTimeRepository.getCallArgs[0].setting).toBe(
-        'last commit DateTime',
-      );
+      expect(dateTimeRepository.getCallArgs[0].setting).toBe('last commit DateTime');
     });
   });
 

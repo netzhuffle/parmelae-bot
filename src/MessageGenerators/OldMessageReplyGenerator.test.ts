@@ -1,11 +1,13 @@
 import { test, expect } from 'bun:test';
+
 import { AIMessage } from '@langchain/core/messages';
-import { GptModelsProvider } from '../GptModelsProvider.js';
 import { ChatOpenAI } from '@langchain/openai';
-import { OldMessageReplyGenerator } from './OldMessageReplyGenerator.js';
+import { OpenAIEmbeddings } from '@langchain/openai';
+
 import { ChatGptService } from '../ChatGptService.js';
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
-import { OpenAIEmbeddings } from '@langchain/openai';
+import { GptModelsProvider } from '../GptModelsProvider.js';
+import { OldMessageReplyGenerator } from './OldMessageReplyGenerator.js';
 
 test('generate', async () => {
   const chatOpenAiFake = new ChatOpenAiFake(new AIMessage('Reply'));

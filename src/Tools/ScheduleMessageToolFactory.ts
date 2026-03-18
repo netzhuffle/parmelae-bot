@@ -1,7 +1,8 @@
 import { injectable } from 'inversify';
-import { ScheduleMessageTool } from './ScheduleMessageTool.js';
+
 import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository.js';
 import { ScheduledMessageService } from '../ScheduledMessageService.js';
+import { ScheduleMessageTool } from './ScheduleMessageTool.js';
 
 /** Factory for the schedule message tool. */
 @injectable()
@@ -18,11 +19,6 @@ export class ScheduleMessageToolFactory {
    * @param fromId - The user who asked to schedule the message.
    */
   create(chatId: bigint, fromId: bigint): ScheduleMessageTool {
-    return new ScheduleMessageTool(
-      this.repository,
-      this.service,
-      chatId,
-      fromId,
-    );
+    return new ScheduleMessageTool(this.repository, this.service, chatId, fromId);
   }
 }

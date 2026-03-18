@@ -1,21 +1,19 @@
 import { describe, it, expect, mock } from 'bun:test';
+
+import { StructuredTool } from '@langchain/core/tools';
+import { ChatOpenAI } from '@langchain/openai';
+
 import { AgentStateGraphFactory } from './AgentStateGraphFactory.js';
 import { ModelNodeFactory } from './ModelNodeFactory.js';
-import { ToolsNodeFactory } from './ToolsNodeFactory.js';
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
 import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
-import { ChatOpenAI } from '@langchain/openai';
-import { StructuredTool } from '@langchain/core/tools';
+import { ToolsNodeFactory } from './ToolsNodeFactory.js';
 
 describe('AgentStateGraphFactory', () => {
   it('should create factory with dependencies', () => {
     // Arrange
-    const agentNodeFactory = mock(
-      () => 'agent-node',
-    ) as unknown as ModelNodeFactory;
-    const toolsNodeFactory = mock(
-      () => 'tools-node',
-    ) as unknown as ToolsNodeFactory;
+    const agentNodeFactory = mock(() => 'agent-node') as unknown as ModelNodeFactory;
+    const toolsNodeFactory = mock(() => 'tools-node') as unknown as ToolsNodeFactory;
     const toolCallAnnouncementNodeFactory = mock(
       () => 'announcement-node',
     ) as unknown as ToolCallAnnouncementNodeFactory;
@@ -83,9 +81,7 @@ describe('AgentStateGraphFactory', () => {
     expect(mockBindTools).toHaveBeenCalledWith(tools);
     expect(mockAgentNodeFactoryCreate).toHaveBeenCalledWith(mockBoundLlm);
     expect(mockToolsNodeFactoryCreate).toHaveBeenCalledWith(tools);
-    expect(mockToolCallAnnouncementNodeFactoryCreate).toHaveBeenCalledWith(
-      announceToolCall,
-    );
+    expect(mockToolCallAnnouncementNodeFactoryCreate).toHaveBeenCalledWith(announceToolCall);
     expect(mockToolResponsePersistenceNodeFactoryCreate).toHaveBeenCalled();
   });
 });

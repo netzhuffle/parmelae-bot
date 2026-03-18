@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
-import { Rarity } from '../../generated/prisma/enums.js';
+
 import { PrismaClient } from '../../generated/prisma/client.js';
+import { Rarity } from '../../generated/prisma/enums.js';
 import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 
 /**
@@ -71,10 +72,7 @@ export class PokemonTcgPocketProbabilityRepository {
    * @param rarity - The rarity to count
    * @returns Promise resolving to the count of matching cards (including all cards regardless of isSixPackOnly flag)
    */
-  async countByBoosterRarity(
-    boosterId: number,
-    rarity: Rarity,
-  ): Promise<number> {
+  async countByBoosterRarity(boosterId: number, rarity: Rarity): Promise<number> {
     try {
       return await this.prisma.pokemonCard.count({
         where: {

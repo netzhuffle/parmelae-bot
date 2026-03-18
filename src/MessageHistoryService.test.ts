@@ -1,6 +1,7 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { MessageHistoryService } from './MessageHistoryService.js';
+
 import { MessageRepositoryFake } from './Fakes/MessageRepositoryFake.js';
+import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageWithUserAndToolMessages } from './Repositories/Types.js';
 
 describe('MessageHistoryService', () => {
@@ -46,9 +47,7 @@ describe('MessageHistoryService', () => {
       const result = await service.getHistory(1, 1);
 
       expect(result).toHaveLength(1);
-      expect(result[0].toolCalls).toEqual([
-        { id: 'call-123', name: 'test_tool' },
-      ]);
+      expect(result[0].toolCalls).toEqual([{ id: 'call-123', name: 'test_tool' }]);
     });
 
     it('should follow reply chain when message is a reply', async () => {
@@ -97,9 +96,7 @@ describe('MessageHistoryService', () => {
       expect(result[0].text).toBe('First message');
       expect(result[1].text).toBe('Second message');
       expect(repository.getCallArgs).toEqual([2]);
-      expect(repository.getPreviousChatMessageCallArgs).toEqual([
-        { chatId, beforeMessageId: 2 },
-      ]);
+      expect(repository.getPreviousChatMessageCallArgs).toEqual([{ chatId, beforeMessageId: 2 }]);
     });
 
     it('should stop when requested count is reached', async () => {
@@ -142,9 +139,7 @@ describe('MessageHistoryService', () => {
       const result = await service.getHistory(1, 5);
 
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(
-        singleMessage as MessageWithUserAndToolMessages,
-      );
+      expect(result[0]).toEqual(singleMessage as MessageWithUserAndToolMessages);
     });
 
     it('should handle complex reply chain with tool messages', async () => {
@@ -268,9 +263,7 @@ describe('MessageHistoryService', () => {
       expect(result[2].id).toBe(11);
       expect(result[2].text).toBe('Calling calculation tool...');
       expect(result[3].id).toBe(12);
-      expect(result[3].text).toBe(
-        'Based on the search and calculation, here is the answer.',
-      );
+      expect(result[3].text).toBe('Based on the search and calculation, here is the answer.');
     });
 
     it('should include multiple tool call messages in reply chain', async () => {
@@ -345,9 +338,7 @@ describe('MessageHistoryService', () => {
       expect(result[1].id).toBe(11);
       expect(result[1].text).toBe('Calling calculation tool...');
       expect(result[2].id).toBe(12);
-      expect(result[2].text).toBe(
-        'Based on the search and calculation, here is the answer.',
-      );
+      expect(result[2].text).toBe('Based on the search and calculation, here is the answer.');
       expect(result[3].id).toBe(13);
       expect(result[3].text).toBe('Thanks');
     });
@@ -423,9 +414,7 @@ describe('MessageHistoryService', () => {
       expect(result[1].id).toBe(11);
       expect(result[1].text).toBe('Calling calculation tool...');
       expect(result[2].id).toBe(12);
-      expect(result[2].text).toBe(
-        'Based on the search and calculation, here is the answer.',
-      );
+      expect(result[2].text).toBe('Based on the search and calculation, here is the answer.');
       expect(result[3].id).toBe(13);
       expect(result[3].text).toBe('Thanks');
     });

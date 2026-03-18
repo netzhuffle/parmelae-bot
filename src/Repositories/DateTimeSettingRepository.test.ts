@@ -1,6 +1,7 @@
 import { describe, beforeEach, it, expect, mock, spyOn } from 'bun:test';
-import { DateTimeSettingRepository } from './DateTimeSettingRepository.js';
+
 import { PrismaClient } from '../generated/prisma/client.js';
+import { DateTimeSettingRepository } from './DateTimeSettingRepository.js';
 
 describe('DateTimeSettingRepository', () => {
   let repository: DateTimeSettingRepository;
@@ -21,9 +22,7 @@ describe('DateTimeSettingRepository', () => {
   describe('get', () => {
     it('should return stored date when setting exists', async () => {
       const storedDate = new Date('2025-11-13T15:24:36.000Z');
-      (
-        prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: storedDate,
       });
@@ -38,12 +37,8 @@ describe('DateTimeSettingRepository', () => {
 
     it('should create and return startingValue when setting does not exist', async () => {
       const startingValue = new Date('2025-11-17T10:00:00.000Z');
-      (
-        prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>
-      ).mockResolvedValue(null);
-      (
-        prisma.dateTimeSetting.create as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>).mockResolvedValue(null);
+      (prisma.dateTimeSetting.create as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: startingValue,
       });
@@ -66,15 +61,11 @@ describe('DateTimeSettingRepository', () => {
         // Suppress console output in tests
       });
 
-      (
-        prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: invalidDate,
       });
-      (
-        prisma.dateTimeSetting.update as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.update as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: startingValue,
       });
@@ -82,9 +73,7 @@ describe('DateTimeSettingRepository', () => {
       const result = await repository.get('test-setting', startingValue);
 
       expect(result).toEqual(startingValue);
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Invalid date stored'),
-      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid date stored'));
       expect(prisma.dateTimeSetting.update).toHaveBeenCalledWith({
         where: { setting: 'test-setting' },
         data: { dateTime: startingValue },
@@ -99,15 +88,13 @@ describe('DateTimeSettingRepository', () => {
       const oldDate = new Date('2025-11-13T15:24:36.000Z');
       const newDate = new Date('2025-11-17T10:00:00.000Z');
 
-      (
-        prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: oldDate,
       });
-      (
-        prisma.dateTimeSetting.updateMany as ReturnType<typeof mock>
-      ).mockResolvedValue({ count: 1 });
+      (prisma.dateTimeSetting.updateMany as ReturnType<typeof mock>).mockResolvedValue({
+        count: 1,
+      });
 
       await repository.update('test-setting', newDate);
 
@@ -127,9 +114,7 @@ describe('DateTimeSettingRepository', () => {
       const oldDate = new Date('2025-11-17T10:00:00.000Z');
       const newDate = new Date('2025-11-13T15:24:36.000Z');
 
-      (
-        prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: oldDate,
       });
@@ -143,24 +128,20 @@ describe('DateTimeSettingRepository', () => {
       const invalidDate = new Date(NaN);
 
       // eslint-disable-next-line @typescript-eslint/await-thenable
-      await expect(
-        repository.update('test-setting', invalidDate),
-      ).rejects.toThrow('Cannot update setting');
+      await expect(repository.update('test-setting', invalidDate)).rejects.toThrow(
+        'Cannot update setting',
+      );
     });
 
     it('should update when oldDate is invalid (treat as no old date)', async () => {
       const invalidOldDate = new Date(NaN);
       const newDate = new Date('2025-11-17T10:00:00.000Z');
 
-      (
-        prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: invalidOldDate,
       });
-      (
-        prisma.dateTimeSetting.update as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.update as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: newDate,
       });
@@ -176,12 +157,8 @@ describe('DateTimeSettingRepository', () => {
     it('should update when oldDate does not exist', async () => {
       const newDate = new Date('2025-11-17T10:00:00.000Z');
 
-      (
-        prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>
-      ).mockResolvedValue(null);
-      (
-        prisma.dateTimeSetting.update as ReturnType<typeof mock>
-      ).mockResolvedValue({
+      (prisma.dateTimeSetting.findUnique as ReturnType<typeof mock>).mockResolvedValue(null);
+      (prisma.dateTimeSetting.update as ReturnType<typeof mock>).mockResolvedValue({
         setting: 'test-setting',
         dateTime: newDate,
       });

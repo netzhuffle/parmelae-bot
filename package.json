@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "format": "prettier --write src scripts",
+    "format": "bunx --bun oxfmt src scripts",
     "schema-format": "prisma format",
     "typecheck": "node --max-old-space-size=8192 ./node_modules/.bin/tsc -p tsconfig.notests.json",
     "typecheck-all": "node --max-old-space-size=8192 ./node_modules/.bin/tsc -p tsconfig.json",
@@ -40,7 +40,7 @@
     "@types/node": "^25.5.0",
     "eslint": "^9.39.2",
     "eslint-plugin-promise": "^7.2.1",
-    "prettier": "^3.8.1",
+    "oxfmt": "^0.41.0",
     "prisma": "^7.5.0",
     "task-master-ai": "^0.43.0",
     "typescript": "^5.9.3",

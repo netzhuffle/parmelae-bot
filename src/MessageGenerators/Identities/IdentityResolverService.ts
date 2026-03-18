@@ -1,7 +1,8 @@
 import { injectable } from 'inversify';
+
+import { EmulatorIdentity } from './EmulatorIdentity.js';
 import { Identity } from './Identity.js';
 import { SchiParmelaeIdentity } from './SchiParmelaeIdentity.js';
-import { EmulatorIdentity } from './EmulatorIdentity.js';
 import { UnknownIdentityError } from './UnknownIdentityError.js';
 
 /**
@@ -28,14 +29,8 @@ export class IdentityResolverService {
   ) {
     // Build map with normalized keys (lowercase) for case-insensitive lookup
     this.identityMap = new Map<string, Identity>();
-    this.identityMap.set(
-      this.normalizeName(schiParmelaeIdentity.name),
-      schiParmelaeIdentity,
-    );
-    this.identityMap.set(
-      this.normalizeName(emulatorIdentity.name),
-      emulatorIdentity,
-    );
+    this.identityMap.set(this.normalizeName(schiParmelaeIdentity.name), schiParmelaeIdentity);
+    this.identityMap.set(this.normalizeName(emulatorIdentity.name), emulatorIdentity);
   }
 
   /**
@@ -62,9 +57,7 @@ export class IdentityResolverService {
 
     if (!identity) {
       // Use original identity names (not normalized keys) for error message
-      const availableNames = Array.from(this.identityMap.values()).map(
-        (id) => id.name,
-      );
+      const availableNames = Array.from(this.identityMap.values()).map((id) => id.name);
       throw new UnknownIdentityError(identityName, availableNames);
     }
 

@@ -1,5 +1,6 @@
-import { TelegramService } from '../TelegramService.js';
 import { injectable } from 'inversify';
+
+import { TelegramService } from '../TelegramService.js';
 import { IntermediateAnswerTool } from './IntermediateAnswerTool.js';
 
 @injectable()

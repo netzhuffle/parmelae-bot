@@ -1,11 +1,9 @@
 import { tool } from '@langchain/core/tools';
-import * as z from 'zod';
-import {
-  SET_KEY_VALUES,
-  SET_KEY_NAMES,
-} from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import * as z from 'zod';
+
 import { getToolContext } from '../ChatGptAgentService.js';
+import { SET_KEY_VALUES, SET_KEY_NAMES } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { POKEMON_CARD_ADD_TOOL_NAME } from './toolNames.js';
 
 const schema = z.object({
@@ -14,12 +12,8 @@ const schema = z.object({
     .describe(
       `Set key of the set to add cards from: ${SET_KEY_VALUES.map((key) => `${key} (${SET_KEY_NAMES[key]})`).join(', ')}.`,
     ),
-  startNumber: z
-    .number()
-    .describe('Starting card number in the range (inclusive).'),
-  endNumber: z
-    .number()
-    .describe('Ending card number in the range (inclusive).'),
+  startNumber: z.number().describe('Starting card number in the range (inclusive).'),
+  endNumber: z.number().describe('Ending card number in the range (inclusive).'),
 });
 
 type PokemonCardRangeAddInput = z.infer<typeof schema>;
@@ -46,11 +40,7 @@ export const pokemonCardRangeAddTool = tool(
 
     try {
       // Step 1: Get all card IDs within the specified range
-      const cardIds = await service.getCardIdsInRange(
-        setKey,
-        startNumber,
-        endNumber,
-      );
+      const cardIds = await service.getCardIdsInRange(setKey, startNumber, endNumber);
 
       // Step 2: Handle case where no cards exist in the range
       if (cardIds.length === 0) {

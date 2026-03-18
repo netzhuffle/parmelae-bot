@@ -1,13 +1,11 @@
 import assert from 'assert';
+
 import { injectable } from 'inversify';
+
+import { normalizeUsername } from './BotIdentityContext.js';
+import type { BotConfig, BotConfiguration, GitHubConfig } from './ConfigInterfaces.js';
 import { GptModel, GptModels } from './GptModelsProvider.js';
 import { Identity } from './MessageGenerators/Identities/Identity.js';
-import { normalizeUsername } from './BotIdentityContext.js';
-import type {
-  BotConfig,
-  BotConfiguration,
-  GitHubConfig,
-} from './ConfigInterfaces.js';
 
 /** The configuration options, taken from .env */
 @injectable()
@@ -63,10 +61,7 @@ export class Config implements BotConfig, GitHubConfig {
     assert(Bun.env.OPENAI_API_KEY, 'You must define OPENAI_API_KEY in .env');
     this.openAiKey = Bun.env.OPENAI_API_KEY;
 
-    assert(
-      Bun.env.HELICONE_API_KEY,
-      'You must define HELICONE_API_KEY in .env',
-    );
+    assert(Bun.env.HELICONE_API_KEY, 'You must define HELICONE_API_KEY in .env');
     this.heliconeApiKey = Bun.env.HELICONE_API_KEY;
 
     this.sentryDsn = Bun.env.SENTRY_DSN ?? null;
@@ -94,20 +89,14 @@ export class Config implements BotConfig, GitHubConfig {
       Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS,
       'You must define NEW_COMMIT_ANNOUNCEMENT_CHATS in .env',
     );
-    const newCommitAnnouncementChatStrings =
-      Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS.split(',');
-    this.newCommitAnnouncementChats = newCommitAnnouncementChatStrings.map(
-      (chat) => {
-        try {
-          return BigInt(chat);
-        } catch {
-          assert(
-            false,
-            'NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers',
-          );
-        }
-      },
-    );
+    const newCommitAnnouncementChatStrings = Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS.split(',');
+    this.newCommitAnnouncementChats = newCommitAnnouncementChatStrings.map((chat) => {
+      try {
+        return BigInt(chat);
+      } catch {
+        assert(false, 'NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers');
+      }
+    });
   }
 
   /**
@@ -129,10 +118,7 @@ export class Config implements BotConfig, GitHubConfig {
 
     if (primaryUsername && primaryToken) {
       const normalized = normalizeUsername(primaryUsername);
-      assert(
-        !seenUsernames.has(normalized),
-        `Duplicate bot username: ${primaryUsername}`,
-      );
+      assert(!seenUsernames.has(normalized), `Duplicate bot username: ${primaryUsername}`);
       seenUsernames.add(normalized);
       bots.push({
         username: primaryUsername,
@@ -140,10 +126,7 @@ export class Config implements BotConfig, GitHubConfig {
         defaultIdentity: primaryIdentity,
       });
     } else if (primaryUsername || primaryToken) {
-      assert(
-        false,
-        'Primary bot requires both USERNAME and TELEGRAM_TOKEN to be set',
-      );
+      assert(false, 'Primary bot requires both USERNAME and TELEGRAM_TOKEN to be set');
     }
 
     // Parse additional bots (2-9)
@@ -154,10 +137,7 @@ export class Config implements BotConfig, GitHubConfig {
 
       if (username && token) {
         const normalized = normalizeUsername(username);
-        assert(
-          !seenUsernames.has(normalized),
-          `Duplicate bot username: ${username}`,
-        );
+        assert(!seenUsernames.has(normalized), `Duplicate bot username: ${username}`);
         seenUsernames.add(normalized);
         bots.push({
           username,
@@ -165,10 +145,7 @@ export class Config implements BotConfig, GitHubConfig {
           defaultIdentity: identity,
         });
       } else if (username || token) {
-        assert(
-          false,
-          `Bot ${i} requires both USERNAME_${i} and TELEGRAM_TOKEN_${i} to be set`,
-        );
+        assert(false, `Bot ${i} requires both USERNAME_${i} and TELEGRAM_TOKEN_${i} to be set`);
       }
     }
 
@@ -183,8 +160,6 @@ export class Config implements BotConfig, GitHubConfig {
    */
   getBotByUsername(username: string): BotConfiguration | undefined {
     const normalized = normalizeUsername(username);
-    return this.bots.find(
-      (bot) => normalizeUsername(bot.username) === normalized,
-    );
+    return this.bots.find((bot) => normalizeUsername(bot.username) === normalized);
   }
 }

@@ -1,7 +1,8 @@
-import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository.js';
 import { Tool } from '@langchain/core/tools';
-import { ScheduledMessageService } from '../ScheduledMessageService.js';
+
 import { ErrorService } from '../ErrorService.js';
+import { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository.js';
+import { ScheduledMessageService } from '../ScheduledMessageService.js';
 
 /** RegExp to check for numeric string. */
 const NUMERIC_REGEXP = /^\d+$/;
@@ -52,12 +53,7 @@ export class ScheduleMessageTool extends Tool {
         this.fromId,
       );
       setTimeout(
-        this.service.send.bind(
-          this.service,
-          message,
-          scheduledMessage.id,
-          this.chatId,
-        ),
+        this.service.send.bind(this.service, message, scheduledMessage.id, this.chatId),
         seconds * MILLISECONDS_IN_SECOND,
       );
     } catch (e) {

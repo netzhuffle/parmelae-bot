@@ -7,11 +7,7 @@ export class PokemonTcgPocketProbabilityRepositoryFake {
   public countGodPackEligibleByBoosterReturnValue = 0;
 
   /** Set count for a specific rarity and isSixPackOnly combination (for testing) */
-  setCountByRarity(
-    rarity: Rarity,
-    isSixPackOnly: boolean,
-    count: number,
-  ): void {
+  setCountByRarity(rarity: Rarity, isSixPackOnly: boolean, count: number): void {
     const key = `${rarity}_${isSixPackOnly}`;
     this.countsByRarity.set(key, count);
   }
@@ -30,10 +26,7 @@ export class PokemonTcgPocketProbabilityRepositoryFake {
     return Promise.resolve(this.countsByRarity.get(key) ?? 0);
   }
 
-  async countByBoosterRarity(
-    _boosterId: number,
-    rarity: Rarity,
-  ): Promise<number> {
+  async countByBoosterRarity(_boosterId: number, rarity: Rarity): Promise<number> {
     return Promise.resolve(this.countsIncludingSixPackOnly.get(rarity) ?? 0);
   }
 

@@ -1,16 +1,18 @@
-import { NullReplyStrategy } from './ReplyStrategies/NullReplyStrategy.js';
-import { ReplyStrategy } from './ReplyStrategy.js';
 import assert from 'assert';
+
 import { injectable } from 'inversify';
-import { StickerIdReplyStrategy } from './ReplyStrategies/StickerIdReplyStrategy.js';
-import { NewMembersReplyStrategy } from './ReplyStrategies/NewMembersReplyStrategy.js';
-import { CommandReplyStrategy } from './ReplyStrategies/CommandReplyStrategy.js';
+
 import { BotMentionReplyStrategy } from './ReplyStrategies/ BotMentionReplyStrategy.js';
+import { CommandReplyStrategy } from './ReplyStrategies/CommandReplyStrategy.js';
+import { CommentReplyStrategy } from './ReplyStrategies/CommentReplyStrategy.js';
 import { MessageRepetitionReplyStrategy } from './ReplyStrategies/MessageRepetitionReplyStrategy.js';
+import { NewMembersReplyStrategy } from './ReplyStrategies/NewMembersReplyStrategy.js';
 import { NicknameReplyStrategy } from './ReplyStrategies/NicknameReplyStrategy.js';
+import { NullReplyStrategy } from './ReplyStrategies/NullReplyStrategy.js';
 import { RandomizedGeneratedReplyStrategy } from './ReplyStrategies/RandomizedGeneratedReplyStrategy.js';
 import { RandomizedStickerReplyStrategy } from './ReplyStrategies/RandomizedStickerReplyStrategy.js';
-import { CommentReplyStrategy } from './ReplyStrategies/CommentReplyStrategy.js';
+import { StickerIdReplyStrategy } from './ReplyStrategies/StickerIdReplyStrategy.js';
+import { ReplyStrategy } from './ReplyStrategy.js';
 import { TelegramMessageWithRelations } from './Repositories/Types.js';
 
 /** Finds the ReplyStrategy to handle a given message. */

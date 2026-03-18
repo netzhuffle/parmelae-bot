@@ -82,9 +82,7 @@ export class TelegrafStub {
         } as Typegram.Message.PhotoMessage);
       },
       getFileLink: async () => {
-        return await Promise.resolve(
-          new URL('https://fake-telegram-file-url.com/'),
-        );
+        return await Promise.resolve(new URL('https://fake-telegram-file-url.com/'));
       },
       getMyName: async () => {
         return await Promise.resolve({ name: 'testbot' });

@@ -1,17 +1,19 @@
+import assert from 'node:assert/strict';
+
 import { injectable, inject } from 'inversify';
-import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
+
 import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
-import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
 import { PokemonBoosterModel } from '../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
-import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketInvalidBoosterError.js';
-import { PokemonTcgPocketInvalidRarityError } from './Errors/PokemonTcgPocketInvalidRarityError.js';
+import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
 import { PokemonTcgPocketDuplicateCardNumberError } from './Errors/PokemonTcgPocketDuplicateCardNumberError.js';
+import { PokemonTcgPocketInvalidBoosterError } from './Errors/PokemonTcgPocketInvalidBoosterError.js';
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
-import { PokemonCardWithRelations } from './Repositories/Types.js';
+import { PokemonTcgPocketInvalidRarityError } from './Errors/PokemonTcgPocketInvalidRarityError.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+import { PokemonTcgPocketRepository } from './Repositories/PokemonTcgPocketRepository.js';
+import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { BOOSTERS_STATS_EXPLANATION, SETS_STATS_EXPLANATION } from './texts.js';
-import assert from 'node:assert/strict';
 import {
   CARD_EXISTS_BUT_NO_MATCH_MESSAGE,
   MULTIPLE_MATCHES_MESSAGE,
@@ -153,23 +155,16 @@ export const BOOSTER_VALUES = [
 ] as const;
 
 /** Maps set keys to their probability strategy types (derived from SET_DEFINITIONS) */
-export const SET_PROBABILITY_STRATEGY: Record<
-  SetKey,
-  BoosterProbabilitiesType | undefined
-> = Object.fromEntries(
-  Object.entries(SET_DEFINITIONS).map(([key, def]) => [
-    key,
-    'probabilitiesType' in def ? def.probabilitiesType : undefined,
-  ]),
-) as Record<SetKey, BoosterProbabilitiesType | undefined>;
+export const SET_PROBABILITY_STRATEGY: Record<SetKey, BoosterProbabilitiesType | undefined> =
+  Object.fromEntries(
+    Object.entries(SET_DEFINITIONS).map(([key, def]) => [
+      key,
+      'probabilitiesType' in def ? def.probabilitiesType : undefined,
+    ]),
+  ) as Record<SetKey, BoosterProbabilitiesType | undefined>;
 
 /** Ownership filter values */
-export const OWNERSHIP_FILTER_VALUES = [
-  'all',
-  'owned',
-  'missing',
-  'not_needed',
-] as const;
+export const OWNERSHIP_FILTER_VALUES = ['all', 'owned', 'missing', 'not_needed'] as const;
 
 /** Ownership filter type */
 export type OwnershipFilter = (typeof OWNERSHIP_FILTER_VALUES)[number];
@@ -254,9 +249,7 @@ export const RARITY_MAP: Record<string, Rarity> = {
 };
 
 /** Array of all valid rarity symbols (derived from RARITY_MAP keys) */
-export const RARITY_SYMBOLS: readonly string[] = Object.keys(
-  RARITY_MAP,
-) as readonly string[];
+export const RARITY_SYMBOLS: readonly string[] = Object.keys(RARITY_MAP) as readonly string[];
 
 /** Maps database enum values to rarity symbols */
 const RARITY_REVERSE_MAP: Record<Rarity, string> = {
@@ -293,10 +286,7 @@ export const DIAMOND_RARITIES: readonly Rarity[] = [
  * rarities (including foil variants) plus ONE_STAR illustration rares, as defined
  * by the Pokemon TCG Pocket game mechanics.
  */
-export const TRADABLE_RARITIES: readonly Rarity[] = [
-  ...DIAMOND_RARITIES,
-  Rarity.ONE_STAR,
-] as const;
+export const TRADABLE_RARITIES: readonly Rarity[] = [...DIAMOND_RARITIES, Rarity.ONE_STAR] as const;
 
 /** Array of all star rarities */
 const STAR_RARITIES: readonly Rarity[] = [
@@ -306,10 +296,7 @@ const STAR_RARITIES: readonly Rarity[] = [
 ] as const;
 
 /** Array of all shiny rarities */
-const SHINY_RARITIES: readonly Rarity[] = [
-  Rarity.ONE_SHINY,
-  Rarity.TWO_SHINY,
-] as const;
+const SHINY_RARITIES: readonly Rarity[] = [Rarity.ONE_SHINY, Rarity.TWO_SHINY] as const;
 
 /** Array of crown rarity */
 const CROWN_RARITIES: readonly Rarity[] = [Rarity.CROWN] as const;
@@ -379,22 +366,11 @@ export class PokemonTcgPocketService {
   }
 
   /** Adds multiple cards to a user's collection in bulk and returns formatted result */
-  async addMultipleCardsToCollection(
-    cardIds: number[],
-    userId: bigint,
-  ): Promise<string> {
-    const addedCards = await this.repository.addMultipleCardsToCollection(
-      cardIds,
-      userId,
-    );
+  async addMultipleCardsToCollection(cardIds: number[], userId: bigint): Promise<string> {
+    const addedCards = await this.repository.addMultipleCardsToCollection(cardIds, userId);
 
     const displayName = await this.getDisplayName(userId);
-    const header = BULK_OPERATION_HEADER_MESSAGE(
-      'added',
-      addedCards.length,
-      'to',
-      displayName,
-    );
+    const header = BULK_OPERATION_HEADER_MESSAGE('added', addedCards.length, 'to', displayName);
     const csv = await this.formatCardsAsCsv(addedCards, userId);
     const stats = await this.getFormattedCollectionStats(userId);
     return BULK_OPERATION_WARNING_MESSAGE(header, csv, stats);
@@ -414,9 +390,7 @@ export class PokemonTcgPocketService {
   }
 
   /** Calculates the probability string for a card in its first booster */
-  private async calculateCardProbabilityString(
-    card: PokemonCardWithRelations,
-  ): Promise<string> {
+  private async calculateCardProbabilityString(card: PokemonCardWithRelations): Promise<string> {
     if (card.boosters.length === 0) {
       return 'N/A';
     }
@@ -430,45 +404,31 @@ export class PokemonTcgPocketService {
         // Set not in SET_DEFINITIONS (e.g., test sets), return N/A
         return 'N/A';
       }
-      const probability =
-        await this.probabilityService.calculateSingleCardProbability(
-          card,
-          firstBooster.id,
-          probabilitiesType,
-        );
+      const probability = await this.probabilityService.calculateSingleCardProbability(
+        card,
+        firstBooster.id,
+        probabilitiesType,
+      );
 
       return probability > 0 ? `${(probability * 100).toFixed(2)}%` : 'N/A';
     } catch (error) {
       // Log error but don't fail CSV generation
-      console.warn(
-        `Failed to calculate probability for card ${card.id}:`,
-        error,
-      );
+      console.warn(`Failed to calculate probability for card ${card.id}:`, error);
       return 'N/A';
     }
   }
 
   /** Formats multiple cards as CSV strings */
-  async formatCardsAsCsv(
-    cards: PokemonCardWithRelations[],
-    userId?: bigint,
-  ): Promise<string> {
+  async formatCardsAsCsv(cards: PokemonCardWithRelations[], userId?: bigint): Promise<string> {
     const displayName = userId ? await this.getDisplayName(userId) : 'Owned';
     const header = `ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by ${displayName}`;
-    const csvLines = await Promise.all(
-      cards.map((card) => this.formatCardAsCsv(card, userId)),
-    );
+    const csvLines = await Promise.all(cards.map((card) => this.formatCardAsCsv(card, userId)));
     return [header, ...csvLines].join('\n');
   }
 
   /** Formats a card as a CSV string */
-  private async formatCardAsCsv(
-    card: PokemonCardWithRelations,
-    userId?: bigint,
-  ): Promise<string> {
-    const boosterNames = card.boosters
-      .map((b: PokemonBoosterModel) => b.name)
-      .join(',');
+  private async formatCardAsCsv(card: PokemonCardWithRelations, userId?: bigint): Promise<string> {
+    const boosterNames = card.boosters.map((b: PokemonBoosterModel) => b.name).join(',');
 
     // Calculate probability for first booster (same probability across all boosters)
     const probabilityString = await this.calculateCardProbabilityString(card);
@@ -514,9 +474,7 @@ export class PokemonTcgPocketService {
   }
 
   /** Formats the sets section of collection statistics */
-  private formatSetsSection(
-    sets: { name: string; stats: string[] }[],
-  ): string[] {
+  private formatSetsSection(sets: { name: string; stats: string[] }[]): string[] {
     const lines: string[] = ['Sets:'];
     for (const { name, stats: setStats } of sets) {
       lines.push(`${name}: ${setStats.join(' ⋅ ')}`);
@@ -546,20 +504,14 @@ export class PokemonTcgPocketService {
     }[],
   ): string[] {
     // Helper function to format owned+notNeeded/total
-    const formatBoosterCount = (
-      owned: number,
-      notNeeded: number,
-      total: number,
-    ): string => {
+    const formatBoosterCount = (owned: number, notNeeded: number, total: number): string => {
       if (notNeeded === 0) {
         return `${owned}/${total}`;
       }
       return `${owned}+${notNeeded}/${total}`;
     };
 
-    const lines: string[] = [
-      'Booster Packs (sorted by probability for new cards, descending):',
-    ];
+    const lines: string[] = ['Booster Packs (sorted by probability for new cards, descending):'];
     for (const {
       name,
       diamondOwned,
@@ -623,9 +575,7 @@ export class PokemonTcgPocketService {
         );
         return {
           name: set.name,
-          stats: this.formatSetStats(
-            this.calculateSetStats(cardsWithServiceStatus),
-          ),
+          stats: this.formatSetStats(this.calculateSetStats(cardsWithServiceStatus)),
         };
       }),
       boosters: rawStats.sets
@@ -665,12 +615,10 @@ export class PokemonTcgPocketService {
               return {
                 name: booster.name,
                 diamondOwned: diamondCards.filter(
-                  ({ ownershipStatus }) =>
-                    ownershipStatus === CardOwnershipStatus.OWNED,
+                  ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.OWNED,
                 ).length,
                 diamondNotNeeded: diamondCards.filter(
-                  ({ ownershipStatus }) =>
-                    ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+                  ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
                 ).length,
                 diamondTotal: diamondCards.length,
                 newDiamondCardProbability:
@@ -680,12 +628,10 @@ export class PokemonTcgPocketService {
                     probabilitiesType,
                   ) * 100,
                 tradableOwned: tradableCards.filter(
-                  ({ ownershipStatus }) =>
-                    ownershipStatus === CardOwnershipStatus.OWNED,
+                  ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.OWNED,
                 ).length,
                 tradableNotNeeded: tradableCards.filter(
-                  ({ ownershipStatus }) =>
-                    ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+                  ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
                 ).length,
                 tradableTotal: tradableCards.length,
                 newTradableCardProbability:
@@ -695,12 +641,10 @@ export class PokemonTcgPocketService {
                     probabilitiesType,
                   ) * 100,
                 allOwned: cardsWithServiceStatus.filter(
-                  ({ ownershipStatus }) =>
-                    ownershipStatus === CardOwnershipStatus.OWNED,
+                  ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.OWNED,
                 ).length,
                 allNotNeeded: cardsWithServiceStatus.filter(
-                  ({ ownershipStatus }) =>
-                    ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+                  ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
                 ).length,
                 allTotal: cardsWithServiceStatus.length,
                 newCardProbability:
@@ -711,20 +655,14 @@ export class PokemonTcgPocketService {
                   ) * 100,
               };
             })
-            .filter(
-              (booster): booster is NonNullable<typeof booster> =>
-                booster !== null,
-            ),
+            .filter((booster): booster is NonNullable<typeof booster> => booster !== null),
         )
         .sort((a, b) => b.newCardProbability - a.newCardProbability),
     };
   }
 
   /** Checks if a card has a specific rarity */
-  private isCardOfRarity(
-    card: PokemonCardModel,
-    rarities: readonly Rarity[],
-  ): boolean {
+  private isCardOfRarity(card: PokemonCardModel, rarities: readonly Rarity[]): boolean {
     return card.rarity !== null && rarities.includes(card.rarity);
   }
 
@@ -740,15 +678,9 @@ export class PokemonTcgPocketService {
       diamonds: this.calculateCardGroup(cards, (card) =>
         this.isCardOfRarity(card, DIAMOND_RARITIES),
       ),
-      stars: this.calculateCardGroup(cards, (card) =>
-        this.isCardOfRarity(card, STAR_RARITIES),
-      ),
-      shinies: this.calculateCardGroup(cards, (card) =>
-        this.isCardOfRarity(card, SHINY_RARITIES),
-      ),
-      crowns: this.calculateCardGroup(cards, (card) =>
-        this.isCardOfRarity(card, CROWN_RARITIES),
-      ),
+      stars: this.calculateCardGroup(cards, (card) => this.isCardOfRarity(card, STAR_RARITIES)),
+      shinies: this.calculateCardGroup(cards, (card) => this.isCardOfRarity(card, SHINY_RARITIES)),
+      crowns: this.calculateCardGroup(cards, (card) => this.isCardOfRarity(card, CROWN_RARITIES)),
       promos: this.calculateCardGroup(cards, (card) => card.rarity === null),
     };
   }
@@ -765,8 +697,7 @@ export class PokemonTcgPocketService {
         ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.OWNED,
       ).length,
       notNeeded: filteredCards.filter(
-        ({ ownershipStatus }) =>
-          ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
+        ({ ownershipStatus }) => ownershipStatus === CardOwnershipStatus.NOT_NEEDED,
       ).length,
       total: filteredCards.length,
     };
@@ -831,10 +762,7 @@ export class PokemonTcgPocketService {
     return parts;
   }
 
-  private async synchronizeSet(
-    setKey: string,
-    setData: SetData,
-  ): Promise<void> {
+  private async synchronizeSet(setKey: string, setData: SetData): Promise<void> {
     // Check for duplicate card numbers
     const cardNumbers = Object.keys(setData.cards);
     const uniqueNumbers = new Set(cardNumbers);
@@ -843,10 +771,7 @@ export class PokemonTcgPocketService {
       const duplicateNumber = cardNumbers.find(
         (num) => cardNumbers.filter((n) => n === num).length > 1,
       );
-      throw new PokemonTcgPocketDuplicateCardNumberError(
-        setKey,
-        duplicateNumber!,
-      );
+      throw new PokemonTcgPocketDuplicateCardNumberError(setKey, duplicateNumber!);
     }
 
     const set = await this.getOrCreateSet(setKey, setData);
@@ -858,10 +783,7 @@ export class PokemonTcgPocketService {
     await this.synchronizeCards(setKey, setData, boosters);
   }
 
-  private async getOrCreateSet(
-    setKey: string,
-    setData: SetData,
-  ): Promise<PokemonSetModel | null> {
+  private async getOrCreateSet(setKey: string, setData: SetData): Promise<PokemonSetModel | null> {
     const set =
       (await this.repository.retrieveSetByKey(setKey)) ??
       (await this.repository.createSet(setKey, setData.name));
@@ -883,10 +805,8 @@ export class PokemonTcgPocketService {
     const boosters = await Promise.all(
       boosterNames.map(async (name) => {
         const booster =
-          (await this.repository.retrieveBoosterByNameAndSetKey(
-            name,
-            setKey,
-          )) ?? (await this.repository.createBooster(name, setKey));
+          (await this.repository.retrieveBoosterByNameAndSetKey(name, setKey)) ??
+          (await this.repository.createBooster(name, setKey));
         return booster;
       }),
     );
@@ -906,10 +826,7 @@ export class PokemonTcgPocketService {
     for (const [cardNumberString, card] of Object.entries(setData.cards)) {
       const cardNumber = parseInt(cardNumberString, 10);
       if (isNaN(cardNumber)) {
-        throw new PokemonTcgPocketInvalidCardNumberError(
-          setKey,
-          cardNumberString,
-        );
+        throw new PokemonTcgPocketInvalidCardNumberError(setKey, cardNumberString);
       }
 
       await this.synchronizeCard(setKey, cardNumber, card, validBoosterNames);
@@ -922,19 +839,12 @@ export class PokemonTcgPocketService {
     cardData: Card,
     validBoosterNames: Set<string>,
   ): Promise<void> {
-    const card = await this.repository.retrieveCardByNumberAndSetKey(
-      number,
-      setKey,
-    );
+    const card = await this.repository.retrieveCardByNumberAndSetKey(number, setKey);
     if (card) {
       return;
     }
 
-    const cardBoosterNames = this.convertToBoosterNameArray(
-      cardData,
-      validBoosterNames,
-      setKey,
-    );
+    const cardBoosterNames = this.convertToBoosterNameArray(cardData, validBoosterNames, setKey);
     const rarity = this.convertSymbolToRarity(cardData.rarity);
     const isSixPackOnly = cardData.isSixPackOnly === true;
 
@@ -970,11 +880,10 @@ export class PokemonTcgPocketService {
       }
 
       // Look up the booster ID
-      const godPackBooster =
-        await this.repository.retrieveBoosterByNameAndSetKey(
-          cardData.godPackBooster,
-          setKey,
-        );
+      const godPackBooster = await this.repository.retrieveBoosterByNameAndSetKey(
+        cardData.godPackBooster,
+        setKey,
+      );
 
       if (!godPackBooster) {
         throw new Error(
@@ -1011,14 +920,10 @@ export class PokemonTcgPocketService {
       return Array.from(validBoosterNames);
     }
 
-    const boosterNames = Array.isArray(cardData.boosters)
-      ? cardData.boosters
-      : [cardData.boosters];
+    const boosterNames = Array.isArray(cardData.boosters) ? cardData.boosters : [cardData.boosters];
 
     // Validate that all referenced boosters exist
-    const invalidBoosters = boosterNames.filter(
-      (name) => !validBoosterNames.has(name),
-    );
+    const invalidBoosters = boosterNames.filter((name) => !validBoosterNames.has(name));
     if (invalidBoosters.length > 0) {
       throw new PokemonTcgPocketInvalidBoosterError(cardData.name, setKey);
     }
@@ -1026,9 +931,7 @@ export class PokemonTcgPocketService {
     return boosterNames;
   }
 
-  private convertSymbolToRarity(
-    rarityString: string | undefined,
-  ): Rarity | null {
+  private convertSymbolToRarity(rarityString: string | undefined): Rarity | null {
     if (!rarityString) {
       return null;
     }
@@ -1073,8 +976,7 @@ export class PokemonTcgPocketService {
     const searchParams: Record<string, unknown> = {};
 
     if (cardName) searchParams.cardName = cardName;
-    if (idInfo?.setKey ?? setKey)
-      searchParams.setKey = idInfo?.setKey ?? setKey;
+    if (idInfo?.setKey ?? setKey) searchParams.setKey = idInfo?.setKey ?? setKey;
     if (booster) searchParams.booster = booster;
     if (idInfo?.cardNumber) searchParams.cardNumber = idInfo?.cardNumber;
     if (rarity) searchParams.rarity = RARITY_MAP[rarity];
@@ -1101,9 +1003,7 @@ export class PokemonTcgPocketService {
       const paramsWithoutOwnership = { ...searchParams };
       delete paramsWithoutOwnership.ownershipFilter;
       delete paramsWithoutOwnership.userId;
-      const cardsWithoutOwnership = await this.searchCards(
-        paramsWithoutOwnership,
-      );
+      const cardsWithoutOwnership = await this.searchCards(paramsWithoutOwnership);
       if (cardsWithoutOwnership.length > 0) {
         return { cards: cardsWithoutOwnership };
       }
@@ -1140,11 +1040,7 @@ export class PokemonTcgPocketService {
 
         if (idOnlyCards.length > 0) {
           const cardDetails = await this.formatCardsAsCsv(idOnlyCards, userId);
-          return CARD_EXISTS_BUT_NO_MATCH_MESSAGE(
-            idInfo.setKey,
-            idInfo.cardNumber,
-            cardDetails,
-          );
+          return CARD_EXISTS_BUT_NO_MATCH_MESSAGE(idInfo.setKey, idInfo.cardNumber, cardDetails);
         }
       }
 
@@ -1163,10 +1059,7 @@ export class PokemonTcgPocketService {
     bulkOperation: boolean,
   ): Promise<string> {
     const displayName = await this.getDisplayName(userId);
-    const operationMap: Record<
-      PokemonCardOperation,
-      { verb: string; preposition: string }
-    > = {
+    const operationMap: Record<PokemonCardOperation, { verb: string; preposition: string }> = {
       add: { verb: 'added', preposition: 'to' },
       remove: { verb: 'removed', preposition: 'from' },
       'mark-as-not-needed': { verb: 'marked as not needed', preposition: 'in' },
@@ -1174,9 +1067,7 @@ export class PokemonTcgPocketService {
     const { verb, preposition } = operationMap[operation];
 
     if (!bulkOperation && cards.length > 1) {
-      return MULTIPLE_MATCHES_MESSAGE(
-        await this.formatCardsAsCsv(cards, userId),
-      );
+      return MULTIPLE_MATCHES_MESSAGE(await this.formatCardsAsCsv(cards, userId));
     }
 
     if (cards.length > 1 && bulkOperation) {
@@ -1185,28 +1076,15 @@ export class PokemonTcgPocketService {
           if (operation === 'remove') {
             return this.removeCardFromCollection(card.id, userId);
           } else if (operation === 'add') {
-            return this.addCardToCollection(
-              card.id,
-              userId,
-              OwnershipStatus.OWNED,
-            );
+            return this.addCardToCollection(card.id, userId, OwnershipStatus.OWNED);
           } else {
             // mark-as-not-needed
-            return this.addCardToCollection(
-              card.id,
-              userId,
-              OwnershipStatus.NOT_NEEDED,
-            );
+            return this.addCardToCollection(card.id, userId, OwnershipStatus.NOT_NEEDED);
           }
         }),
       );
 
-      const header = BULK_OPERATION_HEADER_MESSAGE(
-        verb,
-        cards.length,
-        preposition,
-        displayName,
-      );
+      const header = BULK_OPERATION_HEADER_MESSAGE(verb, cards.length, preposition, displayName);
       const csv = await this.formatCardsAsCsv(updatedCards, userId);
       const stats = await this.getFormattedCollectionStats(userId);
       return BULK_OPERATION_WARNING_MESSAGE(header, csv, stats);
@@ -1219,25 +1097,13 @@ export class PokemonTcgPocketService {
     if (operation === 'remove') {
       updatedCard = await this.removeCardFromCollection(card.id, userId);
     } else if (operation === 'add') {
-      updatedCard = await this.addCardToCollection(
-        card.id,
-        userId,
-        OwnershipStatus.OWNED,
-      );
+      updatedCard = await this.addCardToCollection(card.id, userId, OwnershipStatus.OWNED);
     } else {
       // mark-as-not-needed
-      updatedCard = await this.addCardToCollection(
-        card.id,
-        userId,
-        OwnershipStatus.NOT_NEEDED,
-      );
+      updatedCard = await this.addCardToCollection(card.id, userId, OwnershipStatus.NOT_NEEDED);
     }
 
-    const header = SINGLE_OPERATION_HEADER_MESSAGE(
-      verb,
-      preposition,
-      displayName,
-    );
+    const header = SINGLE_OPERATION_HEADER_MESSAGE(verb, preposition, displayName);
     const csv = await this.formatCardsAsCsv([updatedCard], userId);
     const stats = await this.getFormattedCollectionStats(userId);
     return `${header}\n${csv}${UPDATED_STATS_MESSAGE(stats)}`;

@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 
-import * as cheerio from 'cheerio';
 import assert from 'node:assert/strict';
+
+import * as cheerio from 'cheerio';
 
 // ---------------------------
 // Configuration
@@ -99,9 +100,7 @@ function validatePokewikiUrl(url: string): void {
   try {
     const urlObj = new URL(url);
     if (urlObj.origin !== POKEWIKI_BASE_URL) {
-      throw new Error(
-        `URL must be from ${POKEWIKI_BASE_URL}, got: ${urlObj.origin}`,
-      );
+      throw new Error(`URL must be from ${POKEWIKI_BASE_URL}, got: ${urlObj.origin}`);
     }
   } catch (error) {
     if (error instanceof TypeError) {
@@ -137,9 +136,7 @@ export async function fetchWikitext(url: string): Promise<string> {
 
   const response = await fetch(editUrl);
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch edit source: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Failed to fetch edit source: ${response.status} ${response.statusText}`);
   }
 
   const html = await response.text();
@@ -147,9 +144,7 @@ export async function fetchWikitext(url: string): Promise<string> {
   const textarea = $('#wpTextbox1').val();
 
   if (typeof textarea !== 'string') {
-    throw new Error(
-      'Edit source page did not contain expected textarea element (#wpTextbox1).',
-    );
+    throw new Error('Edit source page did not contain expected textarea element (#wpTextbox1).');
   }
 
   if (textarea.length < MIN_WIKITEXT_LENGTH) {
@@ -221,10 +216,7 @@ function extractBoosterBlock(
   const otherBoosters = allBoosters.filter((b) => b !== booster);
 
   // Escape special regex characters in header pattern
-  const escapedHeader = boosterHeaderPattern.replace(
-    /[.*+?^${}()|[\]\\]/g,
-    '\\$&',
-  );
+  const escapedHeader = boosterHeaderPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
   let boosterBlockRegex: RegExp;
   if (otherBoosters.length > 0) {
@@ -233,9 +225,7 @@ function extractBoosterBlock(
       .map((b) => `=== ${b}-Booster ===`)
       .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
       .join('|');
-    boosterBlockRegex = new RegExp(
-      `${escapedHeader}([\\s\\S]*?)(?=${nextBoosterPattern}|$)`,
-    );
+    boosterBlockRegex = new RegExp(`${escapedHeader}([\\s\\S]*?)(?=${nextBoosterPattern}|$)`);
   } else {
     // Single booster: match until end of source
     boosterBlockRegex = new RegExp(`${escapedHeader}([\\s\\S]*?)$`);
@@ -413,9 +403,7 @@ export function formatYaml(
 
     // godPackBooster (only for crown cards, when present)
     if (card.rarity === '♛' && card.godPackBooster) {
-      lines.push(
-        `      godPackBooster: ${escapeYamlString(card.godPackBooster)}`,
-      );
+      lines.push(`      godPackBooster: ${escapeYamlString(card.godPackBooster)}`);
     }
   }
 
@@ -580,18 +568,12 @@ export async function parseSet(url: string): Promise<ParsedSet> {
 
     // For promo sets, rarity is optional
     if (!isPromoSet) {
-      assert(
-        rarity !== undefined,
-        `Could not find rarity in Setzeile: ${match[0]}`,
-      );
+      assert(rarity !== undefined, `Could not find rarity in Setzeile: ${match[0]}`);
     }
 
     const mappedRarity = rarity ? RARITY_MAP[rarity] : undefined;
     if (!isPromoSet) {
-      assert(
-        mappedRarity !== undefined,
-        `Rarity mapping failed for: ${rarity}`,
-      );
+      assert(mappedRarity !== undefined, `Rarity mapping failed for: ${rarity}`);
     }
 
     const cardEntry: CardEntry = {
@@ -658,12 +640,7 @@ async function main(): Promise<void> {
 
   try {
     const parsedSet = await parseSet(url);
-    const yaml = formatYaml(
-      parsedSet.setId,
-      parsedSet.name,
-      parsedSet.boosters,
-      parsedSet.cards,
-    );
+    const yaml = formatYaml(parsedSet.setId, parsedSet.name, parsedSet.boosters, parsedSet.cards);
     console.log(yaml);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

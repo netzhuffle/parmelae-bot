@@ -1,7 +1,8 @@
-import container from './inversify.config.js';
-import { Config } from './Config.js';
-import { Bot } from './Bot.js';
 import * as Sentry from '@sentry/node';
+
+import { Bot } from './Bot.js';
+import { Config } from './Config.js';
+import container from './inversify.config.js';
 
 const config = container.get(Config);
 if (config.sentryDsn) {

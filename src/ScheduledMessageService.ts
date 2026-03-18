@@ -1,7 +1,8 @@
 import { injectable } from 'inversify';
+
+import { ErrorService } from './ErrorService.js';
 import { ScheduledMessageRepository } from './Repositories/ScheduledMessageRepository.js';
 import { TelegramService } from './TelegramService.js';
-import { ErrorService } from './ErrorService.js';
 
 const ONE_SECOND_IN_MILLISECONDS = 1000;
 
@@ -22,10 +23,7 @@ export class ScheduledMessageService {
       if (timeout <= ONE_SECOND_IN_MILLISECONDS) {
         this.send(message.text, message.id, message.chatId);
       } else {
-        setTimeout(
-          this.send.bind(this, message.text, message.id, message.chatId),
-          timeout,
-        );
+        setTimeout(this.send.bind(this, message.text, message.id, message.chatId), timeout);
       }
     });
   }

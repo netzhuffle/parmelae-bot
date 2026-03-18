@@ -1,5 +1,8 @@
 import { tool } from '@langchain/core/tools';
+import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import * as z from 'zod';
+
+import { getToolContext } from '../ChatGptAgentService.js';
 import { OwnershipStatus } from '../generated/prisma/enums.js';
 import {
   SET_KEY_VALUES,
@@ -7,8 +10,6 @@ import {
   BOOSTER_VALUES,
   RARITY_SYMBOLS,
 } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
-import { LangGraphRunnableConfig } from '@langchain/langgraph';
-import { getToolContext } from '../ChatGptAgentService.js';
 import {
   POKEMON_CARD_ADD_TOOL_DESCRIPTION,
   CARD_ID_MISMATCH_MESSAGE,
@@ -63,14 +64,7 @@ type PokemonCardAddInput = z.infer<typeof schema>;
 
 export const pokemonCardAddTool = tool(
   async (
-    {
-      card,
-      setKey,
-      booster,
-      rarity,
-      operation,
-      bulkOperation,
-    }: PokemonCardAddInput,
+    { card, setKey, booster, rarity, operation, bulkOperation }: PokemonCardAddInput,
     config: LangGraphRunnableConfig,
   ): Promise<string> => {
     const context = getToolContext(config);
@@ -104,21 +98,15 @@ export const pokemonCardAddTool = tool(
     );
 
     // Search for matching cards
-    const { cards, idOnlyCards } = await service.searchCardsWithFallback(
-      searchParams,
-      idInfo,
-    );
+    const { cards, idOnlyCards } = await service.searchCardsWithFallback(searchParams, idInfo);
 
     // Handle no cards found
     if (cards.length === 0) {
       if (idOnlyCards && idOnlyCards.length > 0) {
         const cardDetails = await service.formatCardsAsCsv(idOnlyCards, userId);
         return (
-          CARD_EXISTS_BUT_NO_MATCH_MESSAGE(
-            idInfo!.setKey,
-            idInfo!.cardNumber,
-            cardDetails,
-          ) + OPERATION_RESULT_MESSAGE(operation)
+          CARD_EXISTS_BUT_NO_MATCH_MESSAGE(idInfo!.setKey, idInfo!.cardNumber, cardDetails) +
+          OPERATION_RESULT_MESSAGE(operation)
         );
       }
 
@@ -130,20 +118,14 @@ export const pokemonCardAddTool = tool(
     if (operation === 'add') {
       // Filter for missing OR not_needed cards (allows upgrading not_needed to owned)
       filteredCards = cards.filter((card) => {
-        const userOwnership = card.ownership.find(
-          (ownership) => ownership.userId === userId,
-        );
-        return (
-          !userOwnership || userOwnership.status === OwnershipStatus.NOT_NEEDED
-        );
+        const userOwnership = card.ownership.find((ownership) => ownership.userId === userId);
+        return !userOwnership || userOwnership.status === OwnershipStatus.NOT_NEEDED;
       });
     } else if (operation === 'remove') {
       // Filter for owned OR not_needed cards (allows removing both states)
       // Note: Partial removal is allowed - we only act on cards the user can actually remove
       filteredCards = cards.filter((card) => {
-        const userOwnership = card.ownership.find(
-          (ownership) => ownership.userId === userId,
-        );
+        const userOwnership = card.ownership.find((ownership) => ownership.userId === userId);
         return (
           userOwnership &&
           (userOwnership.status === OwnershipStatus.OWNED ||
@@ -162,10 +144,7 @@ export const pokemonCardAddTool = tool(
       if (operation === 'add') {
         return NO_MATCHING_MISSING_CARDS_MESSAGE(displayName, cardDetails);
       } else if (operation === 'remove') {
-        return NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE(
-          displayName,
-          cardDetails,
-        );
+        return NO_MATCHING_CARDS_IN_COLLECTION_MESSAGE(displayName, cardDetails);
       }
       // For mark-as-not-needed, this shouldn't happen due to search filter
       return NO_CARDS_IN_DB_MESSAGE(operation);
@@ -173,9 +152,7 @@ export const pokemonCardAddTool = tool(
 
     // Process found cards
     if (!bulkOperation && filteredCards.length > 1) {
-      return MULTIPLE_MATCHES_MESSAGE(
-        await service.formatCardsAsCsv(filteredCards, userId),
-      );
+      return MULTIPLE_MATCHES_MESSAGE(await service.formatCardsAsCsv(filteredCards, userId));
     }
 
     // Check ownership status for mark-as-not-needed operation
@@ -185,28 +162,18 @@ export const pokemonCardAddTool = tool(
       const displayName = await service.getDisplayName(userId);
       const ownedCards = filteredCards.filter((card) =>
         card.ownership.some(
-          (ownership) =>
-            ownership.userId === userId &&
-            ownership.status === OwnershipStatus.OWNED,
+          (ownership) => ownership.userId === userId && ownership.status === OwnershipStatus.OWNED,
         ),
       );
 
       if (ownedCards.length > 0) {
         const cardDetails = await service.formatCardsAsCsv(ownedCards, userId);
-        return OWNED_CARDS_CANNOT_BE_MARKED_AS_NOT_NEEDED_MESSAGE(
-          displayName,
-          cardDetails,
-        );
+        return OWNED_CARDS_CANNOT_BE_MARKED_AS_NOT_NEEDED_MESSAGE(displayName, cardDetails);
       }
     }
 
     // Process the cards
-    return service.processCards(
-      filteredCards,
-      userId,
-      operation,
-      bulkOperation,
-    );
+    return service.processCards(filteredCards, userId, operation, bulkOperation);
   },
   {
     name: POKEMON_CARD_ADD_TOOL_NAME,

@@ -1,10 +1,11 @@
 import { beforeEach, afterEach, describe, it, expect, jest } from 'bun:test';
-import { MessageStorageService } from './MessageStorageService.js';
+
 import { MessageRepositoryFake } from './Fakes/MessageRepositoryFake.js';
 import { OldMessageReplyServiceFake } from './Fakes/OldMessageReplyServiceFake.js';
-import { MessageWithUser } from './Repositories/Types.js';
-import type { MessageRepository } from './Repositories/MessageRepository.js';
+import { MessageStorageService } from './MessageStorageService.js';
 import type { OldMessageReplyService } from './OldMessageReplyService.js';
+import type { MessageRepository } from './Repositories/MessageRepository.js';
+import { MessageWithUser } from './Repositories/Types.js';
 
 describe('MessageStorageService', () => {
   let messageStorageService: MessageStorageService;

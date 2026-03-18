@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 
-import { $ } from 'bun';
 import { join } from 'path';
+
+import { $ } from 'bun';
 
 // Configuration
 const BACKUP_DIR = join(import.meta.dir, '../../backups');
@@ -21,8 +22,7 @@ interface BackupFile {
 async function getBackupFiles(): Promise<BackupFile[]> {
   try {
     // Use Bun's shell to list files with safety check
-    const result =
-      await $`find ${BACKUP_DIR} -name "${BACKUP_PREFIX}*.db" -type f`.text();
+    const result = await $`find ${BACKUP_DIR} -name "${BACKUP_PREFIX}*.db" -type f`.text();
     const files = result.trim().split('\n').filter(Boolean);
 
     // Safety check: Ensure we're only working with backup files
@@ -30,9 +30,7 @@ async function getBackupFiles(): Promise<BackupFile[]> {
       (file) => !file.includes(BACKUP_PREFIX) || !file.endsWith('.db'),
     );
     if (invalidFiles.length > 0) {
-      throw new Error(
-        `Found non-backup files in results: ${invalidFiles.join(', ')}`,
-      );
+      throw new Error(`Found non-backup files in results: ${invalidFiles.join(', ')}`);
     }
 
     const fileStats = await Promise.all(
@@ -75,9 +73,7 @@ async function cleanupBackups(): Promise<void> {
     console.log(`📋 Found ${backupFiles.length} backup files`);
 
     if (backupFiles.length <= MAX_BACKUPS) {
-      console.log(
-        `✅ No cleanup needed - only ${backupFiles.length} backups exist`,
-      );
+      console.log(`✅ No cleanup needed - only ${backupFiles.length} backups exist`);
       return;
     }
 
@@ -98,8 +94,7 @@ async function cleanupBackups(): Promise<void> {
         console.log(`🗑️  Deleted: ${file.name} (${formatFileSize(file.size)})`);
         return { success: true, size: file.size, name: file.name };
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error(`❌ Failed to delete ${file.name}:`, errorMessage);
         return { success: false, size: 0, name: file.name };
       }

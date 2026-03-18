@@ -1,6 +1,7 @@
+import { injectable } from 'inversify';
+
 import { PrismaClient } from '../generated/prisma/client.js';
 import { ScheduledMessageModel } from '../generated/prisma/models/ScheduledMessage.js';
-import { injectable } from 'inversify';
 
 /** Repository for scheduled messages */
 @injectable()

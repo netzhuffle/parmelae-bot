@@ -1,5 +1,6 @@
-import { injectable } from 'inversify';
 import { StructuredTool, Tool } from '@langchain/core/tools';
+import { injectable } from 'inversify';
+
 import { Identity } from './Identity.js';
 
 /** The prompt messages. */

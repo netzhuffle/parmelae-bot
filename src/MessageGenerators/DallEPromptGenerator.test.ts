@@ -1,16 +1,16 @@
 import { test, expect } from 'bun:test';
+
 import { AIMessage } from '@langchain/core/messages';
-import { DallEPromptGenerator } from './DallEPromptGenerator.js';
-import { GptModelsProvider } from '../GptModelsProvider.js';
 import { ChatOpenAI } from '@langchain/openai';
-import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
-import { ChatGptService } from '../ChatGptService.js';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
+import { ChatGptService } from '../ChatGptService.js';
+import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+import { GptModelsProvider } from '../GptModelsProvider.js';
+import { DallEPromptGenerator } from './DallEPromptGenerator.js';
+
 test('generate', async () => {
-  const chatOpenAiFake = new ChatOpenAiFake(
-    new AIMessage('DALL-E description'),
-  );
+  const chatOpenAiFake = new ChatOpenAiFake(new AIMessage('DALL-E description'));
   const sut = new DallEPromptGenerator(
     new ChatGptService(
       new GptModelsProvider({

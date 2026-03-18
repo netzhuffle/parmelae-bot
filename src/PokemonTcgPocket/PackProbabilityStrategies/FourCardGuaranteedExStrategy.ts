@@ -1,5 +1,6 @@
-import { Rarity } from '../../generated/prisma/enums.js';
 import { injectable } from 'inversify';
+
+import { Rarity } from '../../generated/prisma/enums.js';
 import { PackProbabilityStrategy } from './PackProbabilityStrategy.js';
 
 /**
@@ -38,9 +39,7 @@ export class FourCardGuaranteedExStrategy implements PackProbabilityStrategy {
   } as const;
 
   /** Slot 1: 100% ONE_DIAMOND */
-  private readonly slot1Distribution = new Map<Rarity, number>([
-    [Rarity.ONE_DIAMOND, 1.0],
-  ]);
+  private readonly slot1Distribution = new Map<Rarity, number>([[Rarity.ONE_DIAMOND, 1.0]]);
 
   /** Slot 2: 17.73% ONE_DIAMOND, 82.27% TWO_DIAMONDS */
   private readonly slot2Distribution = new Map<Rarity, number>([
@@ -62,9 +61,7 @@ export class FourCardGuaranteedExStrategy implements PackProbabilityStrategy {
   ]);
 
   /** Slot 4: 100% FOUR_DIAMONDS */
-  private readonly slot4Distribution = new Map<Rarity, number>([
-    [Rarity.FOUR_DIAMONDS, 1.0],
-  ]);
+  private readonly slot4Distribution = new Map<Rarity, number>([[Rarity.FOUR_DIAMONDS, 1.0]]);
 
   readonly slotDistributions = {
     1: this.slot1Distribution,

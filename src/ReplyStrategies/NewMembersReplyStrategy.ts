@@ -1,9 +1,11 @@
-import { ReplyStrategy } from '../ReplyStrategy.js';
-import { injectable } from 'inversify';
 import assert from 'assert';
+
+import { injectable } from 'inversify';
+
+import { ReplyStrategy } from '../ReplyStrategy.js';
+import { TelegramMessageWithRelations } from '../Repositories/Types.js';
 import { Sticker } from '../Sticker.js';
 import { TelegramService } from '../TelegramService.js';
-import { TelegramMessageWithRelations } from '../Repositories/Types.js';
 
 /** Possible messages. %u will be replaced with the user’s first name. */
 const MESSAGES = [
@@ -13,24 +15,12 @@ const MESSAGES = [
   'Neue Wähler! %u, willkommen.',
   'Es freut mich, dass Sie hier sind, %u.',
   'Sie würden mich doch auch wählen, %u, oder? Willkommen!',
-  new Sticker(
-    'CAACAgQAAxkBAAEDe-9hHCedKTkqD5q28fNC_QPskmoeggACCQADGzHQB7YWKGObHwqcIAQ',
-  ),
-  new Sticker(
-    'CAACAgQAAxkBAAEDe_FhHChKNUTKx7ClLPi8LnVqgBoWiwACFwADGzHQB5n_p7uFvNX5IAQ',
-  ),
-  new Sticker(
-    'CAACAgQAAxkBAAEDe_NhHChfR2GXOEgazyGQMcBgh3-N2QACIgADGzHQB1MGbzrur3htIAQ',
-  ),
-  new Sticker(
-    'CAACAgQAAxkBAAEDe_lhHCh9Kdw_A0QQb2bFMZ1iXirfswACQAADGzHQBzQQuA1tKXrKIAQ',
-  ),
-  new Sticker(
-    'CAACAgQAAxkBAAEDfAFhHCiX1bMBfca_9nNZD2buqsH2egACSgADGzHQB5xKfgjgIlcIIAQ',
-  ),
-  new Sticker(
-    'CAACAgQAAxkBAAEDfAdhHCivPudpZv2nvYcOywciVkGdNwACPwADmu78Apk-SGoCcKTzIAQ',
-  ),
+  new Sticker('CAACAgQAAxkBAAEDe-9hHCedKTkqD5q28fNC_QPskmoeggACCQADGzHQB7YWKGObHwqcIAQ'),
+  new Sticker('CAACAgQAAxkBAAEDe_FhHChKNUTKx7ClLPi8LnVqgBoWiwACFwADGzHQB5n_p7uFvNX5IAQ'),
+  new Sticker('CAACAgQAAxkBAAEDe_NhHChfR2GXOEgazyGQMcBgh3-N2QACIgADGzHQB1MGbzrur3htIAQ'),
+  new Sticker('CAACAgQAAxkBAAEDe_lhHCh9Kdw_A0QQb2bFMZ1iXirfswACQAADGzHQBzQQuA1tKXrKIAQ'),
+  new Sticker('CAACAgQAAxkBAAEDfAFhHCiX1bMBfca_9nNZD2buqsH2egACSgADGzHQB5xKfgjgIlcIIAQ'),
+  new Sticker('CAACAgQAAxkBAAEDfAdhHCivPudpZv2nvYcOywciVkGdNwACPwADmu78Apk-SGoCcKTzIAQ'),
 ];
 
 const USER_REPLACEMENT_REG_EXP = /%u/g;

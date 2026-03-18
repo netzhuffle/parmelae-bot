@@ -1,9 +1,10 @@
 import { beforeEach, afterEach, describe, it, expect, jest } from 'bun:test';
-import { ScheduleMessageTool } from './ScheduleMessageTool.js';
+
 import { ScheduledMessageRepositoryFake } from '../Fakes/ScheduledMessageRepositoryFake.js';
-import { ScheduledMessageService } from '../ScheduledMessageService.js';
 import { TelegramServiceFake } from '../Fakes/TelegramServiceFake.js';
 import type { ScheduledMessageRepository } from '../Repositories/ScheduledMessageRepository.js';
+import { ScheduledMessageService } from '../ScheduledMessageService.js';
+import { ScheduleMessageTool } from './ScheduleMessageTool.js';
 
 describe('ScheduleMessageTool', () => {
   let scheduleMessageTool: ScheduleMessageTool;
@@ -16,8 +17,7 @@ describe('ScheduleMessageTool', () => {
     jest.useFakeTimers();
     repository = new ScheduledMessageRepositoryFake();
     const telegram = new TelegramServiceFake();
-    const scheduledMessageRepository =
-      repository as unknown as ScheduledMessageRepository;
+    const scheduledMessageRepository = repository as unknown as ScheduledMessageRepository;
     service = new ScheduledMessageService(scheduledMessageRepository, telegram);
     scheduleMessageTool = new ScheduleMessageTool(
       scheduledMessageRepository,

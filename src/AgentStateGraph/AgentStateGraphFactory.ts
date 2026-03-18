@@ -1,13 +1,14 @@
 import { AIMessage } from '@langchain/core/messages';
+import { StructuredTool, Tool } from '@langchain/core/tools';
 import { END, START, StateGraph } from '@langchain/langgraph';
 import { ChatOpenAI } from '@langchain/openai';
 import { injectable } from 'inversify';
-import { StructuredTool, Tool } from '@langchain/core/tools';
+
 import { ModelNodeFactory } from './ModelNodeFactory.js';
-import { ToolsNodeFactory } from './ToolsNodeFactory.js';
+import { StateAnnotation } from './StateAnnotation.js';
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
 import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
-import { StateAnnotation } from './StateAnnotation.js';
+import { ToolsNodeFactory } from './ToolsNodeFactory.js';
 
 function routeModelReply({ messages }: typeof StateAnnotation.State) {
   const lastMessage = messages[messages.length - 1] as AIMessage;
@@ -44,15 +45,9 @@ export class AgentStateGraphFactory {
         this.toolCallAnnouncementNodeFactory.create(announceToolCall),
       )
       .addNode('tools', this.toolsNodeFactory.create(tools))
-      .addNode(
-        'toolResponsePersistence',
-        this.toolResponsePersistenceNodeFactory.create(),
-      )
+      .addNode('toolResponsePersistence', this.toolResponsePersistenceNodeFactory.create())
       .addEdge(START, 'model')
-      .addConditionalEdges('model', routeModelReply, [
-        'toolCallAnnouncement',
-        END,
-      ])
+      .addConditionalEdges('model', routeModelReply, ['toolCallAnnouncement', END])
       .addEdge('toolCallAnnouncement', 'tools')
       .addEdge('tools', 'toolResponsePersistence')
       .addEdge('toolResponsePersistence', 'model')

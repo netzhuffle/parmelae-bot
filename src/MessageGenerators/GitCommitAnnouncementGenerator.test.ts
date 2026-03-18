@@ -1,16 +1,16 @@
 import { test, expect } from 'bun:test';
+
 import { AIMessage } from '@langchain/core/messages';
-import { GptModelsProvider } from '../GptModelsProvider.js';
 import { ChatOpenAI } from '@langchain/openai';
-import { GitCommitAnnouncementGenerator } from './GitCommitAnnouncementGenerator.js';
-import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
-import { ChatGptService } from '../ChatGptService.js';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
+import { ChatGptService } from '../ChatGptService.js';
+import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+import { GptModelsProvider } from '../GptModelsProvider.js';
+import { GitCommitAnnouncementGenerator } from './GitCommitAnnouncementGenerator.js';
+
 test('generate', async () => {
-  const chatOpenAiFake = new ChatOpenAiFake(
-    new AIMessage('Commit Description'),
-  );
+  const chatOpenAiFake = new ChatOpenAiFake(new AIMessage('Commit Description'));
   const sut = new GitCommitAnnouncementGenerator(
     new ChatGptService(
       new GptModelsProvider({

@@ -1,7 +1,8 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { diceTool } from './diceTool.js';
-import { TelegramServiceFake } from '../Fakes/TelegramServiceFake.js';
+
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
+import { TelegramServiceFake } from '../Fakes/TelegramServiceFake.js';
+import { diceTool } from './diceTool.js';
 
 const TEST_CHAT_ID = '123456789';
 const BASE_TELEGRAM_REQUEST = {
@@ -22,14 +23,11 @@ describe('diceTool', () => {
   });
 
   describe('die (🎲)', () => {
-    it.each([1, 2, 3, 4, 5, 6])(
-      'should handle die value %i correctly',
-      async (value) => {
-        telegramFake.result = { method: 'sendDice', value };
-        const result = await diceTool.invoke({ type: '🎲' }, config);
-        expect(result).toBe(`Your six sided die rolled a ${value}.`);
-      },
-    );
+    it.each([1, 2, 3, 4, 5, 6])('should handle die value %i correctly', async (value) => {
+      telegramFake.result = { method: 'sendDice', value };
+      const result = await diceTool.invoke({ type: '🎲' }, config);
+      expect(result).toBe(`Your six sided die rolled a ${value}.`);
+    });
 
     it('should send correct emoji to Telegram', async () => {
       telegramFake.result = { method: 'sendDice', value: 1 };
@@ -56,17 +54,13 @@ describe('diceTool', () => {
       it('shows "Missed!" when scoring 0/5', async () => {
         telegramFake.result = { method: 'sendDice', value: 1 };
         const result = await diceTool.invoke({ type: '🎯' }, config);
-        expect(result).toBe(
-          'Game 🎯: You scored 0 out of max. 5 points. Missed!',
-        );
+        expect(result).toBe('Game 🎯: You scored 0 out of max. 5 points. Missed!');
       });
 
       it('shows "Bullseye!" when scoring 5/5', async () => {
         telegramFake.result = { method: 'sendDice', value: 6 };
         const result = await diceTool.invoke({ type: '🎯' }, config);
-        expect(result).toBe(
-          'Game 🎯: You scored 5 out of max. 5 points. Bullseye!',
-        );
+        expect(result).toBe('Game 🎯: You scored 5 out of max. 5 points. Bullseye!');
       });
     });
 
@@ -157,9 +151,7 @@ describe('diceTool', () => {
       it('should handle a strike', async () => {
         telegramFake.result = { method: 'sendDice', value: 6 };
         const result = await diceTool.invoke({ type: '🎳' }, config);
-        expect(result).toBe(
-          'Game 🎳: You knocked down 6 of the 6 pins. Strike!',
-        );
+        expect(result).toBe('Game 🎳: You knocked down 6 of the 6 pins. Strike!');
       });
 
       it('should handle a regular hit', async () => {

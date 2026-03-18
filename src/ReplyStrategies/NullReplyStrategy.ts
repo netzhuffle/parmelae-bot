@@ -1,5 +1,6 @@
-import { ReplyStrategy } from '../ReplyStrategy.js';
 import { injectable } from 'inversify';
+
+import { ReplyStrategy } from '../ReplyStrategy.js';
 
 /** Handles all messages by doing nothing. */
 @injectable()

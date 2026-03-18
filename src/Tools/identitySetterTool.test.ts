@@ -1,10 +1,11 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { identitySetterTool } from './identitySetterTool.js';
-import { SchiParmelaeIdentity } from '../MessageGenerators/Identities/SchiParmelaeIdentity.js';
-import { EmulatorIdentity } from '../MessageGenerators/Identities/EmulatorIdentity.js';
+
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
+import { EmulatorIdentity } from '../MessageGenerators/Identities/EmulatorIdentity.js';
 import { Identity } from '../MessageGenerators/Identities/Identity.js';
 import { IdentityResolverService } from '../MessageGenerators/Identities/IdentityResolverService.js';
+import { SchiParmelaeIdentity } from '../MessageGenerators/Identities/SchiParmelaeIdentity.js';
+import { identitySetterTool } from './identitySetterTool.js';
 
 const TEST_CHAT_ID_1 = '123456789';
 const TEST_CHAT_ID_2 = '987654321';
@@ -20,10 +21,7 @@ describe('identitySetterTool', () => {
     identityByChatId = new Map<bigint, Identity>();
     schiParmelaeIdentity = new SchiParmelaeIdentity();
     emulatorIdentity = new EmulatorIdentity();
-    identityResolver = new IdentityResolverService(
-      schiParmelaeIdentity,
-      emulatorIdentity,
-    );
+    identityResolver = new IdentityResolverService(schiParmelaeIdentity, emulatorIdentity);
 
     config = createTestToolConfig({
       chatId: BigInt(TEST_CHAT_ID_1),
@@ -38,48 +36,30 @@ describe('identitySetterTool', () => {
 
   describe('setting valid identities', () => {
     it('should set Schi Parmelä identity successfully', async () => {
-      const result = await identitySetterTool.invoke(
-        { identity: 'Schi Parmelä' },
-        config,
-      );
+      const result = await identitySetterTool.invoke({ identity: 'Schi Parmelä' }, config);
 
       expect(result).toBe('Success: Schi Parmelä will be used from now on.');
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
-        schiParmelaeIdentity,
-      );
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(schiParmelaeIdentity);
     });
 
     it('should set Emulator identity successfully', async () => {
-      const result = await identitySetterTool.invoke(
-        { identity: 'Emulator' },
-        config,
-      );
+      const result = await identitySetterTool.invoke({ identity: 'Emulator' }, config);
 
       expect(result).toBe('Success: Emulator will be used from now on.');
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
-        emulatorIdentity,
-      );
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(emulatorIdentity);
     });
 
     it('should trim whitespace from identity name', async () => {
-      const result = await identitySetterTool.invoke(
-        { identity: '  Emulator  ' },
-        config,
-      );
+      const result = await identitySetterTool.invoke({ identity: '  Emulator  ' }, config);
 
       expect(result).toBe('Success: Emulator will be used from now on.');
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
-        emulatorIdentity,
-      );
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(emulatorIdentity);
     });
   });
 
   describe('setting invalid identities', () => {
     it('should return error message for unknown identity', async () => {
-      const result = await identitySetterTool.invoke(
-        { identity: 'Unknown Identity' },
-        config,
-      );
+      const result = await identitySetterTool.invoke({ identity: 'Unknown Identity' }, config);
 
       expect(result).toContain('Error: Unknown identity "Unknown Identity"');
       expect(result).toContain('Available identities:');
@@ -95,10 +75,7 @@ describe('identitySetterTool', () => {
     });
 
     it('should return error message for whitespace-only identity', async () => {
-      const result = await identitySetterTool.invoke(
-        { identity: '   ' },
-        config,
-      );
+      const result = await identitySetterTool.invoke({ identity: '   ' }, config);
 
       // Whitespace is trimmed by identitySetterTool before passing to resolver
       expect(result).toContain('Error: Unknown identity ""');
@@ -107,16 +84,11 @@ describe('identitySetterTool', () => {
     });
 
     it('should accept case-insensitive identity names', async () => {
-      const result = await identitySetterTool.invoke(
-        { identity: 'schi parmelä' },
-        config,
-      );
+      const result = await identitySetterTool.invoke({ identity: 'schi parmelä' }, config);
 
       // Output uses resolved identity's original name, not the input casing
       expect(result).toBe('Success: Schi Parmelä will be used from now on.');
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
-        schiParmelaeIdentity,
-      );
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(schiParmelaeIdentity);
     });
   });
 
@@ -137,9 +109,7 @@ describe('identitySetterTool', () => {
       });
 
       // Verify first chat has the identity set
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
-        emulatorIdentity,
-      );
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(emulatorIdentity);
 
       // Verify second chat doesn't have identity set
       expect(identityByChatId.has(BigInt(TEST_CHAT_ID_2))).toBe(false);
@@ -148,31 +118,20 @@ describe('identitySetterTool', () => {
       await identitySetterTool.invoke({ identity: 'Schi Parmelä' }, config2);
 
       // Verify both chats have correct identities
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
-        emulatorIdentity,
-      );
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_2))).toBe(
-        schiParmelaeIdentity,
-      );
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(emulatorIdentity);
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_2))).toBe(schiParmelaeIdentity);
     });
 
     it('should overwrite previous identity for same chat', async () => {
       // Set initial identity
       await identitySetterTool.invoke({ identity: 'Schi Parmelä' }, config);
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
-        schiParmelaeIdentity,
-      );
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(schiParmelaeIdentity);
 
       // Change to different identity
-      const result = await identitySetterTool.invoke(
-        { identity: 'Emulator' },
-        config,
-      );
+      const result = await identitySetterTool.invoke({ identity: 'Emulator' }, config);
 
       expect(result).toBe('Success: Emulator will be used from now on.');
-      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(
-        emulatorIdentity,
-      );
+      expect(identityByChatId.get(BigInt(TEST_CHAT_ID_1))).toBe(emulatorIdentity);
     });
   });
 });

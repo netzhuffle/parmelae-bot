@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
-import { MessageRepository } from './Repositories/MessageRepository.js';
+
 import { OldMessageReplyService } from './OldMessageReplyService.js';
+import { MessageRepository } from './Repositories/MessageRepository.js';
 import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
@@ -21,9 +22,7 @@ export class MessageStorageService {
   constructor(private readonly messageRepository: MessageRepository) {}
 
   /** Stores a telegram message and its author if message type is supported by storage. */
-  store(
-    message: UnstoredMessageWithRelations,
-  ): Promise<TelegramMessageWithRelations> {
+  store(message: UnstoredMessageWithRelations): Promise<TelegramMessageWithRelations> {
     return this.messageRepository.store(message);
   }
 
@@ -58,41 +57,30 @@ export class MessageStorageService {
     }
   }
 
-  private deleteAndScheduleNext(
-    oldMessageReplyService: OldMessageReplyService,
-  ) {
+  private deleteAndScheduleNext(oldMessageReplyService: OldMessageReplyService) {
     this.messageRepository
       .deleteOld()
       .then((deletedMessages) => oldMessageReplyService.reply(deletedMessages))
-      .catch((e) =>
-        console.error('old messages could not be deleted or replied to', e),
-      );
+      .catch((e) => console.error('old messages could not be deleted or replied to', e));
     this.scheduleNextDeletion(oldMessageReplyService);
   }
 
   private scheduleNextDeletion(oldMessageReplyService: OldMessageReplyService) {
-    const mainChatLengthInHours =
-      MAIN_CHAT_TIME_ENDING_HOUR - MAIN_CHAT_TIME_STARTING_HOUR + 1;
-    const mainChatLengthInMilliseconds =
-      mainChatLengthInHours * HOUR_IN_MILLISECONDS;
+    const mainChatLengthInHours = MAIN_CHAT_TIME_ENDING_HOUR - MAIN_CHAT_TIME_STARTING_HOUR + 1;
+    const mainChatLengthInMilliseconds = mainChatLengthInHours * HOUR_IN_MILLISECONDS;
     const randomMillisecondInMainChatTime = Math.floor(
       Math.random() * mainChatLengthInMilliseconds,
     );
     const tomorrowMainChatStartTimeDate = new Date();
-    tomorrowMainChatStartTimeDate.setDate(
-      tomorrowMainChatStartTimeDate.getDate() + 1,
+    tomorrowMainChatStartTimeDate.setDate(tomorrowMainChatStartTimeDate.getDate() + 1);
+    const tomorrowMainChatStartTimeInMilliseconds = tomorrowMainChatStartTimeDate.setHours(
+      MAIN_CHAT_TIME_STARTING_HOUR,
+      0,
+      0,
+      0,
     );
-    const tomorrowMainChatStartTimeInMilliseconds =
-      tomorrowMainChatStartTimeDate.setHours(
-        MAIN_CHAT_TIME_STARTING_HOUR,
-        0,
-        0,
-        0,
-      );
     const waitingTimeInMilliseconds =
-      tomorrowMainChatStartTimeInMilliseconds +
-      randomMillisecondInMainChatTime -
-      Date.now();
+      tomorrowMainChatStartTimeInMilliseconds + randomMillisecondInMainChatTime - Date.now();
     setTimeout(
       this.deleteAndScheduleNext.bind(this, oldMessageReplyService),
       waitingTimeInMilliseconds,

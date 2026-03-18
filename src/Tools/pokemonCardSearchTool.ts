@@ -1,5 +1,8 @@
 import { tool } from '@langchain/core/tools';
+import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import * as z from 'zod';
+
+import { getToolContext } from '../ChatGptAgentService.js';
 import {
   SET_KEY_VALUES,
   SET_KEY_NAMES,
@@ -7,8 +10,6 @@ import {
   OWNERSHIP_FILTER_VALUES,
   RARITY_SYMBOLS,
 } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
-import { LangGraphRunnableConfig } from '@langchain/langgraph';
-import { getToolContext } from '../ChatGptAgentService.js';
 import {
   CARD_ID_MISMATCH_MESSAGE,
   NO_CARDS_FOUND_MESSAGE,
@@ -80,20 +81,13 @@ export const pokemonCardSearchTool = tool(
     );
 
     // Search for matching cards
-    const { cards, idOnlyCards } = await service.searchCardsWithFallback(
-      searchParams,
-      idInfo,
-    );
+    const { cards, idOnlyCards } = await service.searchCardsWithFallback(searchParams, idInfo);
 
     // Handle no cards found
     if (cards.length === 0) {
       if (idOnlyCards && idOnlyCards.length > 0) {
         const csv = await service.formatCardsAsCsv(idOnlyCards, userId);
-        return CARD_EXISTS_BUT_NO_MATCH_MESSAGE(
-          idInfo!.setKey,
-          idInfo!.cardNumber,
-          csv,
-        );
+        return CARD_EXISTS_BUT_NO_MATCH_MESSAGE(idInfo!.setKey, idInfo!.cardNumber, csv);
       }
       return NO_CARDS_FOUND_MESSAGE;
     }

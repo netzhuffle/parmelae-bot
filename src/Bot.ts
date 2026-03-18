@@ -1,17 +1,19 @@
 import assert from 'assert';
+
+import * as Typegram from '@telegraf/types';
 import { injectable } from 'inversify';
+import { message } from 'telegraf/filters';
+
+import { BotManager } from './BotManager.js';
 import { Config } from './Config.js';
-import { MessageStorageService } from './MessageStorageService.js';
+import { ErrorService } from './ErrorService.js';
 import { GitHubService } from './GitHubService.js';
+import { MessageStorageService } from './MessageStorageService.js';
 import { OldMessageReplyService } from './OldMessageReplyService.js';
-import { TelegramMessageService } from './TelegramMessageService.js';
+import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 import { ReplyStrategyFinder } from './ReplyStrategyFinder.js';
 import { ScheduledMessageService } from './ScheduledMessageService.js';
-import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
-import { BotManager } from './BotManager.js';
-import { message } from 'telegraf/filters';
-import * as Typegram from '@telegraf/types';
-import { ErrorService } from './ErrorService.js';
+import { TelegramMessageService } from './TelegramMessageService.js';
 
 /** The most helpful bot in the world. */
 @injectable()
@@ -45,9 +47,7 @@ export class Bot {
     this.messageStorage.startDailyDeletion(this.oldMessageReplyService);
     this.gitHub.announceNewCommits().catch(ErrorService.log);
     this.scheduledMessageService.schedule().catch(ErrorService.log);
-    this.pokemonTcgPocketService
-      .synchronizeCardDatabaseWithYamlSource()
-      .catch(ErrorService.log);
+    this.pokemonTcgPocketService.synchronizeCardDatabaseWithYamlSource().catch(ErrorService.log);
   }
 
   /**

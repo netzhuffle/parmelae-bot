@@ -1,13 +1,15 @@
 import assert from 'assert';
+
 import {
   AIMessagePromptTemplate,
   ChatPromptTemplate,
   HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
 } from '@langchain/core/prompts';
+import { injectable } from 'inversify';
+
 import { ChatGptService } from '../ChatGptService.js';
 import { GptModels } from '../GptModelsProvider.js';
-import { injectable } from 'inversify';
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromMessages([
@@ -36,9 +38,7 @@ const PROMPT = ChatPromptTemplate.fromMessages([
   AIMessagePromptTemplate.fromTemplate(
     'Entschuldigung, ich bin mir nicht sicher, ob ich diese Nachricht vor 7 Tagen übersehen habe. Ich leite das WBF (Eidgenössisches Departement für Wirtschaft, Bildung und Forschung). Haben Sie weitere Fragen?',
   ),
-  HumanMessagePromptTemplate.fromTemplate(
-    'https://www.youtube.com/watch?v=Qp9es-qnt8k',
-  ),
+  HumanMessagePromptTemplate.fromTemplate('https://www.youtube.com/watch?v=Qp9es-qnt8k'),
   AIMessagePromptTemplate.fromTemplate(
     'Wir haben uns bei der Bundesratssitzung die YouTube-Video angeschaut, die Sie letzte Woche geteilt haben. Haben Sie weitere Links zu diesem Thema? @Nurtak @bugybunny @marinom @netzhuffle @aerobless',
   ),

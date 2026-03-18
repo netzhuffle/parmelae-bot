@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'bun:test';
-import { ShinyAsPotentialSixthCardStrategy } from './ShinyAsPotentialSixthCardStrategy.js';
+
 import { Rarity } from '../../generated/prisma/enums.js';
+import { ShinyAsPotentialSixthCardStrategy } from './ShinyAsPotentialSixthCardStrategy.js';
 
 describe('ShinyAsPotentialSixthCardStrategy', () => {
   const strategy = new ShinyAsPotentialSixthCardStrategy();
@@ -14,9 +15,7 @@ describe('ShinyAsPotentialSixthCardStrategy', () => {
   describe('packWeights', () => {
     it('should sum to 1.0', () => {
       const sum =
-        strategy.packWeights.normal +
-        strategy.packWeights.god +
-        (strategy.packWeights.six ?? 0);
+        strategy.packWeights.normal + strategy.packWeights.god + (strategy.packWeights.six ?? 0);
       expect(sum).toBeCloseTo(1.0, 4);
     });
   });
@@ -34,9 +33,7 @@ describe('ShinyAsPotentialSixthCardStrategy', () => {
     it('should have slots 1-3 as 100% ONE_DIAMOND', () => {
       for (let slot = 1; slot <= 3; slot++) {
         const distribution =
-          strategy.slotDistributions[
-            slot as keyof typeof strategy.slotDistributions
-          ];
+          strategy.slotDistributions[slot as keyof typeof strategy.slotDistributions];
         expect(distribution?.size).toBe(1);
         expect(distribution?.get(Rarity.ONE_DIAMOND)).toBe(1);
       }
@@ -46,10 +43,7 @@ describe('ShinyAsPotentialSixthCardStrategy', () => {
       const distribution = strategy.slotDistributions[4];
       expect(distribution).toBeDefined();
       if (!distribution) return;
-      const sum = Array.from(distribution.values()).reduce(
-        (acc, val) => acc + val,
-        0,
-      );
+      const sum = Array.from(distribution.values()).reduce((acc, val) => acc + val, 0);
       expect(sum).toBeCloseTo(1.0, 5);
     });
 
@@ -63,10 +57,7 @@ describe('ShinyAsPotentialSixthCardStrategy', () => {
       const distribution = strategy.slotDistributions[5];
       expect(distribution).toBeDefined();
       if (!distribution) return;
-      const sum = Array.from(distribution.values()).reduce(
-        (acc, val) => acc + val,
-        0,
-      );
+      const sum = Array.from(distribution.values()).reduce((acc, val) => acc + val, 0);
       expect(sum).toBeCloseTo(1.0, 5);
     });
 
@@ -80,10 +71,7 @@ describe('ShinyAsPotentialSixthCardStrategy', () => {
       const distribution = strategy.slotDistributions[6];
       expect(distribution).toBeDefined();
       if (!distribution) return;
-      const sum = Array.from(distribution.values()).reduce(
-        (acc, val) => acc + val,
-        0,
-      );
+      const sum = Array.from(distribution.values()).reduce((acc, val) => acc + val, 0);
       expect(sum).toBeCloseTo(1.0, 5);
     });
 

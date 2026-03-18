@@ -1,6 +1,7 @@
 import { tool } from '@langchain/core/tools';
-import * as z from 'zod';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import * as z from 'zod';
+
 import { getToolContext } from '../ChatGptAgentService.js';
 
 /**
@@ -12,8 +13,7 @@ export const identityQueryTool = tool(
     const chatId = context.chatId;
 
     const identity =
-      context.identityByChatId.get(chatId)?.name ??
-      context.identities.schiParmelae.name;
+      context.identityByChatId.get(chatId)?.name ?? context.identities.schiParmelae.name;
 
     return identity;
   },

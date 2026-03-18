@@ -1,19 +1,17 @@
 import { describe, beforeEach, it, afterEach, expect } from 'bun:test';
-import {
-  PokemonTcgPocketService,
-  Sets,
-} from '../PokemonTcgPocket/PokemonTcgPocketService.js';
-import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
-import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
+
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
-import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
-import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
+import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
+import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
 import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 import { ShinyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
+import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
+import { PokemonTcgPocketService, Sets } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { PokemonTcgPocketProbabilityRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketProbabilityRepository.js';
+import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
 
 describe('pokemonCardStats', () => {
   let repository: PokemonTcgPocketRepositoryFake;
@@ -162,9 +160,7 @@ describe('pokemonCardStats', () => {
 
       const result = await pokemonCardStatsTool.invoke({}, config);
       expect(result).toContain('Sets:');
-      expect(result).toContain(
-        'Unschlagbare Gene: ♦️ 2/5 ⋅ ⭐️ 3 ⋅ ✴️ 1 ⋅ 👑 1',
-      );
+      expect(result).toContain('Unschlagbare Gene: ♦️ 2/5 ⋅ ⭐️ 3 ⋅ ✴️ 1 ⋅ 👑 1');
     });
 
     it('should show correct format for promo sets without rarities', async () => {
@@ -343,26 +339,10 @@ describe('pokemonCardStats', () => {
       const cards = await repository.searchCards({ setKey: 'A1' });
 
       // Add cards with different ownership statuses
-      await repository.addCardToCollection(
-        cards[0].id,
-        BigInt(1),
-        OwnershipStatus.OWNED,
-      );
-      await repository.addCardToCollection(
-        cards[1].id,
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
-      await repository.addCardToCollection(
-        cards[3].id,
-        BigInt(1),
-        OwnershipStatus.OWNED,
-      );
-      await repository.addCardToCollection(
-        cards[4].id,
-        BigInt(1),
-        OwnershipStatus.NOT_NEEDED,
-      );
+      await repository.addCardToCollection(cards[0].id, BigInt(1), OwnershipStatus.OWNED);
+      await repository.addCardToCollection(cards[1].id, BigInt(1), OwnershipStatus.NOT_NEEDED);
+      await repository.addCardToCollection(cards[3].id, BigInt(1), OwnershipStatus.OWNED);
+      await repository.addCardToCollection(cards[4].id, BigInt(1), OwnershipStatus.NOT_NEEDED);
       // Card 3 (index 2) remains missing
 
       const result = await pokemonCardStatsTool.invoke({}, config);

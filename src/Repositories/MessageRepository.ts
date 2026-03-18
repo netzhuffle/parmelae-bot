@@ -1,9 +1,11 @@
+import assert from 'node:assert/strict';
+
+import { injectable } from 'inversify';
+
 import { Prisma, PrismaClient } from '../generated/prisma/client.js';
 import { ChatModel } from '../generated/prisma/models/Chat.js';
 import { MessageModel } from '../generated/prisma/models/Message.js';
 import { UserModel } from '../generated/prisma/models/User.js';
-import { injectable } from 'inversify';
-import assert from 'node:assert/strict';
 import {
   MessageWithRelations,
   MessageWithUser,
@@ -59,9 +61,7 @@ export class MessageRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   /** Returns the full message including user, reply-to, tool messages, and tool call messages relations. */
-  async get(
-    id: number,
-  ): Promise<MessageWithUserReplyToToolMessagesAndToolCallMessages> {
+  async get(id: number): Promise<MessageWithUserReplyToToolMessagesAndToolCallMessages> {
     return this.prisma.message.findUniqueOrThrow({
       where: {
         id,
@@ -71,9 +71,7 @@ export class MessageRepository {
   }
 
   /** Stores a telegram message and its author. */
-  async store(
-    message: UnstoredMessageWithRelations,
-  ): Promise<TelegramMessageWithRelations> {
+  async store(message: UnstoredMessageWithRelations): Promise<TelegramMessageWithRelations> {
     if (message.telegramMessageId !== null) {
       const databaseMessage = await this.prisma.message.findUnique({
         where: {
@@ -159,10 +157,7 @@ export class MessageRepository {
    * @param messageId - The ID of the message to update.
    * @param toolCalls - The tool calls JSON data to store.
    */
-  async updateToolCalls(
-    messageId: number,
-    toolCalls: Prisma.InputJsonValue,
-  ): Promise<void> {
+  async updateToolCalls(messageId: number, toolCalls: Prisma.InputJsonValue): Promise<void> {
     await this.prisma.message.update({
       where: { id: messageId },
       data: { toolCalls },
@@ -192,9 +187,7 @@ export class MessageRepository {
     });
   }
 
-  private connectChat(
-    chat: ChatModel,
-  ): Prisma.ChatCreateNestedOneWithoutMessagesInput {
+  private connectChat(chat: ChatModel): Prisma.ChatCreateNestedOneWithoutMessagesInput {
     return {
       connectOrCreate: {
         where: {
@@ -207,9 +200,7 @@ export class MessageRepository {
     };
   }
 
-  private connectUser(
-    user: UserModel,
-  ): Prisma.UserCreateNestedOneWithoutMessagesInput {
+  private connectUser(user: UserModel): Prisma.UserCreateNestedOneWithoutMessagesInput {
     return {
       connectOrCreate: {
         where: {
@@ -224,9 +215,7 @@ export class MessageRepository {
 
   private connectNewChatMembers(
     message: UnstoredMessageWithRelations,
-  ):
-    | Prisma.ChatEntryMessagesUsersCreateNestedManyWithoutMessageInput
-    | undefined {
+  ): Prisma.ChatEntryMessagesUsersCreateNestedManyWithoutMessageInput | undefined {
     if (!message.newChatMembers?.length) {
       return undefined;
     }
@@ -270,9 +259,7 @@ export class MessageRepository {
     };
   }
 
-  private isTelegramMessage(
-    message: Omit<MessageModel, 'id'>,
-  ): message is TelegramMessage {
+  private isTelegramMessage(message: Omit<MessageModel, 'id'>): message is TelegramMessage {
     return message.telegramMessageId !== null;
   }
 
@@ -280,8 +267,6 @@ export class MessageRepository {
     message: MessageWithRelations,
   ): asserts message is TelegramMessageWithRelations {
     assert(this.isTelegramMessage(message));
-    assert(
-      !message.replyToMessage || this.isTelegramMessage(message.replyToMessage),
-    );
+    assert(!message.replyToMessage || this.isTelegramMessage(message.replyToMessage));
   }
 }

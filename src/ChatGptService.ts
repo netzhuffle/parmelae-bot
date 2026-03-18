@@ -1,16 +1,10 @@
+import { ContentBlock, HumanMessage, MessageContent } from '@langchain/core/messages';
 import { BaseChatPromptTemplate } from '@langchain/core/prompts';
-import {
-  ContentBlock,
-  HumanMessage,
-  MessageContent,
-} from '@langchain/core/messages';
 import { ChainValues } from '@langchain/core/utils/types';
 import { injectable } from 'inversify';
+
 import { GptModel, GptModelsProvider } from './GptModelsProvider.js';
-import {
-  ChatGptMessage,
-  ChatGptRoles,
-} from './MessageGenerators/ChatGptMessage.js';
+import { ChatGptMessage, ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
 
 /** ChatGPT Service */
 @injectable()
@@ -38,19 +32,14 @@ export class ChatGptService {
   }
 
   /** Returns a human chat message with a username. */
-  static createUserChatMessage(
-    name: string,
-    content: MessageContent,
-  ): HumanMessage {
+  static createUserChatMessage(name: string, content: MessageContent): HumanMessage {
     return new HumanMessage({
       name,
       content,
     });
   }
 
-  private getTextContentBlock(
-    contentBlocks: ContentBlock.Standard[],
-  ): ContentBlock.Text {
+  private getTextContentBlock(contentBlocks: ContentBlock.Standard[]): ContentBlock.Text {
     for (const contentBlock of contentBlocks) {
       if (contentBlock.type === 'text') {
         return contentBlock;

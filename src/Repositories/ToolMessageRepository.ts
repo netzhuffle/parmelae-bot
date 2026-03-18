@@ -1,4 +1,5 @@
 import { injectable } from 'inversify';
+
 import { PrismaClient } from '../generated/prisma/client.js';
 
 /**
@@ -11,11 +12,7 @@ export class ToolMessageRepository {
   /**
    * Store a tool message response in the database.
    */
-  async store(data: {
-    toolCallId: string;
-    text: string;
-    messageId: number;
-  }): Promise<void> {
+  async store(data: { toolCallId: string; text: string; messageId: number }): Promise<void> {
     await this.prisma.toolMessage.create({
       data: {
         toolCallId: data.toolCallId,

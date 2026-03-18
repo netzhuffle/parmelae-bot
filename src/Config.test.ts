@@ -1,4 +1,5 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
+
 import { Config } from './Config.js';
 
 function resetTestEnv(): void {

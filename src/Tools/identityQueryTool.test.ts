@@ -1,9 +1,10 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { identityQueryTool } from './identityQueryTool.js';
-import { SchiParmelaeIdentity } from '../MessageGenerators/Identities/SchiParmelaeIdentity.js';
-import { EmulatorIdentity } from '../MessageGenerators/Identities/EmulatorIdentity.js';
+
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
+import { EmulatorIdentity } from '../MessageGenerators/Identities/EmulatorIdentity.js';
 import { Identity } from '../MessageGenerators/Identities/Identity.js';
+import { SchiParmelaeIdentity } from '../MessageGenerators/Identities/SchiParmelaeIdentity.js';
+import { identityQueryTool } from './identityQueryTool.js';
 
 const TEST_CHAT_ID_1 = '123456789';
 const TEST_CHAT_ID_2 = '987654321';

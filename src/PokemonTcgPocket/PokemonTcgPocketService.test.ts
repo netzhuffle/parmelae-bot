@@ -1,28 +1,23 @@
 import { describe, beforeEach, it, afterEach, expect, spyOn } from 'bun:test';
-import {
-  PokemonTcgPocketService,
-  RARITY_MAP,
-  Sets,
-  Card,
-} from './PokemonTcgPocketService.js';
-import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
+
 import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
-import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { PokemonTcgPocketInvalidCardNumberError } from './Errors/PokemonTcgPocketInvalidCardNumberError.js';
-import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
+import { PokemonTcgPocketProbabilityRepositoryFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
+import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
+import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 import { ShinyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
-import { PokemonTcgPocketProbabilityRepositoryFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
+import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+import { PokemonTcgPocketService, RARITY_MAP, Sets, Card } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
 /** Helper function to create a probability service with all strategies */
 function createProbabilityService(
   probabilityRepository?: PokemonTcgPocketProbabilityRepositoryFake,
 ): PokemonTcgPocketProbabilityService {
-  const repo =
-    probabilityRepository ?? new PokemonTcgPocketProbabilityRepositoryFake();
+  const repo = probabilityRepository ?? new PokemonTcgPocketProbabilityRepositoryFake();
   return new PokemonTcgPocketProbabilityService(
     new FiveCardsWithoutShinyStrategy(),
     new FiveCardsStrategy(),
@@ -56,11 +51,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
 
         try {
           await service.synchronizeCardDatabaseWithYamlSource();
@@ -91,11 +82,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify all cards were created with correct rarities
@@ -131,17 +118,11 @@ describe('PokemonTcgPocketService', () => {
         };
 
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
 
         try {
           await service.synchronizeCardDatabaseWithYamlSource();
-          expect.unreachable(
-            'Should have thrown PokemonTcgPocketInvalidCardNumberError',
-          );
+          expect.unreachable('Should have thrown PokemonTcgPocketInvalidCardNumberError');
         } catch (error) {
           expect(error).toBeInstanceOf(PokemonTcgPocketInvalidCardNumberError);
           expect((error as Error).message).toContain('not-a-number');
@@ -161,11 +142,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
 
         try {
           await service.synchronizeCardDatabaseWithYamlSource();
@@ -196,20 +173,14 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
 
         try {
           await service.synchronizeCardDatabaseWithYamlSource();
           expect.unreachable('Expected promise to reject');
         } catch (error) {
           expect(error).toBeInstanceOf(Error);
-          expect((error as Error).message).toContain(
-            'has godPackBooster but is not a crown card',
-          );
+          expect((error as Error).message).toContain('has godPackBooster but is not a crown card');
         }
       });
 
@@ -229,11 +200,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
 
         try {
           await service.synchronizeCardDatabaseWithYamlSource();
@@ -260,20 +227,14 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
 
         try {
           await service.synchronizeCardDatabaseWithYamlSource();
           expect.unreachable('Expected promise to reject');
         } catch (error) {
           expect(error).toBeInstanceOf(Error);
-          expect((error as Error).message).toContain(
-            'references non-existent godPackBooster',
-          );
+          expect((error as Error).message).toContain('references non-existent godPackBooster');
         }
       });
 
@@ -293,11 +254,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
 
         try {
           await service.synchronizeCardDatabaseWithYamlSource();
@@ -324,11 +281,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
 
         await service.synchronizeCardDatabaseWithYamlSource();
 
@@ -352,11 +305,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
@@ -391,11 +340,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
@@ -431,11 +376,7 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify set was created
@@ -445,10 +386,7 @@ describe('PokemonTcgPocketService', () => {
         // Verify boosters were created
         const boosters = repository.getAllBoosters();
         expect(boosters).toHaveLength(2);
-        expect(boosters.map((b) => b.name).sort()).toEqual([
-          'Booster1',
-          'Booster2',
-        ]);
+        expect(boosters.map((b) => b.name).sort()).toEqual(['Booster1', 'Booster2']);
 
         // Verify cards were created
         const cards = repository.getAllCards();
@@ -464,10 +402,7 @@ describe('PokemonTcgPocketService', () => {
         const card2 = cards.find((c) => c.name === 'Test Card 2')!;
         const card2Boosters = repository.getCardBoosters(card2.id);
         expect(card2Boosters).toHaveLength(2);
-        expect(card2Boosters.map((b) => b.name).sort()).toEqual([
-          'Booster1',
-          'Booster2',
-        ]);
+        expect(card2Boosters.map((b) => b.name).sort()).toEqual(['Booster1', 'Booster2']);
       });
     });
 
@@ -489,34 +424,23 @@ describe('PokemonTcgPocketService', () => {
           },
         };
         const probabilityService = createProbabilityService();
-        const service = new PokemonTcgPocketService(
-          probabilityService,
-          repository,
-          setsData,
-        );
+        const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
         await service.synchronizeCardDatabaseWithYamlSource();
 
         // Verify sets were created
         const sets = repository.getAllSets();
         expect(sets).toHaveLength(2);
-        expect(sets.map((s) => s.name).sort()).toEqual([
-          'First Set',
-          'Second Set',
-        ]);
+        expect(sets.map((s) => s.name).sort()).toEqual(['First Set', 'Second Set']);
 
         // Verify first set has default booster
         const set1 = sets.find((s) => s.name === 'First Set')!;
-        const set1Boosters = repository
-          .getAllBoosters()
-          .filter((b) => b.setId === set1.id);
+        const set1Boosters = repository.getAllBoosters().filter((b) => b.setId === set1.id);
         expect(set1Boosters).toHaveLength(1);
         expect(set1Boosters[0].name).toBe('First Set');
 
         // Verify second set has specified booster
         const set2 = sets.find((s) => s.name === 'Second Set')!;
-        const set2Boosters = repository
-          .getAllBoosters()
-          .filter((b) => b.setId === set2.id);
+        const set2Boosters = repository.getAllBoosters().filter((b) => b.setId === set2.id);
         expect(set2Boosters).toHaveLength(1);
         expect(set2Boosters[0].name).toBe('Booster1');
 
@@ -558,11 +482,7 @@ describe('PokemonTcgPocketService', () => {
         },
       };
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        setsData,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created
@@ -580,9 +500,7 @@ describe('PokemonTcgPocketService', () => {
       ]);
 
       // Verify card with specified booster is only in that booster
-      const cardInOne = cards.find(
-        (c) => c.name === 'Card In Specific Booster',
-      )!;
+      const cardInOne = cards.find((c) => c.name === 'Card In Specific Booster')!;
       const cardInOneBoosters = repository.getCardBoosters(cardInOne.id);
       expect(cardInOneBoosters).toHaveLength(1);
       expect(cardInOneBoosters[0].name).toBe('Booster1');
@@ -608,11 +526,7 @@ describe('PokemonTcgPocketService', () => {
         },
       };
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        setsData,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created
@@ -620,22 +534,14 @@ describe('PokemonTcgPocketService', () => {
       expect(cards).toHaveLength(2);
 
       // Verify card with boosters is in specified booster
-      const cardWithBoosters = cards.find(
-        (c) => c.name === 'Card With Boosters',
-      )!;
-      const cardWithBoostersBoosters = repository.getCardBoosters(
-        cardWithBoosters.id,
-      );
+      const cardWithBoosters = cards.find((c) => c.name === 'Card With Boosters')!;
+      const cardWithBoostersBoosters = repository.getCardBoosters(cardWithBoosters.id);
       expect(cardWithBoostersBoosters).toHaveLength(1);
       expect(cardWithBoostersBoosters[0].name).toBe('Booster1');
 
       // Verify card with null boosters has no boosters
-      const cardWithoutBoosters = cards.find(
-        (c) => c.name === 'Card Without Boosters',
-      )!;
-      const cardWithoutBoostersBoosters = repository.getCardBoosters(
-        cardWithoutBoosters.id,
-      );
+      const cardWithoutBoosters = cards.find((c) => c.name === 'Card Without Boosters')!;
+      const cardWithoutBoostersBoosters = repository.getCardBoosters(cardWithoutBoosters.id);
       expect(cardWithoutBoostersBoosters).toHaveLength(0);
 
       // Verify boosters were created (probabilitiesType is now determined per-set, not per-booster)
@@ -662,11 +568,7 @@ describe('PokemonTcgPocketService', () => {
         },
       };
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        setsData,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created
@@ -706,11 +608,7 @@ describe('PokemonTcgPocketService', () => {
         },
       };
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        setsData,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created
@@ -765,11 +663,7 @@ describe('PokemonTcgPocketService', () => {
         },
       };
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        setsData,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created with correct isSixPackOnly values
@@ -782,9 +676,7 @@ describe('PokemonTcgPocketService', () => {
       const sixPackCard = cards.find((c) => c.name === 'Six Pack Only Card')!;
       expect(sixPackCard.isSixPackOnly).toBe(true);
 
-      const anotherRegularCard = cards.find(
-        (c) => c.name === 'Another Regular Card',
-      )!;
+      const anotherRegularCard = cards.find((c) => c.name === 'Another Regular Card')!;
       expect(anotherRegularCard.isSixPackOnly).toBe(false);
 
       // Get boosters
@@ -836,11 +728,7 @@ describe('PokemonTcgPocketService', () => {
         },
       };
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        setsData,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify cards were created with correct isSixPackOnly values
@@ -853,9 +741,7 @@ describe('PokemonTcgPocketService', () => {
       const sixPackCard1 = cards.find((c) => c.name === 'Six Pack Only Card')!;
       expect(sixPackCard1.isSixPackOnly).toBe(true);
 
-      const sixPackCard2 = cards.find(
-        (c) => c.name === 'Another Six Pack Only Card',
-      )!;
+      const sixPackCard2 = cards.find((c) => c.name === 'Another Six Pack Only Card')!;
       expect(sixPackCard2.isSixPackOnly).toBe(true);
 
       // Get boosters
@@ -884,11 +770,7 @@ describe('PokemonTcgPocketService', () => {
         },
       };
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        setsData,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, setsData);
       await service.synchronizeCardDatabaseWithYamlSource();
 
       // Verify all cards have isSixPackOnly false
@@ -927,11 +809,7 @@ describe('PokemonTcgPocketService', () => {
         isSixPackOnly: false,
       });
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        {} as Sets,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
       const searchCardsSpy = spyOn(repository, 'searchCards');
 
       const nameSearchCards = await service.searchCards({ cardName: 'chu' });
@@ -1044,24 +922,12 @@ describe('PokemonTcgPocketService', () => {
       const cards = repository.getAllCards();
 
       // Add Card 1 as OWNED, Card 2 as NOT_NEEDED, leave Card 3 as missing
-      await repository.addCardToCollection(
-        cards[0].id,
-        userId,
-        OwnershipStatus.OWNED,
-      );
-      await repository.addCardToCollection(
-        cards[1].id,
-        userId,
-        OwnershipStatus.NOT_NEEDED,
-      );
+      await repository.addCardToCollection(cards[0].id, userId, OwnershipStatus.OWNED);
+      await repository.addCardToCollection(cards[1].id, userId, OwnershipStatus.NOT_NEEDED);
       // Card 3 remains unowned (missing)
 
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        {} as Sets,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
 
       const stats = await service.getCollectionStats(userId);
 
@@ -1106,23 +972,11 @@ describe('PokemonTcgPocketService', () => {
       const cards = repository.getAllCards();
 
       // Add Card 1 as OWNED, Card 2 as NOT_NEEDED (no missing cards)
-      await repository.addCardToCollection(
-        cards[0].id,
-        userId,
-        OwnershipStatus.OWNED,
-      );
-      await repository.addCardToCollection(
-        cards[1].id,
-        userId,
-        OwnershipStatus.NOT_NEEDED,
-      );
+      await repository.addCardToCollection(cards[0].id, userId, OwnershipStatus.OWNED);
+      await repository.addCardToCollection(cards[1].id, userId, OwnershipStatus.NOT_NEEDED);
 
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        {} as Sets,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
 
       const stats = await service.getCollectionStats(userId);
 
@@ -1206,39 +1060,19 @@ describe('PokemonTcgPocketService', () => {
 
       // Set up ownership to create different probabilities
       // High Prob: own 1 out of 2 (higher probability of new card)
-      await repository.addCardToCollection(
-        cards[0].id,
-        userId,
-        OwnershipStatus.OWNED,
-      );
+      await repository.addCardToCollection(cards[0].id, userId, OwnershipStatus.OWNED);
       // card[1] remains missing
 
       // Low Prob: own 2 out of 3 (lower probability of new card)
-      await repository.addCardToCollection(
-        cards[2].id,
-        userId,
-        OwnershipStatus.OWNED,
-      );
-      await repository.addCardToCollection(
-        cards[3].id,
-        userId,
-        OwnershipStatus.OWNED,
-      );
+      await repository.addCardToCollection(cards[2].id, userId, OwnershipStatus.OWNED);
+      await repository.addCardToCollection(cards[3].id, userId, OwnershipStatus.OWNED);
       // card[4] remains missing
 
       // Zero Prob: own all cards (0% probability)
-      await repository.addCardToCollection(
-        cards[5].id,
-        userId,
-        OwnershipStatus.OWNED,
-      );
+      await repository.addCardToCollection(cards[5].id, userId, OwnershipStatus.OWNED);
 
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        {} as Sets,
-      );
+      const service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
 
       const stats = await service.getCollectionStats(userId);
 
@@ -1282,20 +1116,13 @@ describe('PokemonTcgPocketService', () => {
         },
       };
 
-      service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        testSets,
-      );
+      service = new PokemonTcgPocketService(probabilityService, repository, testSets);
 
       await service.synchronizeCardDatabaseWithYamlSource();
     });
 
     it('should detect foil rarities and set FOUR_CARDS_WITH_GUARANTEED_EX', async () => {
-      const booster = await repository.retrieveBoosterByNameAndSetKey(
-        'Test Booster',
-        'TEST',
-      );
+      const booster = await repository.retrieveBoosterByNameAndSetKey('Test Booster', 'TEST');
 
       expect(booster).toBeDefined();
       // probabilitiesType is now determined per-set via SET_DEFINITIONS, not per-booster
@@ -1305,18 +1132,9 @@ describe('PokemonTcgPocketService', () => {
 
     it('should create cards with foil rarities correctly', async () => {
       // Check individual cards
-      const foilCard1 = await repository.retrieveCardByNumberAndSetKey(
-        2,
-        'TEST',
-      );
-      const foilCard2 = await repository.retrieveCardByNumberAndSetKey(
-        3,
-        'TEST',
-      );
-      const foilCard3 = await repository.retrieveCardByNumberAndSetKey(
-        4,
-        'TEST',
-      );
+      const foilCard1 = await repository.retrieveCardByNumberAndSetKey(2, 'TEST');
+      const foilCard2 = await repository.retrieveCardByNumberAndSetKey(3, 'TEST');
+      const foilCard3 = await repository.retrieveCardByNumberAndSetKey(4, 'TEST');
 
       expect(foilCard1?.rarity).toBe(Rarity.ONE_DIAMOND_FOIL);
       expect(foilCard2?.rarity).toBe(Rarity.TWO_DIAMONDS_FOIL);
@@ -1345,11 +1163,7 @@ describe('PokemonTcgPocketService', () => {
         },
       };
 
-      const mixedService = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        mixedSets,
-      );
+      const mixedService = new PokemonTcgPocketService(probabilityService, repository, mixedSets);
 
       await mixedService.synchronizeCardDatabaseWithYamlSource();
 
@@ -1357,10 +1171,7 @@ describe('PokemonTcgPocketService', () => {
         'Regular Booster',
         'MIXED',
       );
-      const foilBooster = await repository.retrieveBoosterByNameAndSetKey(
-        'Foil Booster',
-        'MIXED',
-      );
+      const foilBooster = await repository.retrieveBoosterByNameAndSetKey('Foil Booster', 'MIXED');
 
       // probabilitiesType is now determined per-set via SET_DEFINITIONS, not per-booster
       // For MIXED set, verify boosters were created correctly
@@ -1389,18 +1200,11 @@ describe('PokemonTcgPocketService', () => {
         },
       };
 
-      const mixedService = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        mixedSets,
-      );
+      const mixedService = new PokemonTcgPocketService(probabilityService, repository, mixedSets);
 
       await mixedService.synchronizeCardDatabaseWithYamlSource();
 
-      const booster = await repository.retrieveBoosterByNameAndSetKey(
-        'Mixed Booster',
-        'MIXED',
-      );
+      const booster = await repository.retrieveBoosterByNameAndSetKey('Mixed Booster', 'MIXED');
 
       // probabilitiesType is now determined per-set via SET_DEFINITIONS, not per-booster
       // For MIXED set, verify booster was created correctly
@@ -1427,18 +1231,11 @@ describe('PokemonTcgPocketService', () => {
         },
       };
 
-      const mixedService = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        mixedSets,
-      );
+      const mixedService = new PokemonTcgPocketService(probabilityService, repository, mixedSets);
 
       await mixedService.synchronizeCardDatabaseWithYamlSource();
 
-      const booster = await repository.retrieveBoosterByNameAndSetKey(
-        'Mixed Booster',
-        'MIXED',
-      );
+      const booster = await repository.retrieveBoosterByNameAndSetKey('Mixed Booster', 'MIXED');
 
       // probabilitiesType is now determined per-set via SET_DEFINITIONS, not per-booster
       // For MIXED set, verify booster was created correctly
@@ -1458,19 +1255,13 @@ describe('PokemonTcgPocketService', () => {
 
     beforeEach(() => {
       repository = new PokemonTcgPocketRepositoryFake();
-      const probabilityRepository =
-        new PokemonTcgPocketProbabilityRepositoryFake();
+      const probabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
       // Setup probability repository with test data for probability calculations
       probabilityRepository.setCountByRarity(Rarity.ONE_DIAMOND, false, 10); // Default count
-      probabilityRepository.setCountIncludingSixPackOnly(
-        Rarity.ONE_DIAMOND,
-        10,
-      );
+      probabilityRepository.setCountIncludingSixPackOnly(Rarity.ONE_DIAMOND, 10);
       probabilityRepository.countGodPackEligibleByBoosterReturnValue = 0; // No god pack by default
 
-      const probabilityService = createProbabilityService(
-        probabilityRepository,
-      );
+      const probabilityService = createProbabilityService(probabilityRepository);
       const setsData: Sets = {
         TEST: {
           name: 'Test Set',
@@ -1479,11 +1270,7 @@ describe('PokemonTcgPocketService', () => {
           },
         },
       };
-      service = new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        setsData,
-      );
+      service = new PokemonTcgPocketService(probabilityService, repository, setsData);
     });
 
     it('should include Probability column in correct position', async () => {
@@ -1508,9 +1295,7 @@ describe('PokemonTcgPocketService', () => {
       const lines = csv.split('\n');
       const header = lines[0];
 
-      expect(header).toBe(
-        'ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by Owned',
-      );
+      expect(header).toBe('ID,Name,Rarity,Set,Boosters,Probability,SixPackOnly,Owned by Owned');
     });
 
     it('should format probability as percentage with 2 decimals', async () => {

@@ -1,5 +1,6 @@
-import { injectable } from 'inversify';
 import { ToolMessage } from '@langchain/core/messages';
+import { injectable } from 'inversify';
+
 import { MessageRepository } from '../Repositories/MessageRepository.js';
 import { ToolMessageRepository } from '../Repositories/ToolMessageRepository.js';
 import { StateAnnotation } from './StateAnnotation.js';
@@ -19,19 +20,11 @@ export class ToolResponsePersistenceNodeFactory {
    * Creates the node for persisting tool calls and responses.
    */
   create() {
-    return async ({
-      messages,
-      toolExecution,
-    }: typeof StateAnnotation.State) => {
-      const { announcementMessageId, originalAIMessage, currentToolCallIds } =
-        toolExecution || {};
+    return async ({ messages, toolExecution }: typeof StateAnnotation.State) => {
+      const { announcementMessageId, originalAIMessage, currentToolCallIds } = toolExecution || {};
 
       // Skip if no tool execution context
-      if (
-        !announcementMessageId ||
-        !originalAIMessage ||
-        !currentToolCallIds?.length
-      ) {
+      if (!announcementMessageId || !originalAIMessage || !currentToolCallIds?.length) {
         return {};
       }
 
@@ -42,9 +35,7 @@ export class ToolResponsePersistenceNodeFactory {
 
       // Only store tool calls that have corresponding responses
       const toolCallsWithResponses = originalAIMessage.tool_calls
-        ?.filter((toolCall) =>
-          newToolMessages.some((msg) => msg.tool_call_id === toolCall.id),
-        )
+        ?.filter((toolCall) => newToolMessages.some((msg) => msg.tool_call_id === toolCall.id))
         .map((toolCall) => ({
           id: toolCall.id,
           name: toolCall.name,
@@ -53,10 +44,7 @@ export class ToolResponsePersistenceNodeFactory {
 
       // Persist tool calls to Message.toolCalls JSON (only those with responses)
       if (toolCallsWithResponses?.length) {
-        await this.messageRepository.updateToolCalls(
-          announcementMessageId,
-          toolCallsWithResponses,
-        );
+        await this.messageRepository.updateToolCalls(announcementMessageId, toolCallsWithResponses);
       }
 
       // Persist tool responses to ToolMessage table
@@ -64,9 +52,7 @@ export class ToolResponsePersistenceNodeFactory {
         await this.toolMessageRepository.store({
           toolCallId: toolMsg.tool_call_id,
           text:
-            typeof toolMsg.content === 'string'
-              ? toolMsg.content
-              : JSON.stringify(toolMsg.content),
+            typeof toolMsg.content === 'string' ? toolMsg.content : JSON.stringify(toolMsg.content),
           messageId: announcementMessageId,
         });
       }

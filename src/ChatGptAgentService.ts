@@ -1,42 +1,41 @@
 import assert from 'node:assert/strict';
-import { injectable } from 'inversify';
+
 import { AIMessage, SystemMessage } from '@langchain/core/messages';
-import { GptModelsProvider } from './GptModelsProvider.js';
-import {
-  ChatGptMessage,
-  ChatGptRoles,
-} from './MessageGenerators/ChatGptMessage.js';
-import { GoogleSearchToolFactory } from './Tools/GoogleSearchToolFactory.js';
-import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
-import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
+import { StructuredTool, Tool } from '@langchain/core/tools';
+import { LangGraphRunnableConfig } from '@langchain/langgraph';
+import { injectable } from 'inversify';
+
+import { AgentStateGraphFactory } from './AgentStateGraph/AgentStateGraphFactory.js';
+import { CallbackHandler } from './CallbackHandler.js';
 import { Config } from './Config.js';
-import { SchiParmelaeIdentity } from './MessageGenerators/Identities/SchiParmelaeIdentity.js';
+import { Conversation } from './Conversation.js';
+import { DallEService } from './DallEService.js';
+import { ErrorService } from './ErrorService.js';
+import { MessageModel } from './generated/prisma/models/Message.js';
+import { GptModelsProvider } from './GptModelsProvider.js';
+import { ChatGptMessage, ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
+import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
 import { EmulatorIdentity } from './MessageGenerators/Identities/EmulatorIdentity.js';
 import { Identity } from './MessageGenerators/Identities/Identity.js';
 import { IdentityResolverService } from './MessageGenerators/Identities/IdentityResolverService.js';
-import { SCHEDULE_MESSAGE_TOOL_NAME } from './Tools/ScheduleMessageTool.js';
-import { INTERMEDIATE_ANSWER_TOOL_NAME } from './Tools/IntermediateAnswerTool.js';
-import { StructuredTool, Tool } from '@langchain/core/tools';
-import { MessageModel } from './generated/prisma/models/Message.js';
-import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
-import { CallbackHandler } from './CallbackHandler.js';
-import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
-import { ErrorService } from './ErrorService.js';
-import { Conversation } from './Conversation.js';
+import { SchiParmelaeIdentity } from './MessageGenerators/Identities/SchiParmelaeIdentity.js';
+import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
+import { TelegramService } from './TelegramService.js';
+import { dateTimeTool } from './Tools/dateTimeTool.js';
+import { diceTool } from './Tools/diceTool.js';
+import { GoogleSearchToolFactory } from './Tools/GoogleSearchToolFactory.js';
+import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
+import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
 import { identityQueryTool } from './Tools/identityQueryTool.js';
 import { identitySetterTool } from './Tools/identitySetterTool.js';
-import { diceTool } from './Tools/diceTool.js';
-import { dateTimeTool } from './Tools/dateTimeTool.js';
-import { pokemonCardSearchTool } from './Tools/pokemonCardSearchTool.js';
+import { INTERMEDIATE_ANSWER_TOOL_NAME } from './Tools/IntermediateAnswerTool.js';
+import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
 import { pokemonCardAddTool } from './Tools/pokemonCardAddTool.js';
 import { pokemonCardRangeAddTool } from './Tools/pokemonCardRangeAddTool.js';
+import { pokemonCardSearchTool } from './Tools/pokemonCardSearchTool.js';
 import { pokemonCardStatsTool } from './Tools/pokemonCardStatsTool.js';
-import { LangGraphRunnableConfig } from '@langchain/langgraph';
-import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
-import { TelegramService } from './TelegramService.js';
-import { DallEService } from './DallEService.js';
-import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
-import { AgentStateGraphFactory } from './AgentStateGraph/AgentStateGraphFactory.js';
+import { SCHEDULE_MESSAGE_TOOL_NAME } from './Tools/ScheduleMessageTool.js';
+import { ScheduleMessageToolFactory } from './Tools/ScheduleMessageToolFactory.js';
 import { WebBrowserToolFactory } from './Tools/WebBrowserToolFactory.js';
 
 /** Enhanced response from ChatGPT agent including tool call message IDs */
@@ -185,13 +184,7 @@ export class ChatGptAgentService {
       );
     } catch (error) {
       if (retries < 2) {
-        return this.generate(
-          message,
-          conversation,
-          announceToolCall,
-          identity,
-          retries + 1,
-        );
+        return this.generate(message, conversation, announceToolCall, identity, retries + 1);
       }
       ErrorService.log(error);
       assert(error instanceof Error);
@@ -216,18 +209,10 @@ export class ChatGptAgentService {
    * @param message - The message being processed (needed for dynamic tool creation)
    * @returns Complete tools array ready for agent creation
    */
-  private buildTools(
-    identity: Identity,
-    message: MessageModel,
-  ): (StructuredTool | Tool)[] {
+  private buildTools(identity: Identity, message: MessageModel): (StructuredTool | Tool)[] {
     // Guard against identity tools shadowing critical system tools
-    const criticalToolNames = new Set([
-      SCHEDULE_MESSAGE_TOOL_NAME,
-      INTERMEDIATE_ANSWER_TOOL_NAME,
-    ]);
-    const conflictingTools = identity.tools.filter((tool) =>
-      criticalToolNames.has(tool.name),
-    );
+    const criticalToolNames = new Set([SCHEDULE_MESSAGE_TOOL_NAME, INTERMEDIATE_ANSWER_TOOL_NAME]);
+    const conflictingTools = identity.tools.filter((tool) => criticalToolNames.has(tool.name));
     if (conflictingTools.length > 0) {
       console.warn(
         `Identity "${identity.name}" defines tools that conflict with critical system tools: ${conflictingTools.map((t) => t.name).join(', ')}. ` +
@@ -236,9 +221,7 @@ export class ChatGptAgentService {
     }
 
     // Merge global tools with identity-specific tools (excluding conflicts)
-    const identityTools = identity.tools.filter(
-      (tool) => !criticalToolNames.has(tool.name),
-    );
+    const identityTools = identity.tools.filter((tool) => !criticalToolNames.has(tool.name));
     return [
       ...this.tools,
       ...identityTools,

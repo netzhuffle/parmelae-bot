@@ -1,7 +1,8 @@
 import { beforeEach, describe, it, mock, expect } from 'bun:test';
-import { MessageModel } from './generated/prisma/models/Message.js';
-import { CommandService } from './CommandService.js';
+
 import { Commands } from './Command.js';
+import { CommandService } from './CommandService.js';
+import { MessageModel } from './generated/prisma/models/Message.js';
 import { ReplyGenerator } from './MessageGenerators/ReplyGenerator.js';
 import { TelegramMessageWithReplyTo } from './Repositories/Types.js';
 
@@ -47,10 +48,7 @@ describe('CommandService', () => {
       replyToMessage: messageToReplyTo,
     };
     replyGenerator.generate = mock(
-      async (
-        message: MessageModel,
-        announceToolCall: (text: string) => Promise<number | null>,
-      ) => {
+      async (message: MessageModel, announceToolCall: (text: string) => Promise<number | null>) => {
         const messageId = await announceToolCall('Using tool X');
         expect(messageId).toBeNull(); // Should return null since no message is stored
         return {

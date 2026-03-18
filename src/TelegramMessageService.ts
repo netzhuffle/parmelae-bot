@@ -1,16 +1,18 @@
+import assert from 'node:assert/strict';
+
+import * as Typegram from '@telegraf/types';
 import { injectable, inject } from 'inversify';
-import { MessageStorageService } from './MessageStorageService.js';
+
+import { normalizeUsername } from './BotIdentityContext.js';
+import { Config } from './Config.js';
+import type { BotConfig } from './ConfigInterfaces.js';
 import { ChatModel } from './generated/prisma/models/Chat.js';
 import { UserModel } from './generated/prisma/models/User.js';
-import type { BotConfig } from './ConfigInterfaces.js';
-import { Config } from './Config.js';
-import assert from 'node:assert/strict';
+import { MessageStorageService } from './MessageStorageService.js';
 import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
 } from './Repositories/Types.js';
-import * as Typegram from '@telegraf/types';
-import { normalizeUsername } from './BotIdentityContext.js';
 
 type SupportedMessage =
   | Typegram.Message.TextMessage
@@ -42,9 +44,7 @@ export class TelegramMessageService {
   ) {}
 
   /** Stores a message sent to or coming from Telegram. */
-  store(
-    telegramMessage: SupportedMessage,
-  ): Promise<TelegramMessageWithRelations> {
+  store(telegramMessage: SupportedMessage): Promise<TelegramMessageWithRelations> {
     assert(this.isSupported(telegramMessage));
     const message = this.getMessage(telegramMessage);
     return this.messageStorage.store(message);
@@ -81,9 +81,7 @@ export class TelegramMessageService {
     return true;
   }
 
-  private isStickerMessage(
-    message: Typegram.Message,
-  ): message is Typegram.Message.StickerMessage {
+  private isStickerMessage(message: Typegram.Message): message is Typegram.Message.StickerMessage {
     return 'sticker' in message;
   }
 
@@ -106,11 +104,9 @@ export class TelegramMessageService {
       id: BigInt(telegramChat.id),
       type: telegramChat.type,
       title: 'title' in telegramChat ? telegramChat.title : null,
-      username:
-        'username' in telegramChat ? (telegramChat.username ?? null) : null,
+      username: 'username' in telegramChat ? (telegramChat.username ?? null) : null,
       firstName: 'first_name' in telegramChat ? telegramChat.first_name : null,
-      lastName:
-        'last_name' in telegramChat ? (telegramChat.last_name ?? null) : null,
+      lastName: 'last_name' in telegramChat ? (telegramChat.last_name ?? null) : null,
     };
   }
 
@@ -160,17 +156,12 @@ export class TelegramMessageService {
     };
   }
 
-  private getMessage(
-    telegramMessage: SupportedMessage,
-  ): UnstoredMessageWithRelations {
+  private getMessage(telegramMessage: SupportedMessage): UnstoredMessageWithRelations {
     assert(telegramMessage.from);
     const chatId = BigInt(telegramMessage.chat.id);
     const replyToMessage =
-      'reply_to_message' in telegramMessage
-        ? telegramMessage.reply_to_message
-        : undefined;
-    const editDate =
-      'edit_date' in telegramMessage ? telegramMessage.edit_date : undefined;
+      'reply_to_message' in telegramMessage ? telegramMessage.reply_to_message : undefined;
+    const editDate = 'edit_date' in telegramMessage ? telegramMessage.edit_date : undefined;
     return {
       telegramMessageId: telegramMessage.message_id,
       chatId,
@@ -181,9 +172,7 @@ export class TelegramMessageService {
       editedAt: this.getOptionalDate(editDate),
       replyToMessageId: replyToMessage?.message_id ?? null,
       replyToMessage:
-        replyToMessage && this.isSupported(replyToMessage)
-          ? this.getMessage(replyToMessage)
-          : null,
+        replyToMessage && this.isSupported(replyToMessage) ? this.getMessage(replyToMessage) : null,
       text: this.getMessageText(telegramMessage),
       imageFileId: this.hasImageAttachment(telegramMessage)
         ? this.getImageFileId(telegramMessage)
@@ -228,9 +217,7 @@ export class TelegramMessageService {
         info += audio.title;
       }
       const duration = audio.duration;
-      const attachment = info
-        ? `[♫: ${info} (${duration}s)]`
-        : `[♫: ${duration} Sekunden]`;
+      const attachment = info ? `[♫: ${info} (${duration}s)]` : `[♫: ${duration} Sekunden]`;
       return message.caption ? `${attachment}: ${message.caption}` : attachment;
     }
 
@@ -296,10 +283,7 @@ export class TelegramMessageService {
 
     if ('poll' in message) {
       const poll = message.poll;
-      let text =
-        poll.type === 'quiz'
-          ? `Quizfrage: ${poll.question}`
-          : `Umfrage: ${poll.question}`;
+      let text = poll.type === 'quiz' ? `Quizfrage: ${poll.question}` : `Umfrage: ${poll.question}`;
       for (const option of poll.options) {
         text += `\n[ ] ${option.text}`;
       }
@@ -310,9 +294,7 @@ export class TelegramMessageService {
       if (this.hasImageAttachment(message)) {
         return '';
       }
-      return message.sticker.emoji
-        ? `[Sticker: ${message.sticker.emoji}]`
-        : '[Sticker]';
+      return message.sticker.emoji ? `[Sticker: ${message.sticker.emoji}]` : '[Sticker]';
     }
 
     if ('video' in message) {
@@ -344,11 +326,7 @@ export class TelegramMessageService {
   private hasImageAttachment(
     message: SupportedMessage,
   ): message is SupportedMessage & ImageAttachmentMessage {
-    if (
-      'photo' in message &&
-      Array.isArray(message.photo) &&
-      message.photo.length
-    ) {
+    if ('photo' in message && Array.isArray(message.photo) && message.photo.length) {
       return true;
     }
     if ('sticker' in message && 'thumbnail' in message.sticker) {
@@ -365,10 +343,7 @@ export class TelegramMessageService {
 
     let largestPhotoSize = message.photo[0];
     for (const photoSize of message.photo) {
-      if (
-        photoSize.width * photoSize.height >
-        largestPhotoSize.width * largestPhotoSize.height
-      ) {
+      if (photoSize.width * photoSize.height > largestPhotoSize.width * largestPhotoSize.height) {
         largestPhotoSize = photoSize;
       }
     }

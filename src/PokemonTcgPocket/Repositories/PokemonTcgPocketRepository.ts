@@ -1,18 +1,16 @@
+import { injectable } from 'inversify';
+
 import { PrismaClient } from '../../generated/prisma/client.js';
-import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
+import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
 import { PokemonBoosterModel } from '../../generated/prisma/models/PokemonBooster.js';
 import { PokemonCardModel } from '../../generated/prisma/models/PokemonCard.js';
-import { Rarity, OwnershipStatus } from '../../generated/prisma/enums.js';
-import { injectable } from 'inversify';
+import { PokemonSetModel } from '../../generated/prisma/models/PokemonSet.js';
+import { NotExhaustiveSwitchError } from '../../NotExhaustiveSwitchError.js';
+import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
 import { PokemonTcgPocketDatabaseError } from '../Errors/PokemonTcgPocketDatabaseError.js';
 import { PokemonTcgPocketNotFoundError } from '../Errors/PokemonTcgPocketNotFoundError.js';
-import { PokemonTcgPocketEntityCache } from '../Caches/PokemonTcgPocketEntityCache.js';
+import { OwnershipFilter, CardOwnershipStatus } from '../PokemonTcgPocketService.js';
 import { PokemonCardWithRelations } from './Types.js';
-import {
-  OwnershipFilter,
-  CardOwnershipStatus,
-} from '../PokemonTcgPocketService.js';
-import { NotExhaustiveSwitchError } from '../../NotExhaustiveSwitchError.js';
 
 /** Repository for Pokémon TCG Pocket data */
 @injectable()
@@ -35,11 +33,7 @@ export class PokemonTcgPocketRepository {
 
       return set;
     } catch (error) {
-      throw new PokemonTcgPocketDatabaseError(
-        'retrieve',
-        `set ${key}`,
-        this.formatError(error),
-      );
+      throw new PokemonTcgPocketDatabaseError('retrieve', `set ${key}`, this.formatError(error));
     }
   }
 
@@ -118,19 +112,12 @@ export class PokemonTcgPocketRepository {
       this.cache.setSetId(key, set.id);
       return set;
     } catch (error) {
-      throw new PokemonTcgPocketDatabaseError(
-        'create',
-        `set ${key}`,
-        this.formatError(error),
-      );
+      throw new PokemonTcgPocketDatabaseError('create', `set ${key}`, this.formatError(error));
     }
   }
 
   /** Creates a new booster */
-  async createBooster(
-    name: string,
-    setKey: string,
-  ): Promise<PokemonBoosterModel> {
+  async createBooster(name: string, setKey: string): Promise<PokemonBoosterModel> {
     try {
       const setId = await this.resolveSetId(setKey);
       if (!setId) {
@@ -267,11 +254,7 @@ export class PokemonTcgPocketRepository {
         orderBy: [{ set: { key: 'asc' } }, { number: 'asc' }],
       });
     } catch (error) {
-      throw new PokemonTcgPocketDatabaseError(
-        'search',
-        'cards',
-        this.formatError(error),
-      );
+      throw new PokemonTcgPocketDatabaseError('search', 'cards', this.formatError(error));
     }
   }
 
@@ -489,9 +472,7 @@ export class PokemonTcgPocketRepository {
               isSixPackOnly: card.isSixPackOnly,
               godPackBoosterId: card.godPackBoosterId,
             },
-            ownershipStatus: this.convertToCardOwnershipStatus(
-              card.ownership[0]?.status ?? null,
-            ),
+            ownershipStatus: this.convertToCardOwnershipStatus(card.ownership[0]?.status ?? null),
           })),
           boosters: set.boosters.map((booster) => ({
             booster: {
@@ -509,9 +490,7 @@ export class PokemonTcgPocketRepository {
                 isSixPackOnly: card.isSixPackOnly,
                 godPackBoosterId: card.godPackBoosterId,
               },
-              ownershipStatus: this.convertToCardOwnershipStatus(
-                card.ownership[0]?.status ?? null,
-              ),
+              ownershipStatus: this.convertToCardOwnershipStatus(card.ownership[0]?.status ?? null),
             })),
           })),
         })),
@@ -568,10 +547,7 @@ export class PokemonTcgPocketRepository {
     const set = await this.retrieveSetByKey(key);
     return set?.id ?? null;
   }
-  private async resolveBoosterIds(
-    setKey: string,
-    names: string[],
-  ): Promise<number[]> {
+  private async resolveBoosterIds(setKey: string, names: string[]): Promise<number[]> {
     const ids = await Promise.all(
       names.map(async (name) => {
         const cachedId = this.cache.getBoosterId(setKey, name);
@@ -581,10 +557,7 @@ export class PokemonTcgPocketRepository {
 
         const booster = await this.retrieveBoosterByNameAndSetKey(name, setKey);
         if (!booster) {
-          throw new PokemonTcgPocketNotFoundError(
-            'Booster',
-            `${name} in set ${setKey}`,
-          );
+          throw new PokemonTcgPocketNotFoundError('Booster', `${name} in set ${setKey}`);
         }
 
         return booster.id;
@@ -602,9 +575,7 @@ export class PokemonTcgPocketRepository {
     return String(error);
   }
 
-  protected convertToCardOwnershipStatus(
-    status: OwnershipStatus | null,
-  ): CardOwnershipStatus {
+  protected convertToCardOwnershipStatus(status: OwnershipStatus | null): CardOwnershipStatus {
     switch (status) {
       case OwnershipStatus.OWNED:
         return CardOwnershipStatus.OWNED;

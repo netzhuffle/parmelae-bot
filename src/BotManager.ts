@@ -1,9 +1,11 @@
-import { injectable, inject } from 'inversify';
-import type { BotConfig } from './ConfigInterfaces.js';
-import { Config } from './Config.js';
-import { Telegraf } from 'telegraf';
-import { normalizeUsername } from './BotIdentityContext.js';
 import assert from 'node:assert/strict';
+
+import { injectable, inject } from 'inversify';
+import { Telegraf } from 'telegraf';
+
+import { normalizeUsername } from './BotIdentityContext.js';
+import { Config } from './Config.js';
+import type { BotConfig } from './ConfigInterfaces.js';
 
 /**
  * Manages multiple Telegraf bot instances.

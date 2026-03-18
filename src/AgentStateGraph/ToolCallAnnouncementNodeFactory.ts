@@ -1,5 +1,6 @@
-import { injectable } from 'inversify';
 import { AIMessage } from '@langchain/core/messages';
+import { injectable } from 'inversify';
+
 import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
 import { StateAnnotation } from './StateAnnotation.js';
 
@@ -14,10 +15,7 @@ export class ToolCallAnnouncementNodeFactory {
     return (
       '{' +
       Object.entries(params)
-        .map(
-          ([key, value]) =>
-            `${key}: ${typeof value === 'string' ? value : String(value)}`,
-        )
+        .map(([key, value]) => `${key}: ${typeof value === 'string' ? value : String(value)}`)
         .join(', ') +
       '}'
     );
@@ -27,10 +25,7 @@ export class ToolCallAnnouncementNodeFactory {
     return toolCall.name !== INTERMEDIATE_ANSWER_TOOL_NAME;
   }
 
-  private formatToolCall(toolCall: {
-    name: string;
-    args?: Record<string, unknown>;
-  }): string {
+  private formatToolCall(toolCall: { name: string; args?: Record<string, unknown> }): string {
     const { name: toolName, args: input } = toolCall;
     const filtered = Object.fromEntries(
       Object.entries(input ?? {}).filter(
@@ -50,10 +45,7 @@ export class ToolCallAnnouncementNodeFactory {
     toolCalls: { name: string; args?: Record<string, unknown> }[],
   ): string[] {
     const lines: string[] = [];
-    if (
-      typeof lastMessage.content === 'string' &&
-      lastMessage.content.trim() !== ''
-    ) {
+    if (typeof lastMessage.content === 'string' && lastMessage.content.trim() !== '') {
       lines.push(lastMessage.content);
     }
     for (const toolCall of toolCalls) {

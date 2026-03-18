@@ -7,9 +7,7 @@ export class UnknownIdentityError extends Error {
     public readonly available: readonly string[],
   ) {
     const availableNames = available.join('", "');
-    super(
-      `Unknown identity "${input}". Available identities: "${availableNames}".`,
-    );
+    super(`Unknown identity "${input}". Available identities: "${availableNames}".`);
     this.name = 'UnknownIdentityError';
   }
 }

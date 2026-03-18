@@ -6,13 +6,9 @@ import { MessageWithUserAndToolMessages } from '../Repositories/Types.js';
 export class MessageHistoryServiceFake {
   private messages: MessageWithUserAndToolMessages[] = [];
 
-  public getHistoryCallArgs: { toMessageId: number; messageCount: number }[] =
-    [];
+  public getHistoryCallArgs: { toMessageId: number; messageCount: number }[] = [];
 
-  getHistory(
-    toMessageId: number,
-    messageCount: number,
-  ): Promise<MessageWithUserAndToolMessages[]> {
+  getHistory(toMessageId: number, messageCount: number): Promise<MessageWithUserAndToolMessages[]> {
     this.getHistoryCallArgs.push({ toMessageId, messageCount });
     return Promise.resolve(this.messages.slice(0, messageCount));
   }
@@ -24,9 +20,7 @@ export class MessageHistoryServiceFake {
   private async getHistoryForMessages(
     _messageIds: number[],
   ): Promise<MessageWithUserAndToolMessages[]> {
-    return Promise.reject(
-      new Error('getHistoryForMessages not implemented in fake'),
-    );
+    return Promise.reject(new Error('getHistoryForMessages not implemented in fake'));
   }
 
   reset(): void {

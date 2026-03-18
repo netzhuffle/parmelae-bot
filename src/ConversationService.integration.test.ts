@@ -1,10 +1,12 @@
 import { describe, beforeEach, it, afterEach, expect } from 'bun:test';
+
+import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
+
+import { BotIdentityContext } from './BotIdentityContext.js';
 import { ConversationService } from './ConversationService.js';
-import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageRepositoryFake } from './Fakes/MessageRepositoryFake.js';
 import { TelegramServiceFake } from './Fakes/TelegramServiceFake.js';
-import { BotIdentityContext } from './BotIdentityContext.js';
-import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
+import { MessageHistoryService } from './MessageHistoryService.js';
 import { MessageRepository } from './Repositories/MessageRepository.js';
 
 describe('ConversationService Integration', () => {
@@ -23,10 +25,7 @@ describe('ConversationService Integration', () => {
     messageHistoryService = new MessageHistoryService(
       messageRepository as unknown as MessageRepository,
     );
-    conversationService = new ConversationService(
-      messageHistoryService,
-      telegramService,
-    );
+    conversationService = new ConversationService(messageHistoryService, telegramService);
   });
 
   afterEach(() => {
@@ -127,11 +126,7 @@ describe('ConversationService Integration', () => {
       });
 
       // Get the conversation starting from the final message
-      const conversation = await conversationService.getConversation(
-        4,
-        10,
-        botContext,
-      );
+      const conversation = await conversationService.getConversation(4, 10, botContext);
 
       // Verify the complete conversation flow
       expect(conversation.messages).toHaveLength(6);
@@ -144,9 +139,7 @@ describe('ConversationService Integration', () => {
 
       // 2. First tool call announcement (converted to AIMessage)
       expect(conversation.messages[1]).toBeInstanceOf(AIMessage);
-      expect(conversation.messages[1].content).toBe(
-        'Calling weather tool for London...',
-      );
+      expect(conversation.messages[1].content).toBe('Calling weather tool for London...');
 
       // 3. First tool response
       expect(conversation.messages[2]).toBeInstanceOf(ToolMessage);
@@ -156,9 +149,7 @@ describe('ConversationService Integration', () => {
 
       // 4. Second tool call announcement (converted to AIMessage)
       expect(conversation.messages[3]).toBeInstanceOf(AIMessage);
-      expect(conversation.messages[3].content).toBe(
-        'Calling time tool for current time...',
-      );
+      expect(conversation.messages[3].content).toBe('Calling time tool for current time...');
 
       // 5. Second tool response
       expect(conversation.messages[4]).toBeInstanceOf(ToolMessage);
@@ -243,25 +234,17 @@ describe('ConversationService Integration', () => {
         toolCallMessages: [searchToolCallMessage],
       });
 
-      const conversation = await conversationService.getConversation(
-        12,
-        5,
-        botContext,
-      );
+      const conversation = await conversationService.getConversation(12, 5, botContext);
 
       expect(conversation.messages).toHaveLength(4);
 
       // User message
       expect(conversation.messages[0]).toBeInstanceOf(HumanMessage);
-      expect(conversation.messages[0].content).toBe(
-        'Search for information about TypeScript',
-      );
+      expect(conversation.messages[0].content).toBe('Search for information about TypeScript');
 
       // Tool call announcement
       expect(conversation.messages[1]).toBeInstanceOf(AIMessage);
-      expect(conversation.messages[1].content).toBe(
-        'Searching for TypeScript information...',
-      );
+      expect(conversation.messages[1].content).toBe('Searching for TypeScript information...');
 
       // Tool response
       expect(conversation.messages[2]).toBeInstanceOf(ToolMessage);
@@ -321,11 +304,7 @@ describe('ConversationService Integration', () => {
         toolCallMessages: [],
       });
 
-      const conversation = await conversationService.getConversation(
-        21,
-        5,
-        botContext,
-      );
+      const conversation = await conversationService.getConversation(21, 5, botContext);
 
       expect(conversation.messages).toHaveLength(2);
 

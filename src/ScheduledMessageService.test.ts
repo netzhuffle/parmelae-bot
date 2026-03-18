@@ -1,9 +1,10 @@
 import { beforeEach, afterEach, describe, it, expect, jest } from 'bun:test';
-import { ScheduledMessageService } from './ScheduledMessageService.js';
+
 import { ScheduledMessageRepositoryFake } from './Fakes/ScheduledMessageRepositoryFake.js';
 import { TelegramServiceFake } from './Fakes/TelegramServiceFake.js';
 import { ScheduledMessageModel } from './generated/prisma/models/ScheduledMessage.js';
 import type { ScheduledMessageRepository } from './Repositories/ScheduledMessageRepository.js';
+import { ScheduledMessageService } from './ScheduledMessageService.js';
 
 describe('ScheduledMessageService', () => {
   let scheduledMessageService: ScheduledMessageService;

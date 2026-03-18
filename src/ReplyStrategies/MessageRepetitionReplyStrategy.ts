@@ -1,8 +1,9 @@
-import { ReplyStrategy } from '../ReplyStrategy.js';
 import { injectable } from 'inversify';
-import { TelegramService } from '../TelegramService.js';
-import { Sticker } from '../Sticker.js';
+
 import { MessageModel } from '../generated/prisma/models/Message.js';
+import { ReplyStrategy } from '../ReplyStrategy.js';
+import { Sticker } from '../Sticker.js';
+import { TelegramService } from '../TelegramService.js';
 
 /** Repeats a message that two other users wrote. */
 @injectable()
@@ -24,10 +25,7 @@ export class MessageRepetitionReplyStrategy implements ReplyStrategy {
       return true;
     }
 
-    if (
-      message.stickerFileId &&
-      this.lastMessage?.stickerFileId === message.stickerFileId
-    ) {
+    if (message.stickerFileId && this.lastMessage?.stickerFileId === message.stickerFileId) {
       // Same sticker: Repeat.
       this.lastMessage = null;
       return true;
@@ -40,10 +38,7 @@ export class MessageRepetitionReplyStrategy implements ReplyStrategy {
 
   async handle(message: MessageModel): Promise<void> {
     if (message.stickerFileId) {
-      await this.telegram.send(
-        new Sticker(message.stickerFileId),
-        message.chatId,
-      );
+      await this.telegram.send(new Sticker(message.stickerFileId), message.chatId);
       return;
     }
 

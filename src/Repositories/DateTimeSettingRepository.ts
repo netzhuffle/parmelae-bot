@@ -1,5 +1,6 @@
-import { PrismaClient } from '../generated/prisma/client.js';
 import { injectable } from 'inversify';
+
+import { PrismaClient } from '../generated/prisma/client.js';
 
 /** Manages DateTime settings. */
 @injectable()
@@ -31,9 +32,7 @@ export class DateTimeSettingRepository {
 
     const storedDate = dateTimeSetting.dateTime;
     if (!this.isValidDate(storedDate)) {
-      console.warn(
-        `Invalid date stored for setting "${setting}". Using starting value instead.`,
-      );
+      console.warn(`Invalid date stored for setting "${setting}". Using starting value instead.`);
       // Repair the corrupted value by updating it with the starting value
       await this.prisma.dateTimeSetting.update({
         where: { setting },
@@ -52,9 +51,7 @@ export class DateTimeSettingRepository {
    */
   async update(setting: string, newDate: Date): Promise<void> {
     if (!this.isValidDate(newDate)) {
-      throw new Error(
-        `Cannot update setting "${setting}": provided date is invalid`,
-      );
+      throw new Error(`Cannot update setting "${setting}": provided date is invalid`);
     }
 
     const oldSetting = await this.prisma.dateTimeSetting.findUnique({

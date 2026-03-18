@@ -39,8 +39,5 @@ export function normalizeUsername(username: string): string {
  */
 export function validateBotIdentityContext(context: BotIdentityContext): void {
   const normalized = normalizeUsername(context.username);
-  assert(
-    normalized.length > 0,
-    'BotIdentityContext.username must be non-empty',
-  );
+  assert(normalized.length > 0, 'BotIdentityContext.username must be non-empty');
 }

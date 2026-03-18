@@ -1,6 +1,7 @@
-import { injectable } from 'inversify';
-import { Config } from '../Config.js';
 import { Tool } from '@langchain/core/tools';
+import { injectable } from 'inversify';
+
+import { Config } from '../Config.js';
 import { GptModels } from '../GptModelsProvider.js';
 
 @injectable()
@@ -27,8 +28,6 @@ export class GptModelSetterTool extends Tool {
         );
     }
 
-    return Promise.resolve(
-      `Success: ${this.config.gptModel} will be used from now on.`,
-    );
+    return Promise.resolve(`Success: ${this.config.gptModel} will be used from now on.`);
   }
 }

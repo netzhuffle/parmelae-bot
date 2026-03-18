@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'bun:test';
-import { ModelNodeFactory } from './ModelNodeFactory.js';
+
 import { AIMessageChunk } from '@langchain/core/messages';
+
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+import { ModelNodeFactory } from './ModelNodeFactory.js';
 import { StateAnnotation } from './StateAnnotation.js';
 
 describe('ModelNodeFactory', () => {

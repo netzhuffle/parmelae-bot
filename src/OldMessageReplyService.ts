@@ -1,10 +1,11 @@
-import { Config } from './Config.js';
-import { TelegramService } from './TelegramService.js';
-import { MessageWithUser, TelegramMessage } from './Repositories/Types.js';
-import { OldMessageReplyGenerator } from './MessageGenerators/OldMessageReplyGenerator.js';
-import { ChatGptService } from './ChatGptService.js';
 import { injectable } from 'inversify';
+
+import { ChatGptService } from './ChatGptService.js';
+import { Config } from './Config.js';
 import { MessageModel } from './generated/prisma/models/Message.js';
+import { OldMessageReplyGenerator } from './MessageGenerators/OldMessageReplyGenerator.js';
+import { MessageWithUser, TelegramMessage } from './Repositories/Types.js';
+import { TelegramService } from './TelegramService.js';
 
 /**
  * Minimum length to consider reply to a message.
@@ -32,13 +33,9 @@ export class OldMessageReplyService {
    * @param oldMessages List of old messages
    */
   async reply(oldMessages: MessageWithUser[]): Promise<void> {
-    let replyCandidates = oldMessages.filter((message) =>
-      this.mayReplyToOldMessage(message),
-    );
+    let replyCandidates = oldMessages.filter((message) => this.mayReplyToOldMessage(message));
     while (replyCandidates.length > 0) {
-      const randomMessageIndex = Math.floor(
-        Math.random() * replyCandidates.length,
-      );
+      const randomMessageIndex = Math.floor(Math.random() * replyCandidates.length);
       const randomMessage = replyCandidates[randomMessageIndex];
       if (!this.isTelegramMessage(randomMessage)) {
         // Should never happen as mayReplyToOldMessage filtered out non-telegram messages.

@@ -1,9 +1,11 @@
 import { describe, beforeEach, it, expect, mock } from 'bun:test';
+
 import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
+
 import { MessageRepository } from '../Repositories/MessageRepository.js';
 import { ToolMessageRepository } from '../Repositories/ToolMessageRepository.js';
-import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
 import { StateAnnotation } from './StateAnnotation.js';
+import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
 
 // Create mock functions separately for proper assertion tracking
 const mockUpdateToolCalls = mock(() => Promise.resolve());
@@ -75,10 +77,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
 
       await node(state);
 
-      expect(mockUpdateToolCalls).toHaveBeenCalledWith(
-        456,
-        originalAIMessage.tool_calls,
-      );
+      expect(mockUpdateToolCalls).toHaveBeenCalledWith(456, originalAIMessage.tool_calls);
 
       expect(mockStore).toHaveBeenCalledTimes(2);
       expect(mockStore).toHaveBeenCalledWith({
@@ -275,9 +274,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
       };
 
       // Replace the mock implementation to reject with an error
-      mockUpdateToolCalls.mockImplementation(() =>
-        Promise.reject(new Error('Database error')),
-      );
+      mockUpdateToolCalls.mockImplementation(() => Promise.reject(new Error('Database error')));
 
       try {
         await node(state);

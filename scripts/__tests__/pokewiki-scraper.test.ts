@@ -1,4 +1,5 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
+
 import {
   matchAll,
   escapeYamlString,
@@ -13,8 +14,7 @@ describe('Pokewiki Scraper', () => {
     it('should extract all regex matches with capture groups', () => {
       const text =
         '{{Setzeile|1|Bisasam|SomeField|C Pocket|}} {{Setzeile|2|Bisaknosp|SomeField|U Pocket|}}';
-      const regex =
-        /\{\{Setzeile\|(\d+)\|([^|]+)\|[^|]*?\|([^}|]+)(?:\|[^}]*)?\}\}/g;
+      const regex = /\{\{Setzeile\|(\d+)\|([^|]+)\|[^|]*?\|([^}|]+)(?:\|[^}]*)?\}\}/g;
       const matches = matchAll(text, regex);
 
       expect(matches.length).toBe(2);
@@ -24,8 +24,7 @@ describe('Pokewiki Scraper', () => {
 
     it('should return empty array when no matches found', () => {
       const text = 'No matches here';
-      const regex =
-        /\{\{Setzeile\|(\d+)\|([^|]+)\|[^|]*?\|([^}|]+)(?:\|[^}]*)?\}\}/g;
+      const regex = /\{\{Setzeile\|(\d+)\|([^|]+)\|[^|]*?\|([^}|]+)(?:\|[^}]*)?\}\}/g;
       const matches = matchAll(text, regex);
 
       expect(matches).toEqual([]);
@@ -127,9 +126,7 @@ describe('Pokewiki Scraper', () => {
     it('should validate Pokewiki URLs', async () => {
       // Test that fetchWikitext validates URLs
       // Invalid domain
-      const invalidDomainPromise = fetchWikitext(
-        'https://example.com/Some_Page',
-      );
+      const invalidDomainPromise = fetchWikitext('https://example.com/Some_Page');
       // eslint-disable-next-line @typescript-eslint/await-thenable
       await expect(invalidDomainPromise).rejects.toThrow('URL must be from');
 
@@ -212,9 +209,7 @@ describe('Pokewiki Scraper', () => {
       const url = 'https://www.pokewiki.de/Test_Set';
 
       // eslint-disable-next-line @typescript-eslint/await-thenable
-      await expect(fetchWikitext(url)).rejects.toThrow(
-        'Edit source content is too short',
-      );
+      await expect(fetchWikitext(url)).rejects.toThrow('Edit source content is too short');
     });
 
     it('should throw error if fetch fails', async () => {
@@ -230,9 +225,7 @@ describe('Pokewiki Scraper', () => {
       const url = 'https://www.pokewiki.de/Test_Set';
 
       // eslint-disable-next-line @typescript-eslint/await-thenable
-      await expect(fetchWikitext(url)).rejects.toThrow(
-        'Failed to fetch edit source',
-      );
+      await expect(fetchWikitext(url)).rejects.toThrow('Failed to fetch edit source');
     });
   });
 

@@ -1,5 +1,5 @@
-import { $ } from 'bun';
 import { tool } from '@langchain/core/tools';
+import { $ } from 'bun';
 import * as z from 'zod';
 
 /**
@@ -11,12 +11,10 @@ import * as z from 'zod';
 export const minecraftStopTool = tool(
   async (): Promise<string> => {
     try {
-      const result =
-        await $`/home/jannis/parmelae-bot/cmd/stopminecraft`.text();
+      const result = await $`/home/jannis/parmelae-bot/cmd/stopminecraft`.text();
       return result.trim();
     } catch (error) {
-      const stderr =
-        (error as { stderr?: string })?.stderr?.trim() ?? 'Unknown error';
+      const stderr = (error as { stderr?: string })?.stderr?.trim() ?? 'Unknown error';
       return `Error: ${stderr}`;
     }
   },

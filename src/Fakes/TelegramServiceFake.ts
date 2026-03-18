@@ -1,9 +1,11 @@
-import { TelegramService } from '../TelegramService.js';
+import assert from 'node:assert/strict';
+
+import * as Typegram from '@telegraf/types';
+
 import { TelegramMessageService } from '../TelegramMessageService.js';
+import { TelegramService } from '../TelegramService.js';
 import { BotManagerFake } from './BotManagerFake.js';
 import { ConfigFake } from './ConfigFake.js';
-import * as Typegram from '@telegraf/types';
-import assert from 'node:assert/strict';
 
 export class TelegramServiceFake extends TelegramService {
   result?: {
@@ -36,10 +38,7 @@ export class TelegramServiceFake extends TelegramService {
     super(botManagerFake, undefined as unknown as TelegramMessageService);
   }
 
-  async sendDice(
-    emoji: string,
-    chatId: bigint,
-  ): Promise<Typegram.Message.DiceMessage> {
+  async sendDice(emoji: string, chatId: bigint): Promise<Typegram.Message.DiceMessage> {
     this.request = { method: 'sendDice', emoji, chatId: chatId.toString() };
 
     assert(
@@ -55,11 +54,7 @@ export class TelegramServiceFake extends TelegramService {
     });
   }
 
-  async replyWithImage(
-    url: string,
-    caption: string,
-    chatId: bigint,
-  ): Promise<void> {
+  async replyWithImage(url: string, caption: string, chatId: bigint): Promise<void> {
     this.request = {
       method: 'sendImage',
       url,
@@ -73,10 +68,7 @@ export class TelegramServiceFake extends TelegramService {
     return Promise.resolve(`https://fake-telegram-file-url.com/${fileId}`);
   }
 
-  async send(
-    message: string | import('../Sticker.js').Sticker,
-    chatId: bigint,
-  ): Promise<number> {
+  async send(message: string | import('../Sticker.js').Sticker, chatId: bigint): Promise<number> {
     this.sendCallArgs.push({ message, chatId });
 
     if (this.sendShouldThrow) {

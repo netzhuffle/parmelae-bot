@@ -1,15 +1,17 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
-import { dallETool } from './dallETool.js';
-import { TelegramServiceFake } from '../Fakes/TelegramServiceFake.js';
-import { DallEServiceFake } from '../Fakes/DallEServiceFake.js';
-import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator.js';
-import { ChatGptService } from '../ChatGptService.js';
-import { GptModelsProvider } from '../GptModelsProvider.js';
-import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+
 import { AIMessage } from '@langchain/core/messages';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { ChatOpenAI } from '@langchain/openai';
+
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
+import { ChatGptService } from '../ChatGptService.js';
+import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+import { DallEServiceFake } from '../Fakes/DallEServiceFake.js';
+import { TelegramServiceFake } from '../Fakes/TelegramServiceFake.js';
+import { GptModelsProvider } from '../GptModelsProvider.js';
+import { DallEPromptGenerator } from '../MessageGenerators/DallEPromptGenerator.js';
+import { dallETool } from './dallETool.js';
 const TEST_CHAT_ID = '123456789';
 
 describe('dallETool', () => {
@@ -74,9 +76,7 @@ describe('dallETool', () => {
       config,
     );
 
-    expect(result).toBe(
-      'You could not send the image due to technical difficulties.',
-    );
+    expect(result).toBe('You could not send the image due to technical difficulties.');
     expect(telegramFake.request).toBeUndefined();
   });
 });

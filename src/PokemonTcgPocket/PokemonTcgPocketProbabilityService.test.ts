@@ -1,17 +1,18 @@
 import { describe, it, beforeEach, expect } from 'bun:test';
+
+import { Rarity } from '../generated/prisma/enums.js';
 import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
 import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
-import { Rarity } from '../generated/prisma/enums.js';
-import { BoosterProbabilitiesType } from './PokemonTcgPocketService.js';
-import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
-import { PokemonCardWithRelations } from './Repositories/Types.js';
 import { PokemonTcgPocketProbabilityRepositoryFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
-import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
+import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
+import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
 import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
 import { ShinyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
+import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
+import { BoosterProbabilitiesType } from './PokemonTcgPocketService.js';
 import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
+import { PokemonCardWithRelations } from './Repositories/Types.js';
 
 /** Helper to set up probability repository for testing single card probability calculations */
 function setupRepositoryForProbabilityTests(
@@ -38,8 +39,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
   let service: PokemonTcgPocketProbabilityService;
 
   beforeEach(() => {
-    const probabilityRepository =
-      new PokemonTcgPocketProbabilityRepositoryFake();
+    const probabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
     service = new PokemonTcgPocketProbabilityService(
       new FiveCardsWithoutShinyStrategy(),
       new FiveCardsStrategy(),
@@ -253,9 +253,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
 
     it('should handle missing only ONE_DIAMOND cards', () => {
       const boosterCards = createTestCards();
-      const missingCards = boosterCards.filter(
-        (card) => card.rarity === Rarity.ONE_DIAMOND,
-      );
+      const missingCards = boosterCards.filter((card) => card.rarity === Rarity.ONE_DIAMOND);
 
       const probability = service.calculateNewCardProbability(
         boosterCards,
@@ -272,8 +270,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       const fiveCardsWithoutShinyStrategy = new FiveCardsWithoutShinyStrategy();
       const missingCards = boosterCards.filter(
         (card) =>
-          card.rarity !== null &&
-          fiveCardsWithoutShinyStrategy.godPackRarities.has(card.rarity),
+          card.rarity !== null && fiveCardsWithoutShinyStrategy.godPackRarities.has(card.rarity),
       );
 
       const probability = service.calculateNewCardProbability(
@@ -290,8 +287,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
     it('should handle missing shiny cards', () => {
       const boosterCards = createTestCards();
       const missingCards = boosterCards.filter(
-        (card) =>
-          card.rarity === Rarity.ONE_SHINY || card.rarity === Rarity.TWO_SHINY,
+        (card) => card.rarity === Rarity.ONE_SHINY || card.rarity === Rarity.TWO_SHINY,
       );
 
       const probability = service.calculateNewCardProbability(
@@ -647,9 +643,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
       ];
 
       // Only one of the 3◆ six-only is missing
-      const missingCards: PokemonCardModel[] = [
-        sixOnlyCard(2001, Rarity.THREE_DIAMONDS),
-      ];
+      const missingCards: PokemonCardModel[] = [sixOnlyCard(2001, Rarity.THREE_DIAMONDS)];
 
       const p = service.calculateNewCardProbability(
         boosterCards,
@@ -698,9 +692,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         // Only THREE_DIAMONDS available are six-pack-only
         sixOnlyCard(4001, Rarity.THREE_DIAMONDS),
       ];
-      const missingCards: PokemonCardModel[] = [
-        sixOnlyCard(4001, Rarity.THREE_DIAMONDS),
-      ];
+      const missingCards: PokemonCardModel[] = [sixOnlyCard(4001, Rarity.THREE_DIAMONDS)];
 
       const p = service.calculateNewCardProbability(
         boosterCards,
@@ -722,9 +714,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
         // Only ONE_STAR available is six-pack-only
         sixOnlyCard(5001, Rarity.ONE_STAR),
       ];
-      const missingCards: PokemonCardModel[] = [
-        sixOnlyCard(5001, Rarity.ONE_STAR),
-      ];
+      const missingCards: PokemonCardModel[] = [sixOnlyCard(5001, Rarity.ONE_STAR)];
 
       const p = service.calculateNewCardProbability(
         boosterCards,
@@ -743,9 +733,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
     it('should handle four-card packs with foil rarities', () => {
       const cards = createTestCardsWithFoilRarities();
       const missingCards = cards.filter(
-        (c) =>
-          c.rarity === Rarity.ONE_DIAMOND_FOIL ||
-          c.rarity === Rarity.THREE_DIAMONDS_FOIL,
+        (c) => c.rarity === Rarity.ONE_DIAMOND_FOIL || c.rarity === Rarity.THREE_DIAMONDS_FOIL,
       );
 
       const probability = service.calculateNewCardProbability(
@@ -793,8 +781,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
     it('should calculate tradable card probabilities for four-card packs', () => {
       const cards = createTestCardsWithFoilRarities();
       const missingCards = cards.filter(
-        (c) =>
-          c.rarity === Rarity.ONE_DIAMOND_FOIL || c.rarity === Rarity.ONE_STAR,
+        (c) => c.rarity === Rarity.ONE_DIAMOND_FOIL || c.rarity === Rarity.ONE_STAR,
       );
 
       const probability = service.calculateNewTradableCardProbability(
@@ -838,9 +825,7 @@ describe('PokemonTcgPocketProbabilityService', () => {
 
       // Create a scenario where only normal pack rarities are missing
       const normalPackOnlyMissingCards = cards.filter(
-        (c) =>
-          c.rarity === Rarity.ONE_DIAMOND ||
-          c.rarity === Rarity.ONE_DIAMOND_FOIL,
+        (c) => c.rarity === Rarity.ONE_DIAMOND || c.rarity === Rarity.ONE_DIAMOND_FOIL,
       );
 
       const godPackProbability = service.calculateNewCardProbability(
@@ -997,26 +982,22 @@ describe('PokemonTcgPocketProbabilityService', () => {
       setup.setCount(Rarity.ONE_STAR, false, 5);
       setup.setCountIncludingSixPackOnly(Rarity.ONE_STAR, 5); // For undefined mode
       setup.setGodPackEligibleCount(20);
-      const probabilityWithGodPacks =
-        await service.calculateSingleCardProbability(
-          targetCard,
-          BOOSTER_ID,
-          BoosterProbabilitiesType.FIVE_CARDS,
-        );
+      const probabilityWithGodPacks = await service.calculateSingleCardProbability(
+        targetCard,
+        BOOSTER_ID,
+        BoosterProbabilitiesType.FIVE_CARDS,
+      );
 
       // Test without god packs (no god pack eligible cards)
       setup.setGodPackEligibleCount(0);
-      const probabilityWithoutGodPacks =
-        await service.calculateSingleCardProbability(
-          targetCard,
-          BOOSTER_ID,
-          BoosterProbabilitiesType.FIVE_CARDS,
-        );
+      const probabilityWithoutGodPacks = await service.calculateSingleCardProbability(
+        targetCard,
+        BOOSTER_ID,
+        BoosterProbabilitiesType.FIVE_CARDS,
+      );
 
       // Probability with god packs should be higher than without
-      expect(probabilityWithGodPacks).toBeGreaterThan(
-        probabilityWithoutGodPacks,
-      );
+      expect(probabilityWithGodPacks).toBeGreaterThan(probabilityWithoutGodPacks);
       // Only normal pack contribution
       expect(probabilityWithoutGodPacks).toBeCloseTo(0.0256, 4);
     });
@@ -1128,11 +1109,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
   describe('sixthCardFilterMode behavior', () => {
     describe('flag-based filtering (BabyAsPotentialSixthCardStrategy)', () => {
       it('should exclude isSixPackOnly cards from normal pack slots 1-5', async () => {
-        const testProbabilityRepository =
-          new PokemonTcgPocketProbabilityRepositoryFake();
-        const testSetup = setupRepositoryForProbabilityTests(
-          testProbabilityRepository,
-        );
+        const testProbabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(testProbabilityRepository);
         const TEST_BOOSTER_ID = 1;
         const testService = new PokemonTcgPocketProbabilityService(
           new FiveCardsWithoutShinyStrategy(),
@@ -1168,11 +1146,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
       });
 
       it('should exclude isSixPackOnly cards from god packs', async () => {
-        const testProbabilityRepository =
-          new PokemonTcgPocketProbabilityRepositoryFake();
-        const testSetup = setupRepositoryForProbabilityTests(
-          testProbabilityRepository,
-        );
+        const testProbabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(testProbabilityRepository);
         const TEST_BOOSTER_ID = 1;
         const testService = new PokemonTcgPocketProbabilityService(
           new FiveCardsWithoutShinyStrategy(),
@@ -1213,11 +1188,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
       });
 
       it('should include regular cards (not isSixPackOnly) in normal pack slots 1-5', async () => {
-        const testProbabilityRepository =
-          new PokemonTcgPocketProbabilityRepositoryFake();
-        const testSetup = setupRepositoryForProbabilityTests(
-          testProbabilityRepository,
-        );
+        const testProbabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(testProbabilityRepository);
         const TEST_BOOSTER_ID = 1;
         const testService = new PokemonTcgPocketProbabilityService(
           new FiveCardsWithoutShinyStrategy(),
@@ -1255,11 +1227,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
 
     describe('rarity-based filtering (ShinyAsPotentialSixthCardStrategy)', () => {
       it('should include isSixPackOnly cards in normal pack slots 1-5', async () => {
-        const testProbabilityRepository =
-          new PokemonTcgPocketProbabilityRepositoryFake();
-        const testSetup = setupRepositoryForProbabilityTests(
-          testProbabilityRepository,
-        );
+        const testProbabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(testProbabilityRepository);
         const TEST_BOOSTER_ID = 1;
         const targetCard: PokemonCardModel = {
           id: 1,
@@ -1297,11 +1266,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
       });
 
       it('should include isSixPackOnly cards in god packs', async () => {
-        const testProbabilityRepository =
-          new PokemonTcgPocketProbabilityRepositoryFake();
-        const testSetup = setupRepositoryForProbabilityTests(
-          testProbabilityRepository,
-        );
+        const testProbabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(testProbabilityRepository);
         const TEST_BOOSTER_ID = 1;
         const targetCard: PokemonCardModel = {
           id: 1,
@@ -1338,11 +1304,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
       });
 
       it('should calculate probability correctly when mixing regular and isSixPackOnly cards', async () => {
-        const testProbabilityRepository =
-          new PokemonTcgPocketProbabilityRepositoryFake();
-        const testSetup = setupRepositoryForProbabilityTests(
-          testProbabilityRepository,
-        );
+        const testProbabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(testProbabilityRepository);
         const TEST_BOOSTER_ID = 1;
         const regularCard: PokemonCardModel = {
           id: 1,
@@ -1377,19 +1340,17 @@ describe('PokemonTcgPocketProbabilityService', () => {
           new ShinyAsPotentialSixthCardStrategy(),
           testProbabilityRepository as unknown as PokemonTcgPocketProbabilityRepository,
         );
-        const regularProbability =
-          await testService.calculateSingleCardProbability(
-            regularCard,
-            TEST_BOOSTER_ID,
-            BoosterProbabilitiesType.SHINY_AS_POTENTIAL_SIXTH_CARD,
-          );
+        const regularProbability = await testService.calculateSingleCardProbability(
+          regularCard,
+          TEST_BOOSTER_ID,
+          BoosterProbabilitiesType.SHINY_AS_POTENTIAL_SIXTH_CARD,
+        );
 
-        const sixPackOnlyProbability =
-          await testService.calculateSingleCardProbability(
-            sixPackOnlyCard,
-            TEST_BOOSTER_ID,
-            BoosterProbabilitiesType.SHINY_AS_POTENTIAL_SIXTH_CARD,
-          );
+        const sixPackOnlyProbability = await testService.calculateSingleCardProbability(
+          sixPackOnlyCard,
+          TEST_BOOSTER_ID,
+          BoosterProbabilitiesType.SHINY_AS_POTENTIAL_SIXTH_CARD,
+        );
 
         // Both should have the same probability since flag is ignored
         // Both should be 1/15 of the slot weight
@@ -1401,11 +1362,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
 
     describe('undefined sixthCardFilterMode (strategies without sixth card)', () => {
       it('should ignore isSixPackOnly flag for four-card packs', async () => {
-        const testProbabilityRepository =
-          new PokemonTcgPocketProbabilityRepositoryFake();
-        const testSetup = setupRepositoryForProbabilityTests(
-          testProbabilityRepository,
-        );
+        const testProbabilityRepository = new PokemonTcgPocketProbabilityRepositoryFake();
+        const testSetup = setupRepositoryForProbabilityTests(testProbabilityRepository);
         const TEST_BOOSTER_ID = 1;
         const targetCard: PokemonCardModel = {
           id: 1,
