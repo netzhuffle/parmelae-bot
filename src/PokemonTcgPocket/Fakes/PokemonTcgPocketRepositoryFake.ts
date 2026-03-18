@@ -151,7 +151,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
   }
 
   /** Search for cards using various filters */
-  async searchCards(searchCriteria?: {
+  override searchCards = async (searchCriteria?: {
     cardName?: string;
     setName?: string;
     booster?: string;
@@ -160,7 +160,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     cardNumber?: number;
     userId?: bigint;
     ownershipFilter?: OwnershipFilter;
-  }): Promise<PokemonCardWithRelations[]> {
+  }): Promise<PokemonCardWithRelations[]> => {
     // Return all cards with their relationships
     // Apply only basic filtering to minimize business logic in fakes/tests
     let cards = Array.from(this.cards.values());
@@ -290,7 +290,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
         };
       }),
     );
-  }
+  };
 
   /** Adds a card to a user's collection */
   addCardToCollection(

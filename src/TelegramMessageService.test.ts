@@ -2,8 +2,8 @@ import { describe, beforeEach, it, expect } from 'bun:test';
 
 import * as Typegram from '@telegraf/types';
 
+import { normalizeUsername } from './BotIdentityContext.js';
 import type { BotConfig } from './ConfigInterfaces.js';
-import { ConfigFake } from './Fakes/ConfigFake.js';
 import { UserModel } from './generated/prisma/models/User.js';
 import { MessageStorageService } from './MessageStorageService.js';
 import { TelegramMessageService } from './TelegramMessageService.js';
@@ -20,22 +20,19 @@ describe('TelegramMessageService', () => {
 
   beforeEach(() => {
     mockMessageStorage = {} as MessageStorageService;
-    const configFake = new ConfigFake();
-    // Create a custom config with the username needed for these tests
     const primaryBot = {
       username: 'config_bot',
       telegramToken: 'fake-token',
       defaultIdentity: null,
     };
+    const bots = [primaryBot] as const;
     mockConfig = {
-      ...configFake,
       primaryBot,
-      bots: [primaryBot],
-      getBotByUsername: configFake.getBotByUsername.bind({
-        ...configFake,
-        primaryBot,
-        bots: [primaryBot],
-      }),
+      bots,
+      getBotByUsername: (username) => {
+        const normalized = normalizeUsername(username);
+        return bots.find((bot) => normalizeUsername(bot.username) === normalized);
+      },
     };
     service = new TelegramMessageService(mockMessageStorage, mockConfig);
   });

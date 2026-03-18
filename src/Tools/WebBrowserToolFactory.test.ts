@@ -73,7 +73,7 @@ describe('WebBrowserToolFactory', () => {
   test('should create WebBrowser tool without throwing errors', () => {
     const tool = factory.create();
     expect(tool).toBeDefined();
-    expectTypeOf(tool.invoke).toBeFunction();
+    expectTypeOf<typeof tool.invoke>().toBeFunction();
     expect(tool.name).toBe('web-browser');
   });
 
