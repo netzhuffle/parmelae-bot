@@ -42,22 +42,23 @@ export class ConversationService {
     validateBotIdentityContext(respondingBot);
     const historyMessages = await this.messageHistory.getHistory(messageId, messageCount);
 
-    const allMessages = [];
+    const allMessages = (
+      await Promise.all(
+        historyMessages.map(async (message) => {
+          if (this.shouldSkipMessage(message)) {
+            return [];
+          }
 
-    for (const message of historyMessages) {
-      if (this.shouldSkipMessage(message)) {
-        continue;
-      }
+          if (this.isAssistantMessage(message, respondingBot)) {
+            return this.processAssistantMessage(message);
+          }
 
-      if (this.isAssistantMessage(message, respondingBot)) {
-        const assistantMessages = this.processAssistantMessage(message);
-        allMessages.push(...assistantMessages);
-      } else {
-        const content = await this.buildMessageContent(message);
-        const userMessage = this.processUserMessage(message, content);
-        allMessages.push(userMessage);
-      }
-    }
+          const content = await this.buildMessageContent(message);
+          const userMessage = this.processUserMessage(message, content);
+          return [userMessage];
+        }),
+      )
+    ).flat();
 
     return new Conversation(allMessages);
   }

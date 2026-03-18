@@ -240,7 +240,13 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
             throw new Error(`Set with key ${setKey} not found`);
           }
           return {
-            ...card,
+            id: card.id,
+            name: card.name,
+            setId: card.setId,
+            number: card.number,
+            rarity: card.rarity,
+            isSixPackOnly: card.isSixPackOnly,
+            godPackBoosterId: card.godPackBoosterId,
             set: setByKey,
             boosters: this.getCardBoosters(card.id),
             ownership: Array.from(this.cardOwners.get(card.id) ?? []).map((userId) => ({
@@ -283,7 +289,13 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
           };
         });
         return {
-          ...card,
+          id: card.id,
+          name: card.name,
+          setId: card.setId,
+          number: card.number,
+          rarity: card.rarity,
+          isSixPackOnly: card.isSixPackOnly,
+          godPackBoosterId: card.godPackBoosterId,
           set,
           boosters,
           ownership,

@@ -16,7 +16,8 @@
     "builtin": true
   },
   "categories": {
-    "suspicious": "error"
+    "suspicious": "error",
+    "perf": "error"
   },
   "rules": {
     "for-direction": "error",
@@ -47,6 +48,7 @@
     "no-prototype-builtins": "error",
     "no-regex-spaces": "error",
     "no-self-assign": "error",
+    "no-await-in-loop": "off",
     "no-shadow": "error",
     "no-shadow-restricted-names": "error",
     "no-sparse-arrays": "error",

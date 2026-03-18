@@ -299,18 +299,18 @@ function extractSetName(source: string): string {
   }
 
   // Fall back to first section heading, skipping common section names
-  const skipHeadings = [
+  const skipHeadings = new Set([
     'Kartenliste',
     'Erscheinungsraten',
     'Boosterpacks',
     'In anderen Sprachen',
     'Inhaltsverzeichnis',
-  ];
+  ]);
   const allHeadings = source.matchAll(/^==\s*([^=]+?)\s*==/gm);
 
   for (const headingMatch of allHeadings) {
     const heading = headingMatch[1]?.trim();
-    if (heading && !skipHeadings.includes(heading)) {
+    if (heading && !skipHeadings.has(heading)) {
       return heading;
     }
   }

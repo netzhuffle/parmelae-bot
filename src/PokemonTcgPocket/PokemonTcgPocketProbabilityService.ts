@@ -472,22 +472,27 @@ export class PokemonTcgPocketProbabilityService {
     boosterId: number,
     strategy: PackProbabilityStrategy,
   ): Promise<number> {
-    let probabilityNoTarget = 1.0;
+    const slotProbabilities = await Promise.all(
+      Array.from({ length: strategy.cardsPerPack }, (_, index) => index + 1).map(async (slot) => {
+        const distribution =
+          strategy.slotDistributions[slot as keyof typeof strategy.slotDistributions];
+        if (!distribution) {
+          throw new Error(`Slot ${slot} not defined for strategy`);
+        }
 
-    for (let slot = 1; slot <= strategy.cardsPerPack; slot++) {
-      const distribution =
-        strategy.slotDistributions[slot as keyof typeof strategy.slotDistributions];
-      if (!distribution) {
-        throw new Error(`Slot ${slot} not defined for strategy`);
-      }
-      const slotProb = await this.calculateSlotProbabilityFromDistribution(
-        targetCard,
-        distribution,
-        boosterId,
-        strategy,
-      );
-      probabilityNoTarget *= 1.0 - slotProb;
-    }
+        return this.calculateSlotProbabilityFromDistribution(
+          targetCard,
+          distribution,
+          boosterId,
+          strategy,
+        );
+      }),
+    );
+
+    const probabilityNoTarget = slotProbabilities.reduce(
+      (currentProbability, slotProbability) => currentProbability * (1.0 - slotProbability),
+      1.0,
+    );
 
     return 1.0 - probabilityNoTarget;
   }

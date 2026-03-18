@@ -48,14 +48,18 @@ export class ToolResponsePersistenceNodeFactory {
       }
 
       // Persist tool responses to ToolMessage table
-      for (const toolMsg of newToolMessages) {
-        await this.toolMessageRepository.store({
-          toolCallId: toolMsg.tool_call_id,
-          text:
-            typeof toolMsg.content === 'string' ? toolMsg.content : JSON.stringify(toolMsg.content),
-          messageId: announcementMessageId,
-        });
-      }
+      await Promise.all(
+        newToolMessages.map((toolMsg) =>
+          this.toolMessageRepository.store({
+            toolCallId: toolMsg.tool_call_id,
+            text:
+              typeof toolMsg.content === 'string'
+                ? toolMsg.content
+                : JSON.stringify(toolMsg.content),
+            messageId: announcementMessageId,
+          }),
+        ),
+      );
 
       return {};
     };
