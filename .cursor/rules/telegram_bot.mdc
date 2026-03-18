@@ -9,10 +9,10 @@ alwaysApply: false
 
 - **Entry Point Pattern:**
   ```typescript
-  // src/index.ts loads Inversify DI container
-  const container = new Container();
-  // Load services, repositories, and tools
-  const bot = container.get<Bot>(TYPES.Bot);
+  // src/index.ts loads the shared Inversify container
+  import container from './inversify.config.js';
+
+  const bot = await container.getAsync(Bot);
   bot.start();
   ```
 
@@ -123,25 +123,15 @@ alwaysApply: false
 
 - **Tools in Services:**
   ```typescript
-  // Tools under /src/Tools used by Services for AI/LLM integrations
   @injectable()
-  export class ChatGptService {
+  export class ChatGptAgentService {
     constructor(
-      private readonly tools: Tool[],
       private readonly agentStateGraphFactory: AgentStateGraphFactory
     ) {}
   }
   ```
 
-- **Tool Factory Pattern:**
-  ```typescript
-  @injectable()
-  export class SomeToolFactory {
-    create(chatId: bigint): SomeTool {
-      return new SomeTool(this.dependencies, chatId);
-    }
-  }
-  ```
+- **Tool dependencies** should flow through `ToolContext` and `getToolContext(config)` instead of ad hoc factory classes.
 
 ## Error Handling and Monitoring
 
@@ -167,19 +157,17 @@ alwaysApply: false
 
 - **Container Setup:**
   ```typescript
-  // inversify.config.ts wires up all classes and constants
-  container.bind<Bot>(TYPES.Bot).to(Bot);
-  container.bind<MessageRepository>(TYPES.MessageRepository).to(MessageRepository);
-  container.bind<ChatGptService>(TYPES.ChatGptService).to(ChatGptService);
-  ```
+  // inversify.config.ts relies on autobind for injectable classes
+  const container = new Container({
+    defaultScope: 'Singleton',
+    autobind: true,
+  });
 
-- **Type Constants:**
-  ```typescript
-  export const TYPES = {
-    Bot: Symbol.for('Bot'),
-    MessageRepository: Symbol.for('MessageRepository'),
-    // ... other type symbols
-  } as const;
+  // Explicit bindings are for dynamic values and symbols
+  container.bind(POKEMON_TCGP_YAML_SYMBOL).toDynamicValue(async () => {
+    const { default: sets } = await import('../resources/tcgpcards.yaml');
+    return sets;
+  });
   ```
 
 ## Testing Patterns
@@ -211,6 +199,7 @@ alwaysApply: false
 - ❌ **DON'T:** Put business logic in Bot class
 - ❌ **DON'T:** Directly access Telegram API outside TelegramService
 - ❌ **DON'T:** Skip dependency injection for testability
+- ❌ **DON'T:** Reintroduce tool factory classes for LangChain tools
 - ❌ **DON'T:** Handle errors silently without logging
 
 - ✅ **DO:** Use strategy pattern for different message types

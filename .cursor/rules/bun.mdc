@@ -26,7 +26,7 @@ bunx task-master
 bun src/index.ts
 
 # ✅ DO: Use bun run for package.json scripts
-bun run typecheck
+bun run format
 bun run checks
 ```
 
@@ -115,4 +115,4 @@ const octokit = new Octokit(); // GitHub API
 - 🔧 **Simpler config** - Built-in TypeScript, environment loading
 - ⚡ **Better DX** - Native shell operations, unified toolchain
 
-See [testing.mdc](mdc:.cursor/rules/testing.mdc) for Bun testing patterns and [core.mdc](mdc:.cursor/rules/core.mdc) for general development workflow integration.
+See [testing.mdc](mdc:.cursor/rules/testing.mdc) for Bun testing patterns and [core.mdc](mdc:.cursor/rules/core.mdc) for general project standards.

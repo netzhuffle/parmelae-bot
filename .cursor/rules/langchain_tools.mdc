@@ -46,7 +46,7 @@ alwaysApply: false
       // Implementation here
     },
     {
-      name: 'toolName',           // camelCase, descriptive
+      name: 'tool-name',          // kebab-case, descriptive
       description: 'Clear description of what this tool does and when to use it.',
       schema,                     // Zod schema defined above
     },
@@ -108,7 +108,6 @@ alwaysApply: false
   @injectable()
   export class ChatGptAgentService {
     private readonly tools: (StructuredTool | Tool)[] = [
-      new Calculator(),
       diceTool,
       myNewTool, // <-- Add your tool here
       pokemonCardAddTool,

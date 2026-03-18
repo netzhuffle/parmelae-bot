@@ -105,28 +105,9 @@ Cards in Pokémon TCG Pocket sets are typically organized by rarity:
 
 ## **Service Integration Requirements**
 
-### **Update SET_KEY_VALUES and SET_KEY_NAMES**
-```typescript
-// In PokemonTcgPocketService.ts
-export const SET_KEY_VALUES = [
-  'A1', 'A1a', 'A2', 'A2a', 'A2b', 'A3', 'A3a', 'A3b', 'A4', 'A4a',
-  'NEW_SET_KEY', // Add new set key
-  'PROMO-A',
-] as const;
-
-export const SET_KEY_NAMES: Record<SetKey, string> = {
-  // ... existing mappings
-  'NEW_SET_KEY': 'New Set Name',
-};
-```
-
-### **Update BOOSTER_VALUES**
-```typescript
-export const BOOSTER_VALUES = [
-  // ... existing boosters
-  'New Booster Name', // Add if multi-booster set
-] as const;
-```
+- `SET_DEFINITIONS` in `PokemonTcgPocketService.ts` is the source of truth for set keys, set names, boosters, and probability strategy selection.
+- `SET_KEY_VALUES`, `SET_KEY_NAMES`, `BOOSTER_VALUES`, and `SET_PROBABILITY_STRATEGY` are derived from `SET_DEFINITIONS`.
+- When adding or changing a set, update `SET_DEFINITIONS` and keep the YAML data consistent with it instead of hand-editing derived exports.
 
 ## **Validation Checklist**
 
@@ -134,7 +115,7 @@ export const BOOSTER_VALUES = [
 - **✅ Card Numbering**: Sequential numbering starting from 1
 - **✅ Rarity Symbols**: Proper Unicode symbols, not ASCII alternatives
 - **✅ Ex Card Names**: Space before "ex", not hyphen
-- **✅ Service Constants**: Updated SET_KEY_VALUES, SET_KEY_NAMES, and BOOSTER_VALUES
+- **✅ Service Metadata**: Updated `SET_DEFINITIONS` and kept derived exports consistent
 - **✅ YAML Syntax**: Proper indentation (2 spaces), no tabs
 - **✅ Card Count**: Matches expected total for the set
 - **✅ Booster Consistency**: Card-level boosters match set-level boosters (for multi-booster sets)
@@ -145,15 +126,13 @@ export const BOOSTER_VALUES = [
 - ❌ **DON'T**: Use hyphens in ex card names ("Papungha-ex" → "Papungha ex")
 - ❌ **DON'T**: Use ASCII apostrophes or quotes in card names
 - ❌ **DON'T**: Mix single booster strings with booster arrays inconsistently
-- ❌ **DON'T**: Forget to update service constants after adding YAML data
+- ❌ **DON'T**: Forget to update `SET_DEFINITIONS` after adding YAML data
 - ❌ **DON'T**: Use wrong rarity symbols (check Unicode characters)
 
 ## **Testing After Addition**
 
 1. **Format Check**: `bun run format && bun run schema-format`
-2. **Type Check**: `bun run typecheck && bun run typecheck-all`
-3. **Lint Check**: `bun run lint && bun run validate-yaml`
-4. **Test Suite**: `bun test`
+2. **Full Validation**: `bun run checks`
 
 All checks must pass before considering the set addition complete.
 
@@ -173,11 +152,10 @@ All checks must pass before considering the set addition complete.
          boosters: Booster1
    ```
 
-2. **Update Service Constants**:
+2. **Update Service Metadata**:
    ```typescript
-   // Add 'A5' to SET_KEY_VALUES
-   // Add 'A5': 'New Set Name' to SET_KEY_NAMES  
-   // Add 'Booster1', 'Booster2' to BOOSTER_VALUES
+   // Add A5 to SET_DEFINITIONS
+   // Derived exports will update automatically
    ```
 
 3. **Run Full Check Sequence**
