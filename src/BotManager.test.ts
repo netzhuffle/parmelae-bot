@@ -3,29 +3,26 @@ import { BotManager } from './BotManager.js';
 import { Config } from './Config.js';
 import { Telegraf } from 'telegraf';
 
+function resetTestEnv(): void {
+  Object.keys(Bun.env).forEach((key) => {
+    delete Bun.env[key];
+  });
+
+  Bun.env.OPENAI_API_KEY = 'test-openai-key';
+  Bun.env.HELICONE_API_KEY = 'test-helicone-key';
+  Bun.env.GITHUB_PERSONAL_ACCESS_TOKEN = 'test-github-token';
+  Bun.env.SERPAPI_API_KEY = 'test-serpapi-key';
+  Bun.env.CHAT_ALLOWLIST = '123,456';
+  Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS = '789';
+  Bun.env.USERNAME = 'primarybot';
+  Bun.env.TELEGRAM_TOKEN = 'primary-token';
+}
+
 describe('BotManager', () => {
-  const originalEnv = { ...Bun.env };
   let config: Config;
 
   beforeEach(() => {
-    // Reset environment to original state
-    Object.keys(Bun.env).forEach((key) => {
-      delete Bun.env[key];
-    });
-    Object.assign(Bun.env, originalEnv);
-
-    // Set required environment variables
-    Bun.env.OPENAI_API_KEY = 'test-openai-key';
-    Bun.env.HELICONE_API_KEY = 'test-helicone-key';
-    Bun.env.GITHUB_PERSONAL_ACCESS_TOKEN = 'test-github-token';
-    Bun.env.SERPAPI_API_KEY = 'test-serpapi-key';
-    Bun.env.CHAT_ALLOWLIST = '123,456';
-    Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS = '789';
-
-    // Set primary bot
-    Bun.env.USERNAME = 'primarybot';
-    Bun.env.TELEGRAM_TOKEN = 'primary-token';
-
+    resetTestEnv();
     config = new Config();
   });
 

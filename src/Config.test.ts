@@ -1,23 +1,22 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
 import { Config } from './Config.js';
 
+function resetTestEnv(): void {
+  Object.keys(Bun.env).forEach((key) => {
+    delete Bun.env[key];
+  });
+
+  Bun.env.OPENAI_API_KEY = 'test-openai-key';
+  Bun.env.HELICONE_API_KEY = 'test-helicone-key';
+  Bun.env.GITHUB_PERSONAL_ACCESS_TOKEN = 'test-github-token';
+  Bun.env.SERPAPI_API_KEY = 'test-serpapi-key';
+  Bun.env.CHAT_ALLOWLIST = '123,456';
+  Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS = '789';
+}
+
 describe('Config', () => {
-  const originalEnv = { ...Bun.env };
-
   beforeEach(() => {
-    // Reset environment to original state
-    Object.keys(Bun.env).forEach((key) => {
-      delete Bun.env[key];
-    });
-    Object.assign(Bun.env, originalEnv);
-
-    // Set required environment variables
-    Bun.env.OPENAI_API_KEY = 'test-openai-key';
-    Bun.env.HELICONE_API_KEY = 'test-helicone-key';
-    Bun.env.GITHUB_PERSONAL_ACCESS_TOKEN = 'test-github-token';
-    Bun.env.SERPAPI_API_KEY = 'test-serpapi-key';
-    Bun.env.CHAT_ALLOWLIST = '123,456';
-    Bun.env.NEW_COMMITS_ANNOUNCEMENT_CHATS = '789';
+    resetTestEnv();
   });
 
   describe('primary bot configuration', () => {
