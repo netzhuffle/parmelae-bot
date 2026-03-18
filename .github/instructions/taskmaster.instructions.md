@@ -1,12 +1,11 @@
 ---
 description: Comprehensive reference for Taskmaster MCP tools and CLI commands.
-globs: **/*
-alwaysApply: true
+applyTo: "**/*"
 ---
 
 # Taskmaster Tool & Command Reference
 
-This document provides a detailed reference for interacting with Taskmaster, covering both the recommended MCP tools, suitable for integrations like Cursor, and the corresponding `task-master` CLI commands, designed for direct user interaction or fallback.
+This document provides a detailed reference for interacting with Taskmaster, covering both the recommended MCP tools, suitable for integrations like VS Code, and the corresponding `task-master` CLI commands, designed for direct user interaction or fallback.
 
 **Note:** For interacting with Taskmaster programmatically or via integrated tools, using the **MCP tools is strongly recommended** due to better performance, structured data, and error handling. The CLI commands serve as a user-friendly alternative and fallback. 
 
@@ -38,7 +37,7 @@ This document provides a detailed reference for interacting with Taskmaster, cov
     *   `skipInstall`: `Skip installing dependencies. Default is false.` (CLI: `--skip-install`)
     *   `addAliases`: `Add shell aliases tm, taskmaster, hamster, and ham. Default is false.` (CLI: `--aliases`)
     *   `yes`: `Skip prompts and use defaults/provided arguments. Default is false.` (CLI: `-y, --yes`)
-*   **Usage:** Run this once at the beginning of a new project, typically via an integrated tool like Cursor. Operates on the current working directory of the MCP server. 
+*   **Usage:** Run this once at the beginning of a new project, typically via an integrated tool like VS Code. Operates on the current working directory of the MCP server. 
 *   **Important:** Once complete, you *MUST* parse a prd in order to generate tasks. There will be no tasks files until then. The next step after initializing should be to create a PRD using the example PRD in .taskmaster/templates/example_prd.txt. 
 *   **Tagging:** Use the `--tag` option to parse the PRD into a specific, non-default tag context. If the tag doesn't exist, it will be created automatically. Example: `task-master parse-prd spec.txt --tag=new-feature`.
 
@@ -552,7 +551,7 @@ Environment variables are used **only** for sensitive API keys related to AI pro
     *   `AZURE_OPENAI_ENDPOINT`
     *   `OLLAMA_BASE_URL` (Default: `http://localhost:11434/api`)
 
-**Set API keys** in your **`.env`** file in the project root (for CLI use) or within the `env` section of your **`.cursor/mcp.json`** file (for MCP/Cursor integration). All other settings (model choice, max tokens, temperature, log level, custom endpoints) are managed in `.taskmaster/config.json` via `task-master models` command or `models` MCP tool.
+**Set API keys** in your **`.env`** file in the project root (for CLI use) or within the `env` section of your **`.vscode/mcp.json`** file (for MCP/VS Code integration). All other settings (model choice, max tokens, temperature, log level, custom endpoints) are managed in `.taskmaster/config.json` via `task-master models` command or `models` MCP tool.
 
 ---
 
@@ -566,8 +565,8 @@ Default: `core` (7 tools). Set via `TASK_MASTER_TOOLS` env var in MCP config.
 | `standard` | 14 | core + `initialize_project`, `analyze_project_complexity`, `expand_all`, `add_subtask`, `remove_task`, `add_task`, `complexity_report` |
 | `all` | 44+ | standard + dependencies, tags, research, autopilot, scoping, models, rules |
 
-**Upgrade when tool unavailable:** Edit MCP config (`.cursor/mcp.json`, `.mcp.json`, or `.vscode/mcp.json`), change `TASK_MASTER_TOOLS` from `"core"` to `"standard"` or `"all"`, restart MCP.
+**Upgrade when tool unavailable:** Edit MCP config (`.vscode/mcp.json`, `.mcp.json`, or `.vscode/mcp.json`), change `TASK_MASTER_TOOLS` from `"core"` to `"standard"` or `"all"`, restart MCP.
 
 ---
 
-For details on how these commands fit into the development process, see the [dev_workflow.mdc](mdc:.cursor/rules/taskmaster/dev_workflow.mdc).
+For details on how these commands fit into the development process, see the [dev_workflow.instructions.md](.github/instructions/dev_workflow.instructions.md).
