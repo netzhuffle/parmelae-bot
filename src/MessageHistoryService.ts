@@ -82,7 +82,7 @@ export class MessageHistoryService {
     // Add any tool call messages that this message is based on
     if (message.toolCallMessages.length > 0) {
       // Sort tool call messages by ID to ensure chronological order
-      const sortedToolCallMessages = [...message.toolCallMessages].sort((a, b) => a.id - b.id);
+      const sortedToolCallMessages = message.toolCallMessages.toSorted((a, b) => a.id - b.id);
 
       // Add each tool call message to the expanded list
       expandedMessages.push(...sortedToolCallMessages);

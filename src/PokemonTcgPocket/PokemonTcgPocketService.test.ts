@@ -386,7 +386,7 @@ describe('PokemonTcgPocketService', () => {
         // Verify boosters were created
         const boosters = repository.getAllBoosters();
         expect(boosters).toHaveLength(2);
-        expect(boosters.map((b) => b.name).sort()).toEqual(['Booster1', 'Booster2']);
+        expect(boosters.map((b) => b.name).toSorted()).toEqual(['Booster1', 'Booster2']);
 
         // Verify cards were created
         const cards = repository.getAllCards();
@@ -402,7 +402,7 @@ describe('PokemonTcgPocketService', () => {
         const card2 = cards.find((c) => c.name === 'Test Card 2')!;
         const card2Boosters = repository.getCardBoosters(card2.id);
         expect(card2Boosters).toHaveLength(2);
-        expect(card2Boosters.map((b) => b.name).sort()).toEqual(['Booster1', 'Booster2']);
+        expect(card2Boosters.map((b) => b.name).toSorted()).toEqual(['Booster1', 'Booster2']);
       });
     });
 
@@ -430,7 +430,7 @@ describe('PokemonTcgPocketService', () => {
         // Verify sets were created
         const sets = repository.getAllSets();
         expect(sets).toHaveLength(2);
-        expect(sets.map((s) => s.name).sort()).toEqual(['First Set', 'Second Set']);
+        expect(sets.map((s) => s.name).toSorted()).toEqual(['First Set', 'Second Set']);
 
         // Verify first set has default booster
         const set1 = sets.find((s) => s.name === 'First Set')!;
@@ -493,7 +493,7 @@ describe('PokemonTcgPocketService', () => {
       const cardInAll = cards.find((c) => c.name === 'Card In All Boosters')!;
       const cardInAllBoosters = repository.getCardBoosters(cardInAll.id);
       expect(cardInAllBoosters).toHaveLength(3);
-      expect(cardInAllBoosters.map((b) => b.name).sort()).toEqual([
+      expect(cardInAllBoosters.map((b) => b.name).toSorted()).toEqual([
         'Booster1',
         'Booster2',
         'Booster3',

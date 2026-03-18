@@ -40,7 +40,7 @@ export class MessageRepositoryFake {
 
     const messagesInChat = this.messages
       .filter((m) => m.chatId === chatId && m.id < beforeMessageId)
-      .sort((a, b) => b.id - a.id);
+      .toSorted((a, b) => b.id - a.id);
 
     return Promise.resolve(messagesInChat[0] ?? null);
   }

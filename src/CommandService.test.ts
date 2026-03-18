@@ -48,7 +48,11 @@ describe('CommandService', () => {
       replyToMessage: messageToReplyTo,
     };
     replyGenerator.generate = mock(
-      async (message: MessageModel, announceToolCall: (text: string) => Promise<number | null>) => {
+      async (
+        replyTarget: MessageModel,
+        announceToolCall: (text: string) => Promise<number | null>,
+      ) => {
+        expect(replyTarget.id).toBe(messageToReplyTo.id);
         const messageId = await announceToolCall('Using tool X');
         expect(messageId).toBeNull(); // Should return null since no message is stored
         return {

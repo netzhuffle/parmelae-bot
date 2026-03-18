@@ -117,15 +117,19 @@ export const pokemonCardAddTool = tool(
     let filteredCards = cards;
     if (operation === 'add') {
       // Filter for missing OR not_needed cards (allows upgrading not_needed to owned)
-      filteredCards = cards.filter((card) => {
-        const userOwnership = card.ownership.find((ownership) => ownership.userId === userId);
+      filteredCards = cards.filter((candidateCard) => {
+        const userOwnership = candidateCard.ownership.find(
+          (ownership) => ownership.userId === userId,
+        );
         return !userOwnership || userOwnership.status === OwnershipStatus.NOT_NEEDED;
       });
     } else if (operation === 'remove') {
       // Filter for owned OR not_needed cards (allows removing both states)
       // Note: Partial removal is allowed - we only act on cards the user can actually remove
-      filteredCards = cards.filter((card) => {
-        const userOwnership = card.ownership.find((ownership) => ownership.userId === userId);
+      filteredCards = cards.filter((candidateCard) => {
+        const userOwnership = candidateCard.ownership.find(
+          (ownership) => ownership.userId === userId,
+        );
         return (
           userOwnership &&
           (userOwnership.status === OwnershipStatus.OWNED ||
@@ -160,8 +164,8 @@ export const pokemonCardAddTool = tool(
       // Check if any cards are owned (could happen through fallback search)
       // Note: Cards already marked as NOT_NEEDED are allowed and treated idempotently
       const displayName = await service.getDisplayName(userId);
-      const ownedCards = filteredCards.filter((card) =>
-        card.ownership.some(
+      const ownedCards = filteredCards.filter((candidateCard) =>
+        candidateCard.ownership.some(
           (ownership) => ownership.userId === userId && ownership.status === OwnershipStatus.OWNED,
         ),
       );

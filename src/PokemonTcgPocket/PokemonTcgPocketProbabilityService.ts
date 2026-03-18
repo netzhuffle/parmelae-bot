@@ -395,10 +395,8 @@ export class PokemonTcgPocketProbabilityService {
 
       if (strategy.sixthCardFilterMode === 'flag-based') {
         // Filter by isSixPackOnly flag
-        allCards = boosterCards.filter((c) => c.isSixPackOnly === true && c.rarity === rarity);
-        missingCardsInRarity = missingCards.filter(
-          (c) => c.isSixPackOnly === true && c.rarity === rarity,
-        );
+        allCards = boosterCards.filter((c) => c.isSixPackOnly && c.rarity === rarity);
+        missingCardsInRarity = missingCards.filter((c) => c.isSixPackOnly && c.rarity === rarity);
       } else {
         // rarity-based: Use all cards of this rarity
         allCards = boosterCards.filter((c) => c.rarity === rarity);

@@ -150,6 +150,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
     ];
     return node({ messages, toolExecution: {}, toolCallMessageIds: [] }).then(() => {
       expect(announceToolCall).toHaveBeenCalledWith('[TestTool]');
+      return undefined;
     });
   });
 

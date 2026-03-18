@@ -657,7 +657,7 @@ export class PokemonTcgPocketService {
             })
             .filter((booster): booster is NonNullable<typeof booster> => booster !== null),
         )
-        .sort((a, b) => b.newCardProbability - a.newCardProbability),
+        .toSorted((a, b) => b.newCardProbability - a.newCardProbability),
     };
   }
 

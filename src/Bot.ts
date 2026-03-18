@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import * as Typegram from '@telegraf/types';
 import { injectable } from 'inversify';
-import { message } from 'telegraf/filters';
+import { message as messageFilter } from 'telegraf/filters';
 
 import { BotManager } from './BotManager.js';
 import { Config } from './Config.js';
@@ -33,7 +33,7 @@ export class Bot {
   /** Sets the handler to listen to messages. */
   start(): void {
     const primaryTelegraf = this.botManager.getPrimaryBot();
-    primaryTelegraf.on(message(), (context) => {
+    primaryTelegraf.on(messageFilter(), (context) => {
       this.handleMessage(context.message).catch(ErrorService.log);
     });
     primaryTelegraf.catch(ErrorService.log);
@@ -42,6 +42,7 @@ export class Bot {
       .then(() => primaryTelegraf.telegram.getMyName())
       .then((me) => {
         assert(me.name === this.config.primaryBot.username);
+        return undefined;
       })
       .catch(ErrorService.log);
     this.messageStorage.startDailyDeletion(this.oldMessageReplyService);
@@ -59,8 +60,8 @@ export class Bot {
     if (!this.messageService.isSupported(telegramMessage)) {
       return;
     }
-    const message = await this.messageService.store(telegramMessage);
-    const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(message);
-    return replyStrategy.handle(message);
+    const storedMessage = await this.messageService.store(telegramMessage);
+    const replyStrategy = this.replyStrategyFinder.getHandlingStrategy(storedMessage);
+    return replyStrategy.handle(storedMessage);
   }
 }

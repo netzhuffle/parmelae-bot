@@ -317,8 +317,8 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     const set = Array.from(this.sets.values()).find((s) => s.id === card.setId)!;
     const boosters = this.getCardBoosters(card.id);
     const ownership = Array.from(owners).map((ownerId) => {
-      const statusKey = `${card.id}_${ownerId}`;
-      const ownershipStatus = this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+      const ownerStatusKey = `${card.id}_${ownerId}`;
+      const ownershipStatus = this.cardOwnershipStatus.get(ownerStatusKey) ?? OwnershipStatus.OWNED;
       return {
         id: this.nextId++,
         cardId: card.id,
@@ -365,7 +365,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     });
 
     // Return just the card IDs, sorted by number
-    const cardIds = filteredCards.sort((a, b) => a.number - b.number).map((card) => card.id);
+    const cardIds = filteredCards.toSorted((a, b) => a.number - b.number).map((card) => card.id);
 
     return Promise.resolve(cardIds);
   }
@@ -397,8 +397,9 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       const set = Array.from(this.sets.values()).find((s) => s.id === card.setId)!;
       const boosters = this.getCardBoosters(card.id);
       const ownership = Array.from(owners).map((ownerId) => {
-        const statusKey = `${card.id}_${ownerId}`;
-        const ownershipStatus = this.cardOwnershipStatus.get(statusKey) ?? OwnershipStatus.OWNED;
+        const ownerStatusKey = `${card.id}_${ownerId}`;
+        const ownershipStatus =
+          this.cardOwnershipStatus.get(ownerStatusKey) ?? OwnershipStatus.OWNED;
         return {
           id: this.nextId++,
           cardId: card.id,
@@ -426,7 +427,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
     }
 
     return Promise.resolve(
-      result.sort((a, b) => a.set.key.localeCompare(b.set.key) || a.number - b.number),
+      result.toSorted((a, b) => a.set.key.localeCompare(b.set.key) || a.number - b.number),
     );
   }
 

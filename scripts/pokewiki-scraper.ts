@@ -104,7 +104,7 @@ function validatePokewikiUrl(url: string): void {
     }
   } catch (error) {
     if (error instanceof TypeError) {
-      throw new Error(`Invalid URL format: ${url}`);
+      throw new Error(`Invalid URL format: ${url}`, { cause: error });
     }
     throw error;
   }
@@ -610,7 +610,7 @@ export async function parseSet(url: string): Promise<ParsedSet> {
   }
 
   // Sort cards by number
-  const sortedCards = Object.values(cards).sort((a, b) => a.number - b.number);
+  const sortedCards = Object.values(cards).toSorted((a, b) => a.number - b.number);
 
   return {
     setId,

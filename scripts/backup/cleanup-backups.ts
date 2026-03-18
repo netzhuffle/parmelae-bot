@@ -51,7 +51,7 @@ async function getBackupFiles(): Promise<BackupFile[]> {
     );
 
     // Sort by creation time (newest first)
-    return fileStats.sort((a, b) => b.created.getTime() - a.created.getTime());
+    return fileStats.toSorted((a, b) => b.created.getTime() - a.created.getTime());
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('❌ Error reading backup directory:', errorMessage);
