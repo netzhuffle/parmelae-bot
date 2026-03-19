@@ -9,19 +9,19 @@ describe('DateTimeSettingRepository', () => {
   let findUniqueMock: ReturnType<typeof mock>;
   let createMock: ReturnType<typeof mock>;
   let updateMock: ReturnType<typeof mock>;
-  let updateManyMock: ReturnType<typeof mock>;
+  let upsertMock: ReturnType<typeof mock>;
 
   beforeEach(() => {
     findUniqueMock = mock();
     createMock = mock();
     updateMock = mock();
-    updateManyMock = mock();
+    upsertMock = mock();
     prisma = {
       dateTimeSetting: {
         findUnique: findUniqueMock,
         create: createMock,
         update: updateMock,
-        updateMany: updateManyMock,
+        upsert: upsertMock,
       },
     } as unknown as PrismaClient;
     repository = new DateTimeSettingRepository(prisma);
@@ -100,19 +100,22 @@ describe('DateTimeSettingRepository', () => {
         setting: 'test-setting',
         dateTime: oldDate,
       });
-      updateManyMock.mockResolvedValue({
-        count: 1,
+      upsertMock.mockResolvedValue({
+        setting: 'test-setting',
+        dateTime: newDate,
       });
 
       await repository.update('test-setting', newDate);
 
-      expect(updateManyMock).toHaveBeenCalledWith({
+      expect(upsertMock).toHaveBeenCalledWith({
         where: {
           setting: 'test-setting',
-          dateTime: oldDate,
         },
-        data: {
+        create: {
           setting: 'test-setting',
+          dateTime: newDate,
+        },
+        update: {
           dateTime: newDate,
         },
       });
@@ -129,7 +132,7 @@ describe('DateTimeSettingRepository', () => {
 
       await repository.update('test-setting', newDate);
 
-      expect(updateManyMock).not.toHaveBeenCalled();
+      expect(upsertMock).not.toHaveBeenCalled();
     });
 
     it('should throw error when newDate is invalid', async () => {
@@ -149,16 +152,24 @@ describe('DateTimeSettingRepository', () => {
         setting: 'test-setting',
         dateTime: invalidOldDate,
       });
-      updateMock.mockResolvedValue({
+      upsertMock.mockResolvedValue({
         setting: 'test-setting',
         dateTime: newDate,
       });
 
       await repository.update('test-setting', newDate);
 
-      expect(updateMock).toHaveBeenCalledWith({
-        where: { setting: 'test-setting' },
-        data: { dateTime: newDate },
+      expect(upsertMock).toHaveBeenCalledWith({
+        where: {
+          setting: 'test-setting',
+        },
+        create: {
+          setting: 'test-setting',
+          dateTime: newDate,
+        },
+        update: {
+          dateTime: newDate,
+        },
       });
     });
 
@@ -166,16 +177,53 @@ describe('DateTimeSettingRepository', () => {
       const newDate = new Date('2025-11-17T10:00:00.000Z');
 
       findUniqueMock.mockResolvedValue(null);
-      updateMock.mockResolvedValue({
+      upsertMock.mockResolvedValue({
         setting: 'test-setting',
         dateTime: newDate,
       });
 
       await repository.update('test-setting', newDate);
 
-      expect(updateMock).toHaveBeenCalledWith({
-        where: { setting: 'test-setting' },
-        data: { dateTime: newDate },
+      expect(upsertMock).toHaveBeenCalledWith({
+        where: {
+          setting: 'test-setting',
+        },
+        create: {
+          setting: 'test-setting',
+          dateTime: newDate,
+        },
+        update: {
+          dateTime: newDate,
+        },
+      });
+    });
+
+    it('should overwrite the stored date even when the previous timestamp cannot be used as a fingerprint', async () => {
+      const oldDate = new Date('2026-03-19T01:00:00.000Z');
+      const newDate = new Date('2026-03-19T02:00:00.000Z');
+
+      findUniqueMock.mockResolvedValue({
+        setting: 'last commit DateTime',
+        dateTime: oldDate,
+      });
+      upsertMock.mockResolvedValue({
+        setting: 'last commit DateTime',
+        dateTime: newDate,
+      });
+
+      await repository.update('last commit DateTime', newDate);
+
+      expect(upsertMock).toHaveBeenCalledWith({
+        where: {
+          setting: 'last commit DateTime',
+        },
+        create: {
+          setting: 'last commit DateTime',
+          dateTime: newDate,
+        },
+        update: {
+          dateTime: newDate,
+        },
       });
     });
   });

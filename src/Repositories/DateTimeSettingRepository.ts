@@ -54,12 +54,12 @@ export class DateTimeSettingRepository {
       throw new Error(`Cannot update setting "${setting}": provided date is invalid`);
     }
 
-    const oldSetting = await this.prisma.dateTimeSetting.findUnique({
+    const existingSetting = await this.prisma.dateTimeSetting.findUnique({
       where: {
         setting,
       },
     });
-    const oldDate = oldSetting?.dateTime;
+    const oldDate = existingSetting?.dateTime;
 
     // If oldDate exists but is invalid, treat it as if there's no old date
     const validOldDate = oldDate && this.isValidDate(oldDate) ? oldDate : null;
@@ -68,24 +68,15 @@ export class DateTimeSettingRepository {
       return;
     }
 
-    // If oldDate was invalid, we can't use it in the where clause for updateMany
-    // Instead, use update directly (which will fail if setting doesn't exist, which is fine)
-    if (!validOldDate) {
-      await this.prisma.dateTimeSetting.update({
-        where: { setting },
-        data: { dateTime: newDate },
-      });
-      return;
-    }
-
-    await this.prisma.dateTimeSetting.updateMany({
+    await this.prisma.dateTimeSetting.upsert({
       where: {
         setting,
-        // Send old date as a fingerprint to make sure it didn't get changed asynchronously in the meantime.
-        dateTime: validOldDate,
       },
-      data: {
+      create: {
         setting,
+        dateTime: newDate,
+      },
+      update: {
         dateTime: newDate,
       },
     });
