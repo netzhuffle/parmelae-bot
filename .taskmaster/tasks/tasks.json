@@ -3953,13 +3953,25 @@
         "priority": "medium",
         "subtasks": [],
         "updatedAt": "2025-11-28T15:27:24.242Z"
+      },
+      {
+        "id": "76",
+        "title": "Enable Markdown-formatted Telegram replies with safe fallback",
+        "description": "Adopt a MarkdownV2-safe messaging strategy so bot replies render rich formatting while preserving existing content. Add formatting/escaping helpers, update send/reply paths to opt into parse modes, and document risks plus fallback behavior.",
+        "details": "1. Audit all user-facing send/reply paths that emit text or captions, starting with `src/TelegramService.ts:40` and the call sites in `src/ReplyStrategies/BotMentionReplyStrategy.ts:31`, `src/ReplyStrategies/RandomizedGeneratedReplyStrategy.ts:29`, `src/ReplyStrategies/CommandReplyStrategy.ts:31`, `src/ReplyStrategies/CommentReplyStrategy.ts:31`, `src/ReplyStrategies/MessageRepetitionReplyStrategy.ts:39`, `src/ReplyStrategies/StickerIdReplyStrategy.ts:20`, `src/ReplyStrategies/NewMembersReplyStrategy.ts:37`, `src/ReplyStrategies/NicknameReplyStrategy.ts:103`, `src/OldMessageReplyService.ts:58`, `src/GitHubService.ts:104`, `src/ScheduledMessageService.ts:31`, `src/Tools/IntermediateAnswerTool.ts:20`, and `src/Tools/dallETool.ts:23`.\n2. Decide on a safe parse mode strategy: prefer `MarkdownV2` and introduce a formatter module (new file `src/TelegramMarkdown.ts:1`) that exposes `escapeMarkdownV2`, helpers for bold/italic/code/link composition, and a wrapper type (e.g., `{ text, parseMode: 'MarkdownV2', fallbackText }`) so callers can opt into formatting while still escaping untrusted segments.\n3. Update `TelegramService` to accept the formatted wrapper in `send`, `sendWithoutStoring`, `reply`, and `replyWithImage` (`src/TelegramService.ts:40`) and pass `parse_mode` for text/caption sends only; keep stickers/dice unchanged. Add a fallback branch that catches Telegram “can’t parse entities” errors, logs via `ErrorService.log` (`src/ErrorService.ts:1`), and resends without `parse_mode` or with `fallbackText` so messages still deliver.\n4. Apply the helpers at call sites: escape user-echoed text (e.g., `MessageRepetitionReplyStrategy`, `StickerIdReplyStrategy`, `NewMembersReplyStrategy`, `NicknameReplyStrategy`) and opt into Markdown formatting for bot-authored output in generated replies, commands, scheduled messages, GitHub announcements, intermediate answers, and DALL·E captions (files listed in step 1).\n5. Update fakes/stubs to capture parse mode and formatting payloads (`src/Fakes/TelegramServiceFake.ts:10`, `src/Fakes/TelegrafStub.ts:8`) so tests can assert the new behavior.\n6. Documentation + risks: add a Markdown formatting note under Message Handling in `README.md:143` covering MarkdownV2 escaping pitfalls, unsupported formatting for stickers/dice, caption-length implications (ties to Task 52), and the fallback behavior when Telegram rejects formatted text.",
+        "testStrategy": "- Add unit tests for `escapeMarkdownV2` and formatting helpers in a new `src/TelegramMarkdown.test.ts:1` (include edge characters like `_ * [ ] ( ) ~ ` > # + - = | { } . !`).\n- Add TelegramService-focused tests (new `src/TelegramService.test.ts:1`) that verify `parse_mode` is passed for formatted text/captions and that a simulated parse error triggers fallback resend without formatting.\n- Update existing tests that assert send arguments (e.g., `src/Tools/dallETool.test.ts:45`, `src/ScheduledMessageService.test.ts:31`) to expect the wrapper/parse mode behavior.\n- Run `bun test src scripts` and `bun run checks`.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "medium",
+        "subtasks": [],
+        "updatedAt": "2026-03-19T06:30:43.218Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-03-19T05:28:39.569Z",
-      "taskCount": 75,
-      "completedCount": 52,
+      "lastModified": "2026-03-19T06:30:43.218Z",
+      "taskCount": 76,
+      "completedCount": 53,
       "tags": [
         "master"
       ]

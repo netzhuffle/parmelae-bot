@@ -104,6 +104,6 @@ export class NicknameReplyStrategy implements ReplyStrategy {
     const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
     const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
 
-    await this.telegram.reply(`${adjective} ${noun}`, message);
+    await this.telegram.replyBotText(`${adjective} ${noun}`, message);
   }
 }

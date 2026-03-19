@@ -13,6 +13,7 @@ import {
   TelegramMessageWithRelations,
   UnstoredMessageWithRelations,
 } from './Repositories/Types.js';
+import { renderTelegramMarkdownSource } from './TelegramMarkdownSource.js';
 
 type SupportedMessage =
   | Typegram.Message.TextMessage
@@ -44,9 +45,12 @@ export class TelegramMessageService {
   ) {}
 
   /** Stores a message sent to or coming from Telegram. */
-  store(telegramMessage: SupportedMessage): Promise<TelegramMessageWithRelations> {
+  store(
+    telegramMessage: SupportedMessage,
+    options?: { textOverride?: string },
+  ): Promise<TelegramMessageWithRelations> {
     assert(this.isSupported(telegramMessage));
-    const message = this.getMessage(telegramMessage);
+    const message = this.getMessage(telegramMessage, options?.textOverride);
     return this.messageStorage.store(message);
   }
 
@@ -156,7 +160,10 @@ export class TelegramMessageService {
     };
   }
 
-  private getMessage(telegramMessage: SupportedMessage): UnstoredMessageWithRelations {
+  private getMessage(
+    telegramMessage: SupportedMessage,
+    textOverride?: string,
+  ): UnstoredMessageWithRelations {
     assert(telegramMessage.from);
     const chatId = BigInt(telegramMessage.chat.id);
     const replyToMessage =
@@ -173,7 +180,7 @@ export class TelegramMessageService {
       replyToMessageId: replyToMessage?.message_id ?? null,
       replyToMessage:
         replyToMessage && this.isSupported(replyToMessage) ? this.getMessage(replyToMessage) : null,
-      text: this.getMessageText(telegramMessage),
+      text: this.getMessageText(telegramMessage, textOverride),
       imageFileId: this.hasImageAttachment(telegramMessage)
         ? this.getImageFileId(telegramMessage)
         : null,
@@ -193,9 +200,13 @@ export class TelegramMessageService {
     };
   }
 
-  private getMessageText(message: SupportedMessage): string {
+  private getMessageText(message: SupportedMessage, textOverride?: string): string {
+    if (textOverride !== undefined) {
+      return textOverride;
+    }
+
     if ('text' in message) {
-      return message.text;
+      return renderTelegramMarkdownSource(message.text, message.entities);
     }
 
     if ('animation' in message) {
@@ -204,7 +215,12 @@ export class TelegramMessageService {
       const attachment = animation.file_name
         ? `[GIF: ${animation.file_name} (${animation.duration}s)]`
         : `[GIF: ${animation.duration} Sekunden]`;
-      return message.caption ? `${attachment}: ${message.caption}` : attachment;
+      return message.caption
+        ? `${attachment}: ${renderTelegramMarkdownSource(
+            message.caption,
+            message.caption_entities,
+          )}`
+        : attachment;
     }
 
     if ('audio' in message) {
@@ -218,7 +234,12 @@ export class TelegramMessageService {
       }
       const duration = audio.duration;
       const attachment = info ? `[♫: ${info} (${duration}s)]` : `[♫: ${duration} Sekunden]`;
-      return message.caption ? `${attachment}: ${message.caption}` : attachment;
+      return message.caption
+        ? `${attachment}: ${renderTelegramMarkdownSource(
+            message.caption,
+            message.caption_entities,
+          )}`
+        : attachment;
     }
 
     if ('contact' in message) {
@@ -256,7 +277,12 @@ export class TelegramMessageService {
       } else {
         attachment = `[📄 Dateianhang]`;
       }
-      return message.caption ? `${attachment}: ${message.caption}` : attachment;
+      return message.caption
+        ? `${attachment}: ${renderTelegramMarkdownSource(
+            message.caption,
+            message.caption_entities,
+          )}`
+        : attachment;
     }
 
     if ('new_chat_members' in message && message.new_chat_members.length) {
@@ -299,12 +325,22 @@ export class TelegramMessageService {
 
     if ('video' in message) {
       const attachment = `[🎬: ${message.video.duration} Sekunden]`;
-      return message.caption ? `${attachment}: ${message.caption}` : attachment;
+      return message.caption
+        ? `${attachment}: ${renderTelegramMarkdownSource(
+            message.caption,
+            message.caption_entities,
+          )}`
+        : attachment;
     }
 
     if ('voice' in message) {
       const attachment = `[🎤: ${message.voice.duration} Sekunden]`;
-      return message.caption ? `${attachment}: ${message.caption}` : attachment;
+      return message.caption
+        ? `${attachment}: ${renderTelegramMarkdownSource(
+            message.caption,
+            message.caption_entities,
+          )}`
+        : attachment;
     }
 
     if ('venue' in message) {

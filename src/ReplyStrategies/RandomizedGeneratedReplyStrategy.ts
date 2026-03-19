@@ -32,7 +32,7 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
       return this.telegram.send(text, message.chatId);
     };
     const response = await this.replyGenerator.generate(message, announceToolCall);
-    const replyMessageId = await this.telegram.reply(response.text, message);
+    const replyMessageId = await this.telegram.replyBotText(response.text, message);
 
     // Link the final response message to its tool call messages
     await this.messageRepository.updateToolCallMessages(

@@ -6,6 +6,7 @@ import { normalizeUsername } from './BotIdentityContext.js';
 import type { BotConfig } from './ConfigInterfaces.js';
 import { UserModel } from './generated/prisma/models/User.js';
 import { MessageStorageService } from './MessageStorageService.js';
+import { UnstoredMessageWithRelations } from './Repositories/Types.js';
 import { TelegramMessageService } from './TelegramMessageService.js';
 
 // Interface for accessing private methods in tests
@@ -16,10 +17,17 @@ interface TelegramMessageServiceWithPrivates {
 describe('TelegramMessageService', () => {
   let service: TelegramMessageService;
   let mockMessageStorage: MessageStorageService;
+  let storeCalls: unknown[];
   let mockConfig: BotConfig;
 
   beforeEach(() => {
-    mockMessageStorage = {} as MessageStorageService;
+    storeCalls = [];
+    mockMessageStorage = {
+      store: (message: UnstoredMessageWithRelations) => {
+        storeCalls.push(message);
+        return Promise.resolve(message as never);
+      },
+    } as unknown as MessageStorageService;
     const primaryBot = {
       username: 'config_bot',
       telegramToken: 'fake-token',
@@ -140,6 +148,62 @@ describe('TelegramMessageService', () => {
       expect(result.lastName).toBeNull();
       expect(result.username).toBeNull();
       expect(result.languageCode).toBeNull();
+    });
+  });
+
+  describe('store', () => {
+    it('should persist a text override instead of Telegram rendered text', async () => {
+      await service.store(
+        {
+          message_id: 42,
+          date: 1234567890,
+          chat: {
+            id: 123,
+            type: 'private',
+            first_name: 'Test',
+          },
+          from: {
+            id: 456,
+            is_bot: true,
+            first_name: 'ConfigBot',
+            username: 'config_bot',
+          },
+          text: 'Telegram rendered plain text',
+        } as Typegram.Message.TextMessage,
+        { textOverride: 'Original *Markdown* source' },
+      );
+
+      expect(storeCalls).toHaveLength(1);
+      expect((storeCalls[0] as { text: string }).text).toBe('Original *Markdown* source');
+    });
+
+    it('should reconstruct incoming markdown source from Telegram entities', async () => {
+      await service.store({
+        message_id: 43,
+        date: 1234567890,
+        chat: {
+          id: 123,
+          type: 'private',
+          first_name: 'Test',
+        },
+        from: {
+          id: 456,
+          is_bot: false,
+          first_name: 'User',
+          username: 'user',
+        },
+        text: 'Leider *nein*',
+        entities: [
+          {
+            type: 'bold',
+            offset: 0,
+            length: 6,
+          },
+        ],
+      } as Typegram.Message.TextMessage);
+
+      expect(storeCalls).toHaveLength(1);
+      expect((storeCalls[0] as { text: string }).text).toBe('*Leider* \\*nein\\*');
     });
   });
 });

@@ -75,6 +75,36 @@ Sie agieren stets professionell, freundlich und mit dezentem Humor. Sie liefern 
 Output-Verbosity:
 Antwortlängen entsprechen üblicher Chatkommunikation: maximal zwei kurze Absätze; nur auf ausdrücklichen Wunsch bis zu sechs Aufzählungspunkte (ein Satz pro Punkt). Antworten sind vollständig, auch wenn Anfragen kurz sind. Listen nutzen Sie nur bei Bedarf oder auf ausdrücklichen Wunsch, sonst wirken sie KI-haft. Sie fragen nicht, ob Sie weiterhelfen sollen – das wirkt maschinell. 
 
+Telegram-Formatierung:
+Wenn es der Lesbarkeit dient, dürfen Sie in Telegram MarkdownV2 verwenden. Erlaubt sind der volle Telegram-MarkdownV2-Umfang für *fett*, _kursiv_, __unterstrichen__, ~durchgestrichen~, ||Spoiler||, Links, Erwähnungen per tg://user, Datums-/Zeit-Links per tg://time, \`inline code\`, fenced code blocks sowie normale und einklappbare Blockzitate. Custom Emojis verwenden Sie nie. Achten Sie auf vollständig gültige, sauber geschlossene Syntax; verwenden Sie niemals halb offene oder unsichere Markdown-Syntax.
+Beispiele:
+- Fett: *Wichtiger Hinweis*
+- Kursiv: _vertrauliche Bemerkung_
+- Unterstrichen: __Frist heute__
+- Durchgestrichen: ~veraltet~
+- Spoiler: ||interner Zwischenstand||
+- Link: [EDA](https://www.eda.admin.ch/)
+- Erwähnung: [Bundeskanzlei](tg://user?id=123456789)
+- Datums-/Zeit-Link: ![Heute 16:00 Uhr](tg://time?unix=1773932400&format=dt)
+- Inline-Code: \`bun run checks\`
+- Codeblock:
+\`\`\`
+Bericht wird vorbereitet.
+\`\`\`
+- Codeblock mit Sprache:
+\`\`\`python
+status = "in Vorbereitung"
+print(status)
+\`\`\`
+- Blockzitat:
+>Lagebeurteilung folgt
+>Weitere Angaben nach Rücksprache
+- Einklappbares Blockzitat:
+>Kurzfassung
+>Lage stabil
+>Weitere Details intern
+>Nächster Schritt nach Rücksprache||
+
 Es folgt die eigentliche Konversation:`;
 
 const tools = [dallETool, minecraftStatusTool, minecraftStartTool, minecraftStopTool];

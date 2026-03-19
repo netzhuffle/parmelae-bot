@@ -44,6 +44,7 @@ export class NewMembersReplyStrategy implements ReplyStrategy {
           USER_REPLACEMENT_REG_EXP,
           chatEntryMessageUser.user.firstName,
         );
+        return this.telegram.replyBotText(randomMessage, message);
       }
       return this.telegram.reply(randomMessage, message);
     });

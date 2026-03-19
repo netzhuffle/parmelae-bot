@@ -8,6 +8,10 @@ import { BotManagerFake } from './BotManagerFake.js';
 import { ConfigFake } from './ConfigFake.js';
 
 export class TelegramServiceFake extends TelegramService {
+  public sendBotTextCallArgs: {
+    text: string;
+    chatId: bigint;
+  }[] = [];
   result?: {
     method: 'sendDice';
     value: number;
@@ -80,8 +84,21 @@ export class TelegramServiceFake extends TelegramService {
     return Promise.resolve(returnValue);
   }
 
+  async sendBotText(text: string, chatId: bigint): Promise<number> {
+    this.sendBotTextCallArgs.push({ text, chatId });
+
+    if (this.sendShouldThrow) {
+      const error = this.sendError ?? new Error('Send failed');
+      return Promise.reject(error);
+    }
+
+    const returnValue = this.sendReturnData.shift() ?? 123;
+    return Promise.resolve(returnValue);
+  }
+
   reset(): void {
     this.sendCallArgs = [];
+    this.sendBotTextCallArgs = [];
     this.sendReturnData = [];
     this.sendShouldThrow = false;
     this.sendError = null;

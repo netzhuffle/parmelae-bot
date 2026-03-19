@@ -57,7 +57,7 @@ export class OldMessageReplyService {
 
   private async replyToMessage(message: TelegramMessage) {
     const reply = await this.oldMessageReplyGenerator.generate(message.text);
-    await this.telegramService.reply(reply, message);
+    await this.telegramService.replyBotText(reply, message);
   }
 
   private mayReplyToOldMessage(message: MessageWithUser): boolean {

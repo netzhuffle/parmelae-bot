@@ -93,6 +93,41 @@ describe('ConversationService', () => {
       expect(result.messages[0].content).toBe('Bot response');
     });
 
+    it('should preserve markdown source in assistant conversation history', async () => {
+      const messages: MessageWithUserAndToolMessages[] = [
+        {
+          id: 1,
+          telegramMessageId: 123,
+          chatId: BigInt(456),
+          fromId: BigInt(789),
+          sentAt: new Date(),
+          editedAt: null,
+          replyToMessageId: null,
+          text: 'Gerne. *Markdown* mit `Code`.',
+          imageFileId: null,
+          stickerFileId: null,
+          toolCalls: null,
+          messageAfterToolCallsId: null,
+          from: {
+            id: BigInt(789),
+            isBot: true,
+            firstName: 'Bot',
+            lastName: null,
+            username: 'testbot',
+            languageCode: null,
+          },
+          toolMessages: [],
+        },
+      ];
+      messageHistory.setMessages(messages);
+
+      const result = await service.getConversation(1, 1, botContext);
+
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0]).toBeInstanceOf(AIMessage);
+      expect(result.messages[0].content).toBe('Gerne. *Markdown* mit `Code`.');
+    });
+
     it('should convert bot message with tool calls to AIMessage with tool_calls', async () => {
       const toolCalls = [{ id: 'call-123', name: 'search_tool', args: { query: 'test' } }];
       const messages: MessageWithUserAndToolMessages[] = [

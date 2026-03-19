@@ -1,30 +1,65 @@
 import * as Typegram from '@telegraf/types';
 
+interface DateTimeEntity {
+  date_time_format?: string;
+  length: number;
+  offset: number;
+  type: 'date_time';
+  unix_time: number;
+}
+
+interface ExpandableBlockquoteEntity {
+  length: number;
+  offset: number;
+  type: 'expandable_blockquote';
+}
+
+type TelegramRenderableEntity =
+  | Typegram.MessageEntity
+  | DateTimeEntity
+  | ExpandableBlockquoteEntity;
+
 /**
  * Lightweight stub for Telegraf instances in tests.
  * Implements only the methods actually used by the codebase.
  */
 export class TelegrafStub {
+  public sendMessageCalls: {
+    chatId: string;
+    text: string;
+    options?: {
+      entities?: TelegramRenderableEntity[];
+      parse_mode?: 'MarkdownV2';
+      reply_parameters?: {
+        message_id: number;
+      };
+    };
+  }[] = [];
+  public sendMessageErrors: Error[] = [];
   public readonly telegram: {
     sendChatAction: (chatId: string, action: string) => Promise<boolean>;
     sendSticker: (
       chatId: string,
       fileId: string,
-      options?: { reply_to_message_id?: number },
+      options?: { reply_parameters?: { message_id: number } },
     ) => Promise<Typegram.Message.StickerMessage>;
     sendMessage: (
       chatId: string,
       text: string,
-      options?: { reply_to_message_id?: number },
+      options?: {
+        entities?: TelegramRenderableEntity[];
+        parse_mode?: 'MarkdownV2';
+        reply_parameters?: { message_id: number };
+      },
     ) => Promise<Typegram.Message.TextMessage>;
     sendDice: (
       chatId: string,
-      options?: { emoji?: string; reply_to_message_id?: number },
+      options?: { emoji?: string; reply_parameters?: { message_id: number } },
     ) => Promise<Typegram.Message.DiceMessage>;
     sendPhoto: (
       chatId: string,
       url: string,
-      options?: { caption?: string; reply_to_message_id?: number },
+      options?: { caption?: string; reply_parameters?: { message_id: number } },
     ) => Promise<Typegram.Message.PhotoMessage>;
     getFileLink: (fileId: string) => Promise<URL>;
     getMyName: () => Promise<{ name: string }>;
@@ -57,12 +92,17 @@ export class TelegrafStub {
           },
         } as Typegram.Message.StickerMessage);
       },
-      sendMessage: async () => {
+      sendMessage: async (chatId, text, options) => {
+        this.sendMessageCalls.push({ chatId, text, options });
+        const error = this.sendMessageErrors.shift();
+        if (error) {
+          throw error;
+        }
         return await Promise.resolve({
           message_id: 0,
           date: 0,
           chat: privateChat,
-          text: '',
+          text,
         } as Typegram.Message.TextMessage);
       },
       sendDice: async () => {
