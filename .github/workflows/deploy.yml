@@ -25,6 +25,20 @@ jobs:
         with:
           bun-version-file: .bun-version
 
+      - name: Restore Bun install cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.bun/install/cache
+          key: bun-install-${{ runner.os }}-${{ hashFiles('bun.lock', '.bun-version') }}
+          restore-keys: |
+            bun-install-${{ runner.os }}-
+
+      - name: Restore Prisma engine cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/prisma
+          key: prisma-engines-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
