@@ -2882,9 +2882,10 @@
               "59.17"
             ],
             "details": "Implement parsing and validation logic to dynamically register multiple bots from environment variables, ensuring fallback to primary variables for the first bot as needed.\n<info added on 2025-09-17T21:33:43.385Z>\n**Dependencies:** This subtask now depends on subtasks 59.16 (Identity Resolution Service) and 59.17 (DI Refactoring) as they are prerequisites for proper multi-bot environment variable configuration.\n\n**Implementation Plan Complete:**\n\n**Core Changes:**\n1. Add BotConfiguration and MultiBotsConfig types\n2. Implement parseMultiBotEnvironment() method with USERNAME_2-9, TELEGRAM_TOKEN_2-9, DEFAULT_IDENTITY_2-9 parsing\n3. Add DEFAULT_IDENTITY support for primary bot (backwards compatibility)\n4. Maintain existing username/telegramToken properties pointing to primary bot\n5. Add comprehensive validation with clear error messages\n\n**Environment Variable Pattern:**\n- Bot 1: USERNAME, TELEGRAM_TOKEN, DEFAULT_IDENTITY (existing + new DEFAULT_IDENTITY)\n- Bots 2-9: USERNAME_2-9, TELEGRAM_TOKEN_2-9, DEFAULT_IDENTITY_2-9\n- Fallback logic: Bot 1 can use legacy variables or new numbered format\n\n**Validation Requirements:**\n- At least one complete bot configuration required\n- No duplicate usernames allowed\n- Identity names validated against available identities\n- Clear error messages for configuration issues\n\nReady for Act mode implementation once dependencies are completed.\n</info added on 2025-09-17T21:33:43.385Z>",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Unit test environment variable parsing with complete, partial, and missing configurations to verify correct bot registration.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-03-19T03:24:53.092Z"
           },
           {
             "id": 2,
@@ -2894,9 +2895,10 @@
               "59.1"
             ],
             "details": "Ensure BotManager can start, stop, and monitor all bot instances, providing a unified interface for message handling coordination.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Unit test BotManager initialization with multiple bots and verify correct Telegraf instance creation.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-03-19T03:27:34.656Z"
           },
           {
             "id": 3,
@@ -3092,7 +3094,7 @@
         "complexity": 9,
         "recommendedSubtasks": 20,
         "expansionPrompt": "Break down this complex multi-bot system into granular implementation steps covering environment configuration, bot lifecycle management, message routing coordination, identity resolution, tool system integration, dependency injection refactoring, database schema updates, concurrency handling, testing strategies, and documentation. Each subtask should be independently testable and have clear acceptance criteria.",
-        "updatedAt": "2025-12-29T14:51:32.229Z"
+        "updatedAt": "2026-03-19T03:27:34.656Z"
       },
       {
         "id": "60",
@@ -3952,7 +3954,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-12-29T14:51:32.233Z",
+      "lastModified": "2026-03-19T03:27:34.656Z",
       "taskCount": 75,
       "completedCount": 52,
       "tags": [
