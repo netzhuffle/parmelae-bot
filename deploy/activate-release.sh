@@ -88,15 +88,15 @@ bun run migrate-prod
 ln -sfn "$release_dir" "$current_link"
 
 restart_service() {
-  sudo systemctl restart "$service_name"
+  sudo -n systemctl restart "$service_name"
 }
 
 service_is_active() {
-  sudo systemctl is-active --quiet "$service_name"
+  sudo -n systemctl is-active "$service_name" | grep -q '^active$'
 }
 
 show_recent_logs() {
-  sudo journalctl -u "$service_name" -n 50 --no-pager || true
+  sudo -n journalctl -u "$service_name" -n 50 --no-pager || true
 }
 
 wait_for_service() {
@@ -135,7 +135,7 @@ show_recent_logs
 
 if [[ -n "$previous_release" && -d "$previous_release" ]]; then
   ln -sfn "$previous_release" "$current_link"
-  sudo systemctl restart "$service_name" || true
+  sudo -n systemctl restart "$service_name" || true
 fi
 
 exit 1
