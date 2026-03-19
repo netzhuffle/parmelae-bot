@@ -60,6 +60,18 @@ export interface ToolContext {
   identityResolver: IdentityResolverService;
 }
 
+/** Extracts plain text from an AI message across both Completions and Responses API shapes. */
+export function getAiMessageTextContent(message: AIMessage): string {
+  if (typeof message.content === 'string') {
+    return message.content;
+  }
+
+  return message.contentBlocks
+    .filter((contentBlock) => contentBlock.type === 'text')
+    .map((contentBlock) => contentBlock.text)
+    .join('\n');
+}
+
 function assertIsToolContext(value: unknown): asserts value is ToolContext {
   assert(typeof value === 'object');
   assert(value !== null);
@@ -175,7 +187,7 @@ export class ChatGptAgentService {
     retries = 0,
   ): Promise<ChatGptAgentResponse> {
     try {
-      return this.getReply(
+      return await this.getReply(
         message,
         identity.systemPrompt,
         conversation,
@@ -269,7 +281,7 @@ export class ChatGptAgentService {
     );
     const lastMessage = agentOutput.messages[agentOutput.messages.length - 1];
     assert(lastMessage instanceof AIMessage);
-    assert(typeof lastMessage.content === 'string');
+    const content = getAiMessageTextContent(lastMessage);
 
     // Extract tool call message IDs from the final state
     const toolCallMessageIds = agentOutput.toolCallMessageIds;
@@ -277,7 +289,7 @@ export class ChatGptAgentService {
     return {
       message: {
         role: ChatGptRoles.Assistant,
-        content: lastMessage.content,
+        content,
       },
       toolCallMessageIds,
     };
