@@ -49,6 +49,7 @@ shared_dir="${base_dir}/shared"
 shared_env="${shared_dir}/.env"
 shared_db="${shared_dir}/sqlite.db"
 shared_backups="${shared_dir}/backups"
+desired_bun_version="$(tr -d '[:space:]' < "${release_dir}/.bun-version")"
 previous_release=""
 
 if [[ ! -d "$release_dir" ]]; then
@@ -68,6 +69,11 @@ if [[ ! -f "$shared_db" ]]; then
   exit 1
 fi
 
+if [[ -z "$desired_bun_version" ]]; then
+  echo "Missing Bun version in ${release_dir}/.bun-version" >&2
+  exit 1
+fi
+
 if [[ -L "$current_link" || -d "$current_link" ]]; then
   previous_release="$(readlink -f "$current_link" || true)"
 fi
@@ -79,6 +85,14 @@ set +a
 : "${DATABASE_URL:=file:${shared_db}}"
 : "${BACKUP_DIR:=${shared_backups}}"
 export DATABASE_URL BACKUP_DIR
+
+current_bun_version="$(bun --version)"
+if [[ "$current_bun_version" != "$desired_bun_version" ]]; then
+  echo "Upgrading Bun from ${current_bun_version} to ${desired_bun_version}..."
+  curl -fsSL https://bun.sh/install | bash -s -- "bun-v${desired_bun_version}"
+  export PATH="$HOME/.bun/bin:$PATH"
+  echo "Using Bun $(bun --version)"
+fi
 
 cd "$release_dir"
 bun install --frozen-lockfile --production

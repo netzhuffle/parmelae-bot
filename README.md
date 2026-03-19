@@ -195,12 +195,13 @@ bun run checks
 If CI passes, GitHub Actions uploads a release bundle, syncs it to the server, and runs
 `deploy/activate-release.sh`, which:
 
-1. installs production dependencies in the new release
-2. backs up the shared SQLite database
-3. runs Prisma migrations against the shared database
-4. updates the `current` symlink
-5. restarts the systemd service
-6. prunes old backups and releases
+1. upgrades Bun for the deploy user when `.bun-version` changes
+2. installs production dependencies in the new release
+3. backs up the shared SQLite database
+4. runs Prisma migrations against the shared database
+5. updates the `current` symlink
+6. restarts the systemd service
+7. prunes old backups and releases
 
 ### systemd Commands
 
@@ -214,6 +215,7 @@ journalctl -u parmelae-bot -n 100 --no-pager
 ### Important Notes
 
 - The `src/index.ts` entry file must remain a synchronous module (no top-level await).
+- Production Bun is pinned through `.bun-version` and upgraded during deploy only when the pinned version changes.
 - The production database is configured through `DATABASE_URL`.
 - Backups are configured through `BACKUP_DIR`.
 - Code rollback does not automatically roll back database schema changes; keep the pre-deploy SQLite backups.
