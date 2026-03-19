@@ -9,6 +9,7 @@ import { Config } from './Config.js';
 import { PrismaClient } from './generated/prisma/client.js';
 import { GptModels, GptModelsProvider, GptModelsSettings } from './GptModelsProvider.js';
 import { POKEMON_TCGP_YAML_SYMBOL, Sets } from './PokemonTcgPocket/PokemonTcgPocketService.js';
+import { getDatabaseUrl } from './RuntimePaths.js';
 
 const container = new Container({
   defaultScope: 'Singleton',
@@ -63,7 +64,7 @@ container.bind(Octokit).toDynamicValue(
 );
 container.bind(PrismaClient).toDynamicValue(() => {
   const adapter = new PrismaBunSQLite({
-    url: 'file:./prisma/sqlite.db',
+    url: getDatabaseUrl(),
   });
 
   return new PrismaClient({

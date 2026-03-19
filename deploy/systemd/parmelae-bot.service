@@ -1,0 +1,20 @@
+[Unit]
+Description=Parmelae Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=parmelae-bot
+Group=parmelae-bot
+WorkingDirectory=/srv/parmelae-bot/current
+Environment=NODE_ENV=production
+EnvironmentFile=/srv/parmelae-bot/shared/.env
+ExecStart=/home/parmelae-bot/.bun/bin/bun src/index.ts
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+SyslogIdentifier=parmelae-bot
+
+[Install]
+WantedBy=multi-user.target

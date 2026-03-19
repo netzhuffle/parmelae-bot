@@ -1,11 +1,10 @@
 #!/usr/bin/env bun
 
-import { join } from 'path';
-
 import { $ } from 'bun';
 
-// Configuration
-const BACKUP_DIR = join(import.meta.dir, '../../backups');
+import { getBackupDir } from '../../src/RuntimePaths.js';
+
+const BACKUP_DIR = getBackupDir();
 const BACKUP_PREFIX = 'sqlite-backup';
 const MAX_BACKUPS = 5;
 

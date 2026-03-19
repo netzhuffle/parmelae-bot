@@ -4,11 +4,18 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: parmelae-bot-production-deploy
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  ci:
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
       - uses: actions/checkout@v4
@@ -27,55 +34,97 @@ jobs:
       - name: Run checks (type check, lint, test)
         run: bun run checks
 
-      - name: Remove dev dependencies
-        run: bun run install-prod
-
-      - name: Install SSH Key
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      - name: Prepare release bundle
         run: |
-          mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
-          echo ${{ secrets.KNOWN_HOSTS }} >> ~/.ssh/known_hosts
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+          mkdir -p release
+          rsync -a \
+            --exclude '.git/' \
+            --exclude 'node_modules/' \
+            --exclude '.github/' \
+            --exclude '.cursor/' \
+            --exclude '.devcontainer/' \
+            --exclude '.taskmaster/' \
+            --exclude '.vscode/' \
+            --exclude 'backups/' \
+            --exclude '.env' \
+            --exclude 'prisma/sqlite.db' \
+            ./ release/
 
-      - name: Create pre-deployment backup
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        continue-on-error: true
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.sha }}
+          path: release
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Download release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-${{ github.sha }}
+          path: release
+
+      - name: Configure SSH
         run: |
-          echo "Creating pre-deployment backup (if scripts exist)..."
-          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && mkdir -p backups && if test -f scripts/backup/backup-database.ts; bun scripts/backup/backup-database.ts; end' || true
-          echo "✅ Pre-deployment backup completed"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
-      - name: Stop bot (PM2)
+      - name: Sync release to server
         env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 stop parmelae-bot; or true'
-
-      - name: Deploy files
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: rsync -chilOrz --stats --delete --force --exclude .git --exclude .gitignore --exclude .env --exclude .cursor --exclude .devcontainer --exclude .github --exclude .taskmaster --exclude .vscode --exclude backups --exclude prisma/sqlite.db ./ jannis@jannis.rocks:/home/jannis/parmelae-bot/
-
-      - name: Cleanup old backups
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          DEPLOY_BASE: ${{ vars.DEPLOY_BASE }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
         run: |
-          echo "Cleaning up old backups..."
-          ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && bun scripts/backup/cleanup-backups.ts'
-          echo "✅ Backup cleanup completed"
+          set -euo pipefail
 
-      - name: Run database migrations
+          deploy_base="${DEPLOY_BASE:-/srv/parmelae-bot}"
+          deploy_host="${DEPLOY_HOST:-jannis.rocks}"
+          deploy_user="${DEPLOY_USER:-parmelae-bot}"
+          release_id="${GITHUB_SHA}"
+          remote_release_dir="${deploy_base}/releases/${release_id}"
+          ssh_opts="-i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes"
+
+          ssh $ssh_opts "${deploy_user}@${deploy_host}" "mkdir -p '${remote_release_dir}'"
+
+          rsync -az --delete \
+            -e "ssh $ssh_opts" \
+            release/ \
+            "${deploy_user}@${deploy_host}:${remote_release_dir}/"
+
+      - name: Activate release
         env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && bun run migrate-prod'
+          DEPLOY_BASE: ${{ vars.DEPLOY_BASE }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          SERVICE_NAME: ${{ vars.PROD_SERVICE_NAME }}
+        run: |
+          set -euo pipefail
 
-      - name: Start bot (PM2)
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: ssh jannis@jannis.rocks 'cd /home/jannis/parmelae-bot && pm2 start ecosystem.config.cjs'
+          deploy_base="${DEPLOY_BASE:-/srv/parmelae-bot}"
+          deploy_host="${DEPLOY_HOST:-jannis.rocks}"
+          deploy_user="${DEPLOY_USER:-parmelae-bot}"
+          service_name="${SERVICE_NAME:-parmelae-bot}"
+          release_id="${GITHUB_SHA}"
+          remote_release_dir="${deploy_base}/releases/${release_id}"
+          ssh_opts="-i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes"
 
-      - name: Remove SSH
+          ssh $ssh_opts "${deploy_user}@${deploy_host}" "\
+            chmod +x '${remote_release_dir}/deploy/activate-release.sh' && \
+            '${remote_release_dir}/deploy/activate-release.sh' \
+              --base-dir '${deploy_base}' \
+              --release '${release_id}' \
+              --service '${service_name}'"
+
+      - name: Remove SSH config
         if: always()
         run: rm -rf ~/.ssh

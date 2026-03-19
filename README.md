@@ -149,69 +149,82 @@ The bot includes various AI-powered tools:
 
 ## 🚀 Production Deployment
 
-### Build and Deploy
+Production uses GitHub Actions plus a release-based server layout:
+
+```text
+/srv/parmelae-bot/
+├── current -> /srv/parmelae-bot/releases/<git-sha>
+├── releases/
+└── shared/
+    ├── .env
+    ├── sqlite.db
+    └── backups/
+```
+
+The bot runs directly from source with Bun under `systemd`. Releases are synced to
+`releases/<git-sha>`, `current` is updated on successful activation, and the shared
+SQLite database plus backups stay outside the release directories.
+
+### One-time Server Setup
+
+1. Create a dedicated Linux user, for example `parmelae-bot`.
+2. Install Bun for that user.
+3. Create `/srv/parmelae-bot/releases` and `/srv/parmelae-bot/shared/backups`.
+4. Copy the production `.env` to `/srv/parmelae-bot/shared/.env`.
+5. Copy the production SQLite database to `/srv/parmelae-bot/shared/sqlite.db`.
+6. Add production path overrides to `/srv/parmelae-bot/shared/.env`:
+
+```env
+DATABASE_URL="file:/srv/parmelae-bot/shared/sqlite.db"
+BACKUP_DIR="/srv/parmelae-bot/shared/backups"
+```
+
+7. Install the systemd unit from `deploy/systemd/parmelae-bot.service`.
+8. Grant the deployment user permission to run `systemctl` for `parmelae-bot` without a password.
+
+### Deployment Flow
+
+Each push to `main` runs:
 
 ```bash
-# Run quality checks (type checking, linting, tests)
+bun install --frozen-lockfile
+bunx prisma generate
 bun run checks
-
-# Install production dependencies only
-bun run install-prod
-
-# Run database migrations
-bun run migrate-prod
-
-# Start the application
-bun src/index.ts
-
-# Start the application with pm2
-pm2 start ecosystem.config.cjs
 ```
 
-### Process Management with PM2
+If CI passes, GitHub Actions uploads a release bundle, syncs it to the server, and runs
+`deploy/activate-release.sh`, which:
 
-This project uses **PM2** for production process management. The configuration is stored in `ecosystem.config.cjs`.
+1. installs production dependencies in the new release
+2. backs up the shared SQLite database
+3. runs Prisma migrations against the shared database
+4. updates the `current` symlink
+5. restarts the systemd service
+6. prunes old backups and releases
 
-**PM2 Commands:**
+### systemd Commands
 
 ```bash
-# Start the bot
-pm2 start ecosystem.config.cjs
-
-# Stop the bot
-pm2 stop parmelae-bot
-
-# Restart the bot
-pm2 restart parmelae-bot
-
-# View logs
-pm2 logs parmelae-bot
-
-# Monitor status
-pm2 status
-
-# View detailed info
-pm2 show parmelae-bot
+sudo systemctl status parmelae-bot
+sudo systemctl restart parmelae-bot
+sudo systemctl stop parmelae-bot
+journalctl -u parmelae-bot -n 100 --no-pager
 ```
 
-**Log Files:**
+### Important Notes
 
-- General logs: `~/.pm2/logs/parmelae-bot.log`
-- Output logs: `~/.pm2/logs/parmelae-bot-out.log`
-- Error logs: `~/.pm2/logs/parmelae-bot-error.log`
-
-**Important Notes:**
-
-- The `src/index.ts` entry file must remain a synchronous module (no top-level await) to ensure compatibility with pm2's process management.
-- The smoke test (`bun run smoke-test`) validates that the bot can start correctly and should be run before deploying changes.
+- The `src/index.ts` entry file must remain a synchronous module (no top-level await).
+- The production database is configured through `DATABASE_URL`.
+- Backups are configured through `BACKUP_DIR`.
+- Code rollback does not automatically roll back database schema changes; keep the pre-deploy SQLite backups.
 
 ### Environment Considerations
 
-- **Process Management**: PM2 configured in `ecosystem.config.cjs` (see above)
-- **Database**: SQLite for simplicity, easily replaceable with PostgreSQL
+- **Process Management**: systemd service in `deploy/systemd/parmelae-bot.service`
+- **Database**: SQLite stored in `/srv/parmelae-bot/shared/sqlite.db`
 - **Monitoring**: Helicone integration for API usage tracking
 - **Error Handling**: Sentry integration available for error tracking
-- **Scaling**: Stateless design allows for horizontal scaling
+- **Scaling**: Stateless services can scale, but the shared SQLite database is still single-host
 
 ### Getting Started
 

@@ -5,9 +5,10 @@ import { createInterface } from 'readline';
 
 import { $ } from 'bun';
 
-// Configuration
-const BACKUP_DIR = join(import.meta.dir, '../../backups');
-const DB_PATH = join(import.meta.dir, '../../prisma/sqlite.db');
+import { getBackupDir, getDatabasePath } from '../../src/RuntimePaths.js';
+
+const BACKUP_DIR = getBackupDir();
+const DB_PATH = getDatabasePath();
 const BACKUP_PREFIX = 'sqlite-backup';
 
 interface BackupFile {

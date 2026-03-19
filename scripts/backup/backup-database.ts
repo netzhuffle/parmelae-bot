@@ -4,9 +4,10 @@ import { join } from 'path';
 
 import { $ } from 'bun';
 
-// Configuration
-const DB_PATH = join(import.meta.dir, '../../prisma/sqlite.db');
-const BACKUP_DIR = join(import.meta.dir, '../../backups');
+import { getBackupDir, getDatabasePath } from '../../src/RuntimePaths.js';
+
+const DB_PATH = getDatabasePath();
+const BACKUP_DIR = getBackupDir();
 const BACKUP_PREFIX = 'sqlite-backup';
 
 /**
