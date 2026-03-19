@@ -14,11 +14,15 @@ export const GptModels = {
 export const GptModelsSettings = {
   [GptModels.Cheap]: {
     model: GptModels.Cheap + '/openai',
+    // GPT-5.4 models with tools + reasoning must use the Responses API.
+    useResponsesApi: true,
     reasoning: { effort: 'low' },
     verbosity: 'low',
   },
   [GptModels.Advanced]: {
     model: GptModels.Advanced + '/openai',
+    // GPT-5.4 models with tools + reasoning must use the Responses API.
+    useResponsesApi: true,
     reasoning: { effort: 'low' },
     verbosity: 'low',
   },
