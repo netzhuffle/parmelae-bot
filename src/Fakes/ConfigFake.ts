@@ -1,5 +1,5 @@
 import { normalizeUsername } from '../BotIdentityContext.js';
-import type { BotConfig, BotConfiguration, GitHubConfig } from '../ConfigInterfaces.js';
+import type { BotConfig, BotConfiguration, GitHubConfig, GptConfig } from '../ConfigInterfaces.js';
 import { GptModels } from '../GptModelsProvider.js';
 
 /**
@@ -8,7 +8,7 @@ import { GptModels } from '../GptModelsProvider.js';
  * Implements narrow interfaces (BotConfig, GitHubConfig) to avoid type casts
  * and improve type safety in tests.
  */
-export class ConfigFake implements BotConfig, GitHubConfig {
+export class ConfigFake implements BotConfig, GitHubConfig, GptConfig {
   public gptModel = GptModels.Cheap;
   public identityByChatId = new Map();
   public readonly primaryBot: BotConfiguration = {

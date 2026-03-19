@@ -6,6 +6,7 @@ import { OpenAIEmbeddings } from '@langchain/openai';
 
 import { ChatGptService } from '../ChatGptService.js';
 import { ChatOpenAiFake } from '../Fakes/ChatOpenAiFake.js';
+import { ConfigFake } from '../Fakes/ConfigFake.js';
 import { GptModelsProvider } from '../GptModelsProvider.js';
 import { OldMessageReplyGenerator } from './OldMessageReplyGenerator.js';
 
@@ -19,6 +20,7 @@ test('generate', async () => {
         embeddings: undefined as unknown as OpenAIEmbeddings,
       }),
     ),
+    new ConfigFake(),
   );
 
   const response = await sut.generate('old message');

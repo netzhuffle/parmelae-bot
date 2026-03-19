@@ -6,20 +6,20 @@ import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
 /** Enum of GPT language models to use. */
 export const GptModels = {
   /** Cheap model to use in most cases. Needs text & image inputs, text outputs, function calling. */
-  Cheap: 'gpt-5-mini',
-  /** Advanced model to use when asked explicitly. Needs text & image inputs, text outputs, function calling. */
-  Advanced: 'gpt-5.2',
+  Cheap: 'gpt-5.4-mini',
+  /** Advanced model to use only for especially difficult tasks. Needs text & image inputs, text outputs, function calling. */
+  Advanced: 'gpt-5.4',
 } as const;
 
 export const GptModelsSettings = {
   [GptModels.Cheap]: {
     model: GptModels.Cheap + '/openai',
-    reasoning: { effort: 'minimal' },
+    reasoning: { effort: 'low' },
     verbosity: 'low',
   },
   [GptModels.Advanced]: {
     model: GptModels.Advanced + '/openai',
-    reasoning: { effort: 'none' },
+    reasoning: { effort: 'low' },
     verbosity: 'low',
   },
 } satisfies Record<GptModel, ChatOpenAIFields>;
@@ -31,7 +31,7 @@ export type GptModel = (typeof GptModels)[keyof typeof GptModels];
 export class GptModelsProvider {
   /** LangChain chat model of a cheap model. */
   public readonly cheap: ChatOpenAI;
-  /** LangChain chat model of an advanced, more expensive model. */
+  /** LangChain chat model of an advanced, more expensive model reserved for harder tasks. */
   public readonly advanced: ChatOpenAI;
   /** LangChain embeddings model. */
   public readonly embeddings: OpenAIEmbeddings;
@@ -39,7 +39,7 @@ export class GptModelsProvider {
   constructor(models: {
     /** LangChain chat model of a cheap model. */
     cheap: ChatOpenAI;
-    /** LangChain chat model of an advanced, more expensive model. */
+    /** LangChain chat model of an advanced, more expensive model reserved for harder tasks. */
     advanced: ChatOpenAI;
     /** LangChain embeddings model. */
     embeddings: OpenAIEmbeddings;

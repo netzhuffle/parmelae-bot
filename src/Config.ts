@@ -10,8 +10,8 @@ import { Identity } from './MessageGenerators/Identities/Identity.js';
 /** The configuration options, taken from .env */
 @injectable()
 export class Config implements BotConfig, GitHubConfig {
-  /** Which GPT language model to use for LangChain agent and tools. */
-  public gptModel: GptModel = GptModels.Advanced;
+  /** Which GPT language model to use for LangChain agent and tools. Defaults to the cheap model. */
+  public gptModel: GptModel = GptModels.Cheap;
 
   /** The identity to use to reply to messages for each chat. */
   public identityByChatId = new Map<bigint, Identity>();

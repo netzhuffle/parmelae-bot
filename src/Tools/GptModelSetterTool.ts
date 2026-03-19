@@ -8,7 +8,7 @@ import { GptModels } from '../GptModelsProvider.js';
 export class GptModelSetterTool extends Tool {
   name = 'gpt-model-set';
 
-  description = `Use set which GPT language model should be used. Input should be "${GptModels.Cheap}" or "${GptModels.Advanced}".`;
+  description = `Use to set which GPT language model should be used. Prefer "${GptModels.Cheap}" for normal tasks and switch to "${GptModels.Advanced}" only when the task is especially difficult and the cheap model is not sufficient.`;
 
   constructor(private readonly config: Config) {
     super();

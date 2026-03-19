@@ -6,10 +6,11 @@ import {
   HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
 } from '@langchain/core/prompts';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 
 import { ChatGptService } from '../ChatGptService.js';
-import { GptModels } from '../GptModelsProvider.js';
+import { Config } from '../Config.js';
+import type { GptConfig } from '../ConfigInterfaces.js';
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromMessages([
@@ -60,7 +61,10 @@ const PROMPT = ChatPromptTemplate.fromMessages([
 /** Creates replies to 7 days old messages. */
 @injectable()
 export class OldMessageReplyGenerator {
-  constructor(private readonly chatGpt: ChatGptService) {}
+  constructor(
+    private readonly chatGpt: ChatGptService,
+    @inject(Config) private readonly config: GptConfig,
+  ) {}
 
   /**
    * Asks GPT to generate a reply to a 7 days old message.
@@ -70,7 +74,7 @@ export class OldMessageReplyGenerator {
   async generate(text: string): Promise<string> {
     assert(text.length < ChatGptService.MAX_INPUT_TEXT_LENGTH);
 
-    const message = await this.chatGpt.generate(PROMPT, GptModels.Advanced, {
+    const message = await this.chatGpt.generate(PROMPT, this.config.gptModel, {
       text,
     });
     return message.content;

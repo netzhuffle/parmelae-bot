@@ -1,3 +1,5 @@
+import type { GptModel } from './GptModelsProvider.js';
+
 /**
  * Type-only module: All exports are TypeScript interfaces that are erased at runtime.
  * Always use `import type` when importing from this module to avoid runtime import errors.
@@ -32,4 +34,11 @@ export interface BotConfig {
  */
 export interface GitHubConfig {
   readonly newCommitAnnouncementChats: readonly bigint[];
+}
+
+/**
+ * Narrow interface for GPT model selection.
+ */
+export interface GptConfig {
+  gptModel: GptModel;
 }
