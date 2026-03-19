@@ -1552,7 +1552,7 @@
         "description": "Replace the current SerpAPI-based search functionality with OpenAI's web search capabilities, consolidating search capabilities under the OpenAI ecosystem for better integration and improved results.",
         "details": "This migration requires a systematic approach to replace SerpAPI with OpenAI's web search:\n\n1. **Analysis Phase**:\n   - Review the current `GoogleSearchToolFactory` implementation to understand how SerpAPI is integrated\n   - Document the current search request/response flow and data structures\n   - Identify all components that depend on SerpAPI search results\n\n2. **OpenAI Web Search Integration**:\n   - Research OpenAI's web search API documentation, focusing on:\n     - Authentication requirements\n     - Request parameters and limitations\n     - Response format and structure\n     - Rate limits and pricing considerations\n   - Create a new `OpenAIWebSearchTool` class that implements the same interface as the current search tool\n   - Implement the necessary API calls to OpenAI's web search endpoints using the OpenAI SDK\n\n3. **Response Handling**:\n   - Develop parsers for OpenAI's search response format\n   - Map OpenAI search results to the format expected by the application\n   - Handle pagination or result limits differently if OpenAI's API has different constraints\n\n4. **Configuration Updates**:\n   - Update the application configuration to remove SerpAPI API keys and endpoints\n   - Add OpenAI web search specific configuration options\n   - Ensure backward compatibility during transition if needed\n\n5. **Tool Schema Updates**:\n   - Update the search tool schemas to reflect OpenAI's capabilities\n   - Modify tool descriptions to accurately represent the new search functionality\n   - Adjust any parameter validation to match OpenAI's requirements\n\n6. **Code Cleanup**:\n   - Remove all SerpAPI-specific code and dependencies\n   - Update import statements and package.json\n   - Remove unused variables, functions, and classes\n\n7. **Documentation**:\n   - Update developer documentation to reflect the new search implementation\n   - Document any changes in behavior or capabilities for users",
         "testStrategy": "1. **Unit Testing**:\n   - Create unit tests for the new `OpenAIWebSearchTool` class\n   - Test the request formation logic with various query types\n   - Test response parsing with mocked OpenAI search responses\n   - Verify error handling for common failure scenarios (rate limits, authentication issues, etc.)\n\n2. **Integration Testing**:\n   - Test the search functionality with real OpenAI API calls using a test API key\n   - Verify results for different types of queries (factual, navigational, transactional)\n   - Compare results with the previous SerpAPI implementation for quality and completeness\n   - Test pagination or result limit handling\n\n3. **End-to-End Testing**:\n   - Test the complete user flow from query input to search result presentation\n   - Verify that search results are properly formatted and displayed to users\n   - Test with edge cases like very long queries, queries in different languages, etc.\n\n4. **Performance Testing**:\n   - Measure and compare response times between SerpAPI and OpenAI web search\n   - Test under load to ensure the system handles concurrent search requests properly\n   - Monitor API usage to ensure it stays within expected limits\n\n5. **Regression Testing**:\n   - Ensure all existing functionality that relied on search results continues to work\n   - Verify that no other parts of the application are affected by the migration",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           "27",
           "20"
@@ -1565,17 +1565,19 @@
             "description": "Review and document the existing GoogleSearchToolFactory and SerpAPI integration, including how search queries are handled and responses processed.",
             "dependencies": [],
             "details": "Understand the current architecture, data flow, and dependencies related to GoogleSearchToolFactory and SerpAPI to identify all points of integration and potential impact areas.",
-            "status": "pending",
-            "parentId": "undefined"
+            "status": "done",
+            "parentId": "undefined",
+            "updatedAt": "2026-03-19T05:28:39.568Z"
           },
           {
             "id": 2,
             "title": "Research OpenAI API for Web Search",
             "description": "Investigate OpenAI's web search capabilities, including API endpoints, response formats, rate limits, and authentication requirements.",
             "dependencies": [],
-            "details": "Gather documentation and examples on how to use OpenAI's web search API to replace SerpAPI, focusing on differences in request/response structure and constraints.",
-            "status": "pending",
-            "parentId": "undefined"
+            "details": "Gather documentation and examples on how to use OpenAI's web search API to replace SerpAPI, focusing on differences in request/response structure and constraints.\n<info added on 2026-03-19T05:22:53.963Z>\nAdded research note in `docs/openai-web-search-research.md:1` summarizing Responses API `web_search` request/response shape (including `web_search_call` plus assistant `message` with citations), auth via `Authorization: Bearer $OPENAI_API_KEY`, model constraints and tiered rate limits, and migration differences from the current SerpAPI wrapper (`src/Tools/SerpAPI.ts:296`, `src/Tools/GoogleSearchToolFactory.ts:1`, `src/ChatGptAgentService.ts:26`). Key finding: OpenAI built-in web search is server-side and its output is not converted into LangChain `tool_calls`, so the current `ToolNode`/announcement flow (`src/AgentStateGraph/ToolsNodeFactory.ts:1`, `src/AgentStateGraph/ToolCallAnnouncementNodeFactory.ts:64`) will not record search calls without follow-up changes.\n</info added on 2026-03-19T05:22:53.963Z>",
+            "status": "done",
+            "parentId": "undefined",
+            "updatedAt": "2026-03-19T05:23:01.930Z"
           },
           {
             "id": 3,
@@ -1634,7 +1636,8 @@
             "status": "pending",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-03-19T05:28:39.568Z"
       },
       {
         "id": "36",
@@ -3954,7 +3957,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-03-19T03:27:34.656Z",
+      "lastModified": "2026-03-19T05:28:39.569Z",
       "taskCount": 75,
       "completedCount": 52,
       "tags": [
