@@ -35,6 +35,13 @@
 - Tests: `bun test src scripts`
 - Task overview: `bun run tasks`
 
+## Commits
+- Keep commits focused and split unrelated changes instead of bundling them together.
+- Use concise, action-oriented commit subjects that reflect the real scope of the diff.
+- Stage only the files that belong to the requested change.
+- For internal-only changes, add a blank line and `no_announcement` at the end of the commit message; commits without it will be announced in Telegram on the next bot restart.
+- Before requesting elevated git permissions for commits, show the exact commit message to the user and state whether you are about to create one commit or multiple commits.
+
 ## Testing Guidelines
 - Keep tests next to the implementation using `*.test.ts`.
 - Prefer behavior-focused tests over implementation-detail tests.
