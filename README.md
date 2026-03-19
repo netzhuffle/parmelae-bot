@@ -243,15 +243,9 @@ journalctl -u parmelae-bot -n 100 --no-pager
 - **Documentation**: JSDoc for public methods and exported classes
 
 ### Development Workflow
-
-Set up to explore vibe coding using Cursor & task-master!
-
-The agent will use:
-
-1. **Plan Mode**: Think through the implementation approach
-2. **Act Mode**: Implement with tests and documentation
-3. **Quality Checks**: Run the full check suite
-4. **Code Review**: Self-review for readability and maintainability
+- Prefer small, focused changes.
+- Run `bun run checks` before merging.
+- Keep tests and documentation aligned with behavior changes.
 
 ## 📝 Project Status
 

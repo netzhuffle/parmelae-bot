@@ -17,8 +17,7 @@ if (config.sentryDsn) {
   });
 }
 
-// Wrap async initialization in IIFE to avoid top-level await
-// This ensures pm2 can require() this module without "async module" errors
+// Wrap async initialization in an IIFE to keep startup explicit and synchronous at module scope.
 void (async () => {
   const bot = await container.getAsync(Bot);
   bot.start();
