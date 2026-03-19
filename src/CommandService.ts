@@ -4,6 +4,7 @@ import { Command, Commands } from './Command.js';
 import { ReplyGenerator } from './MessageGenerators/ReplyGenerator.js';
 import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
 import { TelegramMessageWithReplyTo } from './Repositories/Types.js';
+import { StreamingTextSink } from './StreamingTextSink.js';
 
 /** Executes a command */
 @injectable()
@@ -16,7 +17,11 @@ export class CommandService {
    * @param command - The command
    * @param message - The message to reply to
    */
-  async execute(command: Command, message: TelegramMessageWithReplyTo): Promise<string> {
+  async execute(
+    command: Command,
+    message: TelegramMessageWithReplyTo,
+    streamSink?: StreamingTextSink,
+  ): Promise<string> {
     if (command === Commands.Unknown) {
       return 'Dieses Kommando ist unbekannt. Ich weiss nicht, was ich tun soll.';
     }
@@ -28,10 +33,17 @@ export class CommandService {
         return 'Ich würde Ihnen gerne einen Kommentar dazu abgeben, aber dazu müssen Sie mich in einer Antwort auf einen Text fragen, s’il vous plait.';
       }
       const toolCalls: string[] = [];
-      const response = await this.replyGenerator.generate(message.replyToMessage, (text) => {
-        toolCalls.push(text);
-        return Promise.resolve(null);
-      });
+      const response = await this.replyGenerator.generate(
+        message.replyToMessage,
+        async (text) => {
+          toolCalls.push(text);
+          if (streamSink) {
+            await streamSink.appendText(text + '\n');
+          }
+          return null;
+        },
+        streamSink,
+      );
       return (toolCalls.length ? toolCalls.join('\n') + '\n' : '') + response.text;
     }
 

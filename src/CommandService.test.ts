@@ -5,6 +5,7 @@ import { CommandService } from './CommandService.js';
 import { MessageModel } from './generated/prisma/models/Message.js';
 import { ReplyGenerator } from './MessageGenerators/ReplyGenerator.js';
 import { TelegramMessageWithReplyTo } from './Repositories/Types.js';
+import { StreamingTextSink } from './StreamingTextSink.js';
 
 describe('CommandService', () => {
   let commandService: CommandService;
@@ -47,6 +48,15 @@ describe('CommandService', () => {
       messageAfterToolCallsId: null,
       replyToMessage: messageToReplyTo,
     };
+    const streamedText: string[] = [];
+    const streamSink: StreamingTextSink = {
+      appendText: async (text) => {
+        streamedText.push(text);
+      },
+      reset: async () => {
+        return;
+      },
+    };
     replyGenerator.generate = mock(
       async (
         replyTarget: MessageModel,
@@ -62,8 +72,9 @@ describe('CommandService', () => {
       },
     );
 
-    const result = await commandService.execute(Commands.Comment, message);
+    const result = await commandService.execute(Commands.Comment, message, streamSink);
 
     expect(result).toBe('Using tool X\nThis is a comment');
+    expect(streamedText).toEqual(['Using tool X\n']);
   });
 });

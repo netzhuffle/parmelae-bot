@@ -6,6 +6,10 @@ import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { injectable } from 'inversify';
 
 import { AgentStateGraphFactory } from './AgentStateGraph/AgentStateGraphFactory.js';
+import {
+  getAiMessageTextChunkContent,
+  getLastAiMessageTextContent,
+} from './AiMessageTextContent.js';
 import { CallbackHandler } from './CallbackHandler.js';
 import { Config } from './Config.js';
 import { Conversation } from './Conversation.js';
@@ -20,6 +24,7 @@ import { Identity } from './MessageGenerators/Identities/Identity.js';
 import { IdentityResolverService } from './MessageGenerators/Identities/IdentityResolverService.js';
 import { SchiParmelaeIdentity } from './MessageGenerators/Identities/SchiParmelaeIdentity.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
+import { StreamingTextSink } from './StreamingTextSink.js';
 import { TelegramService } from './TelegramService.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
 import { diceTool } from './Tools/diceTool.js';
@@ -58,18 +63,6 @@ export interface ToolContext {
     emulator: EmulatorIdentity;
   };
   identityResolver: IdentityResolverService;
-}
-
-/** Extracts plain text from an AI message across both Completions and Responses API shapes. */
-export function getAiMessageTextContent(message: AIMessage): string {
-  if (typeof message.content === 'string') {
-    return message.content;
-  }
-
-  return message.contentBlocks
-    .filter((contentBlock) => contentBlock.type === 'text')
-    .map((contentBlock) => contentBlock.text)
-    .join('\n');
 }
 
 function assertIsToolContext(value: unknown): asserts value is ToolContext {
@@ -184,6 +177,7 @@ export class ChatGptAgentService {
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
     identity: Identity,
+    streamSink?: StreamingTextSink,
     retries = 0,
   ): Promise<ChatGptAgentResponse> {
     try {
@@ -193,10 +187,21 @@ export class ChatGptAgentService {
         conversation,
         announceToolCall,
         identity,
+        streamSink,
       );
     } catch (error) {
       if (retries < 2) {
-        return this.generate(message, conversation, announceToolCall, identity, retries + 1);
+        if (streamSink) {
+          await streamSink.reset();
+        }
+        return this.generate(
+          message,
+          conversation,
+          announceToolCall,
+          identity,
+          streamSink,
+          retries + 1,
+        );
       }
       ErrorService.log(error);
       assert(error instanceof Error);
@@ -248,6 +253,7 @@ export class ChatGptAgentService {
     conversation: Conversation,
     announceToolCall: (text: string) => Promise<number | null>,
     identity: Identity,
+    streamSink?: StreamingTextSink,
   ): Promise<ChatGptAgentResponse> {
     const allTools = this.buildTools(identity, message);
 
@@ -257,41 +263,78 @@ export class ChatGptAgentService {
       announceToolCall,
     });
 
-    const agentOutput = await agent.invoke(
-      {
-        messages: [new SystemMessage(systemPrompt), ...conversation.messages],
-      },
-      {
-        configurable: {
-          chatId: message.chatId,
-          userId: message.fromId,
-          telegramService: this.telegramService,
-          dallEService: this.dallEService,
-          dallEPromptGenerator: this.dallEPromptGenerator,
-          pokemonTcgPocketService: this.pokemonTcgPocketService,
-          identityByChatId: this.config.identityByChatId,
-          identities: {
-            schiParmelae: this.schiParmelaeIdentity,
-            emulator: this.emulatorIdentity,
-          },
-          identityResolver: this.identityResolver,
-        } satisfies ToolContext,
-        callbacks: [this.callbackHandler],
-      },
-    );
-    const lastMessage = agentOutput.messages[agentOutput.messages.length - 1];
-    assert(lastMessage instanceof AIMessage);
-    const content = getAiMessageTextContent(lastMessage);
+    const config = {
+      configurable: {
+        chatId: message.chatId,
+        userId: message.fromId,
+        telegramService: this.telegramService,
+        dallEService: this.dallEService,
+        dallEPromptGenerator: this.dallEPromptGenerator,
+        pokemonTcgPocketService: this.pokemonTcgPocketService,
+        identityByChatId: this.config.identityByChatId,
+        identities: {
+          schiParmelae: this.schiParmelaeIdentity,
+          emulator: this.emulatorIdentity,
+        },
+        identityResolver: this.identityResolver,
+      } satisfies ToolContext,
+      callbacks: [this.callbackHandler],
+    };
+    const input = {
+      messages: [new SystemMessage(systemPrompt), ...conversation.messages],
+    };
+    if (!streamSink) {
+      const agentOutput = await agent.invoke(input, config);
+      const content = getLastAiMessageTextContent(agentOutput.messages);
+      assert(content !== null, 'Agent output must include an assistant message.');
+      return {
+        message: {
+          role: ChatGptRoles.Assistant,
+          content,
+        },
+        toolCallMessageIds: agentOutput.toolCallMessageIds,
+      };
+    }
 
-    // Extract tool call message IDs from the final state
-    const toolCallMessageIds = agentOutput.toolCallMessageIds;
+    let latestState: {
+      messages: unknown[];
+      toolCallMessageIds: number[];
+    } | null = null;
+    let streamedAssistantText = '';
+    const stream = await agent.stream(input, {
+      ...config,
+      streamMode: ['messages', 'values'],
+    });
+    for await (const [mode, payload] of stream) {
+      if (mode === 'messages') {
+        const [messageChunk] = payload as [
+          { content: AIMessage['content']; contentBlocks?: AIMessage['contentBlocks'] },
+          unknown,
+        ];
+        const textChunk = getAiMessageTextChunkContent(messageChunk);
+        if (textChunk.length > 0) {
+          streamedAssistantText += textChunk;
+          void streamSink.appendText(textChunk);
+        }
+        continue;
+      }
+      if (mode === 'values') {
+        latestState = payload as {
+          messages: unknown[];
+          toolCallMessageIds: number[];
+        };
+      }
+    }
 
+    assert(latestState, 'Agent stream must produce a final values payload.');
+    const content = getLastAiMessageTextContent(latestState.messages) ?? streamedAssistantText;
+    assert(content.length > 0, 'Agent stream must end with assistant text.');
     return {
       message: {
         role: ChatGptRoles.Assistant,
         content,
       },
-      toolCallMessageIds,
+      toolCallMessageIds: latestState.toolCallMessageIds,
     };
   }
 }

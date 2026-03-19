@@ -56,8 +56,12 @@ export class OldMessageReplyService {
   }
 
   private async replyToMessage(message: TelegramMessage) {
-    const reply = await this.oldMessageReplyGenerator.generate(message.text);
-    await this.telegramService.replyBotText(reply, message);
+    const streamSession = this.telegramService.createModelTextSession(
+      message.chatId,
+      message.telegramMessageId,
+    );
+    const reply = await this.oldMessageReplyGenerator.generate(message.text, streamSession);
+    await streamSession.sendFinalText(reply);
   }
 
   private mayReplyToOldMessage(message: MessageWithUser): boolean {

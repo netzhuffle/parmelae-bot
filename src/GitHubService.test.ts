@@ -8,6 +8,7 @@ import { DateTimeSettingRepositoryFake } from './Fakes/DateTimeSettingRepository
 import { GitHubService } from './GitHubService.js';
 import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
 import { DateTimeSettingRepository } from './Repositories/DateTimeSettingRepository.js';
+import { FinalizableStreamingTextSink } from './StreamingTextSink.js';
 import { TelegramService } from './TelegramService.js';
 
 describe('GitHubService', () => {
@@ -19,7 +20,8 @@ describe('GitHubService', () => {
   let config: GitHubConfig;
   let listCommitsMock: ReturnType<typeof mock>;
   let generateMock: ReturnType<typeof mock>;
-  let sendMock: ReturnType<typeof mock>;
+  let createModelTextSessionMock: ReturnType<typeof mock>;
+  let sendFinalTextMock: ReturnType<typeof mock>;
 
   beforeEach(() => {
     dateTimeRepository = new DateTimeSettingRepositoryFake();
@@ -35,9 +37,20 @@ describe('GitHubService', () => {
     gitCommitAnnounceGenerator = {
       generate: generateMock,
     } as unknown as GitCommitAnnouncementGenerator;
-    sendMock = mock();
+    sendFinalTextMock = mock(async () => 1);
+    createModelTextSessionMock = mock(() => {
+      return {
+        appendText: async () => {
+          return;
+        },
+        reset: async () => {
+          return;
+        },
+        sendFinalText: sendFinalTextMock,
+      } satisfies FinalizableStreamingTextSink;
+    });
     telegramService = {
-      send: sendMock,
+      createModelTextSession: createModelTextSessionMock,
     } as unknown as TelegramService;
     config = new ConfigFake();
 
@@ -145,8 +158,6 @@ describe('GitHubService', () => {
         ],
       });
       generateMock.mockResolvedValue('Announcement');
-      sendMock.mockResolvedValue(1);
-
       await service.announceNewCommits();
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
@@ -175,8 +186,6 @@ describe('GitHubService', () => {
         ],
       });
       generateMock.mockResolvedValue('Announcement');
-      sendMock.mockResolvedValue(1);
-
       await service.announceNewCommits();
 
       expect(dateTimeRepository.updateCallArgs).toHaveLength(1);
@@ -203,6 +212,44 @@ describe('GitHubService', () => {
       await service.announceNewCommits();
 
       expect(generateMock).not.toHaveBeenCalled();
+    });
+
+    it('streams and sends commit announcements through model text sessions', async () => {
+      const validDate = new Date('2025-11-13T15:24:36.000Z');
+      dateTimeRepository.setStoredDate('last commit DateTime', validDate);
+      config = {
+        ...config,
+        newCommitAnnouncementChats: [BigInt(123), BigInt(456)],
+      };
+      service = new GitHubService(
+        octokit,
+        dateTimeRepository as unknown as DateTimeSettingRepository,
+        gitCommitAnnounceGenerator,
+        telegramService,
+        config,
+      );
+
+      listCommitsMock.mockResolvedValue({
+        data: [
+          {
+            commit: {
+              committer: {
+                date: new Date('2025-11-17T10:00:00.000Z').toISOString(),
+              },
+              message: 'Test commit',
+            },
+          },
+        ],
+      });
+      generateMock.mockResolvedValue('Announcement');
+
+      await service.announceNewCommits();
+
+      expect(createModelTextSessionMock).toHaveBeenCalledTimes(2);
+      expect(generateMock).toHaveBeenCalledTimes(1);
+      expect(sendFinalTextMock).toHaveBeenCalledTimes(2);
+      expect(sendFinalTextMock.mock.calls[0]?.[0]).toBe('Announcement');
+      expect(sendFinalTextMock.mock.calls[1]?.[0]).toBe('Announcement');
     });
   });
 });

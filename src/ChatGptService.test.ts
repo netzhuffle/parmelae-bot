@@ -14,6 +14,7 @@ import { ChatGptService } from './ChatGptService.js';
 import { ChatOpenAiFake } from './Fakes/ChatOpenAiFake.js';
 import { GptModels, GptModelsProvider } from './GptModelsProvider.js';
 import { ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
+import { StreamingTextSink } from './StreamingTextSink.js';
 
 describe('ChatGptService', () => {
   test('generate message', async () => {
@@ -43,5 +44,40 @@ describe('ChatGptService', () => {
       new AIMessage('Assistant Message'),
       new HumanMessage('User Message'),
     ]);
+  });
+
+  test('streams generated text into the provided sink', async () => {
+    const chatOpenAiFake = new ChatOpenAiFake(new AIMessage('completion'));
+    const sink: StreamingTextSink = {
+      appendText: async (text) => {
+        streamedText.push(text);
+      },
+      reset: async () => {
+        return;
+      },
+    };
+    const streamedText: string[] = [];
+    const sut = new ChatGptService(
+      new GptModelsProvider({
+        cheap: chatOpenAiFake as unknown as ChatOpenAI,
+        advanced: undefined as unknown as ChatOpenAI,
+        embeddings: undefined as unknown as OpenAIEmbeddings,
+      }),
+    );
+    const prompt = ChatPromptTemplate.fromMessages([
+      HumanMessagePromptTemplate.fromTemplate('{text}'),
+    ]);
+
+    const response = await sut.generate(
+      prompt,
+      GptModels.Cheap,
+      {
+        text: 'User Message',
+      },
+      sink,
+    );
+
+    expect(response.content).toBe('completion');
+    expect(streamedText).toEqual(['completion']);
   });
 });

@@ -16,6 +16,7 @@ export const GptModelsSettings = {
     model: GptModels.Cheap + '/openai',
     // GPT-5.4 models with tools + reasoning must use the Responses API.
     useResponsesApi: true,
+    streaming: true,
     reasoning: { effort: 'low' },
     verbosity: 'low',
   },
@@ -23,6 +24,7 @@ export const GptModelsSettings = {
     model: GptModels.Advanced + '/openai',
     // GPT-5.4 models with tools + reasoning must use the Responses API.
     useResponsesApi: true,
+    streaming: true,
     reasoning: { effort: 'low' },
     verbosity: 'low',
   },

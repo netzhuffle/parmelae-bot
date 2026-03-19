@@ -8,11 +8,12 @@ import { injectable } from 'inversify';
 
 import { ChatGptService } from '../ChatGptService.js';
 import { GptModels } from '../GptModelsProvider.js';
+import { StreamingTextSink } from '../StreamingTextSink.js';
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromMessages([
   SystemMessagePromptTemplate.fromTemplate(
-    'Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Gerade kündigen Sie Ihre neuen Funktionalitäten basierend auf der neusten Git-Commit-Message an.',
+    'Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Gerade kündigen Sie Ihre neuen Funktionalitäten basierend auf der neusten Git-Commit-Message an. Wenn Sie Formatierung verwenden, dann ausschliesslich gültiges Telegram MarkdownV2 und niemals allgemeines Markdown oder CommonMark. Verboten sind insbesondere Überschriften mit #, horizontale Linien, Tabellen und andere Syntax, die Telegram nicht direkt versteht. Wenn Sie unsicher sind, schreiben Sie lieber ohne Markdown.',
   ),
   HumanMessagePromptTemplate.fromTemplate('Replace username instead of stripping in request'),
   AIMessagePromptTemplate.fromTemplate(
@@ -55,10 +56,15 @@ export class GitCommitAnnouncementGenerator {
    * @param commitMessage - The commit’s message.
    * @return The announcement message.
    */
-  async generate(commitMessage: string): Promise<string> {
-    const message = await this.chatGpt.generate(PROMPT, GptModels.Cheap, {
-      message: commitMessage,
-    });
+  async generate(commitMessage: string, streamSink?: StreamingTextSink): Promise<string> {
+    const message = await this.chatGpt.generate(
+      PROMPT,
+      GptModels.Cheap,
+      {
+        message: commitMessage,
+      },
+      streamSink,
+    );
     return message.content;
   }
 }

@@ -5,6 +5,7 @@ import { ChatGptAgentService } from '../ChatGptAgentService.js';
 import { Config } from '../Config.js';
 import { ConversationService } from '../ConversationService.js';
 import { MessageModel } from '../generated/prisma/models/Message.js';
+import { StreamingTextSink } from '../StreamingTextSink.js';
 import { Identity } from './Identities/Identity.js';
 import { SchiParmelaeIdentity } from './Identities/SchiParmelaeIdentity.js';
 
@@ -38,6 +39,7 @@ export class ReplyGenerator {
   async generate(
     message: MessageModel,
     announceToolCall: (text: string) => Promise<number | null>,
+    streamSink?: StreamingTextSink,
   ): Promise<ReplyGeneratorResponse> {
     const identity = this.getIdentityForChat(message.chatId);
     const botContext: BotIdentityContext = {
@@ -53,6 +55,7 @@ export class ReplyGenerator {
       conversation,
       announceToolCall,
       identity,
+      streamSink,
     );
     return {
       text: completion.message.content,

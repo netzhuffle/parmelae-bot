@@ -84,6 +84,20 @@ class MarkdownV2SourceParser {
     };
   }
 
+  analyzeBestEffort(): Analysis {
+    const sequence = this.parseBestEffortSequence({
+      allowBlockquotes: true,
+      stopAtNewline: false,
+    });
+    return {
+      hasMarkdown: this.hasMarkdown,
+      hasPotentialMarkdown: this.hasPotentialMarkdown,
+      isValid: true,
+      nodes: sequence.nodes,
+      renderedText: sequence.nodes.map(renderNode).join(''),
+    };
+  }
+
   parseInlineOnly(): Analysis {
     const sequence = this.parseSequence({ allowBlockquotes: false, stopAtNewline: false });
     if (!sequence.valid || sequence.foundStop || this.index !== this.text.length) {
@@ -233,6 +247,130 @@ class MarkdownV2SourceParser {
     return { nodes, foundStop: false, valid: true };
   }
 
+  private parseBestEffortSequence(options: {
+    allowBlockquotes: boolean;
+    stopAtNewline: boolean;
+    stopToken?: string;
+  }): SequenceResult {
+    const nodes: Node[] = [];
+    let textBuffer = '';
+
+    const flushTextBuffer = () => {
+      if (textBuffer.length === 0) {
+        return;
+      }
+      nodes.push({ kind: 'text', text: textBuffer });
+      textBuffer = '';
+    };
+
+    while (this.index < this.text.length) {
+      if (options.stopToken && this.text.startsWith(options.stopToken, this.index)) {
+        flushTextBuffer();
+        return { nodes, foundStop: true, valid: true };
+      }
+
+      const character = this.text[this.index];
+      if (options.stopAtNewline && character === '\n') {
+        flushTextBuffer();
+        return { nodes, foundStop: false, valid: true };
+      }
+
+      if (character === '\\') {
+        this.hasPotentialMarkdown = true;
+        if (this.index === this.text.length - 1) {
+          textBuffer += character;
+          this.index += 1;
+          continue;
+        }
+        textBuffer += this.text[this.index + 1];
+        this.index += 2;
+        continue;
+      }
+
+      if (
+        options.allowBlockquotes &&
+        this.isLineStart() &&
+        (this.text.startsWith('**>', this.index) || this.text.startsWith('>', this.index))
+      ) {
+        const blockquote = this.tryParseNode((parser) => parser.parseBlockquote());
+        if (blockquote) {
+          flushTextBuffer();
+          nodes.push(blockquote);
+          continue;
+        }
+      }
+
+      if (this.isLineStart() && this.text.startsWith('```', this.index)) {
+        const pre = this.tryParseNode((parser) => parser.parsePre());
+        if (pre) {
+          flushTextBuffer();
+          nodes.push(pre);
+          continue;
+        }
+      }
+
+      if (this.text.startsWith('![', this.index)) {
+        const link = this.tryParseNode((parser) => parser.parseLink(true));
+        if (link) {
+          flushTextBuffer();
+          nodes.push(link);
+          continue;
+        }
+      }
+
+      if (character === '[') {
+        const link = this.tryParseNode((parser) => parser.parseLink(false));
+        if (link) {
+          flushTextBuffer();
+          nodes.push(link);
+          continue;
+        }
+      }
+
+      if (character === '`') {
+        const code = this.tryParseNode((parser) => parser.parseInlineCode());
+        if (code) {
+          flushTextBuffer();
+          nodes.push(code);
+          continue;
+        }
+      }
+
+      if (this.text.startsWith('__', this.index)) {
+        const underline = this.tryParseNode((parser) => parser.parseFormat('__'));
+        if (underline) {
+          flushTextBuffer();
+          nodes.push(underline);
+          continue;
+        }
+      }
+
+      if (this.text.startsWith('||', this.index)) {
+        const spoiler = this.tryParseNode((parser) => parser.parseFormat('||'));
+        if (spoiler) {
+          flushTextBuffer();
+          nodes.push(spoiler);
+          continue;
+        }
+      }
+
+      if (character === '*' || character === '_' || character === '~') {
+        const format = this.tryParseNode((parser) => parser.parseFormat(character));
+        if (format) {
+          flushTextBuffer();
+          nodes.push(format);
+          continue;
+        }
+      }
+
+      textBuffer += character;
+      this.index += 1;
+    }
+
+    flushTextBuffer();
+    return { nodes, foundStop: false, valid: true };
+  }
+
   private parseBlockquote(): Node | null {
     this.hasMarkdown = true;
     this.hasPotentialMarkdown = true;
@@ -259,10 +397,15 @@ class MarkdownV2SourceParser {
 
       const lineEnd = this.text.indexOf('\n', this.index);
       const currentLineEnd = lineEnd === -1 ? this.text.length : lineEnd;
-      rawLines.push(this.text.slice(this.index, currentLineEnd));
+      const line = this.text.slice(this.index, currentLineEnd);
+      rawLines.push(line);
       this.index = currentLineEnd;
 
       if (this.index >= this.text.length || this.text[this.index] !== '\n') {
+        break;
+      }
+
+      if (line.endsWith('||')) {
         break;
       }
 
@@ -279,7 +422,10 @@ class MarkdownV2SourceParser {
       return null;
     }
 
-    const hasExpandableSuffix = rawLines.at(-1)?.endsWith('||') ?? false;
+    const expandableSuffixLineIndices = rawLines.flatMap((line, lineIndex) =>
+      line.endsWith('||') ? [lineIndex] : [],
+    );
+    const hasExpandableSuffix = expandableSuffixLineIndices.length > 0;
     const expandable = hasExpandablePrefix || hasExpandableSuffix;
 
     if (hasExpandablePrefix && !hasExpandableSuffix) {
@@ -287,7 +433,7 @@ class MarkdownV2SourceParser {
     }
 
     const normalizedLines = rawLines.map((line, lineIndex) => {
-      if (hasExpandableSuffix && lineIndex === rawLines.length - 1) {
+      if (expandableSuffixLineIndices.includes(lineIndex)) {
         return line.slice(0, -2);
       }
       return line;
@@ -463,6 +609,23 @@ class MarkdownV2SourceParser {
 
   private isLineStart(): boolean {
     return this.index === 0 || this.text[this.index - 1] === '\n';
+  }
+
+  private tryParseNode<T extends Node>(
+    parse: (parser: MarkdownV2SourceParser) => T | null,
+  ): T | null {
+    const parser = new MarkdownV2SourceParser(this.text);
+    parser.index = this.index;
+
+    const node = parse(parser);
+    if (node === null) {
+      return null;
+    }
+
+    this.index = parser.index;
+    this.hasMarkdown ||= parser.hasMarkdown;
+    this.hasPotentialMarkdown ||= parser.hasPotentialMarkdown;
+    return node;
   }
 }
 
@@ -658,16 +821,56 @@ export function renderSupportedTelegramEntities(text: string): {
   entities: TelegramRenderableEntity[];
   text: string;
 } | null {
-  const analysis = analyzeTelegramMarkdown(text);
-  if (!analysis.hasMarkdown || !analysis.isValid || !analysis.nodes) {
-    return null;
-  }
-
   try {
-    return renderEntityNodes(analysis.nodes);
+    const strictAnalysis = analyzeTelegramMarkdown(text);
+    if (strictAnalysis.hasMarkdown && strictAnalysis.isValid && strictAnalysis.nodes) {
+      return renderEntityNodes(strictAnalysis.nodes);
+    }
+
+    const bestEffortAnalysis = new MarkdownV2SourceParser(text).analyzeBestEffort();
+    if (!bestEffortAnalysis.hasMarkdown || !bestEffortAnalysis.nodes) {
+      return null;
+    }
+
+    const rendered = renderEntityNodes(bestEffortAnalysis.nodes);
+    return rendered.entities.length === 0 ? null : rendered;
   } catch {
     return null;
   }
+}
+
+export function renderSupportedTelegramDraftEntities(text: string): {
+  entities: TelegramRenderableEntity[];
+  text: string;
+} | null {
+  const rendered = renderSupportedTelegramEntities(text);
+  if (rendered === null) {
+    return null;
+  }
+
+  let trailingBlockquoteIndex = -1;
+  let trailingBlockquoteEnd = -1;
+  rendered.entities.forEach((entity, index) => {
+    const entityEnd = entity.offset + entity.length;
+    if (entity.type === 'blockquote' && entityEnd >= trailingBlockquoteEnd) {
+      trailingBlockquoteIndex = index;
+      trailingBlockquoteEnd = entityEnd;
+    }
+  });
+
+  if (
+    trailingBlockquoteIndex === -1 ||
+    rendered.text.slice(trailingBlockquoteEnd).trim().length > 0
+  ) {
+    return rendered;
+  }
+
+  const entities = [...rendered.entities];
+  entities[trailingBlockquoteIndex] = {
+    ...entities[trailingBlockquoteIndex],
+    type: 'expandable_blockquote',
+  } as TelegramRenderableEntity;
+  return { text: rendered.text, entities };
 }
 
 export function escapeTelegramMarkdownV2(text: string): string {

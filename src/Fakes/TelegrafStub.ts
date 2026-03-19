@@ -24,6 +24,11 @@ type TelegramRenderableEntity =
  * Implements only the methods actually used by the codebase.
  */
 export class TelegrafStub {
+  public callApiCalls: {
+    apiMethod: string;
+    payload: unknown;
+  }[] = [];
+  public callApiErrors: Error[] = [];
   public sendMessageCalls: {
     chatId: string;
     text: string;
@@ -61,6 +66,7 @@ export class TelegrafStub {
       url: string,
       options?: { caption?: string; reply_parameters?: { message_id: number } },
     ) => Promise<Typegram.Message.PhotoMessage>;
+    callApi: (apiMethod: string, payload?: unknown) => Promise<unknown>;
     getFileLink: (fileId: string) => Promise<URL>;
     getMyName: () => Promise<{ name: string }>;
   };
@@ -120,6 +126,14 @@ export class TelegrafStub {
           chat: privateChat,
           photo: [],
         } as Typegram.Message.PhotoMessage);
+      },
+      callApi: async (apiMethod, payload) => {
+        this.callApiCalls.push({ apiMethod, payload });
+        const error = this.callApiErrors.shift();
+        if (error) {
+          throw error;
+        }
+        return true;
       },
       getFileLink: async () => {
         return await Promise.resolve(new URL('https://fake-telegram-file-url.com/'));

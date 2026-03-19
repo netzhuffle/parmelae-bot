@@ -1,10 +1,12 @@
-import { ContentBlock, HumanMessage, MessageContent } from '@langchain/core/messages';
+import { HumanMessage, MessageContent } from '@langchain/core/messages';
 import { BaseChatPromptTemplate } from '@langchain/core/prompts';
 import { ChainValues } from '@langchain/core/utils/types';
 import { injectable } from 'inversify';
 
+import { getAiMessageTextChunkContent } from './AiMessageTextContent.js';
 import { GptModel, GptModelsProvider } from './GptModelsProvider.js';
 import { ChatGptMessage, ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
+import { StreamingTextSink } from './StreamingTextSink.js';
 
 /** ChatGPT Service */
 @injectable()
@@ -21,13 +23,24 @@ export class ChatGptService {
     prompt: BaseChatPromptTemplate,
     model: GptModel,
     promptValues: ChainValues,
+    streamSink?: StreamingTextSink,
   ): Promise<ChatGptMessage> {
     const chain = prompt.pipe(this.models.getModel(model));
-    const response = await chain.invoke(promptValues);
-    const textContentBlock = this.getTextContentBlock(response.contentBlocks);
+    const stream = await chain.stream(promptValues);
+    let content = '';
+    for await (const chunk of stream) {
+      const textChunk = getAiMessageTextChunkContent(chunk);
+      if (textChunk.length === 0) {
+        continue;
+      }
+      content += textChunk;
+      if (streamSink) {
+        void streamSink.appendText(textChunk);
+      }
+    }
     return {
       role: ChatGptRoles.Assistant,
-      content: textContentBlock.text,
+      content,
     };
   }
 
@@ -37,14 +50,5 @@ export class ChatGptService {
       name,
       content,
     });
-  }
-
-  private getTextContentBlock(contentBlocks: ContentBlock.Standard[]): ContentBlock.Text {
-    for (const contentBlock of contentBlocks) {
-      if (contentBlock.type === 'text') {
-        return contentBlock;
-      }
-    }
-    throw new Error('No text content found in response');
   }
 }

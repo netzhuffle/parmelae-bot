@@ -10,4 +10,12 @@ describe('GptModelsSettings', () => {
   it('uses the Responses API for the advanced model', () => {
     expect(GptModelsSettings[GptModels.Advanced].useResponsesApi).toBe(true);
   });
+
+  it('streams tokens for the cheap model', () => {
+    expect(GptModelsSettings[GptModels.Cheap].streaming).toBe(true);
+  });
+
+  it('streams tokens for the advanced model', () => {
+    expect(GptModelsSettings[GptModels.Advanced].streaming).toBe(true);
+  });
 });

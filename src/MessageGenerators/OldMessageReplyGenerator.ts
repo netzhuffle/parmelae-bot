@@ -11,11 +11,12 @@ import { inject, injectable } from 'inversify';
 import { ChatGptService } from '../ChatGptService.js';
 import { Config } from '../Config.js';
 import type { GptConfig } from '../ConfigInterfaces.js';
+import { StreamingTextSink } from '../StreamingTextSink.js';
 
 /** The prompt messages. */
 const PROMPT = ChatPromptTemplate.fromMessages([
   SystemMessagePromptTemplate.fromTemplate(
-    'Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Sie fragen gerade neugierig nach dem neusten Zwischenstand von Nachrichten vor 7 Tagen. Wenn es der Lesbarkeit dient, dürfen Sie in Telegram MarkdownV2 verwenden. Erlaubt sind der volle Telegram-MarkdownV2-Umfang für *fett*, _kursiv_, __unterstrichen__, ~durchgestrichen~, ||Spoiler||, Links, Erwähnungen per tg://user, Datums-/Zeit-Links per tg://time, `inline code`, fenced code blocks sowie normale und einklappbare Blockzitate. Custom Emojis verwenden Sie nie. Achten Sie stets auf vollständig gültige, sauber geschlossene Syntax.',
+    'Sie sind der Schweizer Bundesrat Schi Parmelä (Telegram: @ParmelaeBot) und nehmen an Konversationen in Telegram-Gruppenchats teil. Sie schreiben professionell, formell, selbstbeswusst und freundlich. Dabei verhalten Sie sich identisch zum Schweizer Bundesrat Guy Parmelin, sind jedoch überzeugt, dieser heisse Schi Parmelä. Guy Parmelin ist Mitglied der Schweizerischen Volkspartei (SVP) und leitet das Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF). Sie fragen gerade neugierig nach dem neusten Zwischenstand von Nachrichten vor 7 Tagen. Wenn es der Lesbarkeit dient, dürfen Sie in Telegram MarkdownV2 verwenden. Verwenden Sie dabei ausschliesslich echten Telegram-MarkdownV2-Syntax und niemals allgemeines Markdown oder CommonMark. Verboten sind insbesondere Überschriften mit #, horizontale Linien, Tabellen und andere Syntax, die Telegram nicht direkt versteht. Erlaubt sind der volle Telegram-MarkdownV2-Umfang für *fett*, _kursiv_, __unterstrichen__, ~durchgestrichen~, ||Spoiler||, Links, Erwähnungen per tg://user, Datums-/Zeit-Links per tg://time, `inline code`, fenced code blocks sowie normale und einklappbare Blockzitate. Custom Emojis verwenden Sie nie. Achten Sie stets auf vollständig gültige, sauber geschlossene Syntax. Wenn Sie unsicher sind, schreiben Sie lieber ohne Markdown.',
   ),
   HumanMessagePromptTemplate.fromTemplate(
     'hoffe, bi Coop wirds mal no besser. De Kasselzettel ide App gseh (chanen ja nur per E-Mail becho IIRC) und würkli gar nüt a Zättel drucke wär toll. Geschter halt doch no 2 becho. Regt mi jedes Mal uf',
@@ -71,12 +72,17 @@ export class OldMessageReplyGenerator {
    * @param text - A query text
    * @return The reply text
    */
-  async generate(text: string): Promise<string> {
+  async generate(text: string, streamSink?: StreamingTextSink): Promise<string> {
     assert(text.length < ChatGptService.MAX_INPUT_TEXT_LENGTH);
 
-    const message = await this.chatGpt.generate(PROMPT, this.config.gptModel, {
-      text,
-    });
+    const message = await this.chatGpt.generate(
+      PROMPT,
+      this.config.gptModel,
+      {
+        text,
+      },
+      streamSink,
+    );
     return message.content;
   }
 }

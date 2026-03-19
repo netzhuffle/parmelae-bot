@@ -6,6 +6,7 @@ import { Config } from './Config.js';
 import type { GitHubConfig } from './ConfigInterfaces.js';
 import { GitCommitAnnouncementGenerator } from './MessageGenerators/GitCommitAnnouncementGenerator.js';
 import { DateTimeSettingRepository } from './Repositories/DateTimeSettingRepository.js';
+import { CompositeStreamingTextSink } from './StreamingTextSink.js';
 import { TelegramService } from './TelegramService.js';
 
 interface Commit {
@@ -106,12 +107,16 @@ export class GitHubService {
       return;
     }
 
-    const announcementText = await this.gitCommitAnnounceGenerator.generate(commitMessage);
-    const promises: Promise<number>[] = [];
-    this.config.newCommitAnnouncementChats.forEach((chat) => {
-      promises.push(this.telegramService.send(announcementText, chat));
-    });
-    await Promise.all(promises);
+    const streamSessions = this.config.newCommitAnnouncementChats.map((chat) =>
+      this.telegramService.createModelTextSession(chat),
+    );
+    const announcementText = await this.gitCommitAnnounceGenerator.generate(
+      commitMessage,
+      new CompositeStreamingTextSink(streamSessions),
+    );
+    await Promise.all(
+      streamSessions.map((streamSession) => streamSession.sendFinalText(announcementText)),
+    );
   }
 
   private async updateSettingIfNewer(date: Date): Promise<void> {
