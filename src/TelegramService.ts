@@ -27,7 +27,9 @@ interface SendMessageDraftPayload {
   parse_mode?: 'MarkdownV2';
 }
 
-const DRAFT_UPDATE_INTERVAL_MS = 50;
+const INITIAL_DRAFT_UPDATE_INTERVAL_MS = 30;
+const DRAFT_UPDATE_INTERVAL_STEP_MS = 15;
+const TELEGRAM_MAX_MESSAGE_LENGTH = 4096;
 
 class TelegramDraftSession implements FinalizableStreamingTextSink {
   private buffer = '';
@@ -37,6 +39,7 @@ class TelegramDraftSession implements FinalizableStreamingTextSink {
   private draftWaitTimeout: ReturnType<typeof setTimeout> | null = null;
   private draftWaitResolver: (() => void) | null = null;
   private draftsCanceled = false;
+  private sentDraftCount = 0;
 
   constructor(
     private readonly sendDraftText: (
@@ -78,7 +81,7 @@ class TelegramDraftSession implements FinalizableStreamingTextSink {
   private queueDraftUpdate(text: string): void {
     this.queuedDraftText = text;
     if (this.draftUpdateLoop === null) {
-      this.nextAllowedDraftUpdateAt ??= Date.now() + DRAFT_UPDATE_INTERVAL_MS;
+      this.nextAllowedDraftUpdateAt ??= Date.now() + this.getNextDraftDelayMs();
       this.draftUpdateLoop = this.runDraftUpdateLoop();
     }
   }
@@ -106,7 +109,8 @@ class TelegramDraftSession implements FinalizableStreamingTextSink {
       // oxlint-disable-next-line no-await-in-loop -- Draft updates must be sent in order for a single draft_id.
       const didSendDraft = await this.sendDraftText(this.chatId, this.draftId, text);
       if (didSendDraft) {
-        this.nextAllowedDraftUpdateAt = Date.now() + DRAFT_UPDATE_INTERVAL_MS;
+        this.sentDraftCount += 1;
+        this.nextAllowedDraftUpdateAt = Date.now() + this.getNextDraftDelayMs();
       }
     }
 
@@ -124,6 +128,10 @@ class TelegramDraftSession implements FinalizableStreamingTextSink {
         this.draftWaitResolver?.();
       }, delayMs);
     });
+  }
+
+  private getNextDraftDelayMs(): number {
+    return INITIAL_DRAFT_UPDATE_INTERVAL_MS + this.sentDraftCount * DRAFT_UPDATE_INTERVAL_STEP_MS;
   }
 
   private cancelPendingDraftUpdates(): void {
@@ -461,39 +469,45 @@ export class TelegramService {
               message_id: replyToMessageId,
             },
           };
-
     const renderedEntities = renderSupportedTelegramEntities(text);
     if (renderedEntities !== null) {
+      const message = await this.primaryTelegraf.telegram.sendMessage(
+        chatId.toString(),
+        renderedEntities.text,
+        {
+          ...replyParameters,
+          entities: renderedEntities.entities as Typegram.MessageEntity[],
+        },
+      );
       return {
-        message: await this.primaryTelegraf.telegram.sendMessage(
-          chatId.toString(),
-          renderedEntities.text,
-          {
-            ...replyParameters,
-            entities: renderedEntities.entities as Typegram.MessageEntity[],
-          },
-        ),
+        message,
         storedText: text,
       };
     }
 
     const renderedText = renderSupportedMarkdownV2(text);
     if (renderedText !== null) {
-      return {
-        message: await this.primaryTelegraf.telegram.sendMessage(chatId.toString(), renderedText, {
+      const message = await this.primaryTelegraf.telegram.sendMessage(
+        chatId.toString(),
+        renderedText,
+        {
           ...replyParameters,
           parse_mode: this.markdownParseMode,
-        }),
+        },
+      );
+      return {
+        message,
         storedText: text,
       };
     }
 
     try {
+      const message = await this.primaryTelegraf.telegram.sendMessage(chatId.toString(), text, {
+        ...replyParameters,
+        parse_mode: this.markdownParseMode,
+      });
       return {
-        message: await this.primaryTelegraf.telegram.sendMessage(chatId.toString(), text, {
-          ...replyParameters,
-          parse_mode: this.markdownParseMode,
-        }),
+        message,
         storedText: text,
       };
     } catch (error) {
@@ -502,11 +516,16 @@ export class TelegramService {
       }
 
       const escapedText = escapeTelegramMarkdownV2(text);
-      return {
-        message: await this.primaryTelegraf.telegram.sendMessage(chatId.toString(), escapedText, {
+      const message = await this.primaryTelegraf.telegram.sendMessage(
+        chatId.toString(),
+        escapedText,
+        {
           ...replyParameters,
           parse_mode: this.markdownParseMode,
-        }),
+        },
+      );
+      return {
+        message,
         storedText: text,
       };
     }
@@ -527,29 +546,54 @@ export class TelegramService {
   ): SendMessageDraftPayload {
     const renderedEntities = renderSupportedTelegramDraftEntities(text);
     if (renderedEntities !== null) {
-      return {
+      return this.trimDraftPayloadToMaxLength({
         chat_id: chatId.toString(),
         draft_id: draftId,
         text: renderedEntities.text,
         entities: renderedEntities.entities as Typegram.MessageEntity[],
-      };
+      });
     }
 
     const renderedText = renderSupportedMarkdownV2(text);
     if (renderedText !== null) {
-      return {
+      return this.trimDraftPayloadToMaxLength({
         chat_id: chatId.toString(),
         draft_id: draftId,
         text: renderedText,
         parse_mode: this.markdownParseMode,
-      };
+      });
     }
 
-    return {
+    return this.trimDraftPayloadToMaxLength({
       chat_id: chatId.toString(),
       draft_id: draftId,
       text,
       parse_mode: this.markdownParseMode,
+    });
+  }
+
+  private trimDraftPayloadToMaxLength(payload: SendMessageDraftPayload): SendMessageDraftPayload {
+    if (payload.text.length <= TELEGRAM_MAX_MESSAGE_LENGTH) {
+      return payload;
+    }
+
+    const start = payload.text.length - TELEGRAM_MAX_MESSAGE_LENGTH;
+    if (payload.entities !== undefined) {
+      return {
+        ...payload,
+        text: payload.text.slice(start),
+        entities: payload.entities
+          .filter(
+            (entity) =>
+              entity.offset >= start && entity.offset + entity.length <= payload.text.length,
+          )
+          .map((entity) => Object.assign({}, entity, { offset: entity.offset - start })),
+      };
+    }
+
+    return {
+      ...payload,
+      text: payload.text.slice(start),
     };
   }
 

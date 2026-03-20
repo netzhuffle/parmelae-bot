@@ -50,9 +50,9 @@ describe('TelegramService model-authored text', () => {
     await session.appendText('*Hallo');
     await advanceTimersByTime(0);
     expect(telegrafStub.callApiCalls).toEqual([]);
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(30);
     await session.appendText(' Welt*');
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(45);
 
     expect(telegrafStub.callApiCalls).toEqual([
       {
@@ -88,7 +88,7 @@ describe('TelegramService model-authored text', () => {
 
     await session.appendText('*Hallo');
     await advanceTimersByTime(0);
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(30);
     const storedId = await session.sendFinalText('*Hallo Welt*');
 
     expect(storedId).toBe(123);
@@ -157,7 +157,7 @@ describe('TelegramService model-authored text', () => {
 
     await session.appendText('*Hallo');
     await advanceTimersByTime(0);
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(30);
     await session.appendText(' Welt*');
     await session.sendFinalText('*Hallo Welt*');
 
@@ -193,7 +193,7 @@ describe('TelegramService model-authored text', () => {
 
     await session.appendText('*Hallo');
     await advanceTimersByTime(0);
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(30);
 
     expect(telegrafStub.callApiCalls).toEqual([
       {
@@ -333,12 +333,12 @@ describe('TelegramService model-authored text', () => {
 
     await session.appendText('*Hallo');
     await advanceTimersByTime(0);
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(30);
     const resetPromise = session.reset();
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(45);
     await resetPromise;
     await session.appendText('Neu');
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(60);
 
     expect(telegrafStub.callApiCalls).toEqual([
       {
@@ -375,7 +375,7 @@ describe('TelegramService model-authored text', () => {
     const session = service.createModelTextSession(BigInt(123));
 
     await session.appendText('> Zitat');
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(30);
 
     expect(telegrafStub.callApiCalls).toEqual([
       {
@@ -400,9 +400,9 @@ describe('TelegramService model-authored text', () => {
     const session = service.createModelTextSession(BigInt(123));
 
     await session.appendText('> Zitat');
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(30);
     await session.appendText('\n\nNachtrag');
-    await advanceTimersByTime(300);
+    await advanceTimersByTime(45);
 
     expect(telegrafStub.callApiCalls).toEqual([
       {
@@ -433,6 +433,26 @@ describe('TelegramService model-authored text', () => {
               length: 6,
             },
           ],
+        },
+      },
+    ]);
+  });
+
+  it('trims draft payloads to Telegrams 4096 character limit by keeping the latest tail', async () => {
+    const session = service.createModelTextSession(BigInt(123));
+    const text = 'a'.repeat(5000);
+
+    await session.appendText(text);
+    await advanceTimersByTime(30);
+
+    expect(telegrafStub.callApiCalls).toEqual([
+      {
+        apiMethod: 'sendMessageDraft',
+        payload: {
+          chat_id: '123',
+          draft_id: 1,
+          parse_mode: 'MarkdownV2',
+          text: 'a'.repeat(4096),
         },
       },
     ]);
