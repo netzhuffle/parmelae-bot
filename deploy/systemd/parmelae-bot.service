@@ -14,6 +14,17 @@ ExecStart=/home/parmelae-bot/.bun/bin/bun src/index.ts
 Restart=always
 RestartSec=3
 NoNewPrivileges=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+SystemCallArchitectures=native
+UMask=027
 SyslogIdentifier=parmelae-bot
 
 [Install]
