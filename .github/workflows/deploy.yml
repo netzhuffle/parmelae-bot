@@ -139,7 +139,7 @@ jobs:
           ssh_opts="-i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes"
 
           ssh $ssh_opts "${deploy_user}@${deploy_host}" "\
-            chmod +x '${remote_release_dir}/deploy/activate-release.sh' && \
+            chmod +x '${remote_release_dir}/deploy/activate-release.sh' '${remote_release_dir}/parmelae-bot' && \
             '${remote_release_dir}/deploy/activate-release.sh' \
               --base-dir '${deploy_base}' \
               --release '${release_id}' \
