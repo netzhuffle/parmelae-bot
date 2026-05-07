@@ -9,7 +9,7 @@
     "validate-yaml": "yaml-validator resources/*.yaml",
     "test": "bun test src scripts",
     "checks": "bun run format && bun run schema-format && bun run lint:without-tests && bun run lint && bun run validate-yaml && bun test",
-    "build:executable": "bun build src/index.ts --compile --compile-target=bun-linux-x64-modern --outfile=dist/parmelae-bot",
+    "build:executable": "bun build src/index.ts --compile --compile-target=bun-linux-x64-modern --bytecode --no-compile-autoload-dotenv --no-compile-autoload-bunfig --outfile=dist/parmelae-bot",
     "migrate": "prisma migrate dev",
     "tasks": "task-master list --status=pending,in-progress,review,deferred --with-subtasks",
     "run-dev": "bun src/index.ts",
