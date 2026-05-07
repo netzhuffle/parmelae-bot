@@ -1,6 +1,7 @@
 /.env
 /.taskmaster/tasks/*.txt
 /node_modules/
+/dist/
 /prisma/sqlite.db
 /prisma/sqlite.db-journal
 /src/generated/prisma

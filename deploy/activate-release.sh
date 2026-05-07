@@ -5,6 +5,7 @@ base_dir="/srv/parmelae-bot"
 release_id=""
 service_name="parmelae-bot"
 keep_releases=5
+executable_path="parmelae-bot"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -71,6 +72,25 @@ fi
 
 if [[ -z "$desired_bun_version" ]]; then
   echo "Missing Bun version in ${release_dir}/.bun-version" >&2
+  exit 1
+fi
+
+if [[ ! -x "${release_dir}/${executable_path}" ]]; then
+  echo "Compiled executable is missing or not executable: ${release_dir}/${executable_path}" >&2
+  exit 1
+fi
+
+if ! grep -qw avx2 /proc/cpuinfo; then
+  echo "Server CPU does not support AVX2, but this release uses bun-linux-x64-modern." >&2
+  exit 1
+fi
+
+expected_exec_start="${current_link}/${executable_path}"
+actual_exec_start="$(systemctl show "$service_name" --property=ExecStart --value 2>/dev/null || true)"
+
+if [[ "$actual_exec_start" != *"$expected_exec_start"* ]]; then
+  echo "Systemd service ${service_name} does not run ${expected_exec_start}." >&2
+  echo "Current ExecStart: ${actual_exec_start:-<unavailable>}" >&2
   exit 1
 fi
 

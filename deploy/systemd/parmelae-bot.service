@@ -10,10 +10,9 @@ Group=parmelae-bot
 WorkingDirectory=/srv/parmelae-bot/current
 Environment=NODE_ENV=production
 EnvironmentFile=/srv/parmelae-bot/shared/.env
-ExecStart=/home/parmelae-bot/.bun/bin/bun src/index.ts
+ExecStart=/srv/parmelae-bot/current/parmelae-bot
 Restart=always
 RestartSec=3
-NoNewPrivileges=true
 PrivateTmp=true
 ProtectKernelTunables=true
 ProtectKernelModules=true

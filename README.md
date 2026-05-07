@@ -161,26 +161,27 @@ Production uses GitHub Actions plus a release-based server layout:
     └── backups/
 ```
 
-The bot runs directly from source with Bun under `systemd`. Releases are synced to
+The bot runs as a compiled Bun executable under `systemd`. Releases are synced to
 `releases/<git-sha>`, `current` is updated on successful activation, and the shared
 SQLite database plus backups stay outside the release directories.
 
 ### One-time Server Setup
 
-1. Create a dedicated Linux user, for example `parmelae-bot`.
-2. Install Bun for that user.
-3. Create `/srv/parmelae-bot/releases` and `/srv/parmelae-bot/shared/backups`.
-4. Copy the production `.env` to `/srv/parmelae-bot/shared/.env`.
-5. Copy the production SQLite database to `/srv/parmelae-bot/shared/sqlite.db`.
-6. Add production path overrides to `/srv/parmelae-bot/shared/.env`:
+1. Create a dedicated runtime Linux user, for example `parmelae-bot`.
+2. Create a separate deployment Linux user, for example `deploy-parmelae-bot`.
+3. Install Bun for the deployment user. Bun is still used during activation for backups and Prisma migrations.
+4. Create `/srv/parmelae-bot/releases` and `/srv/parmelae-bot/shared/backups`.
+5. Copy the production `.env` to `/srv/parmelae-bot/shared/.env`.
+6. Copy the production SQLite database to `/srv/parmelae-bot/shared/sqlite.db`.
+7. Add production path overrides to `/srv/parmelae-bot/shared/.env`:
 
 ```env
 DATABASE_URL="file:/srv/parmelae-bot/shared/sqlite.db"
 BACKUP_DIR="/srv/parmelae-bot/shared/backups"
 ```
 
-7. Install the systemd unit from `deploy/systemd/parmelae-bot.service`.
-8. Grant the deployment user permission to run `systemctl` for `parmelae-bot` without a password.
+8. Install the systemd unit from `deploy/systemd/parmelae-bot.service`.
+9. Grant the deployment user permission to run `systemctl` and `journalctl` for `parmelae-bot` without a password.
 
 ### Deployment Flow
 
@@ -190,18 +191,20 @@ Each push to `main` runs:
 bun install --frozen-lockfile
 bunx prisma generate
 bun run checks
+bun run build:executable
 ```
 
 If CI passes, GitHub Actions uploads a release bundle, syncs it to the server, and runs
 `deploy/activate-release.sh`, which:
 
-1. upgrades Bun for the deploy user when `.bun-version` changes
-2. installs production dependencies in the new release
-3. backs up the shared SQLite database
-4. runs Prisma migrations against the shared database
-5. updates the `current` symlink
-6. restarts the systemd service
-7. prunes old backups and releases
+1. verifies the compiled executable and server CPU support
+2. upgrades Bun for the deploy user when `.bun-version` changes
+3. installs production dependencies for deployment-time backup and migration commands
+4. backs up the shared SQLite database
+5. runs Prisma migrations against the shared database
+6. updates the `current` symlink
+7. restarts the systemd service
+8. prunes old backups and releases
 
 ### systemd Commands
 
@@ -214,8 +217,9 @@ journalctl -u parmelae-bot -n 100 --no-pager
 
 ### Important Notes
 
-- The `src/index.ts` entry file must remain a synchronous module (no top-level await).
-- Production Bun is pinned through `.bun-version` and upgraded during deploy only when the pinned version changes.
+- The runtime service starts `/srv/parmelae-bot/current/parmelae-bot`.
+- The executable is built for `bun-linux-x64-modern`; the server CPU must support AVX2.
+- Deploy-time Bun is pinned through `.bun-version` and upgraded during deploy only when the pinned version changes.
 - The production database is configured through `DATABASE_URL`.
 - Backups are configured through `BACKUP_DIR`.
 - The Minecraft server name defaults to `atm8` and can be changed through `MINECRAFT_SERVER_NAME`.
@@ -224,6 +228,7 @@ journalctl -u parmelae-bot -n 100 --no-pager
 ### Environment Considerations
 
 - **Process Management**: systemd service in `deploy/systemd/parmelae-bot.service`
+- **Runtime Artifact**: compiled Bun executable at `/srv/parmelae-bot/current/parmelae-bot`
 - **Database**: SQLite stored in `/srv/parmelae-bot/shared/sqlite.db`
 - **Monitoring**: Helicone integration for API usage tracking
 - **Error Handling**: Sentry integration available for error tracking

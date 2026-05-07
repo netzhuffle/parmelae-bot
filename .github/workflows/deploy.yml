@@ -48,6 +48,9 @@ jobs:
       - name: Run checks (type check, lint, test)
         run: bun run checks
 
+      - name: Build executable
+        run: bun run build:executable
+
       - name: Prepare release bundle
         run: |
           mkdir -p release
@@ -60,9 +63,11 @@ jobs:
             --exclude '.taskmaster/' \
             --exclude '.vscode/' \
             --exclude 'backups/' \
+            --exclude 'dist/' \
             --exclude '.env' \
             --exclude 'prisma/sqlite.db' \
             ./ release/
+          install -m 755 dist/parmelae-bot release/parmelae-bot
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v6
@@ -104,7 +109,7 @@ jobs:
 
           deploy_base="${DEPLOY_BASE:-/srv/parmelae-bot}"
           deploy_host="${DEPLOY_HOST:-jannis.rocks}"
-          deploy_user="${DEPLOY_USER:-parmelae-bot}"
+          deploy_user="${DEPLOY_USER:-deploy-parmelae-bot}"
           release_id="${GITHUB_SHA}"
           remote_release_dir="${deploy_base}/releases/${release_id}"
           ssh_opts="-i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes"
@@ -127,7 +132,7 @@ jobs:
 
           deploy_base="${DEPLOY_BASE:-/srv/parmelae-bot}"
           deploy_host="${DEPLOY_HOST:-jannis.rocks}"
-          deploy_user="${DEPLOY_USER:-parmelae-bot}"
+          deploy_user="${DEPLOY_USER:-deploy-parmelae-bot}"
           service_name="${SERVICE_NAME:-parmelae-bot}"
           release_id="${GITHUB_SHA}"
           remote_release_dir="${deploy_base}/releases/${release_id}"
