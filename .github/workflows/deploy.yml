@@ -53,21 +53,10 @@ jobs:
 
       - name: Prepare release bundle
         run: |
-          mkdir -p release
-          rsync -a \
-            --exclude '.git/' \
-            --exclude 'node_modules/' \
-            --exclude '.github/' \
-            --exclude '.cursor/' \
-            --exclude '.devcontainer/' \
-            --exclude '.taskmaster/' \
-            --exclude '.vscode/' \
-            --exclude 'backups/' \
-            --exclude 'dist/' \
-            --exclude '.env' \
-            --exclude 'prisma/sqlite.db' \
-            ./ release/
+          install -d release/deploy release/prisma
           install -m 755 dist/parmelae-bot release/parmelae-bot
+          install -m 755 deploy/activate-release.sh release/deploy/activate-release.sh
+          cp -R prisma/migrations release/prisma/migrations
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v6

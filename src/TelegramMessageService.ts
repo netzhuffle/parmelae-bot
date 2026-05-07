@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import * as Typegram from '@telegraf/types';
+import type * as Typegram from '@telegraf/types';
 import { injectable, inject } from 'inversify';
 
 import { normalizeUsername } from './BotIdentityContext.js';

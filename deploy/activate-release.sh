@@ -37,10 +37,8 @@ if [[ -z "$release_id" ]]; then
   exit 1
 fi
 
-export PATH="$HOME/.bun/bin:$PATH"
-
-if ! command -v bun >/dev/null 2>&1; then
-  echo "bun not found in PATH." >&2
+if [[ ! "$release_id" =~ ^[A-Za-z0-9._-]+$ ]]; then
+  echo "Invalid release value: ${release_id}" >&2
   exit 1
 fi
 
@@ -50,7 +48,6 @@ shared_dir="${base_dir}/shared"
 shared_env="${shared_dir}/.env"
 shared_db="${shared_dir}/sqlite.db"
 shared_backups="${shared_dir}/backups"
-desired_bun_version="$(tr -d '[:space:]' < "${release_dir}/.bun-version")"
 previous_release=""
 
 if [[ ! -d "$release_dir" ]]; then
@@ -67,11 +64,6 @@ fi
 
 if [[ ! -f "$shared_db" ]]; then
   echo "Missing shared database: ${shared_db}" >&2
-  exit 1
-fi
-
-if [[ -z "$desired_bun_version" ]]; then
-  echo "Missing Bun version in ${release_dir}/.bun-version" >&2
   exit 1
 fi
 
@@ -106,18 +98,9 @@ set +a
 : "${BACKUP_DIR:=${shared_backups}}"
 export DATABASE_URL BACKUP_DIR
 
-current_bun_version="$(bun --version)"
-if [[ "$current_bun_version" != "$desired_bun_version" ]]; then
-  echo "Upgrading Bun from ${current_bun_version} to ${desired_bun_version}..."
-  curl -fsSL https://bun.sh/install | bash -s -- "bun-v${desired_bun_version}"
-  export PATH="$HOME/.bun/bin:$PATH"
-  echo "Using Bun $(bun --version)"
-fi
-
 cd "$release_dir"
-bun install --frozen-lockfile --production
-bun scripts/backup/backup-database.ts
-bun run migrate-prod
+./"${executable_path}" deploy backup
+./"${executable_path}" deploy migrate
 
 ln -sfn "$release_dir" "$current_link"
 
@@ -158,7 +141,7 @@ prune_old_releases() {
 }
 
 if restart_service && wait_for_service; then
-  bun scripts/backup/cleanup-backups.ts || true
+  ./"${executable_path}" deploy cleanup-backups || true
   prune_old_releases || true
   echo "Activated release ${release_id}."
   exit 0

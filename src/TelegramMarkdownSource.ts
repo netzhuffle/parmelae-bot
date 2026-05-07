@@ -1,4 +1,4 @@
-import * as Typegram from '@telegraf/types';
+import type * as Typegram from '@telegraf/types';
 
 interface DateTimeEntity {
   date_time_format?: string;

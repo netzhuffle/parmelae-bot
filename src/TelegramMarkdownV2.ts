@@ -1,4 +1,4 @@
-import * as Typegram from '@telegraf/types';
+import type * as Typegram from '@telegraf/types';
 
 const RESERVED_CHARACTERS = /[_*[\]()~`>#+\-=|{}.!\\]/g;
 const LINK_URL_RESERVED_CHARACTERS = /[)\\]/g;

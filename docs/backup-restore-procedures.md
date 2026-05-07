@@ -16,14 +16,11 @@ The backup system provides automated database protection with the following feat
 ### File Structure
 ```
 project-root/
-├── prisma/sqlite.db          # Production database
-├── backups/                  # Backup directory
+├── shared/sqlite.db          # Production database
+├── shared/backups/           # Backup directory
 │   ├── sqlite-backup-YYYY-MM-DD-HH-mm-ss.db
 │   └── ...
-└── scripts/backup/
-    ├── backup-database.ts    # Main backup script
-    ├── cleanup-backups.ts    # Retention management
-    └── restore-database.ts   # Manual restore tool
+└── current/parmelae-bot      # Compiled executable with deploy backup commands
 ```
 
 ### Backup Naming Convention
@@ -38,7 +35,7 @@ Example: `sqlite-backup-2024-01-15-14-30-45.db`
 The backup process is integrated into the deployment workflow:
 
 1. **SSH Setup** - Establishes secure connection to production server
-2. **Database Backup** - Creates backup using `sqlite3` CLI safe backup method
+2. **Database Backup** - Creates backup using the compiled executable and `sqlite3` CLI safe backup method
 3. **Backup Cleanup** - Removes old backups, keeping only 5 most recent
 4. **Deployment** - Proceeds with application deployment
 
@@ -55,39 +52,40 @@ The backup process is integrated into the deployment workflow:
 ### Prerequisites
 
 1. SSH access to production server
-2. Backup files available in `/home/jannis/parmelae-bot/backups/`
-3. Bot service stopped (PM2)
+2. Backup files available in `/srv/parmelae-bot/shared/backups/`
+3. Bot service stopped through systemd
 
 ### Restore Steps
 
 1. **Connect to production server:**
-   ```bash
+   ```fish
    ssh jannis@jannis.rocks
    ```
 
-2. **Navigate to project directory:**
-   ```bash
-   cd /home/jannis/parmelae-bot
+2. **Navigate to deployment directory:**
+   ```fish
+   cd /srv/parmelae-bot
    ```
 
 3. **Stop the bot service:**
-   ```bash
-   pm2 stop parmelae-bot
+   ```fish
+   sudo systemctl stop parmelae-bot
    ```
 
-4. **Run the restore script:**
-   ```bash
-   bun scripts/backup/restore-database.ts
+4. **Create a pre-restore copy of the current database:**
+   ```fish
+   cp shared/sqlite.db shared/backups/pre-restore-(date -u +%Y-%m-%d-%H-%M-%S).db
    ```
 
-5. **Follow the interactive prompts:**
-   - Select the backup file to restore
-   - Confirm the restoration
-   - Wait for verification
+5. **Restore the selected backup file:**
+   ```fish
+   cp shared/backups/sqlite-backup-YYYY-MM-DD-HH-mm-ss.db shared/sqlite.db
+   sqlite3 -readonly shared/sqlite.db "PRAGMA integrity_check;"
+   ```
 
 6. **Restart the bot service:**
-   ```bash
-   pm2 start ecosystem.config.cjs
+   ```fish
+   sudo systemctl start parmelae-bot
    ```
 
 ### Restore Safety Features
@@ -103,12 +101,12 @@ The backup process is integrated into the deployment workflow:
 ### File Permissions
 
 Backup files are stored with restricted permissions:
-```bash
+```fish
 # Backup directory permissions
-chmod 750 /home/jannis/parmelae-bot/backups
+chmod 750 /srv/parmelae-bot/shared/backups
 
 # Backup file permissions
-chmod 640 /home/jannis/parmelae-bot/backups/*.db
+chmod 640 /srv/parmelae-bot/shared/backups/*.db
 ```
 
 ### Access Control
@@ -129,12 +127,12 @@ chmod 640 /home/jannis/parmelae-bot/backups/*.db
 ### Backup Monitoring
 
 Check backup status after deployments:
-```bash
+```fish
 # List recent backups
-ls -la /home/jannis/parmelae-bot/backups/
+ls -la /srv/parmelae-bot/shared/backups/
 
 # Check backup file integrity
-bun scripts/backup/restore-database.ts --verify-only
+sqlite3 -readonly /srv/parmelae-bot/shared/backups/sqlite-backup-YYYY-MM-DD-HH-mm-ss.db "PRAGMA integrity_check;"
 ```
 
 ### Storage Management
@@ -163,10 +161,10 @@ Backup operations are logged with timestamps:
 - Error messages in deployment logs
 
 **Solutions:**
-1. Check database file exists: `ls -la prisma/sqlite.db`
-2. Verify file permissions: `ls -la prisma/`
+1. Check database file exists: `ls -la /srv/parmelae-bot/shared/sqlite.db`
+2. Verify file permissions: `ls -la /srv/parmelae-bot/shared/`
 3. Check disk space: `df -h`
-4. Review backup script logs
+4. Review deployment logs
 
 #### Restore Verification Fails
 
@@ -188,7 +186,7 @@ Backup operations are logged with timestamps:
 
 **Solutions:**
 1. Check backup directory permissions
-2. Verify script execution rights
+2. Verify executable and directory permissions
 3. Review file ownership
 4. Check disk space availability
 
@@ -209,7 +207,7 @@ If the production database becomes corrupted:
 If backup directory becomes inaccessible:
 
 1. **Create new backup directory**
-2. **Update script configurations**
+2. **Update `BACKUP_DIR` in `/srv/parmelae-bot/shared/.env`**
 3. **Test backup functionality**
 4. **Monitor next deployment**
 
@@ -222,7 +220,7 @@ If backup directory becomes inaccessible:
 ### Weekly
 - Verify backup file integrity
 - Review backup retention policy
-- Check backup script functionality
+- Check deploy backup command functionality
 
 ### Monthly
 - Test restore procedure in staging environment
@@ -234,10 +232,10 @@ If backup directory becomes inaccessible:
 For backup and restore issues:
 - **Primary Contact:** System Administrator
 - **Emergency Contact:** DevOps Team
-- **Documentation:** This file and inline script comments
+- **Documentation:** This file and deploy command implementation comments
 
 ---
 
-**Last Updated:** January 2024  
-**Version:** 1.0  
+**Last Updated:** May 2026  
+**Version:** 2.0  
 **Maintainer:** DevOps Team 

@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import * as Typegram from '@telegraf/types';
+import type * as Typegram from '@telegraf/types';
 import { injectable } from 'inversify';
 import { message as messageFilter } from 'telegraf/filters';
 

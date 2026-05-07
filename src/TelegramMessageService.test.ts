@@ -1,6 +1,6 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
 
-import * as Typegram from '@telegraf/types';
+import type * as Typegram from '@telegraf/types';
 
 import { normalizeUsername } from './BotIdentityContext.js';
 import type { BotConfig } from './ConfigInterfaces.js';

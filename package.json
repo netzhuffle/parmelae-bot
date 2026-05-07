@@ -13,9 +13,7 @@
     "migrate": "prisma migrate dev",
     "tasks": "task-master list --status=pending,in-progress,review,deferred --with-subtasks",
     "run-dev": "bun src/index.ts",
-    "prisma-studio": "prisma studio",
-    "install-prod": "bun install --production --frozen-lockfile",
-    "migrate-prod": "prisma migrate deploy"
+    "prisma-studio": "prisma studio"
   },
   "dependencies": {
     "@langchain/classic": "^1.0.24",

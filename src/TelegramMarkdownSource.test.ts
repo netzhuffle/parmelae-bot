@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import * as Typegram from '@telegraf/types';
+import type * as Typegram from '@telegraf/types';
 
 import { renderTelegramMarkdownSource } from './TelegramMarkdownSource.js';
 
