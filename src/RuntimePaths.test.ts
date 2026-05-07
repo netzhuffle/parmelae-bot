@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 import { join } from 'path';
 
-import { getBackupDir, getCommandPath, getDatabasePath, getDatabaseUrl } from './RuntimePaths.js';
+import { getBackupDir, getDatabasePath, getDatabaseUrl } from './RuntimePaths.js';
 
 const originalDatabaseUrl = Bun.env.DATABASE_URL;
 const originalBackupDir = Bun.env.BACKUP_DIR;
@@ -44,9 +44,5 @@ describe('RuntimePaths', () => {
     Bun.env.BACKUP_DIR = '/srv/parmelae-bot/shared/backups';
 
     expect(getBackupDir()).toBe('/srv/parmelae-bot/shared/backups');
-  });
-
-  it('resolves commands from the repo cmd directory', () => {
-    expect(getCommandPath('startminecraft')).toBe(join(import.meta.dir, '../cmd/startminecraft'));
   });
 });

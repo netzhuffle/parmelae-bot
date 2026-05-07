@@ -218,6 +218,7 @@ journalctl -u parmelae-bot -n 100 --no-pager
 - Production Bun is pinned through `.bun-version` and upgraded during deploy only when the pinned version changes.
 - The production database is configured through `DATABASE_URL`.
 - Backups are configured through `BACKUP_DIR`.
+- The Minecraft server name defaults to `atm8` and can be changed through `MINECRAFT_SERVER_NAME`.
 - Code rollback does not automatically roll back database schema changes; keep the pre-deploy SQLite backups.
 
 ### Environment Considerations

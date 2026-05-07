@@ -4,7 +4,6 @@ import { join, resolve } from 'path';
 const PROJECT_ROOT = resolve(import.meta.dir, '..');
 const DEFAULT_DATABASE_URL = 'file:./prisma/sqlite.db';
 const DEFAULT_BACKUP_DIR = join(PROJECT_ROOT, 'backups');
-const COMMANDS_DIR = join(PROJECT_ROOT, 'cmd');
 
 /**
  * Returns the configured SQLite database URL.
@@ -34,11 +33,4 @@ export function getDatabasePath(databaseUrl: string = getDatabaseUrl()): string 
  */
 export function getBackupDir(): string {
   return Bun.env.BACKUP_DIR ?? DEFAULT_BACKUP_DIR;
-}
-
-/**
- * Resolves a command path from the repo-local cmd/ directory.
- */
-export function getCommandPath(commandName: string): string {
-  return join(COMMANDS_DIR, commandName);
 }

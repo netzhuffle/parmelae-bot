@@ -1,8 +1,7 @@
 import { tool } from '@langchain/core/tools';
-import { $ } from 'bun';
 import * as z from 'zod';
 
-import { getCommandPath } from '../RuntimePaths.js';
+import { runMinecraftServerCommand } from './minecraftServerCommand.js';
 
 /**
  * Tool for checking Minecraft server status.
@@ -12,13 +11,7 @@ import { getCommandPath } from '../RuntimePaths.js';
  */
 export const minecraftStatusTool = tool(
   async (): Promise<string> => {
-    try {
-      const result = await $`${getCommandPath('statusminecraft')}`.text();
-      return result.trim();
-    } catch (error) {
-      const stderr = (error as { stderr?: string })?.stderr?.trim() ?? 'Unknown error';
-      return `Error: ${stderr}`;
-    }
+    return runMinecraftServerCommand('status');
   },
   {
     name: 'minecraft-status',
