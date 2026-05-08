@@ -248,6 +248,37 @@ describe('TelegramService model-authored text', () => {
     );
   });
 
+  it('does not show backslashes when fallback escaping partially escaped MarkdownV2', async () => {
+    telegrafStub.sendMessageErrors.push(new Error("Bad Request: can't parse entities"));
+    const session = service.createModelTextSession(BigInt(123));
+
+    await session.sendFinalText('Telegram\\-Anhangsnachrichten.');
+
+    expect(telegrafStub.sendMessageCalls).toEqual([
+      {
+        chatId: '123',
+        text: 'Telegram\\-Anhangsnachrichten.',
+        options: {
+          parse_mode: 'MarkdownV2',
+        },
+      },
+      {
+        chatId: '123',
+        text: 'Telegram\\-Anhangsnachrichten\\.',
+        options: {
+          parse_mode: 'MarkdownV2',
+        },
+      },
+    ]);
+    expect(storeCalls).toHaveLength(1);
+    expect(storeCalls[0]).toEqual(
+      expect.objectContaining({
+        message_id: 0,
+        text: 'Telegram\\-Anhangsnachrichten.',
+      }),
+    );
+  });
+
   it('uses Telegram entities for supported markdown so plain punctuation stays intact', async () => {
     const session = service.createModelTextSession(BigInt(123));
 

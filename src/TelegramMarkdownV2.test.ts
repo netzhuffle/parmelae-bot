@@ -3,6 +3,7 @@ import { describe, expect, it } from 'bun:test';
 import {
   containsSupportedMarkdownV2,
   escapeTelegramMarkdownV2,
+  escapeTelegramMarkdownV2FallbackText,
   hasPotentialMarkdownV2,
   isValidSupportedMarkdownV2,
   renderSupportedMarkdownV2,
@@ -115,6 +116,12 @@ describe('TelegramMarkdownV2', () => {
 
   it('escapes markdown v2 reserved characters', () => {
     expect(escapeTelegramMarkdownV2('Preis (CHF)!')).toBe('Preis \\(CHF\\)\\!');
+  });
+
+  it('normalizes existing markdown v2 escapes before fallback escaping', () => {
+    expect(escapeTelegramMarkdownV2FallbackText('Telegram\\-Anhangsnachrichten.')).toBe(
+      'Telegram\\-Anhangsnachrichten\\.',
+    );
   });
 
   it('renders supported markdown as safe Telegram MarkdownV2', () => {

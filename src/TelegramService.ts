@@ -10,7 +10,7 @@ import { Sticker } from './Sticker.js';
 import { FinalizableStreamingTextSink } from './StreamingTextSink.js';
 import {
   containsSupportedMarkdownV2,
-  escapeTelegramMarkdownV2,
+  escapeTelegramMarkdownV2FallbackText,
   hasPotentialMarkdownV2,
   isValidSupportedMarkdownV2,
   renderSupportedMarkdownV2,
@@ -515,7 +515,7 @@ export class TelegramService {
         throw error;
       }
 
-      const escapedText = escapeTelegramMarkdownV2(text);
+      const escapedText = escapeTelegramMarkdownV2FallbackText(text);
       const message = await this.primaryTelegraf.telegram.sendMessage(
         chatId.toString(),
         escapedText,
@@ -600,7 +600,7 @@ export class TelegramService {
   private async sendEscapedMessageDraft(payload: SendMessageDraftPayload): Promise<boolean> {
     const escapedPayload: SendMessageDraftPayload = {
       ...payload,
-      text: escapeTelegramMarkdownV2(payload.text),
+      text: escapeTelegramMarkdownV2FallbackText(payload.text),
     };
 
     try {

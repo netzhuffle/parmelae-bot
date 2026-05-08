@@ -1,6 +1,7 @@
 import type * as Typegram from '@telegraf/types';
 
 const RESERVED_CHARACTERS = /[_*[\]()~`>#+\-=|{}.!\\]/g;
+const RESERVED_ESCAPE_SEQUENCES = /\\([_*[\]()~`>#+\-=|{}.!\\])/g;
 const LINK_URL_RESERVED_CHARACTERS = /[)\\]/g;
 const CODE_RESERVED_CHARACTERS = /[`\\]/g;
 
@@ -875,6 +876,10 @@ export function renderSupportedTelegramDraftEntities(text: string): {
 
 export function escapeTelegramMarkdownV2(text: string): string {
   return escapePlainText(text);
+}
+
+export function escapeTelegramMarkdownV2FallbackText(text: string): string {
+  return escapePlainText(text.replaceAll(RESERVED_ESCAPE_SEQUENCES, '$1'));
 }
 
 export function hasPotentialMarkdownV2(text: string): boolean {
