@@ -15,6 +15,8 @@ import {
 } from './Repositories/Types.js';
 import { renderTelegramMarkdownSource } from './TelegramMarkdownSource.js';
 
+type TelegramMessageLike = Typegram.Message | CompatibilityAttachmentMessage;
+
 type SupportedMessage =
   | Typegram.Message.TextMessage
   | Typegram.Message.AnimationMessage
@@ -28,13 +30,110 @@ type SupportedMessage =
   | Typegram.Message.PhotoMessage
   | Typegram.Message.PollMessage
   | Typegram.Message.StickerMessage
+  | Typegram.Message.StoryMessage
   | Typegram.Message.VideoMessage
+  | Typegram.Message.VideoNoteMessage
   | Typegram.Message.VoiceMessage
-  | Typegram.Message.VenueMessage;
+  | Typegram.Message.VenueMessage
+  | CompatibilityAttachmentMessage;
+
+type CompatibilityAttachmentMessage = Typegram.Message.CommonMessage &
+  Partial<{
+    caption: string;
+    caption_entities: Typegram.MessageEntity[];
+    checklist: Checklist;
+    giveaway: Giveaway;
+    giveaway_completed: GiveawayCompleted;
+    giveaway_winners: GiveawayWinners;
+    gift: GiftInfo;
+    gift_upgrade_sent: GiftInfo;
+    invoice: Invoice;
+    live_photo: LivePhoto;
+    paid_media: PaidMediaInfo;
+    passport_data: unknown;
+    refunded_payment: RefundedPayment;
+    successful_payment: SuccessfulPayment;
+    unique_gift: UniqueGiftInfo;
+    web_app_data: WebAppData;
+  }>;
 
 type ImageAttachmentMessage =
   | { photo: Typegram.PhotoSize[] }
-  | { sticker: { thumbnail: Typegram.PhotoSize } };
+  | { sticker: { thumbnail: Typegram.PhotoSize } }
+  | { video: { thumbnail: Typegram.PhotoSize } }
+  | { video_note: { thumbnail: Typegram.PhotoSize } };
+
+interface Checklist {
+  title?: string;
+  tasks?: {
+    text?: string;
+    title?: string;
+    is_checked?: boolean;
+  }[];
+}
+
+interface Giveaway {
+  prize_description?: string;
+  winner_count?: number;
+}
+
+interface GiveawayWinners {
+  prize_description?: string;
+  winner_count: number;
+}
+
+interface GiveawayCompleted {
+  winner_count: number;
+  prize_description?: string;
+}
+
+interface GiftInfo {
+  gift?: {
+    sticker?: {
+      emoji?: string;
+    };
+    star_count?: number;
+  };
+  owned_gift_id?: string;
+}
+
+interface Invoice {
+  title: string;
+  description?: string;
+  currency: string;
+  total_amount: number;
+}
+
+interface LivePhoto {
+  duration?: number;
+}
+
+interface PaidMediaInfo {
+  star_count: number;
+  paid_media?: { type: string }[];
+}
+
+interface RefundedPayment {
+  currency: string;
+  total_amount: number;
+}
+
+interface SuccessfulPayment {
+  currency: string;
+  total_amount: number;
+}
+
+interface UniqueGiftInfo {
+  gift?: {
+    title?: string;
+    name?: string;
+  };
+}
+
+interface WebAppData {
+  data: string;
+  button_text: string;
+}
 
 /** Handles incoming and outgoing Telegram messages. */
 @injectable()
@@ -46,7 +145,7 @@ export class TelegramMessageService {
 
   /** Stores a message sent to or coming from Telegram. */
   store(
-    telegramMessage: SupportedMessage,
+    telegramMessage: TelegramMessageLike,
     options?: { textOverride?: string },
   ): Promise<TelegramMessageWithRelations> {
     assert(this.isSupported(telegramMessage));
@@ -55,7 +154,7 @@ export class TelegramMessageService {
   }
 
   /** Wether the message is supported. */
-  isSupported(message: Typegram.Message): message is SupportedMessage {
+  isSupported(message: TelegramMessageLike): message is SupportedMessage {
     if (!message.from) {
       // Can only store messages with a sender.
       return false;
@@ -69,14 +168,30 @@ export class TelegramMessageService {
       !('dice' in message) &&
       !('document' in message) &&
       !('game' in message) &&
+      !('checklist' in message && message.checklist) &&
+      !('giveaway' in message && message.giveaway) &&
+      !('giveaway_completed' in message && message.giveaway_completed) &&
+      !('giveaway_winners' in message && message.giveaway_winners) &&
+      !('gift' in message && message.gift) &&
+      !('gift_upgrade_sent' in message && message.gift_upgrade_sent) &&
+      !('invoice' in message && message.invoice) &&
+      !('live_photo' in message && message.live_photo) &&
       !('location' in message) &&
       !('new_chat_members' in message && message.new_chat_members.length) &&
+      !('paid_media' in message && message.paid_media) &&
+      !('passport_data' in message && message.passport_data) &&
       !('photo' in message) &&
       !('poll' in message) &&
+      !('refunded_payment' in message && message.refunded_payment) &&
       !('sticker' in message) &&
+      !('story' in message) &&
+      !('successful_payment' in message && message.successful_payment) &&
+      !('unique_gift' in message && message.unique_gift) &&
       !('video' in message) &&
+      !('video_note' in message) &&
       !('voice' in message) &&
-      !('venue' in message)
+      !('venue' in message) &&
+      !('web_app_data' in message && message.web_app_data)
     ) {
       // Unsuported message type.
       return false;
@@ -85,12 +200,14 @@ export class TelegramMessageService {
     return true;
   }
 
-  private isStickerMessage(message: Typegram.Message): message is Typegram.Message.StickerMessage {
+  private isStickerMessage(
+    message: TelegramMessageLike,
+  ): message is Typegram.Message.StickerMessage {
     return 'sticker' in message;
   }
 
   private isNewChatMembersMessage(
-    message: Typegram.Message,
+    message: TelegramMessageLike,
   ): message is Typegram.Message.NewChatMembersMessage {
     return 'new_chat_members' in message;
   }
@@ -285,6 +402,72 @@ export class TelegramMessageService {
         : attachment;
     }
 
+    if ('checklist' in message && message.checklist) {
+      const checklist = message.checklist;
+      const title = checklist.title ? `Checkliste: ${checklist.title}` : 'Checkliste';
+      const tasks = checklist.tasks ?? [];
+      if (!tasks.length) {
+        return `[☑️ ${title}]`;
+      }
+
+      const taskLines = tasks.map((task) => {
+        const status = task.is_checked ? 'x' : ' ';
+        return `[${status}] ${task.text ?? task.title ?? '<ohne Text>'}`;
+      });
+      return `[☑️ ${title}]\n${taskLines.join('\n')}`;
+    }
+
+    if ('game' in message) {
+      return `[Spiel: ${message.game.title}]`;
+    }
+
+    if ('giveaway' in message && message.giveaway) {
+      const giveaway = message.giveaway;
+      const winners = giveaway.winner_count ? `, ${giveaway.winner_count} Gewinner` : '';
+      return `[Giveaway${winners}${this.formatOptionalDetail(giveaway.prize_description)}]`;
+    }
+
+    if ('giveaway_completed' in message && message.giveaway_completed) {
+      const giveaway = message.giveaway_completed;
+      return `[Giveaway abgeschlossen: ${giveaway.winner_count} Gewinner${this.formatOptionalDetail(
+        giveaway.prize_description,
+      )}]`;
+    }
+
+    if ('giveaway_winners' in message && message.giveaway_winners) {
+      const winners = message.giveaway_winners;
+      return `[Giveaway-Gewinner: ${winners.winner_count}${this.formatOptionalDetail(
+        winners.prize_description,
+      )}]`;
+    }
+
+    if ('gift' in message && message.gift) {
+      return `[Geschenk${this.formatGiftDetail(message.gift)}]`;
+    }
+
+    if ('gift_upgrade_sent' in message && message.gift_upgrade_sent) {
+      return `[Geschenk-Upgrade gesendet${this.formatGiftDetail(message.gift_upgrade_sent)}]`;
+    }
+
+    if ('invoice' in message && message.invoice) {
+      const invoice = message.invoice;
+      return `[Rechnung: ${invoice.title}, ${this.formatPaymentAmount(
+        invoice.total_amount,
+        invoice.currency,
+      )}${this.formatOptionalDetail(invoice.description)}]`;
+    }
+
+    if ('live_photo' in message && message.live_photo) {
+      const duration = message.live_photo.duration ? ` (${message.live_photo.duration}s)` : '';
+      const attachment = `[Live-Foto${duration}]`;
+      return message.caption
+        ? `${attachment}: ${renderTelegramMarkdownSource(
+            message.caption,
+            message.caption_entities,
+          )}`
+        : attachment;
+    }
+
     if ('new_chat_members' in message && message.new_chat_members.length) {
       const newChatMembers = message.new_chat_members;
       const names = newChatMembers.map((member) => {
@@ -303,6 +486,24 @@ export class TelegramMessageService {
       return `Neue Mitglieder treten dem Chat bei: ${nameList}.`;
     }
 
+    if ('paid_media' in message && message.paid_media) {
+      const paidMedia = message.paid_media;
+      const mediaTypes = paidMedia.paid_media?.map((media) => media.type).join(', ');
+      const attachment = `[Bezahlmedien: ${paidMedia.star_count} Sterne${
+        mediaTypes ? `, ${mediaTypes}` : ''
+      }]`;
+      return message.caption
+        ? `${attachment}: ${renderTelegramMarkdownSource(
+            message.caption,
+            message.caption_entities,
+          )}`
+        : attachment;
+    }
+
+    if ('passport_data' in message && message.passport_data) {
+      return '[Telegram-Passport-Daten]';
+    }
+
     if ('photo' in message) {
       return message.caption ?? '';
     }
@@ -316,11 +517,36 @@ export class TelegramMessageService {
       return text;
     }
 
+    if ('refunded_payment' in message && message.refunded_payment) {
+      const payment = message.refunded_payment;
+      return `[Zahlung zurückerstattet: ${this.formatPaymentAmount(
+        payment.total_amount,
+        payment.currency,
+      )}]`;
+    }
+
     if ('sticker' in message) {
       if (this.hasImageAttachment(message)) {
         return '';
       }
       return message.sticker.emoji ? `[Sticker: ${message.sticker.emoji}]` : '[Sticker]';
+    }
+
+    if ('story' in message) {
+      return '[Story]';
+    }
+
+    if ('successful_payment' in message && message.successful_payment) {
+      const payment = message.successful_payment;
+      return `[Zahlung erfolgreich: ${this.formatPaymentAmount(
+        payment.total_amount,
+        payment.currency,
+      )}]`;
+    }
+
+    if ('unique_gift' in message && message.unique_gift) {
+      const gift = message.unique_gift.gift;
+      return `[Einzigartiges Geschenk${this.formatOptionalDetail(gift?.title ?? gift?.name)}]`;
     }
 
     if ('video' in message) {
@@ -331,6 +557,10 @@ export class TelegramMessageService {
             message.caption_entities,
           )}`
         : attachment;
+    }
+
+    if ('video_note' in message) {
+      return `[Video-Nachricht: ${message.video_note.duration} Sekunden]`;
     }
 
     if ('voice' in message) {
@@ -356,6 +586,10 @@ export class TelegramMessageService {
       return `[📍 (lat: ${location.latitude}, lng: ${location.longitude})]`;
     }
 
+    if ('web_app_data' in message && message.web_app_data) {
+      return `[Web-App-Daten über "${message.web_app_data.button_text}": ${message.web_app_data.data}]`;
+    }
+
     throw new UnknownTelegramMessageTypeError(message);
   }
 
@@ -368,6 +602,12 @@ export class TelegramMessageService {
     if ('sticker' in message && 'thumbnail' in message.sticker) {
       return true;
     }
+    if ('video' in message && message.video.thumbnail) {
+      return true;
+    }
+    if ('video_note' in message && message.video_note.thumbnail) {
+      return true;
+    }
 
     return false;
   }
@@ -375,6 +615,12 @@ export class TelegramMessageService {
   private getImageFileId(message: ImageAttachmentMessage): string {
     if ('sticker' in message) {
       return message.sticker.thumbnail.file_id;
+    }
+    if ('video' in message) {
+      return message.video.thumbnail.file_id;
+    }
+    if ('video_note' in message) {
+      return message.video_note.thumbnail.file_id;
     }
 
     let largestPhotoSize = message.photo[0];
@@ -385,11 +631,23 @@ export class TelegramMessageService {
     }
     return largestPhotoSize.file_id;
   }
+
+  private formatGiftDetail(giftInfo: GiftInfo): string {
+    return this.formatOptionalDetail(giftInfo.gift?.sticker?.emoji ?? giftInfo.owned_gift_id);
+  }
+
+  private formatOptionalDetail(detail: string | undefined): string {
+    return detail ? `: ${detail}` : '';
+  }
+
+  private formatPaymentAmount(totalAmount: number, currency: string): string {
+    return `${totalAmount} ${currency}`;
+  }
 }
 
 /** Error for a telegram message with unknown type. */
 class UnknownTelegramMessageTypeError extends Error {
-  constructor(message: Typegram.Message) {
+  constructor(message: TelegramMessageLike) {
     const json = JSON.stringify(message);
     super(`Unknown telegram message type: ${json}`);
   }

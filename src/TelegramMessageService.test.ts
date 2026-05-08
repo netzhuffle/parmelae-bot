@@ -205,5 +205,192 @@ describe('TelegramMessageService', () => {
       expect(storeCalls).toHaveLength(1);
       expect((storeCalls[0] as { text: string }).text).toBe('*Leider* \\*nein\\*');
     });
+
+    it('should summarize newer Telegram attachment fields for the agent', async () => {
+      const attachmentCases: { message: Partial<Typegram.Message>; expectedText: string }[] = [
+        {
+          message: {
+            checklist: {
+              title: 'Einkauf',
+              tasks: [
+                { text: 'Milch', is_checked: true },
+                { text: 'Brot', is_checked: false },
+              ],
+            },
+          } as Partial<Typegram.Message>,
+          expectedText: '[☑️ Checkliste: Einkauf]\n[x] Milch\n[ ] Brot',
+        },
+        {
+          message: {
+            paid_media: {
+              star_count: 42,
+              paid_media: [{ type: 'photo' }, { type: 'video' }],
+            },
+            caption: 'Premium',
+          } as Partial<Typegram.Message>,
+          expectedText: '[Bezahlmedien: 42 Sterne, photo, video]: Premium',
+        },
+        {
+          message: {
+            invoice: {
+              title: 'Käse',
+              description: 'Sehr gut',
+              currency: 'CHF',
+              total_amount: 1200,
+            },
+          } as Partial<Typegram.Message>,
+          expectedText: '[Rechnung: Käse, 1200 CHF: Sehr gut]',
+        },
+        {
+          message: {
+            successful_payment: {
+              currency: 'CHF',
+              total_amount: 1200,
+            },
+          } as Partial<Typegram.Message>,
+          expectedText: '[Zahlung erfolgreich: 1200 CHF]',
+        },
+        {
+          message: {
+            refunded_payment: {
+              currency: 'CHF',
+              total_amount: 1200,
+            },
+          } as Partial<Typegram.Message>,
+          expectedText: '[Zahlung zurückerstattet: 1200 CHF]',
+        },
+        {
+          message: {
+            web_app_data: {
+              button_text: 'Start',
+              data: '{"ok":true}',
+            },
+          } as Partial<Typegram.Message>,
+          expectedText: '[Web-App-Daten über "Start": {"ok":true}]',
+        },
+        {
+          message: {
+            story: {},
+          } as Partial<Typegram.Message>,
+          expectedText: '[Story]',
+        },
+        {
+          message: {
+            live_photo: {
+              duration: 2,
+            },
+            caption: 'Moment',
+          } as Partial<Typegram.Message>,
+          expectedText: '[Live-Foto (2s)]: Moment',
+        },
+        {
+          message: {
+            giveaway_winners: {
+              winner_count: 3,
+              prize_description: 'Preis',
+            },
+          } as Partial<Typegram.Message>,
+          expectedText: '[Giveaway-Gewinner: 3: Preis]',
+        },
+        {
+          message: {
+            gift: {
+              gift: {
+                sticker: {
+                  emoji: '🎁',
+                },
+              },
+            },
+          } as Partial<Typegram.Message>,
+          expectedText: '[Geschenk: 🎁]',
+        },
+      ];
+
+      for (const [index, attachmentCase] of attachmentCases.entries()) {
+        await service.store(createTelegramMessage(attachmentCase.message, index + 100));
+      }
+
+      expect(storeCalls.map((call) => (call as { text: string }).text)).toEqual(
+        attachmentCases.map((attachmentCase) => attachmentCase.expectedText),
+      );
+    });
+
+    it('should send video and video-note thumbnails to the agent as image attachments', async () => {
+      await service.store(
+        createTelegramMessage(
+          {
+            video: {
+              file_id: 'video-file',
+              file_unique_id: 'video-unique',
+              width: 640,
+              height: 480,
+              duration: 12,
+              thumbnail: {
+                file_id: 'video-thumb',
+                file_unique_id: 'video-thumb-unique',
+                width: 320,
+                height: 240,
+              },
+            },
+            caption: 'Video caption',
+          } as Partial<Typegram.Message>,
+          200,
+        ),
+      );
+      await service.store(
+        createTelegramMessage(
+          {
+            video_note: {
+              file_id: 'note-file',
+              file_unique_id: 'note-unique',
+              length: 240,
+              duration: 5,
+              thumbnail: {
+                file_id: 'note-thumb',
+                file_unique_id: 'note-thumb-unique',
+                width: 240,
+                height: 240,
+              },
+            },
+          } as Partial<Typegram.Message>,
+          201,
+        ),
+      );
+
+      expect(
+        storeCalls.map((call) => ({
+          imageFileId: (call as { imageFileId: string | null }).imageFileId,
+          text: (call as { text: string }).text,
+        })),
+      ).toEqual([
+        {
+          imageFileId: 'video-thumb',
+          text: '[🎬: 12 Sekunden]: Video caption',
+        },
+        {
+          imageFileId: 'note-thumb',
+          text: '[Video-Nachricht: 5 Sekunden]',
+        },
+      ]);
+    });
   });
 });
+
+function createTelegramMessage(fields: Partial<Typegram.Message>, messageId = 1): Typegram.Message {
+  return {
+    message_id: messageId,
+    date: 1234567890,
+    chat: {
+      id: 123,
+      type: 'private',
+      first_name: 'Test',
+    },
+    from: {
+      id: 456,
+      is_bot: false,
+      first_name: 'User',
+      username: 'user',
+    },
+    ...fields,
+  } as Typegram.Message;
+}
