@@ -21,7 +21,7 @@
     "@langchain/langgraph": "^1.2.3",
     "@langchain/openai": "^1.3.0",
     "@prisma/client": "^7.8.0",
-    "@sentry/node": "^10.44.0",
+    "@sentry/node": "^10.52.0",
     "@synapsenwerkstatt/prisma-bun-sqlite-adapter": "^1.2.2",
     "cheerio": "^1.2.0",
     "inversify": "^8.1.0",
