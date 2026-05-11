@@ -81,7 +81,7 @@ export class Config implements BotConfig, GitHubConfig {
       try {
         return BigInt(n);
       } catch {
-        assert(false, 'CHAT_ALLOWLIST must contain only numbers');
+        throw new Error('CHAT_ALLOWLIST must contain only numbers');
       }
     });
 
@@ -94,7 +94,7 @@ export class Config implements BotConfig, GitHubConfig {
       try {
         return BigInt(chat);
       } catch {
-        assert(false, 'NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers');
+        throw new Error('NEW_COMMIT_ANNOUNCEMENT_CHATS must contain only numbers');
       }
     });
   }

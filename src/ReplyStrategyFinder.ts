@@ -1,5 +1,3 @@
-import assert from 'assert';
-
 import { injectable } from 'inversify';
 
 import { BotMentionReplyStrategy } from './ReplyStrategies/ BotMentionReplyStrategy.js';
@@ -78,6 +76,6 @@ export class ReplyStrategyFinder {
       }
     }
 
-    assert(false, 'There must be a strategy to handle a message');
+    throw new Error('There must be a strategy to handle a message');
   }
 }

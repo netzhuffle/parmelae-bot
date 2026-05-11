@@ -285,7 +285,7 @@ interface GoogleParameters extends BaseParameters {
 
 type UrlParameters = Record<string, string | number | boolean | undefined | null>;
 
-function buildUrl<P extends UrlParameters>(path: string, parameters: P): string {
+function buildUrl(path: string, parameters: UrlParameters): string {
   const nonUndefinedParams: [string, string][] = Object.entries(parameters)
     .filter(([_, value]) => value !== undefined)
     .map(([key, value]) => [key, `${value}`]);
