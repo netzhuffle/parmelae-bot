@@ -11,6 +11,7 @@ Creates subtasks to break down complex parent tasks into manageable pieces.
 ## Argument Parsing
 
 Flexible natural language:
+
 - "add subtask to 5: implement login form"
 - "break down 5 with: setup, implement, test"
 - "subtask for 5: handle edge cases"
@@ -19,11 +20,13 @@ Flexible natural language:
 ## Execution Modes
 
 ### 1. Create New Subtask
+
 ```bash
 task-master add-subtask --parent=<id> --title="<title>" --description="<desc>"
 ```
 
 ### 2. Convert Existing Task
+
 ```bash
 task-master add-subtask --parent=<id> --task-id=<existing-id>
 ```

@@ -5,6 +5,7 @@ This document outlines the automated backup and restore procedures for the Parme
 ## Overview
 
 The backup system provides automated database protection with the following features:
+
 - **Automated backups** before each deployment
 - **Retention management** (keeps 5 most recent backups)
 - **Integrity verification** of backup files
@@ -14,6 +15,7 @@ The backup system provides automated database protection with the following feat
 ## Backup System Architecture
 
 ### File Structure
+
 ```
 project-root/
 ├── shared/sqlite.db          # Production database
@@ -24,6 +26,7 @@ project-root/
 ```
 
 ### Backup Naming Convention
+
 Backup files follow the pattern: `sqlite-backup-YYYY-MM-DD-HH-mm-ss.db`
 
 Example: `sqlite-backup-2024-01-15-14-30-45.db`
@@ -58,26 +61,31 @@ The backup process is integrated into the deployment workflow:
 ### Restore Steps
 
 1. **Connect to production server:**
+
    ```fish
    ssh jannis@jannis.rocks
    ```
 
 2. **Navigate to deployment directory:**
+
    ```fish
    cd /srv/parmelae-bot
    ```
 
 3. **Stop the bot service:**
+
    ```fish
    sudo systemctl stop parmelae-bot
    ```
 
 4. **Create a pre-restore copy of the current database:**
+
    ```fish
    cp shared/sqlite.db shared/backups/pre-restore-(date -u +%Y-%m-%d-%H-%M-%S).db
    ```
 
 5. **Restore the selected backup file:**
+
    ```fish
    cp shared/backups/sqlite-backup-YYYY-MM-DD-HH-mm-ss.db shared/sqlite.db
    sqlite3 -readonly shared/sqlite.db "PRAGMA integrity_check;"
@@ -101,6 +109,7 @@ The backup process is integrated into the deployment workflow:
 ### File Permissions
 
 Backup files are stored with restricted permissions:
+
 ```fish
 # Backup directory permissions
 chmod 750 /srv/parmelae-bot/shared/backups
@@ -127,6 +136,7 @@ chmod 640 /srv/parmelae-bot/shared/backups/*.db
 ### Backup Monitoring
 
 Check backup status after deployments:
+
 ```fish
 # List recent backups
 ls -la /srv/parmelae-bot/shared/backups/
@@ -145,6 +155,7 @@ sqlite3 -readonly /srv/parmelae-bot/shared/backups/sqlite-backup-YYYY-MM-DD-HH-m
 ### Log Analysis
 
 Backup operations are logged with timestamps:
+
 - Backup creation logs
 - Cleanup operation logs
 - Error messages and stack traces
@@ -157,10 +168,12 @@ Backup operations are logged with timestamps:
 #### Backup Creation Fails
 
 **Symptoms:**
+
 - GitHub Actions deployment fails at backup step
 - Error messages in deployment logs
 
 **Solutions:**
+
 1. Check database file exists: `ls -la /srv/parmelae-bot/shared/sqlite.db`
 2. Verify file permissions: `ls -la /srv/parmelae-bot/shared/`
 3. Check disk space: `df -h`
@@ -169,10 +182,12 @@ Backup operations are logged with timestamps:
 #### Restore Verification Fails
 
 **Symptoms:**
+
 - Backup file cannot be opened
 - Database corruption detected
 
 **Solutions:**
+
 1. Verify backup file integrity: `file backup-file.db`
 2. Check file permissions
 3. Try alternative backup file
@@ -181,10 +196,12 @@ Backup operations are logged with timestamps:
 #### Cleanup Script Errors
 
 **Symptoms:**
+
 - Old backups not removed
 - Permission denied errors
 
 **Solutions:**
+
 1. Check backup directory permissions
 2. Verify executable and directory permissions
 3. Review file ownership
@@ -214,15 +231,18 @@ If backup directory becomes inaccessible:
 ## Maintenance Schedule
 
 ### Daily
+
 - Monitor deployment logs for backup success
 - Check backup directory disk usage
 
 ### Weekly
+
 - Verify backup file integrity
 - Review backup retention policy
 - Check deploy backup command functionality
 
 ### Monthly
+
 - Test restore procedure in staging environment
 - Review security permissions
 - Update documentation as needed
@@ -230,6 +250,7 @@ If backup directory becomes inaccessible:
 ## Contact Information
 
 For backup and restore issues:
+
 - **Primary Contact:** System Administrator
 - **Emergency Contact:** DevOps Team
 - **Documentation:** This file and deploy command implementation comments
@@ -238,4 +259,4 @@ For backup and restore issues:
 
 **Last Updated:** May 2026  
 **Version:** 2.0  
-**Maintainer:** DevOps Team 
+**Maintainer:** DevOps Team

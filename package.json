@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "format": "bunx --bun oxfmt src scripts resources",
+    "format": "bunx --bun oxfmt .",
     "schema-format": "prisma format",
     "lint": "bunx --bun oxlint src scripts",
     "lint:without-tests": "bunx --bun oxlint src scripts --ignore-pattern \"*.test.ts\"",

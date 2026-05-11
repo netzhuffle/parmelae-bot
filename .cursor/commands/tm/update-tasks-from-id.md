@@ -23,20 +23,25 @@ task-master update --from=<id> --prompt="<context>"
 ## Update Process
 
 ### 1. **Task Selection**
+
 Starting from specified ID:
+
 - Include the task itself
 - Include all dependent tasks
 - Include related subtasks
 - Smart boundary detection
 
 ### 2. **Context Application**
+
 AI analyzes the update context and:
+
 - Identifies what needs changing
 - Maintains consistency
 - Preserves completed work
 - Updates related information
 
 ### 3. **Intelligent Updates**
+
 - Modify descriptions appropriately
 - Update test strategies
 - Adjust time estimates
@@ -57,6 +62,7 @@ AI analyzes the update context and:
    - Maintain task flow
 
 3. **Change Preview**
+
    ```
    Bulk Update Preview
    ━━━━━━━━━━━━━━━━━━

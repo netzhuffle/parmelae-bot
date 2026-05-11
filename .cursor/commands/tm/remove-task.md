@@ -36,6 +36,7 @@ task-master remove-task --id=<id> [-y]
    - Blocking implications
 
 3. **Impact Assessment**
+
    ```
    Task Removal Impact
    ━━━━━━━━━━━━━━━━━━
@@ -69,6 +70,7 @@ task-master remove-task --id=<id> [-y]
 ## Alternative Actions
 
 Suggest before deletion:
+
 - Mark as cancelled instead
 - Convert to documentation
 - Archive task data

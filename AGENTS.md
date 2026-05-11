@@ -1,12 +1,14 @@
 # Repository Guidelines
 
 ## Project
+
 - Stack: `bun` + `TypeScript` + `Prisma` + `LangChain/LangGraph` + `Telegraf` + `Inversify`
 - Tests: `bun:test` with colocated `*.test.ts`
 - Quality tooling: `oxfmt` + `oxlint` + `yaml-validator`
 - Package manager/runtime: `bun`
 
 ## Working Defaults For Codex
+
 - Keep changes focused and minimal; avoid unrelated refactors.
 - Fix bugs at root cause, not only symptoms.
 - Add or update regression tests for behavior changes and bug fixes when practical.
@@ -18,6 +20,7 @@
 - Before handoff on implementation changes, run `bun run checks`.
 
 ## Project Structure & Conventions
+
 - Source code lives in `src/`; support scripts live in `scripts/`; card data lives in `resources/`.
 - Services hold business logic; repositories stay focused on CRUD, queries, and mapping.
 - LangChain tools live in `src/Tools/` and use `ToolContext` / `getToolContext(config)` for dependencies. New tools must also be registered in `ChatGptAgentService`.
@@ -27,6 +30,7 @@
 - Public exported classes and non-trivial exported methods should have concise JSDoc focused on non-obvious behavior or business rules.
 
 ## Commands
+
 - Install deps: `bun install`
 - Run app: `bun src/index.ts`
 - Format: `bun run format`
@@ -36,6 +40,7 @@
 - Task overview: `bun run tasks`
 
 ## Commits
+
 - Keep commits focused and split unrelated changes instead of bundling them together.
 - Use concise, action-oriented commit subjects that reflect the real scope of the diff.
 - Stage only the files that belong to the requested change.
@@ -43,12 +48,14 @@
 - Before requesting elevated git permissions for commits, show the exact commit message to the user and state whether you are about to create one commit or multiple commits.
 
 ## Testing Guidelines
+
 - Keep tests next to the implementation using `*.test.ts`.
 - Prefer behavior-focused tests over implementation-detail tests.
 - For timer-driven code, use Bun fake timers instead of real waiting.
 - Keep tests deterministic: no real network calls, no flaky time dependencies, no hidden shared state between tests.
 
 ## Taskmaster
+
 - Taskmaster is available in this repo, but use it only when the user wants task tracking or asks about next/planned work.
 - Common examples:
   - `bun run tasks`

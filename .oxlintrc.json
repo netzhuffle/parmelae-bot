@@ -5,14 +5,7 @@
     "typeAware": true,
     "typeCheck": true
   },
-  "plugins": [
-    "eslint",
-    "typescript",
-    "unicorn",
-    "oxc",
-    "import",
-    "promise",
-  ],
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "promise"],
   "env": {
     "builtin": true
   },
@@ -55,17 +48,13 @@
   },
   "overrides": [
     {
-      "files": [
-        "src/inversify.config.ts"
-      ],
+      "files": ["src/inversify.config.ts"],
       "rules": {
         "import/no-unassigned-import": "off"
       }
     },
     {
-      "files": [
-        "**/*.test.ts"
-      ],
+      "files": ["**/*.test.ts"],
       "rules": {
         "no-await-in-loop": "off"
       }

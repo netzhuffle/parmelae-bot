@@ -1,21 +1,21 @@
 {
-	"meta": {
-		"generatedAt": "2025-09-17T22:10:13.081Z",
-		"tasksAnalyzed": 1,
-		"totalTasks": 59,
-		"analysisCount": 1,
-		"thresholdScore": 5,
-		"projectName": "Taskmaster",
-		"usedResearch": false
-	},
-	"complexityAnalysis": [
-		{
-			"taskId": 59,
-			"taskTitle": "Enable Support for Multiple Telegram Bots with Coordinated Message Handling and Identity Management",
-			"complexityScore": 9,
-			"recommendedSubtasks": 20,
-			"expansionPrompt": "Break down this complex multi-bot system into granular implementation steps covering environment configuration, bot lifecycle management, message routing coordination, identity resolution, tool system integration, dependency injection refactoring, database schema updates, concurrency handling, testing strategies, and documentation. Each subtask should be independently testable and have clear acceptance criteria.",
-			"reasoning": "This is an extremely complex architectural change that touches multiple core systems (DI, messaging, tools, identity management, database). It requires careful coordination between 18+ existing subtasks, involves significant refactoring of existing single-bot assumptions, introduces concurrency challenges, and needs extensive testing. The complexity is amplified by dependencies on other pending tasks and the need to maintain backward compatibility."
-		}
-	]
+  "meta": {
+    "generatedAt": "2025-09-17T22:10:13.081Z",
+    "tasksAnalyzed": 1,
+    "totalTasks": 59,
+    "analysisCount": 1,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": false
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 59,
+      "taskTitle": "Enable Support for Multiple Telegram Bots with Coordinated Message Handling and Identity Management",
+      "complexityScore": 9,
+      "recommendedSubtasks": 20,
+      "expansionPrompt": "Break down this complex multi-bot system into granular implementation steps covering environment configuration, bot lifecycle management, message routing coordination, identity resolution, tool system integration, dependency injection refactoring, database schema updates, concurrency handling, testing strategies, and documentation. Each subtask should be independently testable and have clear acceptance criteria.",
+      "reasoning": "This is an extremely complex architectural change that touches multiple core systems (DI, messaging, tools, identity management, database). It requires careful coordination between 18+ existing subtasks, involves significant refactoring of existing single-bot assumptions, introduces concurrency challenges, and needs extensive testing. The complexity is amplified by dependencies on other pending tasks and the need to maintain backward compatibility."
+    }
+  ]
 }

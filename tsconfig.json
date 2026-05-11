@@ -3,7 +3,7 @@
   "compilerOptions": {
     // Environment setup & latest features
     "lib": ["ESNext"],
-    "target": "ESNext", 
+    "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
     "allowJs": true,
@@ -27,9 +27,5 @@
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true
   },
-  "include": [
-    "src/**/*",
-    "scripts/**/*",
-    "prisma.config.ts"
-  ]
+  "include": ["src/**/*", "scripts/**/*", "prisma.config.ts"]
 }

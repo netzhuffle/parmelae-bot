@@ -1,7 +1,3 @@
 {
-  "setup-worktree": [
-    "cp $ROOT_WORKTREE_PATH/.env .env",
-    "bun install",
-    "bun run migrate"
-  ]
+  "setup-worktree": ["cp $ROOT_WORKTREE_PATH/.env .env", "bun install", "bun run migrate"]
 }

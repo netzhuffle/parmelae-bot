@@ -13,6 +13,7 @@ task-master clear-subtasks --all
 ## Pre-Clear Analysis
 
 1. **Project-Wide Summary**
+
    ```
    Global Subtask Summary
    ━━━━━━━━━━━━━━━━━━━━
@@ -54,6 +55,7 @@ Type 'CLEAR ALL SUBTASKS' to confirm:
 ## Use Cases
 
 Valid reasons for global clear:
+
 - Project restructuring
 - Major pivot in approach
 - Starting fresh breakdown
@@ -71,6 +73,7 @@ Valid reasons for global clear:
 ## Alternative Suggestions
 
 Before clearing all:
+
 - Export subtasks to file
 - Clear only pending subtasks
 - Clear by task category

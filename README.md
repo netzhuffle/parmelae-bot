@@ -52,6 +52,7 @@ src/
 ### Development Setup
 
 1. **Clone and install dependencies**
+
    ```fish
    git clone <repository-url>
    cd parmelae-bot
@@ -59,26 +60,29 @@ src/
    ```
 
 2. **Set up the database**
+
    ```fish
    bun run migrate
    ```
 
 3. **Configure environment**
+
    ```fish
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 4. **Required environment variables**
+
    ```env
    # Telegram Bot Configuration
    USERNAME=your_bot_username
    TELEGRAM_TOKEN=your_bot_token_from_botfather
-   
+
    # AI Configuration
    OPENAI_API_KEY=your_openai_api_key
    HELICONE_API_KEY=your_helicone_key  # Optional: for API monitoring
-   
+
    # Optional Features
    GITHUB_PERSONAL_ACCESS_TOKEN=your_github_token
    SERP_API_KEY=your_serpapi_key  # For web search
@@ -249,6 +253,7 @@ journalctl -u parmelae-bot -n 100 --no-pager
 - **Documentation**: JSDoc for public methods and exported classes
 
 ### Development Workflow
+
 - Prefer small, focused changes.
 - Run `bun run checks` before merging.
 - Keep tests and documentation aligned with behavior changes.
@@ -264,7 +269,7 @@ This is an **active personal project** focused on:
 
 While this started as a “fun project,” it has evolved into a well-structured application demonstrating production-ready patterns and practices.
 
-*(Note: Told you it will overhype itself.)*
+_(Note: Told you it will overhype itself.)_
 
 ## 📄 License
 

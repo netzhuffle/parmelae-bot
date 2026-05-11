@@ -5,6 +5,7 @@ This command helps you get Task Master set up globally on your system.
 ## Detection and Installation Process
 
 1. **Check Current Installation**
+
    ```bash
    # Check if task-master command exists
    which task-master || echo "Task Master not found"
@@ -14,6 +15,7 @@ This command helps you get Task Master set up globally on your system.
    ```
 
 2. **System Requirements Check**
+
    ```bash
    # Verify Node.js is installed
    node --version
@@ -26,11 +28,13 @@ This command helps you get Task Master set up globally on your system.
 
 3. **Install Task Master Globally**
    If not installed, run:
+
    ```bash
    npm install -g task-master-ai
    ```
 
 4. **Verify Installation**
+
    ```bash
    # Check version
    task-master --version
@@ -40,6 +44,7 @@ This command helps you get Task Master set up globally on your system.
    ```
 
 5. **Initial Setup**
+
    ```bash
    # Initialize in current directory
    task-master init
@@ -47,6 +52,7 @@ This command helps you get Task Master set up globally on your system.
 
 6. **Configure AI Provider**
    Ensure you have at least one AI provider API key set:
+
    ```bash
    # Check current configuration
    task-master models --status
@@ -61,6 +67,7 @@ This command helps you get Task Master set up globally on your system.
    ```
 
 7. **Quick Test**
+
    ```bash
    # Create a test PRD
    echo "Build a simple hello world API" > test-prd.txt
@@ -74,6 +81,7 @@ This command helps you get Task Master set up globally on your system.
 If installation fails:
 
 **Permission Errors:**
+
 ```bash
 # Try with sudo (macOS/Linux)
 sudo npm install -g task-master-ai
@@ -84,12 +92,14 @@ export PATH=~/.npm-global/bin:$PATH
 ```
 
 **Network Issues:**
+
 ```bash
 # Use different registry
 npm install -g task-master-ai --registry https://registry.npmjs.org/
 ```
 
 **Node Version Issues:**
+
 ```bash
 # Install Node 20+ via nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -100,6 +110,7 @@ nvm use 20
 ## Success Confirmation
 
 Once installed, you should see:
+
 ```
 ✅ Task Master installed
 ✅ Command 'task-master' available globally
@@ -112,6 +123,7 @@ Try: /taskmaster:init your-prd.md
 ## Next Steps
 
 After installation:
+
 1. Run `/taskmaster:status` to verify setup
 2. Configure AI providers with `/taskmaster:setup-models`
 3. Start using Task Master commands!
