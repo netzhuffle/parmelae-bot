@@ -40,7 +40,6 @@
     "oxlint-tsgolint": "^0.22.1",
     "prisma": "^7.5.0",
     "task-master-ai": "^0.43.1",
-    "typescript": "^5.9.3",
     "yaml-validator": "^5.1.0"
   }
 }
