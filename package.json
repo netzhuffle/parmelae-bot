@@ -2,14 +2,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "format": "bunx --bun oxfmt src scripts",
+    "format": "bunx --bun oxfmt src scripts resources",
     "schema-format": "prisma format",
     "lint": "bunx --bun oxlint src scripts",
     "lint:without-tests": "bunx --bun oxlint src scripts --ignore-pattern \"*.test.ts\"",
-    "validate-yaml": "yaml-validator resources/*.yaml",
     "test": "bun test src scripts",
-    "checks": "bun run format && bun run schema-format && bun run lint:without-tests && bun run lint && bun run validate-yaml && bun test",
-    "build:executable": "bun build src/index.ts --compile --compile-target=bun-linux-x64-modern --bytecode --no-compile-autoload-dotenv --no-compile-autoload-bunfig --outfile=dist/parmelae-bot",
+    "checks": "bun run format && bun run schema-format && bun run lint:without-tests && bun run lint && bun test",
+    "build:executable": "bun build src/index.ts --compile --compile-target=bun-linux-x64-modern --bytecode --minify --target=bun --sourcemap=none --define process.env.NODE_ENV='\"production\"' --no-compile-autoload-dotenv --no-compile-autoload-bunfig --outfile=dist/parmelae-bot",
     "migrate": "prisma migrate dev",
     "tasks": "task-master list --status=pending,in-progress,review,deferred --with-subtasks",
     "run-dev": "bun src/index.ts",
@@ -39,7 +38,6 @@
     "oxlint": "^1.64.0",
     "oxlint-tsgolint": "^0.22.1",
     "prisma": "^7.8.0",
-    "task-master-ai": "^0.43.1",
-    "yaml-validator": "^5.1.0"
+    "task-master-ai": "^0.43.1"
   }
 }
