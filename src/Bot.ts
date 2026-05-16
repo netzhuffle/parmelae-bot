@@ -49,8 +49,8 @@ export class Bot {
       () => {
         void (async () => {
           try {
-            const me = await primaryTelegraf.telegram.getMyName();
-            assert(me.name === this.config.primaryBot.username);
+            const me = await primaryTelegraf.telegram.getMe();
+            assert(me.username === this.config.primaryBot.username);
             this.telegramPollingHealthService.start(primaryTelegraf.telegram);
           } catch (error) {
             ErrorService.log(error);
