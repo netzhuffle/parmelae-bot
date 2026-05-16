@@ -30,6 +30,8 @@ interface SendMessageDraftPayload {
 const INITIAL_DRAFT_UPDATE_INTERVAL_MS = 30;
 const DRAFT_UPDATE_INTERVAL_STEP_MS = 15;
 const TELEGRAM_MAX_MESSAGE_LENGTH = 4096;
+const EMPTY_MODEL_RESPONSE_FALLBACK_TEXT =
+  'Ich habe gerade keine Antwort erzeugen können. Bitte versuchen Sie es noch einmal.';
 
 class TelegramDraftSession implements FinalizableStreamingTextSink {
   private buffer = '';
@@ -389,11 +391,24 @@ export class TelegramService {
     chatId: bigint,
     replyToMessageId?: number,
   ): Promise<number> {
-    const sentMessage = await this.sendTelegramModelText(text, chatId, replyToMessageId);
+    const sendableText = this.getSendableModelText(text, chatId, replyToMessageId);
+    const sentMessage = await this.sendTelegramModelText(sendableText, chatId, replyToMessageId);
     const storedMessage = await this.messageService.store(sentMessage.message, {
       textOverride: sentMessage.storedText,
     });
     return storedMessage.id;
+  }
+
+  private getSendableModelText(text: string, chatId: bigint, replyToMessageId?: number): string {
+    if (text.trim().length > 0) {
+      return text;
+    }
+
+    console.warn('Model-authored Telegram text was empty. Sending fallback text instead.', {
+      chatId: chatId.toString(),
+      replyToMessageId,
+    });
+    return EMPTY_MODEL_RESPONSE_FALLBACK_TEXT;
   }
 
   private async sendTelegramValidatedBotText(

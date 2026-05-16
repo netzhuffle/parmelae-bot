@@ -150,6 +150,56 @@ describe('TelegramService model-authored text', () => {
     ]);
   });
 
+  it('sends and stores fallback text for empty final model text', async () => {
+    spyOn(console, 'warn').mockImplementation(() => undefined);
+    const session = service.createModelTextSession(BigInt(123), 777);
+
+    const storedId = await session.sendFinalText('');
+
+    expect(storedId).toBe(123);
+    expect(telegrafStub.sendMessageCalls).toEqual([
+      {
+        chatId: '123',
+        text: 'Ich habe gerade keine Antwort erzeugen können. Bitte versuchen Sie es noch einmal.',
+        options: {
+          parse_mode: 'MarkdownV2',
+          reply_parameters: {
+            message_id: 777,
+          },
+        },
+      },
+    ]);
+    expect(storeCalls).toEqual([
+      expect.objectContaining({
+        message_id: 0,
+        text: 'Ich habe gerade keine Antwort erzeugen können. Bitte versuchen Sie es noch einmal.',
+      }),
+    ]);
+  });
+
+  it('sends and stores fallback text for whitespace-only final model text', async () => {
+    spyOn(console, 'warn').mockImplementation(() => undefined);
+    const session = service.createModelTextSession(BigInt(123));
+
+    await session.sendFinalText(' \n\t ');
+
+    expect(telegrafStub.sendMessageCalls).toEqual([
+      {
+        chatId: '123',
+        text: 'Ich habe gerade keine Antwort erzeugen können. Bitte versuchen Sie es noch einmal.',
+        options: {
+          parse_mode: 'MarkdownV2',
+        },
+      },
+    ]);
+    expect(storeCalls).toEqual([
+      expect.objectContaining({
+        message_id: 0,
+        text: 'Ich habe gerade keine Antwort erzeugen können. Bitte versuchen Sie es noch einmal.',
+      }),
+    ]);
+  });
+
   it('falls back to final-only sending when drafts are rejected', async () => {
     spyOn(console, 'warn').mockImplementation(() => undefined);
     telegrafStub.callApiErrors.push(new Error('Bad Request: method not available'));
