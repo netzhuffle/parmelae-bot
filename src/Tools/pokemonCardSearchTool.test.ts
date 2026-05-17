@@ -3,15 +3,9 @@ import { describe, beforeEach, it, spyOn, afterEach, expect } from 'bun:test';
 import { ToolContext } from '../ChatGptAgentService.js';
 import { createTestToolConfig } from '../ChatGptAgentService.js';
 import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
+import { createPokemonTcgPocketProbabilityServiceFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
-import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
-import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
-import { ShinyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
-import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 import { PokemonTcgPocketService, Sets } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
-import { PokemonTcgPocketProbabilityRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketProbabilityRepository.js';
 import { PokemonTcgPocketRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketRepository.js';
 import { pokemonCardSearchTool } from './pokemonCardSearchTool.js';
 
@@ -20,16 +14,8 @@ describe('pokemonCardSearch', () => {
   let config: { configurable: ToolContext };
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
-    const probabilityService = new PokemonTcgPocketProbabilityService(
-      new FiveCardsWithoutShinyStrategy(),
-      new FiveCardsStrategy(),
-      new BabyAsPotentialSixthCardStrategy(),
-      new FourCardGuaranteedExStrategy(),
-      new ShinyAsPotentialSixthCardStrategy(),
-      undefined as unknown as PokemonTcgPocketProbabilityRepository,
-    );
     const service = new PokemonTcgPocketService(
-      probabilityService,
+      createPokemonTcgPocketProbabilityServiceFake(),
       repository as unknown as PokemonTcgPocketRepository,
       {} as Sets,
     );

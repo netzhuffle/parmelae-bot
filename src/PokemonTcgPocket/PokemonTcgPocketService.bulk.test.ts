@@ -1,15 +1,10 @@
 import { describe, beforeEach, it, expect } from 'bun:test';
 
 import { OwnershipStatus } from '../generated/prisma/enums.js';
+import { createPokemonTcgPocketProbabilityServiceFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
-import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
-import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
-import { FiveCardsWithoutShinyStrategy } from './PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FourCardGuaranteedExStrategy } from './PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
-import { ShinyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
 import { PokemonTcgPocketService, Sets } from './PokemonTcgPocketService.js';
-import { PokemonTcgPocketProbabilityRepository } from './Repositories/PokemonTcgPocketProbabilityRepository.js';
 
 describe('PokemonTcgPocketService bulk operations', () => {
   let service: PokemonTcgPocketService;
@@ -18,14 +13,7 @@ describe('PokemonTcgPocketService bulk operations', () => {
 
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
-    probabilityService = new PokemonTcgPocketProbabilityService(
-      new FiveCardsWithoutShinyStrategy(),
-      new FiveCardsStrategy(),
-      new BabyAsPotentialSixthCardStrategy(),
-      new FourCardGuaranteedExStrategy(),
-      new ShinyAsPotentialSixthCardStrategy(),
-      undefined as unknown as PokemonTcgPocketProbabilityRepository,
-    );
+    probabilityService = createPokemonTcgPocketProbabilityServiceFake();
     service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
   });
 

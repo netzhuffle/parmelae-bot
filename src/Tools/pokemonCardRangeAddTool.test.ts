@@ -2,15 +2,10 @@ import { describe, beforeEach, it, afterEach, expect } from 'bun:test';
 
 import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { OwnershipStatus } from '../generated/prisma/enums.js';
+import { createPokemonTcgPocketProbabilityServiceFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { BabyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
-import { FiveCardsStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsStrategy.js';
-import { FiveCardsWithoutShinyStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FiveCardsWithoutShinyStrategy.js';
-import { FourCardGuaranteedExStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/FourCardGuaranteedExStrategy.js';
-import { ShinyAsPotentialSixthCardStrategy } from '../PokemonTcgPocket/PackProbabilityStrategies/ShinyAsPotentialSixthCardStrategy.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
 import { PokemonTcgPocketService, Sets } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
-import { PokemonTcgPocketProbabilityRepository } from '../PokemonTcgPocket/Repositories/PokemonTcgPocketProbabilityRepository.js';
 import { pokemonCardRangeAddTool } from './pokemonCardRangeAddTool.js';
 
 describe('pokemonCardRangeAdd', () => {
@@ -20,14 +15,7 @@ describe('pokemonCardRangeAdd', () => {
 
   beforeEach(async () => {
     repository = new PokemonTcgPocketRepositoryFake();
-    probabilityService = new PokemonTcgPocketProbabilityService(
-      new FiveCardsWithoutShinyStrategy(),
-      new FiveCardsStrategy(),
-      new BabyAsPotentialSixthCardStrategy(),
-      new FourCardGuaranteedExStrategy(),
-      new ShinyAsPotentialSixthCardStrategy(),
-      undefined as unknown as PokemonTcgPocketProbabilityRepository,
-    );
+    probabilityService = createPokemonTcgPocketProbabilityServiceFake();
     config = createTestToolConfig({
       userId: BigInt(1),
       pokemonTcgPocketService: new PokemonTcgPocketService(
