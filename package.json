@@ -20,7 +20,7 @@
     "@langchain/langgraph": "^1.2.3",
     "@langchain/openai": "^1.3.0",
     "@prisma/client": "^7.8.0",
-    "@sentry/node": "^10.52.0",
+    "@sentry/node": "^10.53.1",
     "@synapsenwerkstatt/prisma-bun-sqlite-adapter": "^1.2.2",
     "cheerio": "^1.2.0",
     "inversify": "^8.1.0",
@@ -34,8 +34,8 @@
   "devDependencies": {
     "@types/bun": "^1.3.13",
     "@types/node": "^25.7.0",
-    "oxfmt": "^0.49.0",
-    "oxlint": "^1.64.0",
+    "oxfmt": "^0.50.0",
+    "oxlint": "^1.65.0",
     "oxlint-tsgolint": "^0.22.1",
     "prisma": "^7.8.0",
     "task-master-ai": "^0.43.1"
