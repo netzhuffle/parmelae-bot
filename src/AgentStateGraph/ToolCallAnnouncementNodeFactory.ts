@@ -1,6 +1,7 @@
 import { AIMessage } from '@langchain/core/messages';
 import { injectable } from 'inversify';
 
+import { getAiMessageTextContent } from '../AiMessageTextContent.js';
 import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
 import { StateAnnotation } from './StateAnnotation.js';
 
@@ -25,6 +26,20 @@ export class ToolCallAnnouncementNodeFactory {
     return toolCall.name !== INTERMEDIATE_ANSWER_TOOL_NAME;
   }
 
+  private isImageGenerationIntermediateAnswer(toolCall: {
+    args?: Record<string, unknown>;
+    name: string;
+  }): boolean {
+    if (toolCall.name !== INTERMEDIATE_ANSWER_TOOL_NAME) {
+      return false;
+    }
+
+    const text = Object.values(toolCall.args ?? {})
+      .filter((value): value is string => typeof value === 'string')
+      .join(' ');
+    return /\b(bild|foto|photo|zeichnung|zeichnen|male|malen|gemälde)\b/iu.test(text);
+  }
+
   private formatToolCall(toolCall: { name: string; args?: Record<string, unknown> }): string {
     const { name: toolName, args: input } = toolCall;
     const filtered = Object.fromEntries(
@@ -45,8 +60,9 @@ export class ToolCallAnnouncementNodeFactory {
     toolCalls: { name: string; args?: Record<string, unknown> }[],
   ): string[] {
     const lines: string[] = [];
-    if (typeof lastMessage.content === 'string' && lastMessage.content.trim() !== '') {
-      lines.push(lastMessage.content);
+    const content = getAiMessageTextContent(lastMessage).trim();
+    if (content !== '') {
+      lines.push(content);
     }
     for (const toolCall of toolCalls) {
       if (!this.shouldAnnounceToolCall(toolCall)) {
@@ -71,6 +87,9 @@ export class ToolCallAnnouncementNodeFactory {
       const lastMessage = messages[messages.length - 1] as AIMessage;
       const toolCalls = (lastMessage.tool_calls ?? []) as ToolCall[];
       const lines = this.getAnnouncementLines(lastMessage, toolCalls);
+      const pendingImageGenerationStatus = toolCalls.some((toolCall) =>
+        this.isImageGenerationIntermediateAnswer(toolCall),
+      );
 
       if (lines.length > 0) {
         const messageId = await announceToolCall(lines.join('\n'));
@@ -86,11 +105,12 @@ export class ToolCallAnnouncementNodeFactory {
                 .filter((id): id is string => id !== undefined),
             },
             toolCallMessageIds: [messageId],
+            ...(pendingImageGenerationStatus ? { pendingImageGenerationStatus } : {}),
           };
         }
       }
 
-      return {};
+      return pendingImageGenerationStatus ? { pendingImageGenerationStatus } : {};
     };
   }
 }

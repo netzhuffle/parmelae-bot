@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 
 import { AIMessage, SystemMessage } from '@langchain/core/messages';
-import { StructuredTool, Tool } from '@langchain/core/tools';
 import { LangGraphRunnableConfig } from '@langchain/langgraph';
 import { injectable } from 'inversify';
 
 import { AgentStateGraphFactory } from './AgentStateGraph/AgentStateGraphFactory.js';
+import { AgentTool, getAgentToolName } from './AgentTool.js';
 import {
   getAiMessageTextChunkContent,
   getLastAiMessageTextContent,
@@ -13,18 +13,18 @@ import {
 import { CallbackHandler } from './CallbackHandler.js';
 import { Config } from './Config.js';
 import { Conversation } from './Conversation.js';
-import { DallEService } from './DallEService.js';
 import { ErrorService } from './ErrorService.js';
 import { MessageModel } from './generated/prisma/models/Message.js';
 import { GptModelsProvider } from './GptModelsProvider.js';
+import { withHostedImageGenerationStartHandler } from './HostedImageGenerationObserver.js';
+import { getImageGenerationOutputs } from './ImageGenerationOutput.js';
 import { ChatGptMessage, ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
-import { DallEPromptGenerator } from './MessageGenerators/DallEPromptGenerator.js';
 import { EmulatorIdentity } from './MessageGenerators/Identities/EmulatorIdentity.js';
 import { Identity } from './MessageGenerators/Identities/Identity.js';
 import { IdentityResolverService } from './MessageGenerators/Identities/IdentityResolverService.js';
 import { SchiParmelaeIdentity } from './MessageGenerators/Identities/SchiParmelaeIdentity.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
-import { StreamingTextSink } from './StreamingTextSink.js';
+import { isFinalizableStreamingTextSink, StreamingTextSink } from './StreamingTextSink.js';
 import { TelegramService } from './TelegramService.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
 import { diceTool } from './Tools/diceTool.js';
@@ -33,6 +33,7 @@ import { GptModelQueryTool } from './Tools/GptModelQueryTool.js';
 import { GptModelSetterTool } from './Tools/GptModelSetterTool.js';
 import { identityQueryTool } from './Tools/identityQueryTool.js';
 import { identitySetterTool } from './Tools/identitySetterTool.js';
+import { IMAGE_GENERATION_TOOL_NAME } from './Tools/imageGenerationTool.js';
 import { INTERMEDIATE_ANSWER_TOOL_NAME } from './Tools/IntermediateAnswerTool.js';
 import { IntermediateAnswerToolFactory } from './Tools/IntermediateAnswerToolFactory.js';
 import { pokemonCardAddTool } from './Tools/pokemonCardAddTool.js';
@@ -47,6 +48,39 @@ import { WebBrowserToolFactory } from './Tools/WebBrowserToolFactory.js';
 export interface ChatGptAgentResponse {
   message: ChatGptMessage;
   toolCallMessageIds: number[];
+  finalMessageId?: number;
+  finalMessageIds?: number[];
+}
+
+class HostedImageGenerationTextBuffer {
+  private leadInText = '';
+  private followUpText = '';
+
+  imageGenerationStarted = false;
+
+  append(text: string): void {
+    if (this.imageGenerationStarted) {
+      this.followUpText += text;
+    } else {
+      this.leadInText += text;
+    }
+  }
+
+  markImageGenerationStarted(): void {
+    this.imageGenerationStarted = true;
+  }
+
+  getLeadInText(): string {
+    return this.leadInText;
+  }
+
+  getFollowUpText(): string {
+    return this.followUpText.trim();
+  }
+
+  getCombinedText(primaryText: string): string {
+    return [primaryText, this.getFollowUpText()].filter((text) => text.length > 0).join('\n\n');
+  }
 }
 
 /** The context for the tools. */
@@ -54,8 +88,6 @@ export interface ToolContext {
   chatId: bigint;
   userId: bigint;
   telegramService: TelegramService;
-  dallEService: DallEService;
-  dallEPromptGenerator: DallEPromptGenerator;
   pokemonTcgPocketService: PokemonTcgPocketService;
   identityByChatId: Map<bigint, Identity>;
   identities: {
@@ -71,8 +103,6 @@ function assertIsToolContext(value: unknown): asserts value is ToolContext {
   assert('chatId' in value);
   assert('userId' in value);
   assert('telegramService' in value);
-  assert('dallEService' in value);
-  assert('dallEPromptGenerator' in value);
   assert('pokemonTcgPocketService' in value);
   assert('identityByChatId' in value);
   assert('identities' in value);
@@ -102,8 +132,6 @@ export function createTestToolConfig(context: Partial<ToolContext>): {
       chatId: undefined as unknown as bigint,
       userId: undefined as unknown as bigint,
       telegramService: undefined as unknown as TelegramService,
-      dallEService: undefined as unknown as DallEService,
-      dallEPromptGenerator: undefined as unknown as DallEPromptGenerator,
       pokemonTcgPocketService: undefined as unknown as PokemonTcgPocketService,
       identityByChatId: undefined as unknown as Map<bigint, Identity>,
       identities: undefined as unknown as {
@@ -119,7 +147,7 @@ export function createTestToolConfig(context: Partial<ToolContext>): {
 /** ChatGPT Agent Service */
 @injectable()
 export class ChatGptAgentService {
-  private readonly tools: (StructuredTool | Tool)[] = [
+  private readonly tools: AgentTool[] = [
     diceTool,
     dateTimeTool,
     identityQueryTool,
@@ -135,8 +163,6 @@ export class ChatGptAgentService {
     private readonly models: GptModelsProvider,
     private readonly config: Config,
     private readonly telegramService: TelegramService,
-    private readonly dallEService: DallEService,
-    private readonly dallEPromptGenerator: DallEPromptGenerator,
     private readonly callbackHandler: CallbackHandler,
     private readonly pokemonTcgPocketService: PokemonTcgPocketService,
     private readonly schiParmelaeIdentity: SchiParmelaeIdentity,
@@ -226,19 +252,23 @@ export class ChatGptAgentService {
    * @param message - The message being processed (needed for dynamic tool creation)
    * @returns Complete tools array ready for agent creation
    */
-  private buildTools(identity: Identity, message: MessageModel): (StructuredTool | Tool)[] {
+  private buildTools(identity: Identity, message: MessageModel): AgentTool[] {
     // Guard against identity tools shadowing critical system tools
     const criticalToolNames = new Set([SCHEDULE_MESSAGE_TOOL_NAME, INTERMEDIATE_ANSWER_TOOL_NAME]);
-    const conflictingTools = identity.tools.filter((tool) => criticalToolNames.has(tool.name));
+    const conflictingTools = identity.tools.filter((tool) =>
+      criticalToolNames.has(getAgentToolName(tool)),
+    );
     if (conflictingTools.length > 0) {
       console.warn(
-        `Identity "${identity.name}" defines tools that conflict with critical system tools: ${conflictingTools.map((t) => t.name).join(', ')}. ` +
+        `Identity "${identity.name}" defines tools that conflict with critical system tools: ${conflictingTools.map(getAgentToolName).join(', ')}. ` +
           'These will be ignored to prevent system instability.',
       );
     }
 
     // Merge global tools with identity-specific tools (excluding conflicts)
-    const identityTools = identity.tools.filter((tool) => !criticalToolNames.has(tool.name));
+    const identityTools = identity.tools.filter(
+      (tool) => !criticalToolNames.has(getAgentToolName(tool)),
+    );
     return [
       ...this.tools,
       ...identityTools,
@@ -256,11 +286,16 @@ export class ChatGptAgentService {
     streamSink?: StreamingTextSink,
   ): Promise<ChatGptAgentResponse> {
     const allTools = this.buildTools(identity, message);
+    const canUseHostedImageGeneration = allTools.some(
+      (tool) => getAgentToolName(tool) === IMAGE_GENERATION_TOOL_NAME,
+    );
 
     const agent = this.agentStateGraphFactory.create({
       tools: allTools,
       llm: this.models.getModel(this.config.gptModel),
       announceToolCall,
+      runWithUploadPhotoStatus: (task) =>
+        this.telegramService.withUploadPhotoStatus(message.chatId, task),
     });
 
     const config = {
@@ -268,8 +303,6 @@ export class ChatGptAgentService {
         chatId: message.chatId,
         userId: message.fromId,
         telegramService: this.telegramService,
-        dallEService: this.dallEService,
-        dallEPromptGenerator: this.dallEPromptGenerator,
         pokemonTcgPocketService: this.pokemonTcgPocketService,
         identityByChatId: this.config.identityByChatId,
         identities: {
@@ -285,56 +318,133 @@ export class ChatGptAgentService {
     };
     if (!streamSink) {
       const agentOutput = await agent.invoke(input, config);
+      const sentImages = await this.sendGeneratedImages(agentOutput.messages, message.chatId);
       const content = getLastAiMessageTextContent(agentOutput.messages);
       assert(content !== null, 'Agent output must include an assistant message.');
+      assert(
+        content.length > 0 || sentImages > 0,
+        'Agent output must include assistant text or generated images.',
+      );
       return {
         message: {
           role: ChatGptRoles.Assistant,
-          content,
+          content: content.length > 0 ? content : 'Ich habe das Bild gesendet.',
         },
         toolCallMessageIds: agentOutput.toolCallMessageIds,
       };
     }
 
-    let latestState: {
-      messages: unknown[];
-      toolCallMessageIds: number[];
-    } | null = null;
-    let streamedAssistantText = '';
-    const stream = await agent.stream(input, {
-      ...config,
-      streamMode: ['messages', 'values'],
-    });
-    for await (const [mode, payload] of stream) {
-      if (mode === 'messages') {
-        const [messageChunk] = payload as [
-          { content: AIMessage['content']; contentBlocks?: AIMessage['contentBlocks'] },
-          unknown,
-        ];
-        const textChunk = getAiMessageTextChunkContent(messageChunk);
-        if (textChunk.length > 0) {
-          streamedAssistantText += textChunk;
-          void streamSink.appendText(textChunk);
-        }
-        continue;
-      }
-      if (mode === 'values') {
-        latestState = payload as {
-          messages: unknown[];
-          toolCallMessageIds: number[];
-        };
-      }
-    }
+    const latestStateContainer: {
+      value?: {
+        messages: unknown[];
+        toolCallMessageIds: number[];
+      };
+    } = {};
+    const textBuffer = new HostedImageGenerationTextBuffer();
+    let earlyFinalMessageId: number | undefined;
+    let earlyFinalText: string | undefined;
+    let stopUploadPhotoStatus: (() => void) | undefined;
+    const finalMessageIds: number[] = [];
 
-    assert(latestState, 'Agent stream must produce a final values payload.');
-    const content = getLastAiMessageTextContent(latestState.messages) ?? streamedAssistantText;
-    assert(content.length > 0, 'Agent stream must end with assistant text.');
+    const handleHostedImageGenerationStart = async () => {
+      if (!canUseHostedImageGeneration || stopUploadPhotoStatus !== undefined) {
+        return;
+      }
+      textBuffer.markImageGenerationStarted();
+      const leadInText = textBuffer.getLeadInText();
+      if (
+        earlyFinalMessageId === undefined &&
+        leadInText.trim().length > 0 &&
+        isFinalizableStreamingTextSink(streamSink)
+      ) {
+        earlyFinalText = leadInText;
+        earlyFinalMessageId = await streamSink.sendFinalText(earlyFinalText);
+        finalMessageIds.push(earlyFinalMessageId);
+      }
+      stopUploadPhotoStatus = this.telegramService.startUploadPhotoStatus(message.chatId);
+    };
+
+    await withHostedImageGenerationStartHandler(handleHostedImageGenerationStart, async () => {
+      const stream = await agent.stream(input, {
+        ...config,
+        streamMode: ['messages', 'values'],
+      });
+
+      for await (const [mode, payload] of stream) {
+        if (mode === 'messages') {
+          const [messageChunk] = payload as [
+            { content: AIMessage['content']; contentBlocks?: AIMessage['contentBlocks'] },
+            unknown,
+          ];
+          const textChunk = getAiMessageTextChunkContent(messageChunk);
+          if (textChunk.length > 0) {
+            textBuffer.append(textChunk);
+            if (earlyFinalMessageId === undefined && !textBuffer.imageGenerationStarted) {
+              void streamSink.appendText(textChunk);
+            }
+          }
+          continue;
+        }
+        if (mode === 'values') {
+          latestStateContainer.value = payload as {
+            messages: unknown[];
+            toolCallMessageIds: number[];
+          };
+        }
+      }
+    });
+
+    assert(latestStateContainer.value, 'Agent stream must produce a final values payload.');
+    const latestState = latestStateContainer.value;
+    const finalStateContent = getLastAiMessageTextContent(latestState.messages);
+    const content =
+      earlyFinalText ??
+      (finalStateContent !== null && finalStateContent.length > 0
+        ? finalStateContent
+        : textBuffer.getLeadInText());
+    if (
+      earlyFinalMessageId === undefined &&
+      !textBuffer.imageGenerationStarted &&
+      content.length > 0 &&
+      isFinalizableStreamingTextSink(streamSink)
+    ) {
+      earlyFinalMessageId = await streamSink.sendFinalText(content);
+      finalMessageIds.push(earlyFinalMessageId);
+    }
+    let sentImages = 0;
+    try {
+      sentImages = await this.sendGeneratedImages(latestState.messages, message.chatId);
+    } finally {
+      stopUploadPhotoStatus?.();
+    }
+    const postImageContent = textBuffer.getFollowUpText();
+    if (postImageContent.length > 0 && isFinalizableStreamingTextSink(streamSink)) {
+      const postImageMessageId = await streamSink.sendFinalText(postImageContent);
+      finalMessageIds.push(postImageMessageId);
+    }
+    const responseContent = textBuffer.getCombinedText(content);
+    assert(
+      responseContent.length > 0 || sentImages > 0,
+      'Agent stream must end with assistant text or generated images.',
+    );
     return {
       message: {
         role: ChatGptRoles.Assistant,
-        content,
+        content: responseContent.length > 0 ? responseContent : 'Ich habe das Bild gesendet.',
       },
       toolCallMessageIds: latestState.toolCallMessageIds,
+      finalMessageId: finalMessageIds.at(-1),
+      finalMessageIds,
     };
+  }
+
+  private async sendGeneratedImages(messages: unknown[], chatId: bigint): Promise<number> {
+    const generatedImages = getImageGenerationOutputs(messages);
+    await Promise.all(
+      generatedImages.map((image) =>
+        this.telegramService.replyWithImage(image.dataUrl, image.caption, chatId),
+      ),
+    );
+    return generatedImages.length;
   }
 }

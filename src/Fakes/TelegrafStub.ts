@@ -28,6 +28,10 @@ export class TelegrafStub {
     apiMethod: string;
     payload: unknown;
   }[] = [];
+  public sendChatActionCalls: {
+    action: string;
+    chatId: string;
+  }[] = [];
   public callApiErrors: Error[] = [];
   public sendMessageCalls: {
     chatId: string;
@@ -39,6 +43,11 @@ export class TelegrafStub {
         message_id: number;
       };
     };
+  }[] = [];
+  public sendPhotoCalls: {
+    chatId: string;
+    photo: string | { source: Buffer; filename?: string };
+    options?: { caption?: string; reply_parameters?: { message_id: number } };
   }[] = [];
   public sendMessageErrors: Error[] = [];
   public readonly telegram: {
@@ -63,7 +72,7 @@ export class TelegrafStub {
     ) => Promise<Typegram.Message.DiceMessage>;
     sendPhoto: (
       chatId: string,
-      url: string,
+      photo: string | { source: Buffer; filename?: string },
       options?: { caption?: string; reply_parameters?: { message_id: number } },
     ) => Promise<Typegram.Message.PhotoMessage>;
     callApi: (apiMethod: string, payload?: unknown) => Promise<unknown>;
@@ -79,7 +88,8 @@ export class TelegrafStub {
     };
 
     this.telegram = {
-      sendChatAction: async () => {
+      sendChatAction: async (chatId, action) => {
+        this.sendChatActionCalls.push({ action, chatId });
         return await Promise.resolve(true);
       },
       sendSticker: async () => {
@@ -119,7 +129,8 @@ export class TelegrafStub {
           dice: { emoji: '🎲', value: 1 },
         } as Typegram.Message.DiceMessage);
       },
-      sendPhoto: async () => {
+      sendPhoto: async (chatId, photo, options) => {
+        this.sendPhotoCalls.push({ chatId, photo, options });
         return await Promise.resolve({
           message_id: 0,
           date: 0,

@@ -29,4 +29,8 @@ export const StateAnnotation = Annotation.Root({
     reducer: (x, y) => x.concat(y),
     default: () => [],
   }),
+  pendingImageGenerationStatus: Annotation<boolean>({
+    reducer: (_x, y) => y,
+    default: () => false,
+  }),
 });

@@ -172,6 +172,47 @@ export class TelegramService {
     await this.primaryTelegraf.telegram.sendChatAction(chatId.toString(), 'typing');
   }
 
+  /** Display photo upload status while a generated image is being created. */
+  async sendUploadPhoto(chatId: bigint): Promise<void> {
+    await this.primaryTelegraf.telegram.sendChatAction(chatId.toString(), 'upload_photo');
+  }
+
+  /** Starts Telegram's transient photo-upload status and returns a cleanup callback. */
+  startUploadPhotoStatus(chatId: bigint): () => void {
+    void this.sendUploadPhoto(chatId).catch((error: unknown) => {
+      console.warn('Telegram upload_photo status update failed.', {
+        chatId: chatId.toString(),
+        error,
+      });
+    });
+    const interval = setInterval(() => {
+      void this.sendUploadPhoto(chatId).catch((error: unknown) => {
+        console.warn('Telegram upload_photo status update failed.', {
+          chatId: chatId.toString(),
+          error,
+        });
+      });
+    }, 4000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }
+
+  /** Keeps Telegram's transient photo-upload status visible while the task is running. */
+  async withUploadPhotoStatus<Result>(
+    chatId: bigint,
+    task: () => Promise<Result>,
+  ): Promise<Result> {
+    const stopUploadPhotoStatus = this.startUploadPhotoStatus(chatId);
+
+    try {
+      return await task();
+    } finally {
+      stopUploadPhotoStatus();
+    }
+  }
+
   /**
    * Send a message or sticker and stores the message in the database.
    *
@@ -320,14 +361,18 @@ export class TelegramService {
   /**
    * Replies an image to a message.
    *
-   * @param url - The image URL.
+   * @param url - The image URL or data URL.
    * @param caption - The image caption.
    * @param message - The message to reply to.
    */
   async replyWithImage(url: string, caption: string, chatId: bigint): Promise<void> {
-    const sentMessage = await this.primaryTelegraf.telegram.sendPhoto(chatId.toString(), url, {
-      caption: caption,
-    });
+    const sentMessage = await this.primaryTelegraf.telegram.sendPhoto(
+      chatId.toString(),
+      this.getPhotoInput(url),
+      {
+        caption: caption,
+      },
+    );
     await this.messageService.store(sentMessage);
   }
 
@@ -344,6 +389,48 @@ export class TelegramService {
       this.nextDraftId = 1;
     }
     return draftId;
+  }
+
+  private getPhotoInput(url: string): string | { source: Buffer; filename: string } {
+    const dataUrl = this.parseImageDataUrl(url);
+    if (!dataUrl) {
+      return url;
+    }
+
+    return {
+      source: Buffer.from(dataUrl.base64, 'base64'),
+      filename: `generated-image.${dataUrl.extension}`,
+    };
+  }
+
+  private parseImageDataUrl(url: string): { base64: string; extension: string } | null {
+    const match = /^data:(image\/[a-z0-9.+-]+);base64,(.+)$/u.exec(url);
+    if (!match) {
+      return null;
+    }
+
+    const [, mimeType, base64] = match;
+    if (!mimeType || !base64) {
+      return null;
+    }
+
+    return {
+      base64,
+      extension: this.getImageExtension(mimeType),
+    };
+  }
+
+  private getImageExtension(mimeType: string): string {
+    switch (mimeType) {
+      case 'image/jpeg':
+        return 'jpg';
+      case 'image/png':
+        return 'png';
+      case 'image/webp':
+        return 'webp';
+      default:
+        return 'png';
+    }
   }
 
   private async sendMessageDraft(chatId: bigint, draftId: number, text: string): Promise<boolean> {

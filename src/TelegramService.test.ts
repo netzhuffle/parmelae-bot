@@ -538,4 +538,49 @@ describe('TelegramService model-authored text', () => {
       },
     ]);
   });
+
+  it('sends generated image data URLs as uploaded photo buffers', async () => {
+    await service.replyWithImage('data:image/png;base64,aGVsbG8=', 'Generated image', BigInt(123));
+
+    expect(telegrafStub.sendPhotoCalls).toHaveLength(1);
+    expect(telegrafStub.sendPhotoCalls[0]).toEqual({
+      chatId: '123',
+      photo: {
+        source: Buffer.from('hello'),
+        filename: 'generated-image.png',
+      },
+      options: {
+        caption: 'Generated image',
+      },
+    });
+    expect(storeCalls).toHaveLength(1);
+  });
+
+  it('keeps upload-photo status visible while generated images are being created', async () => {
+    let resolveTask: (value: string) => void = () => {
+      return;
+    };
+    const taskPromise = new Promise<string>((resolve) => {
+      resolveTask = resolve;
+    });
+
+    const resultPromise = service.withUploadPhotoStatus(BigInt(123), () => taskPromise);
+    await Promise.resolve();
+
+    expect(telegrafStub.sendChatActionCalls).toEqual([
+      {
+        action: 'upload_photo',
+        chatId: '123',
+      },
+    ]);
+
+    await advanceTimersByTime(4000);
+    expect(telegrafStub.sendChatActionCalls).toHaveLength(2);
+
+    resolveTask('done');
+    expect(await resultPromise).toBe('done');
+    await advanceTimersByTime(4000);
+
+    expect(telegrafStub.sendChatActionCalls).toHaveLength(2);
+  });
 });
