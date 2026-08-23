@@ -1,64 +1,24 @@
-# Repository Guidelines
+# Repository guidance
 
-## Project
+## Development
 
-- Stack: `bun` + `TypeScript` + `Prisma` + `LangChain/LangGraph` + `Telegraf` + `Inversify`
-- Tests: `bun:test` with colocated `*.test.ts`
-- Quality tooling: `oxfmt` + `oxlint` + `yaml-validator`
-- Package manager/runtime: `bun`
+- Use Bun for runtime and package operations. Prefer TypeScript for new source files.
+- Services own business logic; repositories own CRUD, queries, and mapping.
+- LangChain tools use `ToolContext` / `getToolContext(config)` for dependencies and must be registered in `ChatGptAgentService`.
+- Import Prisma model and enum types directly from their generated files rather than barrel files.
+- Prefer fakes at external boundaries. Put reusable fakes in `src/Fakes/` and keep them simple.
+- Use Bun fake timers for timer-driven tests.
+- Every hand-written `oxlint-disable` directive must state its concrete reason.
+- Sequential `await` in a loop must have an `oxlint-disable-next-line` explaining why ordering is required.
+- Run `bun run checks` before handing off implementation changes; completion means the command exits successfully.
 
-## Working Defaults For Codex
+## Conditional guidance
 
-- Keep changes focused and minimal; avoid unrelated refactors.
-- Fix bugs at root cause, not only symptoms.
-- Add or update regression tests for behavior changes and bug fixes when practical.
-- Keep touched documentation aligned with the implemented behavior.
-- Do not edit generated artifacts unless the task explicitly requires it.
-- Preserve unrelated user changes in the worktree.
-- Every hand-written `oxlint-disable` directive must include a concrete reason.
-- Avoid `await` inside loops unless the work is intentionally sequential. When sequential awaiting is required, add an inline `oxlint-disable-next-line` with a concrete reason.
-- Before handoff on implementation changes, run `bun run checks`.
+- **Commits:** Before creating a commit, read `docs/agents/commits.md`.
+- **Task tracking:** Use Taskmaster only when the user asks about planned or next work; consult `package.json` and the CLI help for commands.
 
-## Project Structure & Conventions
+## Agent skills
 
-- Source code lives in `src/`; support scripts live in `scripts/`; card data lives in `resources/`.
-- Services hold business logic; repositories stay focused on CRUD, queries, and mapping.
-- LangChain tools live in `src/Tools/` and use `ToolContext` / `getToolContext(config)` for dependencies. New tools must also be registered in `ChatGptAgentService`.
-- Prefer fakes over mocks for external boundaries. Shared fakes belong in `src/Fakes/` and should stay simple.
-- Error classes should be specific, descriptive, and colocated with the code that uses them. Use assertions only for programmer errors or invariants.
-- Import Prisma model and enum types directly from generated files, not from barrel files.
-- Public exported classes and non-trivial exported methods should have concise JSDoc focused on non-obvious behavior or business rules.
-
-## Commands
-
-- Install deps: `bun install`
-- Run app: `bun src/index.ts`
-- Format: `bun run format`
-- Lint: `bun run lint`
-- Validate all: `bun run checks`
-- Tests: `bun test src scripts`
-- Task overview: `bun run tasks`
-
-## Commits
-
-- Keep commits focused and split unrelated changes instead of bundling them together.
-- Use concise, action-oriented commit subjects that reflect the real scope of the diff.
-- Stage only the files that belong to the requested change.
-- For internal-only changes, add a blank line and `no_announcement` at the end of the commit message; commits without it will be announced in Telegram on the next bot restart.
-- Before requesting elevated git permissions for commits, show the exact commit message to the user and state whether you are about to create one commit or multiple commits.
-
-## Testing Guidelines
-
-- Keep tests next to the implementation using `*.test.ts`.
-- Prefer behavior-focused tests over implementation-detail tests.
-- For timer-driven code, use Bun fake timers instead of real waiting.
-- Keep tests deterministic: no real network calls, no flaky time dependencies, no hidden shared state between tests.
-
-## Taskmaster
-
-- Taskmaster is available in this repo, but use it only when the user wants task tracking or asks about next/planned work.
-- Common examples:
-  - `bun run tasks`
-  - `bunx --bun task-master next`
-  - `bunx --bun task-master show <id>`
-  - `bunx --bun task-master set-status --id=<id> --status=in-progress`
+- **Issues and pull requests:** Before reading or writing GitHub issues or pull requests, read `docs/agents/issue-tracker.md`.
+- **Triage:** Before applying triage roles, read `docs/agents/triage-labels.md`.
+- **Domain docs:** Before relying on domain vocabulary or architectural decisions, read `docs/agents/domain.md`.
