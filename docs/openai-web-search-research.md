@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-03-19
 
-This note captures the findings for Taskmaster task `35.2` and focuses on how OpenAI web search would replace the current SerpAPI integration in this repository.
+This note captures findings about how OpenAI web search would replace the current SerpAPI integration in this repository.
 
 ## Current Repository Baseline
 

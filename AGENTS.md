@@ -15,7 +15,6 @@
 ## Conditional guidance
 
 - **Commits:** Before creating a commit, read `docs/agents/commits.md`.
-- **Task tracking:** Use Taskmaster only when the user asks about planned or next work; consult `package.json` and the CLI help for commands.
 
 ## Agent skills
 

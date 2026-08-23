@@ -10,7 +10,6 @@
     "checks": "bun run format && bun run schema-format && bun run lint:without-tests && bun run lint && bun test",
     "build:executable": "bun build src/index.ts --compile --compile-target=bun-linux-x64-modern --bytecode --minify --target=bun --sourcemap=none --define process.env.NODE_ENV='\"production\"' --no-compile-autoload-dotenv --no-compile-autoload-bunfig --outfile=dist/parmelae-bot",
     "migrate": "prisma migrate dev",
-    "tasks": "task-master list --status=pending,in-progress,review,deferred --with-subtasks",
     "run-dev": "bun src/index.ts",
     "prisma-studio": "prisma studio"
   },
@@ -36,7 +35,6 @@
     "oxfmt": "^0.50.0",
     "oxlint": "^1.65.0",
     "oxlint-tsgolint": "^0.22.1",
-    "prisma": "^7.8.0",
-    "task-master-ai": "^0.43.1"
+    "prisma": "^7.8.0"
   }
 }

@@ -4,12 +4,7 @@
 
   "customizations": {
     "vscode": {
-      "extensions": [
-        "oven.bun-vscode",
-        "dbaeumer.vscode-eslint",
-        "Prisma.prisma",
-        "hamster.task-master-hamster"
-      ]
+      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "Prisma.prisma"]
     }
   },
   "features": {
