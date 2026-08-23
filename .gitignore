@@ -1,5 +1,4 @@
 /.env
-/.taskmaster/tasks/*.txt
 /plans
 /node_modules/
 /dist/
