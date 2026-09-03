@@ -49,8 +49,15 @@ export class TelegrafStub {
     photo: string | { source: Buffer; filename?: string };
     options?: { caption?: string; reply_parameters?: { message_id: number } };
   }[] = [];
+  public sendPhotoErrors: Error[] = [];
   public sendMessageErrors: Error[] = [];
   public readonly telegram: {
+    token: string;
+    options: {
+      apiMode: 'bot';
+      apiRoot: string;
+      testEnv: boolean;
+    };
     sendChatAction: (chatId: string, action: string) => Promise<boolean>;
     sendSticker: (
       chatId: string,
@@ -88,6 +95,12 @@ export class TelegrafStub {
     };
 
     this.telegram = {
+      token: 'fake-telegram-token',
+      options: {
+        apiMode: 'bot',
+        apiRoot: 'https://api.telegram.org',
+        testEnv: false,
+      },
       sendChatAction: async (chatId, action) => {
         this.sendChatActionCalls.push({ action, chatId });
         return await Promise.resolve(true);
@@ -131,6 +144,10 @@ export class TelegrafStub {
       },
       sendPhoto: async (chatId, photo, options) => {
         this.sendPhotoCalls.push({ chatId, photo, options });
+        const error = this.sendPhotoErrors.shift();
+        if (error) {
+          throw error;
+        }
         return await Promise.resolve({
           message_id: 0,
           date: 0,

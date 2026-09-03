@@ -25,7 +25,7 @@ import { IdentityResolverService } from './MessageGenerators/Identities/Identity
 import { SchiParmelaeIdentity } from './MessageGenerators/Identities/SchiParmelaeIdentity.js';
 import { PokemonTcgPocketService } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 import { isFinalizableStreamingTextSink, StreamingTextSink } from './StreamingTextSink.js';
-import { TelegramService } from './TelegramService.js';
+import { TelegramDeliveryError, TelegramService } from './TelegramService.js';
 import { dateTimeTool } from './Tools/dateTimeTool.js';
 import { diceTool } from './Tools/diceTool.js';
 import { GoogleSearchToolFactory } from './Tools/GoogleSearchToolFactory.js';
@@ -216,7 +216,7 @@ export class ChatGptAgentService {
         streamSink,
       );
     } catch (error) {
-      if (retries < 2) {
+      if (retries < 2 && !(error instanceof TelegramDeliveryError)) {
         if (streamSink) {
           await streamSink.reset();
         }
@@ -376,6 +376,9 @@ export class ChatGptAgentService {
             { content: AIMessage['content']; contentBlocks?: AIMessage['contentBlocks'] },
             unknown,
           ];
+          if (!AIMessage.isInstance(messageChunk)) {
+            continue;
+          }
           const textChunk = getAiMessageTextChunkContent(messageChunk);
           if (textChunk.length > 0) {
             textBuffer.append(textChunk);

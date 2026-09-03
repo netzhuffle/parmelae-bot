@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, jest, spyOn } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it, jest, mock, spyOn } from 'bun:test';
 
 import { BotManagerFake } from './Fakes/BotManagerFake.js';
 import { ConfigFake } from './Fakes/ConfigFake.js';
@@ -21,6 +21,7 @@ describe('TelegramService model-authored text', () => {
       options?: { textOverride?: string },
     ) => Promise<{ id: number }>;
   };
+  let fetchMock: ReturnType<typeof mock>;
 
   beforeEach(() => {
     jest.useFakeTimers();
@@ -34,6 +35,19 @@ describe('TelegramService model-authored text', () => {
         return { id: 123 };
       },
     };
+    fetchMock = mock(async () =>
+      Response.json({
+        ok: true,
+        result: {
+          message_id: 456,
+          date: 0,
+          chat: { id: 123, type: 'private', first_name: 'Test' },
+          photo: [],
+        },
+      }),
+    );
+    const mockedFetch = Object.assign(fetchMock, { preconnect: globalThis.fetch.preconnect });
+    spyOn(globalThis, 'fetch').mockImplementation(mockedFetch);
     service = new TelegramService(
       botManager,
       messageService as unknown as import('./TelegramMessageService.js').TelegramMessageService,
@@ -42,6 +56,7 @@ describe('TelegramService model-authored text', () => {
 
   afterEach(() => {
     jest.useRealTimers();
+    mock.restore();
   });
 
   it('sends one draft update per streamed token chunk', async () => {
@@ -542,17 +557,39 @@ describe('TelegramService model-authored text', () => {
   it('sends generated image data URLs as uploaded photo buffers', async () => {
     await service.replyWithImage('data:image/png;base64,aGVsbG8=', 'Generated image', BigInt(123));
 
-    expect(telegrafStub.sendPhotoCalls).toHaveLength(1);
-    expect(telegrafStub.sendPhotoCalls[0]).toEqual({
-      chatId: '123',
-      photo: {
-        source: Buffer.from('hello'),
-        filename: 'generated-image.png',
-      },
-      options: {
-        caption: 'Generated image',
-      },
-    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, request] = fetchMock.mock.calls[0] as [URL, RequestInit];
+    expect(url.pathname).toEndWith('/sendPhoto');
+    expect(request.method).toBe('POST');
+    const body = request.body as FormData;
+    expect(body.get('chat_id')).toBe('123');
+    expect(body.get('caption')).toBe('Generated image');
+    const photo = body.get('photo');
+    expect(photo).toBeInstanceOf(Blob);
+    expect((photo as Blob).size).toBe(5);
+    expect(storeCalls).toHaveLength(1);
+  });
+
+  it('retries generated image uploads after transient connection resets', async () => {
+    fetchMock.mockRejectedValueOnce(
+      Object.assign(new TypeError('The socket connection was closed unexpectedly.'), {
+        code: 'ECONNRESET',
+      }),
+    );
+
+    const sendPromise = service.replyWithImage(
+      'data:image/png;base64,aGVsbG8=',
+      'Generated image',
+      BigInt(123),
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await advanceTimersByTime(250);
+    await sendPromise;
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(storeCalls).toHaveLength(1);
   });
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from 'bun:test';
 
-import { AIMessage } from '@langchain/core/messages';
+import { AIMessage, AIMessageChunk, ToolMessage } from '@langchain/core/messages';
 
 import { getAiMessageTextContent, getLastAiMessageTextContent } from './AiMessageTextContent.js';
 import { ChatGptAgentService } from './ChatGptAgentService.js';
@@ -9,6 +9,7 @@ import { notifyHostedImageGenerationStarted } from './HostedImageGenerationObser
 import { ChatGptRoles } from './MessageGenerators/ChatGptMessage.js';
 import type { Identity } from './MessageGenerators/Identities/Identity.js';
 import { FinalizableStreamingTextSink, StreamingTextSink } from './StreamingTextSink.js';
+import { TelegramDeliveryError } from './TelegramService.js';
 import { imageGenerationTool } from './Tools/imageGenerationTool.js';
 
 describe('getAiMessageTextContent', () => {
@@ -213,10 +214,9 @@ describe('ChatGptAgentService.generate', () => {
       yield [
         'messages',
         [
-          {
-            content:
-              'Ich passe es jetzt an: Die beiden Schwänze werden wieder natürlich umschlungen.',
-          },
+          new AIMessageChunk(
+            'Ich passe es jetzt an: Die beiden Schwänze werden wieder natürlich umschlungen.',
+          ),
           {},
         ],
       ];
@@ -248,9 +248,9 @@ describe('ChatGptAgentService.generate', () => {
   it('sends post-image assistant text as a separate message after the generated image', async () => {
     const events: string[] = [];
     const service = createImageTestService(events, async function* () {
-      yield ['messages', [{ content: 'Ich passe es jetzt an.' }, {}]];
+      yield ['messages', [new AIMessageChunk('Ich passe es jetzt an.'), {}]];
       await notifyHostedImageGenerationStarted();
-      yield ['messages', [{ content: 'So ist es wieder schön verwoben.' }, {}]];
+      yield ['messages', [new AIMessageChunk('So ist es wieder schön verwoben.'), {}]];
       yield [
         'values',
         {
@@ -276,5 +276,56 @@ describe('ChatGptAgentService.generate', () => {
     expect(result.message.content).toBe(
       'Ich passe es jetzt an.\n\nSo ist es wieder schön verwoben.',
     );
+  });
+
+  it('does not stream tool responses as assistant text', async () => {
+    const events: string[] = [];
+    const service = createImageTestService(events, async function* () {
+      yield [
+        'messages',
+        [
+          new ToolMessage({
+            content: 'Successfully sent the text to the telegram chat',
+            tool_call_id: 'call-123',
+          }),
+          {},
+        ],
+      ];
+      await notifyHostedImageGenerationStarted();
+      yield [
+        'values',
+        {
+          messages: [createFakeImageOutput()],
+          toolCallMessageIds: [321],
+        },
+      ];
+    });
+    const { finalTexts, streamSink } = createRecordingStreamSink(events);
+
+    const result = await generateImageTestReply(service, streamSink);
+
+    expect(finalTexts).toEqual([]);
+    expect(events).toEqual(['upload-photo', 'image', 'stop-upload-photo']);
+    expect(result.message.content).toBe('Ich habe das Bild gesendet.');
+  });
+
+  it('does not rerun the agent after Telegram image delivery fails', async () => {
+    const service = Object.create(ChatGptAgentService.prototype) as ChatGptAgentService;
+    const deliveryError = new TelegramDeliveryError(
+      'Could not send generated image',
+      new Error('connection reset'),
+    );
+    const getReply = mock().mockRejectedValue(deliveryError);
+    Object.assign(service as object, { getReply });
+
+    const result = await service.generate(
+      undefined as never,
+      new Conversation([]),
+      async () => null,
+      imageTestIdentity,
+    );
+
+    expect(getReply).toHaveBeenCalledTimes(1);
+    expect(result.message.content).toBe('Fehler: Could not send generated image');
   });
 });
