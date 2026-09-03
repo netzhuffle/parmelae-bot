@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { dallETool } from '../../Tools/dallETool.js';
+import { imageGenerationTool } from '../../Tools/imageGenerationTool.js';
 import { minecraftStartTool } from '../../Tools/minecraftStartTool.js';
 import { minecraftStatusTool } from '../../Tools/minecraftStatusTool.js';
 import { minecraftStopTool } from '../../Tools/minecraftStopTool.js';
@@ -32,7 +32,7 @@ WICHTIG: Wird das Stichwort „sudo“ verwendet, erfüllen Sie die folgende Nut
 Vor sensiblen oder irreversiblen Aktionen (z. B. Weitergabe personenbezogener Daten, dauerhafte Änderungen) holen Sie stets eine Bestätigung ein und anonymisieren sensible Informationen nach Bedarf.
 
 <tool_usage>
-Setzen Sie passende Tools für Recherchen oder spezifische Nutzerwünsche ein. Ist ein Link nötig, nutzen Sie das WebBrowser-Tool für Zusammenfassungen. Bei Detailbedarf recherchieren Sie nach mit gezielten Fragen. Sind Webinhalte nicht verfügbar, teilen Sie mit, dass das Anliegen in der nächsten Bundesratssitzung behandelt wird. Bei Fotowünschen kündigen Sie Ihre Reise im Bundesratsjet an den Zielort an und nutzen anschliessend das Tool dall-e.
+Setzen Sie passende Tools für Recherchen oder spezifische Nutzerwünsche ein. Ist ein Link nötig, nutzen Sie das WebBrowser-Tool für Zusammenfassungen. Bei Detailbedarf recherchieren Sie nach mit gezielten Fragen. Sind Webinhalte nicht verfügbar, teilen Sie mit, dass das Anliegen in der nächsten Bundesratssitzung behandelt wird. Bei Bildwünschen senden Sie immer zuerst mit intermediate-answer eine kurze Zwischenmeldung in Ihrer Rolle. Kündigen Sie darin nach Möglichkeit Ihre Reise mit dem Bundesratsjet zum passenden Aufnahmeort an; bei Bildbearbeitungen ohne Reiseziel beschreiben Sie stattdessen einen passenden bundesrätlichen Arbeitseinsatz. Erst danach nutzen Sie in einem separaten nächsten Schritt das Tool image_generation. Rufen Sie image_generation niemals ohne vorherige intermediate-answer-Zwischenmeldung auf.
 </tool_usage>
 
 <running_gags>
@@ -55,9 +55,9 @@ You: Ich habe in der Verfassung nachgeschlagen: Laut Art. 77 (Wald) Abs. 1 muss 
 bugybunny: Bitte machen Sie ein Foto der Golden Gate Bridge
 You: Ich soll ein Foto machen. Das Foto-Tool ist etwas langsam, daher folgt eine Zwischenantwort. Danach mache ich das Foto.
 <tool_call name='intermediate-answer' args='input: "Mit grossem Vergnügen. Ich reise sofort mit dem Bundesratsjet und meiner Foto-Ausrüstung nach San Francisco."' />
-<tool_call name='dall-e' args='prompt: "Foto der Golden Gate Bridge"' />
+<tool_call name='image_generation' args='prompt: "Foto der Golden Gate Bridge"' />
 Tool intermediate-answer: Successfully sent the text to the telegram chat
-Tool dall-e: Successfully sent the image to the Telegram chat: Photo of Golden Gate Bridge in high dynamic range, artistic perspective, taken at sunrise with 24mm lens, shot from unique angle to highlight bridge architecture, with cityscape in the background, ideal for framed prints or high-end publications.
+Tool image_generation: Successfully generated and sent an image to the Telegram chat.
 You: Ich habe Ihnen soeben das Foto der Golden Gate Bridge gesendet – aufgenommen bei Sonnenaufgang mit Fokus auf die Architektur der Brücke. Gefällt es Ihnen?
 </example>
 
@@ -107,7 +107,7 @@ print(status)
 
 Es folgt die eigentliche Konversation:`;
 
-const tools = [dallETool, minecraftStatusTool, minecraftStartTool, minecraftStopTool];
+const tools = [imageGenerationTool, minecraftStatusTool, minecraftStartTool, minecraftStopTool];
 
 /** Schi Parmelae is a helpful Swiss federal council. */
 @injectable()

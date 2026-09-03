@@ -30,8 +30,30 @@ interface SendMessageDraftPayload {
 const INITIAL_DRAFT_UPDATE_INTERVAL_MS = 30;
 const DRAFT_UPDATE_INTERVAL_STEP_MS = 15;
 const TELEGRAM_MAX_MESSAGE_LENGTH = 4096;
+const PHOTO_UPLOAD_RETRY_DELAYS_MS = [250, 1000] as const;
 const EMPTY_MODEL_RESPONSE_FALLBACK_TEXT =
   'Ich habe gerade keine Antwort erzeugen können. Bitte versuchen Sie es noch einmal.';
+
+/** Signals that Telegram delivery failed after generation and must not replay the agent turn. */
+export class TelegramDeliveryError extends Error {
+  constructor(message: string, cause: unknown) {
+    super(message, { cause });
+    this.name = 'TelegramDeliveryError';
+  }
+}
+
+class TelegramApiError extends Error {
+  constructor(
+    readonly response: {
+      description: string;
+      error_code: number;
+      parameters?: { retry_after?: number };
+    },
+  ) {
+    super(`${response.error_code}: ${response.description}`);
+    this.name = 'TelegramApiError';
+  }
+}
 
 class TelegramDraftSession implements FinalizableStreamingTextSink {
   private buffer = '';
@@ -170,6 +192,47 @@ export class TelegramService {
    */
   async sendTyping(chatId: bigint): Promise<void> {
     await this.primaryTelegraf.telegram.sendChatAction(chatId.toString(), 'typing');
+  }
+
+  /** Display photo upload status while a generated image is being created. */
+  async sendUploadPhoto(chatId: bigint): Promise<void> {
+    await this.primaryTelegraf.telegram.sendChatAction(chatId.toString(), 'upload_photo');
+  }
+
+  /** Starts Telegram's transient photo-upload status and returns a cleanup callback. */
+  startUploadPhotoStatus(chatId: bigint): () => void {
+    void this.sendUploadPhoto(chatId).catch((error: unknown) => {
+      console.warn('Telegram upload_photo status update failed.', {
+        chatId: chatId.toString(),
+        error,
+      });
+    });
+    const interval = setInterval(() => {
+      void this.sendUploadPhoto(chatId).catch((error: unknown) => {
+        console.warn('Telegram upload_photo status update failed.', {
+          chatId: chatId.toString(),
+          error,
+        });
+      });
+    }, 4000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }
+
+  /** Keeps Telegram's transient photo-upload status visible while the task is running. */
+  async withUploadPhotoStatus<Result>(
+    chatId: bigint,
+    task: () => Promise<Result>,
+  ): Promise<Result> {
+    const stopUploadPhotoStatus = this.startUploadPhotoStatus(chatId);
+
+    try {
+      return await task();
+    } finally {
+      stopUploadPhotoStatus();
+    }
   }
 
   /**
@@ -320,15 +383,118 @@ export class TelegramService {
   /**
    * Replies an image to a message.
    *
-   * @param url - The image URL.
+   * @param url - The image URL or data URL.
    * @param caption - The image caption.
    * @param message - The message to reply to.
    */
   async replyWithImage(url: string, caption: string, chatId: bigint): Promise<void> {
-    const sentMessage = await this.primaryTelegraf.telegram.sendPhoto(chatId.toString(), url, {
-      caption: caption,
-    });
+    const sentMessage = await this.sendPhotoWithRetry(url, caption, chatId);
     await this.messageService.store(sentMessage);
+  }
+
+  private async sendPhotoWithRetry(
+    url: string,
+    caption: string,
+    chatId: bigint,
+  ): Promise<Typegram.Message.PhotoMessage> {
+    const photo = this.getPhotoInput(url);
+
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        // oxlint-disable-next-line no-await-in-loop -- Each retry must wait for the preceding Telegram upload attempt.
+        return await this.sendPhoto(photo, caption, chatId);
+      } catch (error) {
+        const retryDelay = PHOTO_UPLOAD_RETRY_DELAYS_MS[attempt];
+        if (retryDelay === undefined || !this.isTransientTelegramDeliveryError(error)) {
+          throw new TelegramDeliveryError(
+            'Could not send the generated image to Telegram.',
+            this.sanitizeTelegramTransportError(error),
+          );
+        }
+
+        console.warn('Telegram photo upload failed transiently. Retrying the upload.', {
+          chatId: chatId.toString(),
+          attempt: attempt + 1,
+          errorCode: this.getErrorCode(error),
+        });
+        // oxlint-disable-next-line no-await-in-loop -- Backoff is required between serialized Telegram upload retries.
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      }
+    }
+  }
+
+  private async sendPhoto(
+    photo: string | { source: Buffer; filename: string },
+    caption: string,
+    chatId: bigint,
+  ): Promise<Typegram.Message.PhotoMessage> {
+    if (typeof photo === 'string') {
+      return await this.primaryTelegraf.telegram.sendPhoto(chatId.toString(), photo, { caption });
+    }
+
+    const formData = new FormData();
+    formData.set('chat_id', chatId.toString());
+    formData.set('caption', caption);
+    formData.set('photo', new Blob([photo.source]), photo.filename);
+
+    const telegram = this.primaryTelegraf.telegram;
+    const apiUrl = new URL(
+      `./${telegram.options.apiMode}${telegram.token}${telegram.options.testEnv ? '/test' : ''}/sendPhoto`,
+      telegram.options.apiRoot,
+    );
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      body: formData,
+    });
+    const payload: unknown = await response.json();
+    if (!this.isSuccessfulTelegramPhotoResponse(payload)) {
+      throw new TelegramApiError(this.getTelegramApiErrorResponse(payload, response.status));
+    }
+    return payload.result;
+  }
+
+  private isSuccessfulTelegramPhotoResponse(
+    payload: unknown,
+  ): payload is { ok: true; result: Typegram.Message.PhotoMessage } {
+    return (
+      typeof payload === 'object' &&
+      payload !== null &&
+      'ok' in payload &&
+      payload.ok === true &&
+      'result' in payload
+    );
+  }
+
+  private getTelegramApiErrorResponse(
+    payload: unknown,
+    status: number,
+  ): { description: string; error_code: number; parameters?: { retry_after?: number } } {
+    if (
+      typeof payload === 'object' &&
+      payload !== null &&
+      'error_code' in payload &&
+      typeof payload.error_code === 'number' &&
+      'description' in payload &&
+      typeof payload.description === 'string'
+    ) {
+      return payload as {
+        description: string;
+        error_code: number;
+        parameters?: { retry_after?: number };
+      };
+    }
+    return {
+      error_code: status,
+      description: `Unexpected Telegram response with HTTP status ${status}`,
+    };
+  }
+
+  private sanitizeTelegramTransportError(error: unknown): Error {
+    const message =
+      error instanceof Error
+        ? error.message.replace(/\/bot\d+:[^/]+\//gu, '/bot<redacted>/')
+        : 'Unknown Telegram transport error';
+    return Object.assign(new Error(message), { code: this.getErrorCode(error) });
   }
 
   /** Returns the URL for a Telegram file id. */
@@ -344,6 +510,48 @@ export class TelegramService {
       this.nextDraftId = 1;
     }
     return draftId;
+  }
+
+  private getPhotoInput(url: string): string | { source: Buffer; filename: string } {
+    const dataUrl = this.parseImageDataUrl(url);
+    if (!dataUrl) {
+      return url;
+    }
+
+    return {
+      source: Buffer.from(dataUrl.base64, 'base64'),
+      filename: `generated-image.${dataUrl.extension}`,
+    };
+  }
+
+  private parseImageDataUrl(url: string): { base64: string; extension: string } | null {
+    const match = /^data:(image\/[a-z0-9.+-]+);base64,(.+)$/u.exec(url);
+    if (!match) {
+      return null;
+    }
+
+    const [, mimeType, base64] = match;
+    if (!mimeType || !base64) {
+      return null;
+    }
+
+    return {
+      base64,
+      extension: this.getImageExtension(mimeType),
+    };
+  }
+
+  private getImageExtension(mimeType: string): string {
+    switch (mimeType) {
+      case 'image/jpeg':
+        return 'jpg';
+      case 'image/png':
+        return 'png';
+      case 'image/webp':
+        return 'webp';
+      default:
+        return 'png';
+    }
   }
 
   private async sendMessageDraft(chatId: bigint, draftId: number, text: string): Promise<boolean> {
@@ -644,6 +852,31 @@ export class TelegramService {
 
   private isTelegramRateLimitError(error: unknown): boolean {
     return this.getTelegramErrorCode(error) === 429;
+  }
+
+  private isTransientTelegramDeliveryError(error: unknown): boolean {
+    const errorCode = this.getErrorCode(error);
+    return (
+      errorCode === 'ECONNRESET' ||
+      errorCode === 'ECONNREFUSED' ||
+      errorCode === 'ETIMEDOUT' ||
+      errorCode === 'EPIPE' ||
+      this.getTelegramErrorCode(error) === 429 ||
+      (this.getTelegramErrorCode(error) ?? 0) >= 500
+    );
+  }
+
+  private getErrorCode(error: unknown): string | number | null {
+    if (typeof error !== 'object' || error === null) {
+      return null;
+    }
+    if ('code' in error && (typeof error.code === 'string' || typeof error.code === 'number')) {
+      return error.code;
+    }
+    if ('cause' in error) {
+      return this.getErrorCode(error.cause);
+    }
+    return null;
   }
 
   private getTelegramRetryAfterMilliseconds(error: unknown): number {
