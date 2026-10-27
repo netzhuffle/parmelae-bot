@@ -51,6 +51,13 @@ jobs:
       - name: Build executable
         run: bun run build:executable
 
+      - name: Verify embedded Bun version
+        run: |
+          expected_version="$(cat .bun-version)"
+          actual_version="$(BUN_BE_BUN=1 ./dist/parmelae-bot --version)"
+          test "$actual_version" = "$expected_version"
+          printf 'Compiled Bun runtime: %s\n' "$actual_version"
+
       - name: Prepare release bundle
         run: |
           install -d release/deploy release/prisma
