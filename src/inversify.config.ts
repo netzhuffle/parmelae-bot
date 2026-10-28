@@ -1,5 +1,4 @@
 import 'reflect-metadata/lite';
-import { ChatOpenAI, DallEAPIWrapper } from '@langchain/openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { PrismaBunSQLite } from '@synapsenwerkstatt/prisma-bun-sqlite-adapter';
 import { Container } from 'inversify';
@@ -8,6 +7,7 @@ import { Octokit } from 'octokit';
 import { Config } from './Config.js';
 import { PrismaClient } from './generated/prisma/client.js';
 import { GptModels, GptModelsProvider, GptModelsSettings } from './GptModelsProvider.js';
+import { createObservedChatOpenAI } from './HostedImageGenerationObserver.js';
 import { POKEMON_TCGP_YAML_SYMBOL, Sets } from './PokemonTcgPocket/PokemonTcgPocketService.js';
 import { getDatabaseUrl } from './RuntimePaths.js';
 
@@ -25,14 +25,14 @@ container.bind(POKEMON_TCGP_YAML_SYMBOL).toDynamicValue(async (): Promise<Sets> 
 container.bind(GptModelsProvider).toDynamicValue(
   (context) =>
     new GptModelsProvider({
-      cheap: new ChatOpenAI({
+      cheap: createObservedChatOpenAI({
         ...GptModelsSettings[GptModels.Cheap],
         apiKey: context.get(Config).heliconeApiKey,
         configuration: {
           baseURL: 'https://ai-gateway.helicone.ai/v1',
         },
       }),
-      advanced: new ChatOpenAI({
+      advanced: createObservedChatOpenAI({
         ...GptModelsSettings[GptModels.Advanced],
         apiKey: context.get(Config).heliconeApiKey,
         configuration: {
@@ -43,15 +43,6 @@ container.bind(GptModelsProvider).toDynamicValue(
         model: 'text-embedding-3-small',
         apiKey: context.get(Config).openAiKey,
       }),
-    }),
-);
-container.bind(DallEAPIWrapper).toDynamicValue(
-  (context) =>
-    new DallEAPIWrapper({
-      model: 'dall-e-3',
-      size: '1024x1024',
-      quality: 'hd',
-      apiKey: context.get(Config).openAiKey,
     }),
 );
 container.bind(Octokit).toDynamicValue(

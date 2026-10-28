@@ -13,6 +13,8 @@ import { SchiParmelaeIdentity } from './Identities/SchiParmelaeIdentity.js';
 export interface ReplyGeneratorResponse {
   text: string;
   toolCallMessageIds: number[];
+  finalMessageId?: number;
+  finalMessageIds?: number[];
 }
 
 /**
@@ -60,6 +62,8 @@ export class ReplyGenerator {
     return {
       text: completion.message.content,
       toolCallMessageIds: completion.toolCallMessageIds,
+      finalMessageId: completion.finalMessageId,
+      finalMessageIds: completion.finalMessageIds,
     };
   }
 

@@ -4,6 +4,7 @@ import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages';
 
 import { MessageRepository } from '../Repositories/MessageRepository.js';
 import { ToolMessageRepository } from '../Repositories/ToolMessageRepository.js';
+import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
 import { StateAnnotation } from './StateAnnotation.js';
 import { ToolResponsePersistenceNodeFactory } from './ToolResponsePersistenceNodeFactory.js';
 
@@ -73,6 +74,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           currentToolCallIds: ['call-123', 'call-124'],
         },
         toolCallMessageIds: [],
+        pendingImageGenerationStatus: false,
       };
 
       await node(state);
@@ -127,6 +129,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           currentToolCallIds: ['call-123'], // Only current call
         },
         toolCallMessageIds: [],
+        pendingImageGenerationStatus: false,
       };
 
       await node(state);
@@ -174,6 +177,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           currentToolCallIds: ['call-123', 'call-124'], // Both tool calls attempted
         },
         toolCallMessageIds: [],
+        pendingImageGenerationStatus: false,
       };
 
       await node(state);
@@ -192,11 +196,43 @@ describe('ToolResponsePersistenceNodeFactory', () => {
       });
     });
 
+    it('should mark image generation status as pending after an intermediate answer', async () => {
+      const originalAIMessage = new AIMessage({
+        content: '',
+        tool_calls: [
+          {
+            id: 'call-123',
+            name: INTERMEDIATE_ANSWER_TOOL_NAME,
+            args: { input: 'Ich erstelle das Bild.' },
+          },
+        ],
+      });
+      const toolMessage = new ToolMessage({
+        content: 'Successfully sent the text to the telegram chat',
+        tool_call_id: 'call-123',
+      });
+      const state: typeof StateAnnotation.State = {
+        messages: [originalAIMessage, toolMessage],
+        toolExecution: {
+          announcementMessageId: 456,
+          originalAIMessage,
+          currentToolCallIds: ['call-123'],
+        },
+        toolCallMessageIds: [],
+        pendingImageGenerationStatus: false,
+      };
+
+      const result = await node(state);
+
+      expect(result).toEqual({ pendingImageGenerationStatus: true });
+    });
+
     it('should skip persistence when no tool execution context', async () => {
       const state: typeof StateAnnotation.State = {
         messages: [new HumanMessage('Hello'), new AIMessage('Hi there')],
         toolExecution: {}, // Empty context
         toolCallMessageIds: [],
+        pendingImageGenerationStatus: false,
       };
 
       const result = await node(state);
@@ -220,6 +256,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           currentToolCallIds: ['call-123'],
         },
         toolCallMessageIds: [],
+        pendingImageGenerationStatus: false,
       };
 
       const result = await node(state);
@@ -243,6 +280,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           // Missing currentToolCallIds
         },
         toolCallMessageIds: [],
+        pendingImageGenerationStatus: false,
       };
 
       const result = await node(state);
@@ -271,6 +309,7 @@ describe('ToolResponsePersistenceNodeFactory', () => {
           currentToolCallIds: ['call-123'],
         },
         toolCallMessageIds: [],
+        pendingImageGenerationStatus: false,
       };
 
       // Replace the mock implementation to reject with an error

@@ -27,7 +27,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {foo: 1}]');
   });
 
@@ -44,7 +49,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {value: plain text}]');
   });
 
@@ -69,7 +79,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledTimes(1);
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {foo: 2}]\n[AnotherTool: {value: baz}]',
@@ -89,8 +104,71 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).not.toHaveBeenCalled();
+  });
+
+  it('announces Responses text blocks before an intermediate image-generation answer', async () => {
+    const node = factory.create(announceToolCall);
+    const messages = [
+      new AIMessage({
+        content: [
+          {
+            type: 'text',
+            text: 'Ich erstelle das Foto.',
+          },
+        ],
+        tool_calls: [
+          {
+            name: INTERMEDIATE_ANSWER_TOOL_NAME,
+            args: { input: 'Ich erstelle das Foto.' },
+          },
+        ],
+      }),
+    ];
+
+    const result = await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
+
+    expect(announceToolCall).toHaveBeenCalledWith('Ich erstelle das Foto.');
+    expect(result).toMatchObject({
+      pendingImageGenerationStatus: true,
+      toolCallMessageIds: [123],
+    });
+  });
+
+  it('marks image-generation status as pending even when the intermediate answer has no model text', async () => {
+    const node = factory.create(announceToolCall);
+    const messages = [
+      new AIMessage({
+        content: '',
+        tool_calls: [
+          {
+            name: INTERMEDIATE_ANSWER_TOOL_NAME,
+            args: { input: 'Ich generiere das Bild.' },
+          },
+        ],
+      }),
+    ];
+
+    const result = await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
+
+    expect(announceToolCall).not.toHaveBeenCalled();
+    expect(result).toEqual({ pendingImageGenerationStatus: true });
   });
 
   it('announces a tool call with object args, single parameter', async () => {
@@ -101,7 +179,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { foo: 1 } }],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {foo: 1}]');
   });
 
@@ -113,7 +196,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { foo: 1, bar: 2 } }],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {foo: 1, bar: 2}]');
   });
 
@@ -125,7 +213,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { foo: 1, bar: null, baz: false, qux: 2 } }],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {foo: 1, qux: 2}]');
   });
 
@@ -137,7 +230,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: {} }],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool]');
   });
 
@@ -148,7 +246,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         contentBlocks: [{ type: 'tool_call', name: 'TestTool', args: undefined }],
       }),
     ];
-    return node({ messages, toolExecution: {}, toolCallMessageIds: [] }).then(() => {
+    return node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    }).then(() => {
       expect(announceToolCall).toHaveBeenCalledWith('[TestTool]');
       return undefined;
     });
@@ -165,7 +268,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledTimes(1);
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {foo: 2}]\n[AnotherTool: {value: baz}]',
@@ -180,7 +288,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { foo: 1 } }],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith(
       'This is the message content.\n[TestTool: {foo: 1}]',
     );
@@ -194,7 +307,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith('Only content, no tool calls.');
   });
 
@@ -206,7 +324,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).not.toHaveBeenCalled();
   });
 
@@ -228,7 +351,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         ],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith(
       '[TestTool: {num: 42, bool: true, arr: 1,2, obj: [object Object]}]',
     );
@@ -242,7 +370,12 @@ describe('ToolCallAnnouncementNodeFactory', () => {
         tool_calls: [{ name: 'TestTool', args: { a: 1, b: 2, c: 3 } }],
       }),
     ];
-    await node({ messages, toolExecution: {}, toolCallMessageIds: [] });
+    await node({
+      messages,
+      toolExecution: {},
+      toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
+    });
     expect(announceToolCall).toHaveBeenCalledWith('[TestTool: {a: 1, b: 2, c: 3}]');
   });
 
@@ -265,6 +398,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       messages,
       toolExecution: {},
       toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
     });
 
     expect(announceToolCall).toHaveBeenCalledWith('Test content\n[TestTool: {foo: 1}]');
@@ -291,6 +425,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       messages,
       toolExecution: {},
       toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
     });
 
     expect(announceToolCall).toHaveBeenCalledWith('Only content, no tool calls.');
@@ -315,6 +450,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       messages,
       toolExecution: {},
       toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
     });
 
     expect(announceToolCall).not.toHaveBeenCalled();
@@ -342,6 +478,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       messages,
       toolExecution: {},
       toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
     });
 
     expect(announceToolCallReturningNull).toHaveBeenCalledWith(
@@ -374,6 +511,7 @@ describe('ToolCallAnnouncementNodeFactory', () => {
       messages,
       toolExecution: {},
       toolCallMessageIds: [],
+      pendingImageGenerationStatus: false,
     });
 
     expect(result).toEqual({

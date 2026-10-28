@@ -9,6 +9,12 @@ export interface FinalizableStreamingTextSink extends StreamingTextSink {
   sendFinalText(text: string): Promise<number>;
 }
 
+export function isFinalizableStreamingTextSink(
+  sink: StreamingTextSink | undefined,
+): sink is FinalizableStreamingTextSink {
+  return sink !== undefined && 'sendFinalText' in sink && typeof sink.sendFinalText === 'function';
+}
+
 /** Fans one streamed response out to multiple sinks. */
 export class CompositeStreamingTextSink implements StreamingTextSink {
   constructor(private readonly sinks: readonly StreamingTextSink[]) {}

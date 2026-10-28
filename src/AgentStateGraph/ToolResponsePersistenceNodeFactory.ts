@@ -3,6 +3,7 @@ import { injectable } from 'inversify';
 
 import { MessageRepository } from '../Repositories/MessageRepository.js';
 import { ToolMessageRepository } from '../Repositories/ToolMessageRepository.js';
+import { INTERMEDIATE_ANSWER_TOOL_NAME } from '../Tools/IntermediateAnswerTool.js';
 import { StateAnnotation } from './StateAnnotation.js';
 
 /**
@@ -61,7 +62,14 @@ export class ToolResponsePersistenceNodeFactory {
         ),
       );
 
-      return {};
+      const persistedToolCalls = toolCallsWithResponses ?? [];
+      const onlySentIntermediateAnswer =
+        persistedToolCalls.length > 0 &&
+        persistedToolCalls.every((toolCall) => toolCall.name === INTERMEDIATE_ANSWER_TOOL_NAME);
+
+      return {
+        pendingImageGenerationStatus: onlySentIntermediateAnswer,
+      };
     };
   }
 }

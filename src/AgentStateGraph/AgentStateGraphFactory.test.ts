@@ -3,6 +3,7 @@ import { describe, it, expect, mock } from 'bun:test';
 import { StructuredTool } from '@langchain/core/tools';
 import { ChatOpenAI } from '@langchain/openai';
 
+import { imageGenerationTool } from '../Tools/imageGenerationTool.js';
 import { AgentStateGraphFactory } from './AgentStateGraphFactory.js';
 import { ModelNodeFactory } from './ModelNodeFactory.js';
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
@@ -79,9 +80,55 @@ describe('AgentStateGraphFactory', () => {
 
     // Verify our factory methods were called using stored mock references
     expect(mockBindTools).toHaveBeenCalledWith(tools);
-    expect(mockAgentNodeFactoryCreate).toHaveBeenCalledWith(mockBoundLlm);
+    expect(mockAgentNodeFactoryCreate).toHaveBeenCalledWith(mockBoundLlm, {
+      runWithUploadPhotoStatus: undefined,
+      useUploadPhotoStatus: false,
+    });
     expect(mockToolsNodeFactoryCreate).toHaveBeenCalledWith(tools);
     expect(mockToolCallAnnouncementNodeFactoryCreate).toHaveBeenCalledWith(announceToolCall);
     expect(mockToolResponsePersistenceNodeFactoryCreate).toHaveBeenCalled();
+  });
+
+  it('passes hosted image generation to the model but not to the executable tools node', () => {
+    const mockBoundLlm = { invoke: mock(() => Promise.resolve({})) };
+    const mockBindTools = mock(() => mockBoundLlm);
+    const mockLlm = {
+      bindTools: mockBindTools,
+    } as unknown as ChatOpenAI;
+    const runWithUploadPhotoStatus = async <Result>(task: () => Promise<Result>) => task();
+
+    const mockAgentNodeFactoryCreate = mock(() => () => ({}));
+    const mockToolsNodeFactoryCreate = mock(() => () => ({}));
+    const mockToolCallAnnouncementNodeFactoryCreate = mock(() => () => ({}));
+    const mockToolResponsePersistenceNodeFactoryCreate = mock(() => () => ({}));
+
+    const factory = new AgentStateGraphFactory(
+      { create: mockAgentNodeFactoryCreate } as unknown as ModelNodeFactory,
+      { create: mockToolsNodeFactoryCreate } as unknown as ToolsNodeFactory,
+      {
+        create: mockToolCallAnnouncementNodeFactoryCreate,
+      } as unknown as ToolCallAnnouncementNodeFactory,
+      {
+        create: mockToolResponsePersistenceNodeFactoryCreate,
+      } as unknown as ToolResponsePersistenceNodeFactory,
+    );
+
+    try {
+      factory.create({
+        tools: [imageGenerationTool],
+        llm: mockLlm,
+        announceToolCall: mock(() => Promise.resolve(123)),
+        runWithUploadPhotoStatus,
+      });
+    } catch {
+      // Expected to fail at LangGraph compilation, but our factory logic should execute.
+    }
+
+    expect(mockBindTools).toHaveBeenCalledWith([imageGenerationTool]);
+    expect(mockAgentNodeFactoryCreate).toHaveBeenCalledWith(mockBoundLlm, {
+      runWithUploadPhotoStatus,
+      useUploadPhotoStatus: true,
+    });
+    expect(mockToolsNodeFactoryCreate).toHaveBeenCalledWith([]);
   });
 });

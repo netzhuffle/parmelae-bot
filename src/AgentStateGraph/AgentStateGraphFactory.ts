@@ -1,9 +1,10 @@
 import { AIMessage } from '@langchain/core/messages';
-import { StructuredTool, Tool } from '@langchain/core/tools';
 import { END, START, StateGraph } from '@langchain/langgraph';
 import { ChatOpenAI } from '@langchain/openai';
 import { injectable } from 'inversify';
 
+import { AgentTool, getAgentToolName, isExecutableAgentTool } from '../AgentTool.js';
+import { IMAGE_GENERATION_TOOL_NAME } from '../Tools/imageGenerationTool.js';
 import { ModelNodeFactory } from './ModelNodeFactory.js';
 import { StateAnnotation } from './StateAnnotation.js';
 import { ToolCallAnnouncementNodeFactory } from './ToolCallAnnouncementNodeFactory.js';
@@ -31,20 +32,32 @@ export class AgentStateGraphFactory {
     tools,
     llm,
     announceToolCall,
+    runWithUploadPhotoStatus,
   }: {
-    tools: (StructuredTool | Tool)[];
+    tools: AgentTool[];
     llm: ChatOpenAI;
     announceToolCall: (text: string) => Promise<number | null>;
+    runWithUploadPhotoStatus?: <Result>(task: () => Promise<Result>) => Promise<Result>;
   }) {
-    const model = llm.bindTools(tools);
+    const model = llm.bindTools(tools as Parameters<ChatOpenAI['bindTools']>[0]);
+    const executableTools = tools.filter(isExecutableAgentTool);
+    const useUploadPhotoStatus = tools.some(
+      (tool) => getAgentToolName(tool) === IMAGE_GENERATION_TOOL_NAME,
+    );
 
     return new StateGraph(StateAnnotation)
-      .addNode('model', this.modelNodeFactory.create(model))
+      .addNode(
+        'model',
+        this.modelNodeFactory.create(model, {
+          runWithUploadPhotoStatus,
+          useUploadPhotoStatus,
+        }),
+      )
       .addNode(
         'toolCallAnnouncement',
         this.toolCallAnnouncementNodeFactory.create(announceToolCall),
       )
-      .addNode('tools', this.toolsNodeFactory.create(tools))
+      .addNode('tools', this.toolsNodeFactory.create(executableTools))
       .addNode('toolResponsePersistence', this.toolResponsePersistenceNodeFactory.create())
       .addEdge(START, 'model')
       .addConditionalEdges('model', routeModelReply, ['toolCallAnnouncement', END])

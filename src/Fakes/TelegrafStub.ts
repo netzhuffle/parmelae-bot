@@ -28,6 +28,10 @@ export class TelegrafStub {
     apiMethod: string;
     payload: unknown;
   }[] = [];
+  public sendChatActionCalls: {
+    action: string;
+    chatId: string;
+  }[] = [];
   public callApiErrors: Error[] = [];
   public sendMessageCalls: {
     chatId: string;
@@ -40,8 +44,20 @@ export class TelegrafStub {
       };
     };
   }[] = [];
+  public sendPhotoCalls: {
+    chatId: string;
+    photo: string | { source: Buffer; filename?: string };
+    options?: { caption?: string; reply_parameters?: { message_id: number } };
+  }[] = [];
+  public sendPhotoErrors: Error[] = [];
   public sendMessageErrors: Error[] = [];
   public readonly telegram: {
+    token: string;
+    options: {
+      apiMode: 'bot';
+      apiRoot: string;
+      testEnv: boolean;
+    };
     sendChatAction: (chatId: string, action: string) => Promise<boolean>;
     sendSticker: (
       chatId: string,
@@ -63,7 +79,7 @@ export class TelegrafStub {
     ) => Promise<Typegram.Message.DiceMessage>;
     sendPhoto: (
       chatId: string,
-      url: string,
+      photo: string | { source: Buffer; filename?: string },
       options?: { caption?: string; reply_parameters?: { message_id: number } },
     ) => Promise<Typegram.Message.PhotoMessage>;
     callApi: (apiMethod: string, payload?: unknown) => Promise<unknown>;
@@ -79,7 +95,14 @@ export class TelegrafStub {
     };
 
     this.telegram = {
-      sendChatAction: async () => {
+      token: 'fake-telegram-token',
+      options: {
+        apiMode: 'bot',
+        apiRoot: 'https://api.telegram.org',
+        testEnv: false,
+      },
+      sendChatAction: async (chatId, action) => {
+        this.sendChatActionCalls.push({ action, chatId });
         return await Promise.resolve(true);
       },
       sendSticker: async () => {
@@ -119,7 +142,12 @@ export class TelegrafStub {
           dice: { emoji: '🎲', value: 1 },
         } as Typegram.Message.DiceMessage);
       },
-      sendPhoto: async () => {
+      sendPhoto: async (chatId, photo, options) => {
+        this.sendPhotoCalls.push({ chatId, photo, options });
+        const error = this.sendPhotoErrors.shift();
+        if (error) {
+          throw error;
+        }
         return await Promise.resolve({
           message_id: 0,
           date: 0,

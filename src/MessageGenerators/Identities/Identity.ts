@@ -1,4 +1,4 @@
-import { StructuredTool, Tool } from '@langchain/core/tools';
+import type { AgentTool } from '../../AgentTool.js';
 
 /** A bot identity, used to generate replies. */
 export interface Identity {
@@ -12,5 +12,5 @@ export interface Identity {
   readonly conversationLength: number;
 
   /** Tools available to this identity. Merged with global tools during agent creation. */
-  readonly tools: readonly (StructuredTool | Tool)[];
+  readonly tools: readonly AgentTool[];
 }

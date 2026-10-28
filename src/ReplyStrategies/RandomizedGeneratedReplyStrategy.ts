@@ -6,6 +6,7 @@ import { ReplyGenerator } from '../MessageGenerators/ReplyGenerator.js';
 import { MessageRepository } from '../Repositories/MessageRepository.js';
 import { TelegramMessage } from '../Repositories/Types.js';
 import { TelegramService } from '../TelegramService.js';
+import { getFinalReplyMessageId } from './GeneratedReplyFinalizer.js';
 
 /** How likely the bot randomly replies to a message. 1 = 100%. */
 const RANDOM_REPLY_PROBABILITY = 0.02;
@@ -36,7 +37,9 @@ export class RandomizedGeneratedReplyStrategy extends AllowlistedReplyStrategy {
       return this.telegram.send(text, message.chatId);
     };
     const response = await this.replyGenerator.generate(message, announceToolCall, streamSession);
-    const replyMessageId = await streamSession.sendFinalText(response.text);
+    const replyMessageId = await getFinalReplyMessageId(response, (text) =>
+      streamSession.sendFinalText(text),
+    );
 
     // Link the final response message to its tool call messages
     await this.messageRepository.updateToolCallMessages(
