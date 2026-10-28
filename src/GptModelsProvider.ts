@@ -6,15 +6,15 @@ import { NotExhaustiveSwitchError } from './NotExhaustiveSwitchError.js';
 /** Enum of GPT language models to use. */
 export const GptModels = {
   /** Cheap model to use in most cases. Needs text & image inputs, text outputs, function calling. */
-  Cheap: 'gpt-5.4-mini',
+  Cheap: 'gpt-6-luna',
   /** Advanced model to use only for especially difficult tasks. Needs text & image inputs, text outputs, function calling. */
-  Advanced: 'gpt-5.4',
+  Advanced: 'gpt-6.1-terra',
 } as const;
 
 export const GptModelsSettings = {
   [GptModels.Cheap]: {
     model: GptModels.Cheap + '/openai',
-    // GPT-5.4 models with tools + reasoning must use the Responses API.
+    // Use the Responses API for tool calling with reasoning.
     useResponsesApi: true,
     streaming: true,
     reasoning: { effort: 'low' },
@@ -22,7 +22,7 @@ export const GptModelsSettings = {
   },
   [GptModels.Advanced]: {
     model: GptModels.Advanced + '/openai',
-    // GPT-5.4 models with tools + reasoning must use the Responses API.
+    // Use the Responses API for tool calling with reasoning.
     useResponsesApi: true,
     streaming: true,
     reasoning: { effort: 'low' },
