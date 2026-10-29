@@ -2,316 +2,35 @@
 
 > “The most helpful bot you’ve ever seen on Telegram.”
 
-A feature-rich Telegram bot with AI conversation capabilities, tool calling, and Pokemon card collection features. Built as a personal project to explore modern LLM & AI integration patterns, vibe coding in complex projects, and bring fun to my friend’s group chats.
+A personal Telegram bot for AI conversations, tool calling, and Pokémon TCG Pocket collection tracking. It uses Bun, TypeScript, LangChain/LangGraph, Telegraf, and Prisma with SQLite.
 
-**Note:** This README was fully written by the bot itself, so it will overly hype itself.
+## Local development
 
-## ✨ Features
-
-- 🤖 **AI Conversations**: Powered by LangChain/LangGraph with intelligent tool calling
-- 🎴 **Pokemon Card Collection**: Complete Pokémon TCG Pocket card tracking and management
-- 🛠️ **Extensible Tools**: Modular tool system for web search, GitHub integration, image generation, and more
-- 📊 **Message History**: Context-aware conversations with persistent message storage
-- ⚡ **Real-time Features**: Scheduled messages, GitHub commit notifications, and Minecraft server management
-- 🎲 **Fun Commands**: Dice rolling, date/time queries, and interactive features
-
-## 🏗️ Architecture
-
-This project demonstrates modern TypeScript patterns and clean architecture principles:
-
-- **TypeScript** with strict configuration and ES modules
-- **Clean Architecture** with repositories, services, and dependency injection
-- **LangChain/LangGraph** for AI agent workflows and tool orchestration
-- **Prisma ORM** with SQLite for data persistence
-- **Inversify** for dependency injection and IoC
-- **Telegraf** for robust Telegram Bot API integration
-- **Comprehensive Testing** with bun and custom fake patterns
-
-### Project Structure
-
-```
-src/
-├── Tools/              # LangChain tools for AI capabilities
-├── Repositories/       # Data access layer with Prisma
-├── Fakes/             # Test doubles for isolated testing
-├── AgentStateGraph/   # LangGraph agent state management
-├── PokemonTcgPocket/  # Pokemon card collection logic
-├── ReplyStrategies/   # Message handling strategies
-└── *.ts               # Core services and business logic
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Bun** - for runtime, package management, and tests (use version from .bun-version file)
-- **Node.js** - required by Prisma for code generation (any recent version)
-- **Telegram Bot Token** from [@BotFather](https://t.me/BotFather)
-- **OpenAI API Key** for AI features
-
-### Development Setup
-
-1. **Clone and install dependencies**
-
-   ```fish
-   git clone <repository-url>
-   cd parmelae-bot
-   bun install --frozen-lockfile
-   ```
-
-2. **Set up the database**
-
-   ```fish
-   bun run migrate
-   ```
-
-3. **Configure environment**
-
-   ```fish
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-4. **Required environment variables**
-
-   ```env
-   # Telegram Bot Configuration
-   USERNAME=your_bot_username
-   TELEGRAM_TOKEN=your_bot_token_from_botfather
-
-   # AI Configuration
-   OPENAI_API_KEY=your_openai_api_key
-   HELICONE_API_KEY=your_helicone_key  # Optional: for API monitoring
-
-   # Optional Features
-   GITHUB_PERSONAL_ACCESS_TOKEN=your_github_token
-   SERP_API_KEY=your_serpapi_key  # For web search
-   ```
-
-5. **Start development server**
-   ```fish
-   bun run run-dev
-   ```
-
-### Dependency release-age policy
-
-Use the Bun version pinned in `.bun-version`. `bunfig.toml` requires newly resolved
-releases to be at least three days old (`minimumReleaseAge = "3d"`). Existing
-`bun.lock` resolutions replay with `bun install --frozen-lockfile`; adding this
-policy does not update dependencies. Release age reduces exposure to newly
-published compromised packages; it is not a package safety guarantee.
-
-For an urgent security update, review the specific release and record the reason,
-review evidence, and removal date in the update PR. Temporarily add only that exact
-`package@version` under `[install]` in `bunfig.toml`, for example:
-
-```toml
-minimumReleaseAgeExcludes = ["example-package@1.2.3"]
-```
-
-Resolve and review the intended update and lockfile diff, then remove the exception
-once the release is three days old. Never exempt a whole package, switch registries,
-or add lifecycle-script trust to bypass the waiting period. No exceptions are
-currently configured. See the [Bun 1.4.4 release notes](https://bun.com/blog/bun-v1.4.4#minimumreleaseage-supports-units-and-per-version-exclusions).
-
-`bun test scripts/__tests__/dependency-release-age.test.ts` verifies the policy
-through real Bun installs against a disposable localhost registry. It uses isolated
-configuration, home, and cache directories, no registry credentials, and publication
-timestamps relative to the test’s clock: a four-day-old release is eligible, while
-two-day-old and one-hour-old releases must wait. It also checks an exact-version
-exception and replays its frozen lock with the exception removed and cache cleared.
-The fixture needs permission to bind a localhost port and uses `tar` to build its
-local package archives; it runs as part of `bun run checks`.
-
-## 🛠️ Development
-
-### Available Scripts
-
-- `bun run run-dev` - Start development server with hot reload
-- `bun run lint` - Run type-aware Oxlint (compiler checking is handled by Bun)
-- `bun run format` - Format with `bun fmt .`
-- `bun run format:check` - Check formatting without writing files
-- `bun run schema-format` - Format the Prisma schema
-- `bun run typecheck` - TypeScript type checking with `bun check`
-- `bun run test` - Run source and script tests (`bun test src scripts`)
-- `bun run checks` - Run formatting, Prisma schema formatting, type checking, lint, and source tests once each, in order
-- `bun run migrate` - Run database migrations
-- `bun run prisma-studio` - Open Prisma Studio for database management
-
-### Code Quality
-
-This project maintains high code quality standards:
-
-- **TypeScript strict mode** with comprehensive type safety
-- **100% test coverage requirement** - every `.ts` file has a corresponding `.test.ts`
-- **Bun fmt + Bun check + type-aware Oxlint** for formatting, type checking, and linting
-- **Custom fake pattern** for isolated unit testing
-- **Dependency injection** for testable, modular code
-
-Bun fmt reads `.oxfmtrc.json`, preserving single quotes, import sorting, and
-exclusions. Oxlint retains its type-aware rules and overrides, with duplicate
-compiler checking disabled. The checker split is a tooling preference, not a
-proven speed improvement; see [validation benchmarks](docs/validation-benchmarks.md).
-
-### Testing Philosophy
-
-- **Unit tests** with custom fakes for external dependencies
-- **Integration tests** for complex workflows
-- **Test-driven development** encouraged
-- **Isolated testing** with dependency injection
-
-## 🤖 Bot Capabilities
-
-### AI Tools
-
-The bot includes various AI-powered tools:
-
-- **Web Search**: Real-time web search via SerpAPI
-- **GitHub Integration**: Repository information and commit tracking
-- **Image Generation**: DALL-E integration for image creation
-- **Pokemon Cards**: Advanced card search and collection management
-- **Date/Time**: Timezone-aware date and time queries
-- **Dice Rolling**: Configurable dice with custom rules
-- **Minecraft Server**: Server status and management commands
-
-### Pokemon TCG Pocket Features
-
-- **Card Database**: Complete card catalog with sets and rarities
-- **Collection Tracking**: Personal card ownership management
-- **Search & Filter**: Advanced search by name, set, rarity, booster
-- **Statistics**: Collection completion tracking and insights
-
-### Message Handling
-
-- **Strategy Pattern**: Different reply strategies for various chat types
-- **Context Awareness**: Maintains conversation history and context
-- **Tool Integration**: Seamless AI tool calling within conversations
-- **Error Handling**: Graceful error recovery and user feedback
-
-## 🚀 Production Deployment
-
-Production uses GitHub Actions plus a release-based server layout:
-
-```text
-/srv/parmelae-bot/
-├── current -> /srv/parmelae-bot/releases/<git-sha>
-├── releases/
-└── shared/
-    ├── .env
-    ├── sqlite.db
-    └── backups/
-```
-
-The bot runs as a compiled Bun executable under `systemd`. Releases are synced to
-`releases/<git-sha>`, `current` is updated on successful activation, and the shared
-SQLite database plus backups stay outside the release directories. The server does
-not need Bun for runtime or activation; Bun is only used in CI to build the executable.
-
-### One-time Server Setup
-
-1. Create a dedicated runtime Linux user, for example `parmelae-bot`.
-2. Create a separate deployment Linux user, for example `deploy-parmelae-bot`.
-3. Create `/srv/parmelae-bot/releases` and `/srv/parmelae-bot/shared/backups`.
-4. Copy the production `.env` to `/srv/parmelae-bot/shared/.env`.
-5. Copy the production SQLite database to `/srv/parmelae-bot/shared/sqlite.db`.
-6. Add production path overrides to `/srv/parmelae-bot/shared/.env`:
-
-```env
-DATABASE_URL="file:/srv/parmelae-bot/shared/sqlite.db"
-BACKUP_DIR="/srv/parmelae-bot/shared/backups"
-```
-
-7. Install the systemd unit from `deploy/systemd/parmelae-bot.service`.
-8. Grant the deployment user permission to run `systemctl` and `journalctl` for `parmelae-bot` without a password.
-
-### Deployment Flow
-
-Each push to `main` runs:
+Use the Bun version in [.bun-version](.bun-version). Prisma code generation also requires Node.js.
 
 ```fish
 bun install --frozen-lockfile
-bunx prisma generate
-bun run checks
-bun run build:executable
+cp .env.example .env
 ```
 
-If CI passes, GitHub Actions uploads a release bundle, syncs it to the server, and runs
-`deploy/activate-release.sh`, which:
-
-1. verifies the compiled executable and server CPU support
-2. backs up the shared SQLite database through the compiled executable
-3. applies pending Prisma SQLite migrations through the compiled executable
-4. updates the `current` symlink
-5. restarts the systemd service
-6. prunes old backups and releases
-
-### systemd Commands
+Fill in `.env` using [.env.example](.env.example). [src/Config.ts](src/Config.ts) defines required values.
 
 ```fish
-sudo systemctl status parmelae-bot
-sudo systemctl restart parmelae-bot
-sudo systemctl stop parmelae-bot
-journalctl -u parmelae-bot -n 100 --no-pager
+bun run migrate
+bun run run-dev
 ```
 
-### Important Notes
+## Dependencies
 
-- The runtime service starts `/srv/parmelae-bot/current/parmelae-bot`.
-- The executable is built for `bun-linux-x64-modern`; the server CPU must support AVX2.
-- Deployment activation does not require Bun or `node_modules` on the server.
-- The production database is configured through `DATABASE_URL`.
-- Backups are configured through `BACKUP_DIR`.
-- The Minecraft server name defaults to `atm8` and can be changed through `MINECRAFT_SERVER_NAME`.
-- Code rollback does not automatically roll back database schema changes; keep the pre-deploy SQLite backups.
+[Release-age policy](docs/dependency-policy.md): urgent-update exceptions. [Validation benchmarks](docs/validation-benchmarks.md): rationale for the checker split.
 
-### Environment Considerations
+## Architecture
 
-- **Process Management**: systemd service in `deploy/systemd/parmelae-bot.service`
-- **Runtime Artifact**: compiled Bun executable at `/srv/parmelae-bot/current/parmelae-bot`
-- **Database**: SQLite stored in `/srv/parmelae-bot/shared/sqlite.db`
-- **Monitoring**: Helicone integration for API usage tracking
-- **Error Handling**: Sentry integration available for error tracking
-- **Scaling**: Stateless services can scale, but the shared SQLite database is still single-host
+Tools extend the agent with search, images, Pokémon cards, scheduling, and other integrations. [Coding standards](CODING_STANDARDS.md#tool-composition) define tool registration and invocation lifecycles; [tool-call history](CODING_STANDARDS.md#tool-call-history) defines announcement and persistence invariants.
 
-### Getting Started
+[Web-search research](docs/openai-web-search-research.md): dated migration investigation, not an implementation contract.
 
-1. **Fork the repository** and create a feature branch
-2. **Follow the existing patterns** - examine similar files for conventions
-3. **Write tests** - every new feature needs corresponding tests
-4. **Run quality checks** - `bun run checks` must pass
-5. **Update documentation** - keep README and code comments current
+## Operations
 
-### Code Conventions
-
-- **File naming**: Services end with `Service.ts`, tools with `Tool.ts`, etc.
-- **Testing**: Use the fake pattern for external dependencies
-- **Error handling**: Create specific error classes extending `Error`
-- **Types**: Define types in the service file they belong to
-- **Documentation**: JSDoc for public methods and exported classes
-
-### Development Workflow
-
-- Prefer small, focused changes.
-- Run `bun run checks` before merging.
-- Keep tests and documentation aligned with behavior changes.
-
-## 📝 Project Status
-
-This is an **active personal project** focused on:
-
-- 🧪 **Experimenting** with modern AI integration patterns
-- 📚 **Learning** LangChain/LangGraph capabilities
-- 🏗️ **Exploring** vibe coding, AI capabilities, and TypeScript
-- 🎯 **Building** practical Telegram bot features
-
-While this started as a “fun project,” it has evolved into a well-structured application demonstrating production-ready patterns and practices.
-
-_(Note: Told you it will overhype itself.)_
-
-## 📄 License
-
-This project is available under the MIT License. See the LICENSE file for details.
-
----
-
-**Note**: This bot is designed for personal use and experimentation. While the code follows production practices, please review and adapt the configuration for your specific use case before deploying to production environments.
+- [Deployment](docs/deployment.md): server prerequisites, release activation, and service commands.
+- [Backup and restore](docs/backup-restore-procedures.md): backup verification and database recovery.

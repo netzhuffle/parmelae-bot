@@ -1,262 +1,52 @@
-# Database Backup and Restore Procedures
+# Database backup and restore
 
-This document outlines the automated backup and restore procedures for the Parmelae Bot SQLite database.
+The production paths below assume the default [deployment layout](deployment.md).
 
-## Overview
+## Deployment backups
 
-The backup system provides automated database protection with the following features:
+[Activation](../deploy/activate-release.sh) runs `parmelae-bot deploy backup` before migrations. [DatabaseBackup.ts](../src/Deploy/DatabaseBackup.ts) uses the `sqlite3` CLI `.backup` command, requires `PRAGMA integrity_check` to return `ok`, and removes a failed backup attempt. Files are named `sqlite-backup-YYYY-MM-DD-HH-mm-ss.db` in UTC.
 
-- **Automated backups** before each deployment
-- **Retention management** (keeps 5 most recent backups)
-- **Integrity verification** of backup files
-- **Manual restore capability** for emergency recovery
-- **Comprehensive logging** for audit trails
+After successful activation, `deploy cleanup-backups` retains the five newest matching backup files by filesystem creation time (falling back to modification time). Cleanup is best-effort: deployment may succeed while old backups remain. Pre-restore files named below are outside this cleanup pattern.
 
-## Backup System Architecture
+## Restore a database
 
-### File Structure
+Restoration discards changes since the selected backup. Choose a database and code release with compatible schemas before proceeding. These are manual server commands; the compiled executable has backup, migration, and cleanup commands, but no restore command.
 
-```
-project-root/
-├── shared/sqlite.db          # Production database
-├── shared/backups/           # Backup directory
-│   ├── sqlite-backup-YYYY-MM-DD-HH-mm-ss.db
-│   └── ...
-└── current/parmelae-bot      # Compiled executable with deploy backup commands
-```
-
-### Backup Naming Convention
-
-Backup files follow the pattern: `sqlite-backup-YYYY-MM-DD-HH-mm-ss.db`
-
-Example: `sqlite-backup-2024-01-15-14-30-45.db`
-
-## Automated Backup Process
-
-### GitHub Actions Integration
-
-The backup process is integrated into the deployment workflow:
-
-1. **SSH Setup** - Establishes secure connection to production server
-2. **Database Backup** - Creates backup using the compiled executable and `sqlite3` CLI safe backup method
-3. **Backup Cleanup** - Removes old backups, keeping only 5 most recent
-4. **Deployment** - Proceeds with application deployment
-
-### Backup Script Features
-
-- **Safe SQLite backup** using `sqlite3` CLI `.backup` command
-- **Atomic operations** to prevent corruption during live database access
-- **Integrity verification** after backup creation
-- **Comprehensive error handling** with detailed logging
-- **Automatic cleanup** of failed backup attempts
-
-## Manual Restore Process
-
-### Prerequisites
-
-1. SSH access to production server
-2. Backup files available in `/srv/parmelae-bot/shared/backups/`
-3. Bot service stopped through systemd
-
-### Restore Steps
-
-1. **Connect to production server:**
-
-   ```fish
-   ssh jannis@jannis.rocks
-   ```
-
-2. **Navigate to deployment directory:**
+1. Stop the service and confirm it is inactive:
 
    ```fish
    cd /srv/parmelae-bot
-   ```
-
-3. **Stop the bot service:**
-
-   ```fish
    sudo systemctl stop parmelae-bot
+   sudo systemctl is-active parmelae-bot
    ```
 
-4. **Create a pre-restore copy of the current database:**
+2. Select a backup and verify it before replacing the current database. Continue only if integrity checking prints `ok`:
 
    ```fish
-   cp shared/sqlite.db shared/backups/pre-restore-(date -u +%Y-%m-%d-%H-%M-%S).db
+   set selected_backup shared/backups/sqlite-backup-YYYY-MM-DD-HH-mm-ss.db
+   sqlite3 -readonly "$selected_backup" "PRAGMA integrity_check;"
    ```
 
-5. **Restore the selected backup file:**
+3. Preserve the stopped database using SQLite’s backup operation (which includes committed WAL data). If the current database cannot be opened, preserve its database and any `-wal`/`-shm` files separately before replacement:
 
    ```fish
-   cp shared/backups/sqlite-backup-YYYY-MM-DD-HH-mm-ss.db shared/sqlite.db
+   set pre_restore shared/backups/pre-restore-(date -u +%Y-%m-%d-%H-%M-%S).db
+   sqlite3 shared/sqlite.db ".backup '$pre_restore'"
+   ```
+
+4. Restore through SQLite so replacement handles the database’s journal state:
+
+   ```fish
+   sqlite3 shared/sqlite.db ".restore '$selected_backup'"
    sqlite3 -readonly shared/sqlite.db "PRAGMA integrity_check;"
    ```
 
-6. **Restart the bot service:**
+5. Continue only after the restored database reports `ok`. Confirm database ownership and permissions permit the runtime user to read and write it, then start the service and inspect logs:
+
    ```fish
    sudo systemctl start parmelae-bot
+   sudo systemctl status parmelae-bot
+   sudo journalctl -u parmelae-bot -n 100 --no-pager
    ```
 
-### Restore Safety Features
-
-- **Pre-restore backup** of current database
-- **Backup verification** before restoration
-- **Post-restore verification** of database integrity
-- **Interactive confirmation** to prevent accidental restores
-- **Detailed logging** of all operations
-
-## Security Best Practices
-
-### File Permissions
-
-Backup files are stored with restricted permissions:
-
-```fish
-# Backup directory permissions
-chmod 750 /srv/parmelae-bot/shared/backups
-
-# Backup file permissions
-chmod 640 /srv/parmelae-bot/shared/backups/*.db
-```
-
-### Access Control
-
-- Backup directory accessible only to application user
-- SSH key-based authentication for deployment
-- No direct database access from external sources
-
-### Data Protection
-
-- Backups contain sensitive user data
-- Files stored on secure production server
-- No backup files in version control
-- Automatic cleanup prevents storage accumulation
-
-## Monitoring and Maintenance
-
-### Backup Monitoring
-
-Check backup status after deployments:
-
-```fish
-# List recent backups
-ls -la /srv/parmelae-bot/shared/backups/
-
-# Check backup file integrity
-sqlite3 -readonly /srv/parmelae-bot/shared/backups/sqlite-backup-YYYY-MM-DD-HH-mm-ss.db "PRAGMA integrity_check;"
-```
-
-### Storage Management
-
-- Maximum 5 backup files retained
-- Automatic cleanup after each deployment
-- Monitor disk space usage
-- Backup files typically 1-10MB each
-
-### Log Analysis
-
-Backup operations are logged with timestamps:
-
-- Backup creation logs
-- Cleanup operation logs
-- Error messages and stack traces
-- Verification results
-
-## Troubleshooting
-
-### Common Issues
-
-#### Backup Creation Fails
-
-**Symptoms:**
-
-- GitHub Actions deployment fails at backup step
-- Error messages in deployment logs
-
-**Solutions:**
-
-1. Check database file exists: `ls -la /srv/parmelae-bot/shared/sqlite.db`
-2. Verify file permissions: `ls -la /srv/parmelae-bot/shared/`
-3. Check disk space: `df -h`
-4. Review deployment logs
-
-#### Restore Verification Fails
-
-**Symptoms:**
-
-- Backup file cannot be opened
-- Database corruption detected
-
-**Solutions:**
-
-1. Verify backup file integrity: `file backup-file.db`
-2. Check file permissions
-3. Try alternative backup file
-4. Contact system administrator
-
-#### Cleanup Script Errors
-
-**Symptoms:**
-
-- Old backups not removed
-- Permission denied errors
-
-**Solutions:**
-
-1. Check backup directory permissions
-2. Verify executable and directory permissions
-3. Review file ownership
-4. Check disk space availability
-
-### Emergency Procedures
-
-#### Database Corruption
-
-If the production database becomes corrupted:
-
-1. **Stop the bot service immediately**
-2. **Identify the most recent working backup**
-3. **Perform manual restore procedure**
-4. **Verify database integrity**
-5. **Restart the bot service**
-
-#### Backup Directory Issues
-
-If backup directory becomes inaccessible:
-
-1. **Create new backup directory**
-2. **Update `BACKUP_DIR` in `/srv/parmelae-bot/shared/.env`**
-3. **Test backup functionality**
-4. **Monitor next deployment**
-
-## Maintenance Schedule
-
-### Daily
-
-- Monitor deployment logs for backup success
-- Check backup directory disk usage
-
-### Weekly
-
-- Verify backup file integrity
-- Review backup retention policy
-- Check deploy backup command functionality
-
-### Monthly
-
-- Test restore procedure in staging environment
-- Review security permissions
-- Update documentation as needed
-
-## Contact Information
-
-For backup and restore issues:
-
-- **Primary Contact:** System Administrator
-- **Emergency Contact:** DevOps Team
-- **Documentation:** This file and deploy command implementation comments
-
----
-
-**Last Updated:** May 2026  
-**Version:** 2.0  
-**Maintainer:** DevOps Team
+On a source checkout with Bun installed, [restore-database.ts](../scripts/backup/restore-database.ts) provides an interactive restore helper. It copies files and does not manage systemd or SQLite sidecar files; use the stopped-service procedure above for production recovery.
