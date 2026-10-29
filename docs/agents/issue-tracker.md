@@ -1,6 +1,6 @@
 # Issue tracker: GitHub
 
-Use the `gh` CLI for repository issues and pull requests.
+Issues and specs live in this repository’s GitHub Issues. Use the `gh` CLI for issues and pull requests.
 
 ## Pull requests as a triage surface
 
@@ -12,12 +12,12 @@ GitHub shares one number space across issues and PRs, so a bare `#42` may be eit
 
 ## Triage labels
 
-Labels match `/triage`’s canonical category and state role names.
+See the [triage label mapping](triage-labels.md).
 
 ## Wayfinding operations
 
 `/wayfinder` uses GitHub issues with native sub-issues and issue dependencies.
 
-- **Children:** Link tickets through the sub-issues API. Where unavailable, use a task list in the map and `Part of #<map>` in each child.
+- **Children:** `gh api --method POST repos/<owner>/<repo>/issues/<map>/sub_issues -F sub_issue_id=<child-db-id>`. Where sub-issues are unavailable, use a task list in the map and `Part of #<map>` in each child.
 - **Blocking:** `gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by -F issue_id=<blocker-db-id>`. The ID is the numeric database ID (`gh api repos/<owner>/<repo>/issues/<n> --jq .id`), rather than the issue number or `node_id`. Where native dependencies are unavailable, use `Blocked by: #<n>, #<n>` in the child body.
 - **Frontier query:** Scope open issues to the map’s sub-issues or task list; native `issue_dependencies_summary.blocked_by` counts open blockers. With body-based dependencies, resolve each blocker’s state.

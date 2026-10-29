@@ -1,5 +1,7 @@
 # Parmelä Bot
 
+> “The most helpful bot you’ve ever seen on Telegram.”
+
 A personal Telegram bot for AI conversations, tool calling, and Pokémon TCG Pocket collection tracking. It uses Bun, TypeScript, LangChain/LangGraph, Telegraf, and Prisma with SQLite.
 
 ## Local development
