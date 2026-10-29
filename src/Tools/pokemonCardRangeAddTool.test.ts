@@ -5,7 +5,7 @@ import { OwnershipStatus } from '../generated/prisma/enums.js';
 import { createPokemonTcgPocketProbabilityServiceFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from '../PokemonTcgPocket/PokemonTcgPocketProbabilityService.js';
-import { PokemonTcgPocketService, Sets } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
+import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { pokemonCardRangeAddTool } from './pokemonCardRangeAddTool.js';
 
 describe('pokemonCardRangeAdd', () => {
@@ -18,11 +18,7 @@ describe('pokemonCardRangeAdd', () => {
     probabilityService = createPokemonTcgPocketProbabilityServiceFake();
     config = createTestToolConfig({
       userId: BigInt(1),
-      pokemonTcgPocketService: new PokemonTcgPocketService(
-        probabilityService,
-        repository,
-        {} as Sets,
-      ),
+      pokemonTcgPocketService: new PokemonTcgPocketService(probabilityService, repository, {}),
     });
 
     // Set up test data

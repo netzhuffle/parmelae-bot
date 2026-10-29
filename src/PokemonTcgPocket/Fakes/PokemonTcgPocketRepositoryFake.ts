@@ -179,7 +179,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
       const setKey = searchCriteria.setKey;
       const cardNumber = searchCriteria.cardNumber;
       cards = cards.filter((card) => {
-        const cardKey = Array.from(this.cards.entries()).find(([_, c]) => c.id === card.id)?.[0];
+        const cardKey = Array.from(this.cards.entries()).find(([, c]) => c.id === card.id)?.[0];
         if (!cardKey) return false;
         const [cardSetKey, cardNumberStr] = cardKey.split('_');
         return cardSetKey === setKey && parseInt(cardNumberStr, 10) === cardNumber;
@@ -230,7 +230,7 @@ export class PokemonTcgPocketRepositoryFake extends PokemonTcgPocketRepository {
         const set = Array.from(this.sets.values()).find((s) => s.id === card.setId);
         if (!set) {
           // Find the set by key instead since that's what we use in tests
-          const cardKey = Array.from(this.cards.entries()).find(([_, c]) => c.id === card.id)?.[0];
+          const cardKey = Array.from(this.cards.entries()).find(([, c]) => c.id === card.id)?.[0];
           if (!cardKey) {
             throw new Error(`Card ${card.id} not found in lookup map`);
           }

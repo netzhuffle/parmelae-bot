@@ -65,7 +65,7 @@ describe('TelegramMarkdownSource', () => {
           is_bot: false,
           first_name: 'Hans',
         },
-      } as Typegram.MessageEntity,
+      },
     ];
 
     expect(renderTelegramMarkdownSource(text, entities)).toBe(

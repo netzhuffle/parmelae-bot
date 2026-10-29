@@ -249,7 +249,7 @@ export const RARITY_MAP: Record<string, Rarity> = {
 };
 
 /** Array of all valid rarity symbols (derived from RARITY_MAP keys) */
-export const RARITY_SYMBOLS: readonly string[] = Object.keys(RARITY_MAP) as readonly string[];
+export const RARITY_SYMBOLS: readonly string[] = Object.keys(RARITY_MAP);
 
 /** Maps database enum values to rarity symbols */
 const RARITY_REVERSE_MAP: Record<Rarity, string> = {
