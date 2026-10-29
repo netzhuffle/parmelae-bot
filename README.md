@@ -9,7 +9,7 @@ A personal Telegram bot for AI conversations, tool calling, and Pokémon TCG Poc
 Use the Bun version in [.bun-version](.bun-version). Prisma code generation also requires Node.js.
 
 ```fish
-bun install
+bun install --frozen-lockfile
 cp .env.example .env
 ```
 
@@ -19,6 +19,10 @@ Fill in `.env` using [.env.example](.env.example). [src/Config.ts](src/Config.ts
 bun run migrate
 bun run run-dev
 ```
+
+## Dependencies
+
+[Release-age policy](docs/dependency-policy.md): urgent-update exceptions. [Validation benchmarks](docs/validation-benchmarks.md): rationale for the checker split.
 
 ## Architecture
 

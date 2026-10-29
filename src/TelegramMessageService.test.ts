@@ -169,7 +169,7 @@ describe('TelegramMessageService', () => {
             username: 'config_bot',
           },
           text: 'Telegram rendered plain text',
-        } as Typegram.Message.TextMessage,
+        },
         { textOverride: 'Original *Markdown* source' },
       );
 
@@ -200,7 +200,7 @@ describe('TelegramMessageService', () => {
             length: 6,
           },
         ],
-      } as Typegram.Message.TextMessage);
+      });
 
       expect(storeCalls).toHaveLength(1);
       expect((storeCalls[0] as { text: string }).text).toBe('*Leider* \\*nein\\*');
@@ -265,7 +265,7 @@ describe('TelegramMessageService', () => {
               button_text: 'Start',
               data: '{"ok":true}',
             },
-          } as Partial<Typegram.Message>,
+          },
           expectedText: '[Web-App-Daten über "Start": {"ok":true}]',
         },
         {
@@ -333,7 +333,7 @@ describe('TelegramMessageService', () => {
               },
             },
             caption: 'Video caption',
-          } as Partial<Typegram.Message>,
+          },
           200,
         ),
       );
@@ -352,7 +352,7 @@ describe('TelegramMessageService', () => {
                 height: 240,
               },
             },
-          } as Partial<Typegram.Message>,
+          },
           201,
         ),
       );

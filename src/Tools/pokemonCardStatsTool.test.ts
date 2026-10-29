@@ -4,7 +4,7 @@ import { createTestToolConfig, ToolContext } from '../ChatGptAgentService.js';
 import { Rarity, OwnershipStatus } from '../generated/prisma/enums.js';
 import { createPokemonTcgPocketProbabilityServiceFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { PokemonTcgPocketRepositoryFake } from '../PokemonTcgPocket/Fakes/PokemonTcgPocketRepositoryFake.js';
-import { PokemonTcgPocketService, Sets } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
+import { PokemonTcgPocketService } from '../PokemonTcgPocket/PokemonTcgPocketService.js';
 import { pokemonCardStatsTool } from './pokemonCardStatsTool.js';
 
 describe('pokemonCardStats', () => {
@@ -17,7 +17,7 @@ describe('pokemonCardStats', () => {
       pokemonTcgPocketService: new PokemonTcgPocketService(
         createPokemonTcgPocketProbabilityServiceFake(),
         repository,
-        {} as Sets,
+        {},
       ),
     });
   });

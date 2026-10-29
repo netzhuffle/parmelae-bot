@@ -2,7 +2,6 @@ import { describe, it, beforeEach, expect } from 'bun:test';
 
 import { Rarity } from '../generated/prisma/enums.js';
 import { PokemonCardModel } from '../generated/prisma/models/PokemonCard.js';
-import { PokemonSetModel } from '../generated/prisma/models/PokemonSet.js';
 import { PokemonTcgPocketProbabilityRepositoryFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { BabyAsPotentialSixthCardStrategy } from './PackProbabilityStrategies/BabyAsPotentialSixthCardStrategy.js';
 import { FiveCardsStrategy } from './PackProbabilityStrategies/FiveCardsStrategy.js';
@@ -597,8 +596,8 @@ describe('PokemonTcgPocketProbabilityService', () => {
         godPackBoosterId: null,
         boosters: [],
         ownership: [],
-        set: { id: 1, key: 'TEST', name: 'Test Set' } as PokemonSetModel,
-      } as PokemonCardWithRelations;
+        set: { id: 1, key: 'TEST', name: 'Test Set' },
+      };
     }
 
     it('excludes isSixPackOnly from slots 1–5 and god packs; six-pack only contributes when only six-only cards are missing', () => {
@@ -1425,8 +1424,8 @@ function createTestCards(): PokemonCardWithRelations[] {
           name: 'Test Set',
           id: 1,
           key: 'TEST',
-        } as PokemonSetModel,
-      } as PokemonCardWithRelations);
+        },
+      });
     }
   }
 
@@ -1448,8 +1447,8 @@ function createCard(rarity: Rarity): PokemonCardWithRelations {
       name: 'Test Set',
       id: 0,
       key: 'TEST',
-    } as PokemonSetModel,
-  } as PokemonCardWithRelations;
+    },
+  };
 }
 
 function createTestCard(id: number, rarity: Rarity): PokemonCardWithRelations {
@@ -1467,8 +1466,8 @@ function createTestCard(id: number, rarity: Rarity): PokemonCardWithRelations {
       name: 'Test Set',
       id: 0,
       key: 'TEST',
-    } as PokemonSetModel,
-  } as PokemonCardWithRelations;
+    },
+  };
 }
 
 /** Creates a set of test cards with foil rarities for four-card pack testing */

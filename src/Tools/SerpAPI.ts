@@ -287,7 +287,7 @@ type UrlParameters = Record<string, string | number | boolean | undefined | null
 
 function buildUrl(path: string, parameters: UrlParameters): string {
   const nonUndefinedParams: [string, string][] = Object.entries(parameters)
-    .filter(([_, value]) => value !== undefined)
+    .filter(([, value]) => value !== undefined)
     .map(([key, value]) => [key, `${value}`]);
   const searchParams = new URLSearchParams(nonUndefinedParams);
   return `https://serpapi.com/${path}?${searchParams.toString()}`;

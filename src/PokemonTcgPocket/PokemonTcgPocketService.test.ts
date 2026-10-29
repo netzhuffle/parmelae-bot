@@ -113,7 +113,7 @@ describe('PokemonTcgPocketService', () => {
         const setsData: Sets = {
           'TEST-SET': {
             name: 'Test Set',
-            cards: invalidCards as Record<number, Card>,
+            cards: invalidCards,
           },
         };
 
@@ -809,7 +809,7 @@ describe('PokemonTcgPocketService', () => {
         isSixPackOnly: false,
       });
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
+      const service = new PokemonTcgPocketService(probabilityService, repository, {});
       const searchCardsSpy = spyOn(repository, 'searchCards');
 
       const nameSearchCards = await service.searchCards({ cardName: 'chu' });
@@ -823,11 +823,7 @@ describe('PokemonTcgPocketService', () => {
 
   describe('formatSetStats', () => {
     it('should format set stats correctly', () => {
-      const service = new PokemonTcgPocketService(
-        createProbabilityService(),
-        repository,
-        {} as Sets,
-      );
+      const service = new PokemonTcgPocketService(createProbabilityService(), repository, {});
 
       // Test with all rarity types
       const stats = {
@@ -843,11 +839,7 @@ describe('PokemonTcgPocketService', () => {
     });
 
     it('should not show stats for rarities with 0 owned cards', () => {
-      const service = new PokemonTcgPocketService(
-        createProbabilityService(),
-        repository,
-        {} as Sets,
-      );
+      const service = new PokemonTcgPocketService(createProbabilityService(), repository, {});
 
       // Test with some rarities having 0 owned cards
       const stats = {
@@ -863,11 +855,7 @@ describe('PokemonTcgPocketService', () => {
     });
 
     it('should show only promo count for sets without rarities', () => {
-      const service = new PokemonTcgPocketService(
-        createProbabilityService(),
-        repository,
-        {} as Sets,
-      );
+      const service = new PokemonTcgPocketService(createProbabilityService(), repository, {});
 
       // Test with only promo cards
       const stats = {
@@ -924,7 +912,7 @@ describe('PokemonTcgPocketService', () => {
       // Card 3 remains unowned (missing)
 
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
+      const service = new PokemonTcgPocketService(probabilityService, repository, {});
 
       const stats = await service.getCollectionStats(userId);
 
@@ -973,7 +961,7 @@ describe('PokemonTcgPocketService', () => {
       await repository.addCardToCollection(cards[1].id, userId, OwnershipStatus.NOT_NEEDED);
 
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
+      const service = new PokemonTcgPocketService(probabilityService, repository, {});
 
       const stats = await service.getCollectionStats(userId);
 
@@ -1069,7 +1057,7 @@ describe('PokemonTcgPocketService', () => {
       await repository.addCardToCollection(cards[5].id, userId, OwnershipStatus.OWNED);
 
       const probabilityService = createProbabilityService();
-      const service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
+      const service = new PokemonTcgPocketService(probabilityService, repository, {});
 
       const stats = await service.getCollectionStats(userId);
 
