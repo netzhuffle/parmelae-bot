@@ -1,6 +1,6 @@
 # Database backup and restore
 
-The production paths below assume the default [deployment layout](deployment.md). Check `DATABASE_URL` and `BACKUP_DIR` in the shared environment before using them with a different installation.
+The production paths below assume the default [deployment layout](deployment.md).
 
 ## Deployment backups
 
@@ -48,11 +48,5 @@ Restoration discards changes since the selected backup. Choose a database and co
    sudo systemctl status parmelae-bot
    sudo journalctl -u parmelae-bot -n 100 --no-pager
    ```
-
-Recovery is complete when the compatible release starts and a bot interaction succeeds. Keep the pre-restore copy until recovery has been verified.
-
-## Diagnose backup failures
-
-Check the activation log, `sqlite3` availability, shared database readability, backup-directory write access, and free disk space. For a candidate backup, run the readonly integrity check above; choose another backup if it does not return `ok`.
 
 On a source checkout with Bun installed, [restore-database.ts](../scripts/backup/restore-database.ts) provides an interactive restore helper. It copies files and does not manage systemd or SQLite sidecar files; use the stopped-service procedure above for production recovery.

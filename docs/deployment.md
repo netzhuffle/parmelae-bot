@@ -48,4 +48,4 @@ sudo systemctl status parmelae-bot
 sudo journalctl -u parmelae-bot -n 100 --no-pager
 ```
 
-Activation checks that systemd reports the service active; inspect logs and exercise the bot after a deployment to confirm application behavior.
+Activation checks systemd’s active state, rather than application health.

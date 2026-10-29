@@ -11,14 +11,12 @@ bun install
 cp .env.example .env
 ```
 
-Fill in `.env` using [.env.example](.env.example). The configuration validator in [src/Config.ts](src/Config.ts) defines required values; this includes Helicone, GitHub, SerpAPI, chat allowlisting, and commit announcement destinations as well as Telegram and OpenAI credentials.
+Fill in `.env` using [.env.example](.env.example). [src/Config.ts](src/Config.ts) defines required values.
 
 ```fish
 bun run migrate
 bun run run-dev
 ```
-
-[package.json](package.json) defines the development and validation commands. Once the feature works, `/code-review` checks the diff against [CODING_STANDARDS.md](CODING_STANDARDS.md) and the originating spec. [AGENTS.md](AGENTS.md) routes agent work to task-specific guidance.
 
 ## Architecture
 

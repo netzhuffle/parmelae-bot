@@ -1,6 +1,6 @@
 # Coding standards
 
-These are the Standards axis of `/code-review`, applied after the feature works. Review new and materially changed code; treat untouched legacy violations as migration debt. Include the tool sections when the diff changes tool construction, registration, execution, announcements, persistence, or history.
+Repository-specific standards for the Standards axis of `/code-review`. Untouched legacy violations are migration debt.
 
 ## Application boundaries
 
@@ -12,8 +12,6 @@ These are the Standards axis of `/code-review`, applied after the feature works.
 
 - Name service files `*Service.ts` and tool files `*Tool.ts` where those suffixes describe the exported role.
 - Keep service-owned types in the service file.
-- Use specific `Error` subclasses for distinct failure cases.
-- Document public methods and exported classes with JSDoc.
 
 ## Tests and diagnostics
 
@@ -31,8 +29,6 @@ These are the Standards axis of `/code-review`, applied after the feature works.
 - Use typographical apostrophes and quotation marks in user-facing text.
 
 ## Tool composition
-
-Tools have three lifecycles. Check that construction and registration match the tool’s lifecycle.
 
 ### Global tools
 
@@ -63,5 +59,3 @@ The persisted conversation must reconstruct every completed tool interaction as 
 5. Link the final assistant response to all accumulated announcement messages. History reconstruction expands those links chronologically into assistant calls followed by their tool responses.
 
 An incomplete call/response pair must not enter reconstructed history. Persistence and final-response linkage are required parts of the response flow: failures propagate through the normal visible error path rather than silently leaving unreconstructable history.
-
-These are ownership and ordering invariants. Keep concrete Prisma shapes and graph topology in their source files rather than duplicating them here.

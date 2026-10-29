@@ -1,6 +1,6 @@
 # Web-search migration investigation
 
-Historical findings from 2026-03-19; this is an unresolved design investigation. Recheck the installed LangChain adapter and provider documentation before implementing a migration.
+Historical findings from 2026-03-19; this is an unresolved design investigation.
 
 ## Why replacing the factory is insufficient
 
@@ -13,7 +13,7 @@ The inspected `@langchain/openai` 1.3.0 adapter exposed Responses built-in tools
 - **Provider-hosted tool:** bind search through the provider adapter; decide how hosted output participates in announcements and history.
 - **Local compatibility adapter:** call hosted search inside a local tool and return text with citations; preserve the existing tool loop at the cost of an additional model request and adapter.
 
-The investigation preferred the hosted tool if its history behavior meets product requirements. Neither option was selected here. Recheck location, domain filtering, result pagination, citation rendering, model support, and configuration requirements against the intended behavior; the APIs do not offer identical search controls.
+The investigation preferred the hosted tool if its history behavior meets product requirements. Neither option was selected here. Search controls differed in location, domain filtering, and pagination; citation rendering and model support were also migration considerations.
 
 ## Original sources
 
