@@ -4,7 +4,7 @@ import { OwnershipStatus } from '../generated/prisma/enums.js';
 import { createPokemonTcgPocketProbabilityServiceFake } from './Fakes/PokemonTcgPocketProbabilityRepositoryFake.js';
 import { PokemonTcgPocketRepositoryFake } from './Fakes/PokemonTcgPocketRepositoryFake.js';
 import { PokemonTcgPocketProbabilityService } from './PokemonTcgPocketProbabilityService.js';
-import { PokemonTcgPocketService, Sets } from './PokemonTcgPocketService.js';
+import { PokemonTcgPocketService } from './PokemonTcgPocketService.js';
 
 describe('PokemonTcgPocketService bulk operations', () => {
   let service: PokemonTcgPocketService;
@@ -14,7 +14,7 @@ describe('PokemonTcgPocketService bulk operations', () => {
   beforeEach(() => {
     repository = new PokemonTcgPocketRepositoryFake();
     probabilityService = createPokemonTcgPocketProbabilityServiceFake();
-    service = new PokemonTcgPocketService(probabilityService, repository, {} as Sets);
+    service = new PokemonTcgPocketService(probabilityService, repository, {});
   });
 
   describe('getCardIdsInRange', () => {

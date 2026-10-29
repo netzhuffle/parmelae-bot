@@ -739,7 +739,7 @@ function renderEntityNodes(nodes: Node[]): {
               : node.marker === '~'
                 ? 'strikethrough'
                 : 'spoiler';
-      entities.push({ type, offset, length } as Typegram.MessageEntity);
+      entities.push({ type, offset, length });
       return;
     }
 

@@ -220,6 +220,6 @@ export function renderTelegramMarkdownSource(
     return escapeMarkdownSourceText(text);
   }
 
-  const roots = buildEntityTree(entities as TelegramMessageEntity[]);
+  const roots = buildEntityTree(entities);
   return renderNodes(text, roots, 0, text.length);
 }

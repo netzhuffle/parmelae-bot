@@ -319,10 +319,7 @@ export class ChatGptAgentService {
         continue;
       }
       if (mode === 'values') {
-        latestState = payload as {
-          messages: unknown[];
-          toolCallMessageIds: number[];
-        };
+        latestState = payload;
       }
     }
 
