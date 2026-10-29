@@ -18,7 +18,7 @@ bun run migrate
 bun run run-dev
 ```
 
-[package.json](package.json) defines the development and validation commands. Read [CODING_STANDARDS.md](CODING_STANDARDS.md) before implementation or review; [AGENTS.md](AGENTS.md) routes agent work to task-specific guidance.
+[package.json](package.json) defines the development and validation commands. Once the feature works, `/code-review` checks the diff against [CODING_STANDARDS.md](CODING_STANDARDS.md) and the originating spec. [AGENTS.md](AGENTS.md) routes agent work to task-specific guidance.
 
 ## Architecture
 

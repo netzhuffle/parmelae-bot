@@ -1,6 +1,6 @@
 # Coding standards
 
-Apply code rules to new and materially changed code; treat untouched legacy violations as migration debt. Read the tool sections when changing their construction, registration, execution, announcements, persistence, or history.
+These are the Standards axis of `/code-review`, applied after the feature works. Review new and materially changed code; treat untouched legacy violations as migration debt. Include the tool sections when the diff changes tool construction, registration, execution, announcements, persistence, or history.
 
 ## Application boundaries
 
@@ -32,7 +32,7 @@ Apply code rules to new and materially changed code; treat untouched legacy viol
 
 ## Tool composition
 
-Tools have three lifecycles. Choose the lifecycle before choosing where to register or construct a tool.
+Tools have three lifecycles. Check that construction and registration match the tool’s lifecycle.
 
 ### Global tools
 
@@ -48,7 +48,7 @@ Identity tools must be safe to reuse across calls and therefore cannot retain mu
 
 Tools that capture message-specific values are constructed for each invocation in `ChatGptAgentService.buildTools`. Schedule and intermediate-answer tools are merged last so their captured chat, sender, and message context belongs to the current request.
 
-When adding a tool, register it at the point matching its lifecycle. Do not move a tool to a broader lifecycle merely to make registration convenient.
+Tool registration matches its lifecycle; registration convenience alone does not justify a broader lifecycle.
 
 ## Tool-call history
 
@@ -65,9 +65,3 @@ The persisted conversation must reconstruct every completed tool interaction as 
 An incomplete call/response pair must not enter reconstructed history. Persistence and final-response linkage are required parts of the response flow: failures propagate through the normal visible error path rather than silently leaving unreconstructable history.
 
 These are ownership and ordering invariants. Keep concrete Prisma shapes and graph topology in their source files rather than duplicating them here.
-
-## Completion and commits
-
-- Run `bun run checks` before handing off implementation changes; completion means the command exits successfully.
-- An internal-only commit message ends with a blank line followed by `no_announcement`. Without it, the bot announces the commit in Telegram on its next restart.
-- Before requesting elevated permission to commit, show the exact commit message and state how many commits will be created.
