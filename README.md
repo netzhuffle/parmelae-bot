@@ -128,11 +128,13 @@ local package archives; it runs as part of `bun run checks`.
 ### Available Scripts
 
 - `bun run run-dev` - Start development server with hot reload
-- `bun run lint` - Run linter
-- `bun run format` - Format code
-- `bun run typecheck` - TypeScript type checking
-- `bun test` - Run test suite
-- `bun run checks` - Run all quality checks (format, typecheck, lint, test)
+- `bun run lint` - Run type-aware Oxlint (compiler checking is handled by Bun)
+- `bun run format` - Format with `bun fmt .`
+- `bun run format:check` - Check formatting without writing files
+- `bun run schema-format` - Format the Prisma schema
+- `bun run typecheck` - TypeScript type checking with `bun check`
+- `bun run test` - Run source and script tests (`bun test src scripts`)
+- `bun run checks` - Run formatting, Prisma schema formatting, type checking, lint, and source tests once each, in order
 - `bun run migrate` - Run database migrations
 - `bun run prisma-studio` - Open Prisma Studio for database management
 
@@ -142,9 +144,14 @@ This project maintains high code quality standards:
 
 - **TypeScript strict mode** with comprehensive type safety
 - **100% test coverage requirement** - every `.ts` file has a corresponding `.test.ts`
-- **Oxlint + oxfmt** for linting and consistent code formatting
+- **Bun fmt + Bun check + type-aware Oxlint** for formatting, type checking, and linting
 - **Custom fake pattern** for isolated unit testing
 - **Dependency injection** for testable, modular code
+
+Bun fmt reads `.oxfmtrc.json`, preserving single quotes, import sorting, and
+exclusions. Oxlint retains its type-aware rules and overrides, with duplicate
+compiler checking disabled. The checker split is a tooling preference, not a
+proven speed improvement; see [validation benchmarks](docs/validation-benchmarks.md).
 
 ### Testing Philosophy
 
