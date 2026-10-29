@@ -2,12 +2,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "format": "bunx --bun oxfmt .",
+    "format": "bun fmt .",
+    "format:check": "bun fmt --check .",
     "schema-format": "prisma format",
+    "typecheck": "bun check",
     "lint": "bunx --bun oxlint src scripts",
-    "lint:without-tests": "bunx --bun oxlint src scripts --ignore-pattern \"*.test.ts\"",
     "test": "bun test src scripts",
-    "checks": "bun run format && bun run schema-format && bun run lint:without-tests && bun run lint && bun test",
+    "checks": "bun run format && bun run schema-format && bun run typecheck && bun run lint && bun run test",
     "build:executable": "bun build src/index.ts --compile --compile-target=bun-linux-x64-modern --bytecode --minify --target=bun --sourcemap=none --define process.env.NODE_ENV='\"production\"' --no-compile-autoload-dotenv --no-compile-autoload-bunfig --outfile=dist/parmelae-bot",
     "migrate": "prisma migrate dev",
     "run-dev": "bun src/index.ts",
@@ -32,7 +33,6 @@
   },
   "devDependencies": {
     "@types/bun": "1.4.4",
-    "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0",
     "oxlint-tsgolint": "^7.0.2005",
     "prisma": "^7.8.0"
